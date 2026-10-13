@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Icono alternativo «Violeta» (el de iOS, render_icon.py): el fondo lleva la imagen completa. -->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@mipmap/ic_launcher_full" />
+    <foreground android:drawable="@drawable/ic_launcher_empty" />
+    <monochrome android:drawable="@drawable/ic_launcher_foreground" />
+</adaptive-icon>

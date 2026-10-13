@@ -1,0 +1,69 @@
+name: Release
+
+# Etiquetas: ios-vX.Y.Z o android-vX.Y.Z (ver docs/RELEASING.md)
+on:
+  push:
+    tags:
+      - "ios-v*"
+      - "android-v*"
+
+jobs:
+  # Los workflows llamados piden contents: write (publican capturas); quien llama tiene que concederlo
+  # o la ejecución ni arranca (startup_failure).
+  build-ios:
+    if: startsWith(github.ref_name, 'ios-v')
+    permissions:
+      contents: write
+    uses: ./.github/workflows/ios.yml
+    with:
+      version: ${{ github.ref_name }}
+
+  build-android:
+    if: startsWith(github.ref_name, 'android-v')
+    permissions:
+      contents: write
+    uses: ./.github/workflows/android.yml
+    secrets: inherit
+    with:
+      version: ${{ github.ref_name }}
+
+  publish:
+    needs: [build-ios, build-android]
+    # Solo una de las dos compilaciones se ejecuta por etiqueta; la otra queda "skipped".
+    if: always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Datos de la versión
+        id: meta
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          if [[ "$TAG" == ios-v* ]]; then
+            echo "artifact=LibreMusic-ios" >> "$GITHUB_OUTPUT"
+            echo "title=iOS ${TAG#ios-v}" >> "$GITHUB_OUTPUT"
+          else
+            echo "artifact=LibreMusic-android" >> "$GITHUB_OUTPUT"
+            echo "title=Android ${TAG#android-v}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ steps.meta.outputs.artifact }}
+          path: dist
+
+      - name: Quitar el prefijo de plataforma del nombre del archivo
+        run: |
+          cd dist
+          for f in LibreMusic-ios-ios-v* LibreMusic-android-android-v*; do
+            [ -e "$f" ] || continue
+            mv "$f" "$(echo "$f" | sed -E 's/-(ios|android)-v/-/')"
+          done
+          sha256sum LibreMusic-* > SHA256SUMS.txt
+          ls -l
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ steps.meta.outputs.title }}
+          files: dist/*
+          generate_release_notes: true

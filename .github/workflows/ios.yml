@@ -1,0 +1,120 @@
+name: iOS
+
+# Solo se lanza cuando cambia la app iOS y sólo en las ramas principales: los minutos de macOS cuentan ×10 en
+# repos privados. En otras ramas, a mano (Actions › iOS › Run workflow) o al crear una versión (release.yml);
+# la sintaxis la comprueba en todas las ramas ios-sintaxis.yml, en Linux.
+on:
+  push:
+    branches: [master, monorepo]
+    paths:
+      - "apps/ios/**"
+      - "shared/design/**"
+      - ".github/workflows/ios.yml"
+  workflow_dispatch:
+  workflow_call:
+    inputs:
+      version:
+        description: "Versión para el nombre del archivo (p. ej. 1.1.0)"
+        type: string
+        required: false
+        default: ""
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: apps/ios
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Tokens de diseño sincronizados
+        working-directory: .
+        run: python3 shared/design/gen_tokens.py --check
+
+      - name: Instalar XcodeGen
+        run: brew install xcodegen
+
+      - name: Generar proyecto
+        run: xcodegen generate
+
+      - name: Compilar sin firmar
+        run: |
+          xcodebuild -project LibreMusic.xcodeproj -scheme LibreMusic \
+            -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build > "$RUNNER_TEMP/build.log" 2>&1 || {
+            grep -E 'error:' "$RUNNER_TEMP/build.log" | sort -u | head -100 | sed 's/^/::error::/'
+            exit 1
+          }
+
+      - name: Crear .ipa
+        run: |
+          VERSION="${{ inputs.version }}"
+          if [ -z "$VERSION" ]; then
+            VERSION="$(grep -m1 'CFBundleShortVersionString' project.yml | sed -E 's/.*"(.*)".*/\1/')-${GITHUB_SHA::7}"
+          fi
+          mkdir -p Payload dist
+          cp -R build/Build/Products/Release-iphoneos/LibreMusic.app Payload/
+          zip -qr "dist/LibreMusic-ios-$VERSION.ipa" Payload
+          (cd dist && shasum -a 256 *.ipa > SHA256SUMS.txt && cat SHA256SUMS.txt)
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LibreMusic-ios
+          path: apps/ios/dist/
+          if-no-files-found: error
+
+  # Capturas en el simulador del iPhone 16 con los mismos escenarios que ScreenshotTest de Android
+  # (ver Sources/Screenshots.swift). Se publican en la rama «screenshots-ios». No corre en las versiones.
+  screenshots:
+    if: inputs.version == ''
+    runs-on: macos-latest
+    timeout-minutes: 40
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: apps/ios
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar XcodeGen
+        run: brew install xcodegen
+
+      - name: Generar proyecto
+        run: xcodegen generate
+
+      - name: Compilar para el simulador
+        run: |
+          xcodebuild -project LibreMusic.xcodeproj -scheme LibreMusic \
+            -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build CODE_SIGNING_ALLOWED=NO build > "$RUNNER_TEMP/sim.log" 2>&1 || {
+            # Errores de compilación como anotaciones (se leen desde la API sin abrir el log).
+            grep -E 'error:' "$RUNNER_TEMP/sim.log" | sort -u | head -100 | sed 's/^/::error::/'
+            exit 1
+          }
+
+      - name: Capturas
+        run: scripts/screenshots.sh build/Build/Products/Debug-iphonesimulator/LibreMusic.app shots
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LibreMusic-ios-screenshots
+          path: apps/ios/shots/
+          if-no-files-found: error
+
+      - name: Publicar capturas
+        if: github.event_name == 'push'
+        working-directory: .
+        run: |
+          cd "$RUNNER_TEMP" && rm -rf pub && mkdir pub && cd pub
+          git init -q && git checkout -q -b screenshots-ios
+          cp "$GITHUB_WORKSPACE"/apps/ios/shots/*.png .
+          git add . && git -c user.name=github-actions -c user.email=actions@github.com commit -q -m "Capturas de iOS de ${GITHUB_SHA::7}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" screenshots-ios

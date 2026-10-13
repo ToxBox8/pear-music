@@ -1,0 +1,39 @@
+# --- Sistema ---
+.DS_Store
+Thumbs.db
+*.swp
+
+# --- iOS (apps/ios) ---
+apps/ios/build/
+apps/ios/*.xcodeproj
+apps/ios/Info.plist
+apps/ios/Payload/
+*.ipa
+xcuserdata/
+DerivedData/
+
+# --- Android (apps/android) ---
+.gradle/
+build/
+local.properties
+.idea/
+*.iml
+.kotlin/
+captures/
+*.apk
+*.aab
+# Claves de firma: NUNCA al repositorio (van en los secretos de GitHub)
+*.jks
+*.keystore
+keystore.properties
+
+# --- Releases locales ---
+dist/
+
+# --- Secretos (backend de soporte, firma de iOS) ---
+.env
+.env.*
+!.env.example
+*.p12
+*.mobileprovision
+CONTRASEÑAS*

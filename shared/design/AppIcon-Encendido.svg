@@ -1,0 +1,8 @@
+<!-- Icono original de la primera versión de Android (icono morado de encendido), recuperado del commit 2c14027
+     (ic_launcher_foreground.xml): el mismo trazo en el lienzo de 1024 del icono de iOS. Icono por defecto desde 0.8.1. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <rect width="1024" height="1024" fill="#07070A"/>
+  <g transform="translate(272 260) scale(12.3)">
+    <path d="M12,13a11,11 0,1 0,15 0M16,16a6,6 0,1 0,8 0M20,9v12" fill="none" stroke="#A78BFA" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+</svg>

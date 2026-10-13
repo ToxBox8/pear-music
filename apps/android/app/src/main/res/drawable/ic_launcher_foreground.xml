@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Nota con bobina de casete, el mismo glifo del icono de iOS (shared/design/AppIcon.svg).
+     Se usa como icono monocromo (iconos temáticos de Android 13+). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="0.1"
+        android:scaleY="0.1"
+        android:translateX="-3.1"
+        android:translateY="2.9">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:fillType="evenOdd"
+            android:pathData="M569,251 L569,251 A17,17 0 0,1 586,268 L586,581 A17,17 0 0,1 569,598 A17,17 0 0,1 552,581 L552,268 A17,17 0 0,1 569,251 Z M569,268 C638,286 698,326 690,416 C678,381 638,358 578,356 Z M460,498 A128,128 0 1,1 459.9,498 Z M460,562 A64,64 0 1,0 460.1,562 Z" />
+    </group>
+</vector>

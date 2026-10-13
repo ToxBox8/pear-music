@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="libre_night">#FF07070A</color>
+    <color name="libre_violet">#FF8B5CF6</color>
+    <!-- Trazo del icono original de encendido (lila de la primera versión). -->
+    <color name="libre_power">#FFA78BFA</color>
+</resources>

@@ -1,0 +1,46 @@
+name: LibreMusic
+options:
+  bundleIdPrefix: com.example
+targets:
+  LibreMusic:
+    type: application
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources: [Sources]
+    info:
+      path: Info.plist
+      properties:
+        CFBundleDisplayName: LibreMusic
+        # Versión de la app (ver docs/RELEASING.md). Súbela en cada versión publicada.
+        CFBundleShortVersionString: "1.4.0"
+        CFBundleVersion: "6"
+        UILaunchScreen: {}
+        UIBackgroundModes: [audio]
+        NSAppleMusicUsageDescription: LibreMusic lee tus playlists de Apple Music para importarlas.
+        NSLocalNetworkUsageDescription: LibreMusic busca a tus amigos en la misma red para hacer un Jam juntos.
+        NSBonjourServices:
+          - _lm-jam._tcp
+          - _lm-jam._udp
+          - _lm-jam2._tcp
+        NSCameraUsageDescription: LibreMusic usa la cámara para escanear el código QR de un Jam.
+        CFBundleURLTypes:
+          - CFBundleURLName: com.example.libremusic
+            CFBundleURLSchemes: [libremusic]
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.libremusic
+        SWIFT_VERSION: "5.0"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        # Icono alternativo (Ajustes › Aspecto › Icono de la app): el violeta. El de por defecto es el
+        # original de encendido.
+        ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: AppIcon-Violeta
+        ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS: YES

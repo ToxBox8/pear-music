@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Icono original de la primera versión de Android (icono morado de encendido, commit 2c14027): icono por
+     defecto desde 0.8.1. Mismo trazo que shared/design/AppIcon-Encendido.svg, en la zona segura de 108dp. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="1.3"
+        android:scaleY="1.3"
+        android:translateX="28"
+        android:translateY="28">
+        <path
+            android:pathData="M12,13a11,11 0,1 0,15 0M16,16a6,6 0,1 0,8 0M20,9v12"
+            android:strokeColor="@color/libre_power"
+            android:strokeWidth="2.5"
+            android:strokeLineCap="round"
+            android:fillColor="#00000000" />
+    </group>
+</vector>

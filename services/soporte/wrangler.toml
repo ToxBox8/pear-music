@@ -1,0 +1,11 @@
+# Backend del botón «Informar de un error» (Fase 4C). Recibe los reportes de las apps y los reenvía a un
+# canal privado de Discord. Despliegue y secretos: README.md.
+name = "libremusic-soporte"
+main = "src/worker.js"
+compatibility_date = "2026-09-01"
+
+# Límite de envíos por dispositivo y por IP. Crear con: npx wrangler kv namespace create RATE
+# y pegar aquí el id que devuelve.
+[[kv_namespaces]]
+binding = "RATE"
+id = "PENDIENTE_DE_CREAR"

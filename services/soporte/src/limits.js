@@ -1,0 +1,74 @@
+// Reglas del reporte, sin dependencias de Cloudflare, para poder probarlas con `node --test`.
+// Las apps usan los mismos límites (SupportLimits en iOS y Android).
+
+export const LIMITS = {
+  maxPhotos: 4,
+  maxPhotoBytes: 1_500_000, // cada foto, ya comprimida por la app
+  maxTotalBytes: 6_500_000, // por debajo de los 8–10 MB que admite un mensaje de Discord sin mejoras
+  minText: 10,
+  maxText: 4000,
+  perDevicePerHour: 5,
+  perIpPerHour: 15,
+};
+
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+export function validEmail(email) {
+  return typeof email === "string" && email.length <= 254 && EMAIL.test(email.trim());
+}
+
+/** ¿Empieza como un JPEG (FF D8 FF)? No basta con el tipo que dice el cliente. */
+export function isJpeg(bytes) {
+  return bytes.length > 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff;
+}
+
+/**
+ * Comprueba un reporte ya leído: { email, text, platform, appVersion, os, model, deviceId, photos: [Uint8Array] }.
+ * Devuelve null si vale, o el motivo del rechazo (se le enseña al usuario).
+ */
+export function checkReport(r) {
+  if (!validEmail(r.email)) return "El correo no es válido.";
+  const text = (r.text ?? "").trim();
+  if (text.length < LIMITS.minText) return "Cuenta un poco más qué ha pasado.";
+  if (text.length > LIMITS.maxText) return `El texto es demasiado largo (máximo ${LIMITS.maxText} caracteres).`;
+  if (!["ios", "android"].includes(r.platform)) return "Plataforma desconocida.";
+  if (!r.deviceId || r.deviceId.length > 64) return "Falta el identificador del dispositivo.";
+  const photos = r.photos ?? [];
+  if (photos.length > LIMITS.maxPhotos) return `Como mucho ${LIMITS.maxPhotos} fotos.`;
+  let total = 0;
+  for (const p of photos) {
+    if (p.length > LIMITS.maxPhotoBytes) return "Una de las fotos es demasiado grande.";
+    if (!isJpeg(p)) return "Sólo se admiten fotos JPEG.";
+    total += p.length;
+  }
+  if (total > LIMITS.maxTotalBytes) return "Las fotos pesan demasiado en total.";
+  return null;
+}
+
+/** Clave del contador de la hora en curso (Workers KV caduca las claves solas). */
+export function rateKey(kind, id, now = Date.now()) {
+  return `rl:${kind}:${id}:${Math.floor(now / 3_600_000)}`;
+}
+
+/** El mensaje de Discord (embed) con los datos del reporte. Recorta lo que Discord no admite. */
+export function discordPayload(r) {
+  const field = (name, value) => ({ name, value: String(value || "—").slice(0, 1024), inline: true });
+  return {
+    username: "LibreMusic · soporte",
+    allowed_mentions: { parse: [] },
+    embeds: [
+      {
+        title: `Reporte desde ${r.platform === "ios" ? "iOS" : "Android"} ${r.appVersion ?? ""}`.trim(),
+        description: r.text.trim().slice(0, 4000),
+        color: 0x8b5cf6,
+        fields: [
+          field("Correo", r.email.trim()),
+          field("Sistema", r.os),
+          field("Modelo", r.model),
+          field("Dispositivo", r.deviceId.slice(0, 8)),
+        ],
+        timestamp: new Date().toISOString(),
+      },
+    ],
+  };
+}
