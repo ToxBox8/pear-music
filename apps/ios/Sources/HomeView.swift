@@ -9,6 +9,8 @@ struct HomeView: View {
     @EnvironmentObject var library: Library
     @EnvironmentObject var jam: JamService
     @AppStorage("searchPlacement") private var searchPlacement = "home"
+    @AppStorage("barStyle") private var barStyle = "classic"
+    @State private var showSettings = false
     @State private var query = ""
 
     /// Buscar vive en Inicio (barra arriba) salvo que en Ajustes se elija la pestaña aparte.
@@ -98,7 +100,15 @@ struct HomeView: View {
                     }
                     .accessibilityLabel(jam.isActive ? "Abrir el Jam" : "Jam con amigos")
                 }
+                // Con la barra estilo SimpMusic, Ajustes sale de la barra y vive aquí, junto al Jam.
+                if barStyle == "simpmusic" {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button { showSettings = true } label: { Image(systemName: "gearshape") }
+                            .accessibilityLabel("Ajustes")
+                    }
+                }
             }
+            .sheet(isPresented: $showSettings) { SettingsView() }
             .refreshable { await load() }
             .task {
                 // Capturas: sin red, como en ScreenshotTest de Android.

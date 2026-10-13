@@ -61,6 +61,8 @@ struct RootView: View {
     @AppStorage("deck") private var deckID = DeckStyle.normal.rawValue
     @Environment(\.verticalSizeClass) private var verticalSize
     @AppStorage("tabOrder") private var tabOrderRaw = ""
+    /// Barra inferior: «classic» o «simpmusic» (Ajustes › Aspecto › Barra inferior; mismo ajuste que Android).
+    @AppStorage("barStyle") private var barStyle = "classic"
     @AppStorage("lastTab") private var lastTab = ""
     @AppStorage("onboarded") private var onboarded = true
     @State private var tab = RootView.startTab()
@@ -81,19 +83,45 @@ struct RootView: View {
 
     /// Orden de las pestañas (Ajustes › Aspecto › Pestañas), también para deslizar a la anterior o la siguiente.
     private var tabOrder: [String] {
-        TabOrder.visible(TabOrder.decode(tabOrderRaw), searchTab: searchPlacement == "tab").map(TabOrder.tag)
+        simpBar ? barTabs : TabOrder.visible(TabOrder.decode(tabOrderRaw), searchTab: searchPlacement == "tab").map(TabOrder.tag)
     }
 
-    var body: some View {
-        TabView(selection: $tab) {
-            ForEach(tabOrder, id: \.self) { t in
+    /// Barra estilo SimpMusic: en la barra van tus pestañas sin Ajustes (que pasa a Inicio, junto al Jam) y Buscar
+    /// va aparte.
+    private var simpBar: Bool { barStyle == "simpmusic" }
+    private var barTabs: [String] {
+        TabOrder.visible(TabOrder.decode(tabOrderRaw), searchTab: false).filter { $0 != TabOrder.settings }.map(TabOrder.tag)
+    }
+
+    @ViewBuilder private var tabView: some View {
+        #if compiler(>=6.2)
+        if simpBar, #available(iOS 26.0, *) {
+            SimpTabView(tab: $tab, tabs: barTabs) { tabContent($0) }
+        } else {
+            classicTabView
+        }
+        #else
+        classicTabView
+        #endif
+    }
+
+    private var classicTabView: some View {
+        // Con la barra estilo SimpMusic antes de iOS 26, Buscar va al final de la barra.
+        let shown = simpBar ? barTabs + [TabOrder.tag(TabOrder.search)] : tabOrder
+        return TabView(selection: $tab) {
+            ForEach(shown, id: \.self) { t in
                 tabContent(t)
                     .tabItem { Label(TabOrder.title(TabOrder.key(t)), systemImage: TabOrder.symbol(TabOrder.key(t))) }
                     .tag(t)
             }
         }
+    }
+
+    var body: some View {
+        tabView
         .onChange(of: tab) { lastTab = TabOrder.key($0) }
-        .onChange(of: searchPlacement) { if $0 != "tab" && tab == TabOrder.search { tab = TabOrder.home } }
+        .onChange(of: barStyle) { _ in if simpBar && TabOrder.key(tab) == TabOrder.settings { tab = TabOrder.tag(TabOrder.home) } }
+        .onChange(of: searchPlacement) { if !simpBar && $0 != "tab" && tab == TabOrder.search { tab = TabOrder.home } }
         // Primera vez: guía de tres pantallas (también desde Ajustes › Ayuda y soporte).
         .fullScreenCover(isPresented: Binding(get: { !onboarded && Demo.current == nil }, set: { if !$0 { onboarded = true } })) {
             OnboardingView()
@@ -129,7 +157,7 @@ struct RootView: View {
                 let l = downloads.songs.shuffled()
                 if let first = l.first { player.play(first, in: l) }
             case .discover: tab = TabOrder.tag("discover")
-            case .search: tab = TabOrder.tag(searchPlacement == "tab" ? "search" : "home")
+            case .search: tab = TabOrder.tag(simpBar || searchPlacement == "tab" ? "search" : "home")
             }
         }
         // Copia automática de la biblioteca (una al día) al abrir y al salir de la app.
@@ -142,6 +170,27 @@ struct RootView: View {
         }
     }
 }
+
+#if compiler(>=6.2)
+/// Barra estilo SimpMusic en iOS 26: la del sistema ya hace lo mismo (Buscar en un círculo aparte con `role: .search`,
+/// se pliega al bajar y el mini reproductor, que es el accesorio, se pone a su lado).
+@available(iOS 26.0, *)
+private struct SimpTabView<Content: View>: View {
+    @Binding var tab: String
+    let tabs: [String]
+    @ViewBuilder let content: (String) -> Content
+
+    var body: some View {
+        TabView(selection: $tab) {
+            ForEach(tabs, id: \.self) { t in
+                Tab(TabOrder.title(TabOrder.key(t)), systemImage: TabOrder.symbol(TabOrder.key(t)), value: t) { content(t) }
+            }
+            Tab(value: TabOrder.tag(TabOrder.search), role: .search) { content(TabOrder.tag(TabOrder.search)) }
+        }
+        .tabBarMinimizeBehavior(.onScrollDown)
+    }
+}
+#endif
 
 extension RootView {
     @ViewBuilder func tabContent(_ tag: String) -> some View {

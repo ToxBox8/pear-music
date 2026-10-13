@@ -112,7 +112,7 @@ struct SettingPreview<Content: View>: View {
 // MARK: - Ajustes (Fase 4)
 /// Dónde está cada opción, para el buscador de Ajustes.
 private enum SettingsDestination: Hashable {
-    case theme, player, artwork, tabs, icon, playback, downloads, library, manage, about, help, support, advanced
+    case theme, player, artwork, tabs, bar, icon, playback, downloads, library, manage, about, help, support, advanced
 }
 
 private struct SettingEntry: Identifiable {
@@ -130,6 +130,7 @@ private let settingsIndex: [SettingEntry] = [
     SettingEntry(title: "Efecto en los títulos", section: "Aspecto", keywords: "símbolos animación scramble", destination: .player),
     SettingEntry(title: "Colores de la portada", section: "Aspecto", keywords: "carátula color tinte sutil equilibrado intenso", destination: .artwork),
     SettingEntry(title: "Pestañas", section: "Aspecto", keywords: "orden barra descubrir inicio biblioteca", destination: .tabs),
+    SettingEntry(title: "Barra inferior", section: "Aspecto", keywords: "barra simpmusic plegar buscar", destination: .bar),
     SettingEntry(title: "Icono de la app", section: "Aspecto", keywords: "logo encendido violeta pantalla de inicio", destination: .icon),
     SettingEntry(title: "Calidad al escuchar", section: "Reproducción", keywords: "streaming datos ahorro máxima kbps", destination: .playback),
     SettingEntry(title: "Seguir con canciones parecidas", section: "Reproducción", keywords: "radio infinita autoplay automático cola acabar", destination: .playback),
@@ -279,6 +280,7 @@ struct SettingsView: View {
         case .player: PlayerSettings()
         case .artwork: ArtworkColorsSettings()
         case .tabs: TabOrderSettings()
+        case .bar: AspectSettings()
         case .icon: AppIconSettings()
         case .playback: AudioSettings()
         case .downloads: DownloadsSettings()
@@ -297,6 +299,7 @@ struct SettingsView: View {
 
 // MARK: Aspecto
 struct AspectSettings: View {
+    @AppStorage("barStyle") private var barStyle = "classic"
     @AppStorage("theme") private var themeID = AppTheme.glass.rawValue
     @AppStorage("appearance") private var appearance = "system"
     @AppStorage("deck") private var deckID = DeckStyle.normal.rawValue
@@ -335,6 +338,19 @@ struct AspectSettings: View {
                 NavigationLink { AppIconSettings() } label: {
                     SettingsRow(icon: "app.badge", palette: 3, title: "Icono de la app", value: nil, subtitle: AppIcon.current.title)
                 }
+            }
+            .glassRow()
+
+            Section {
+                Picker("Barra inferior", selection: $barStyle) {
+                    Text("Clásica").tag("classic")
+                    Text("Estilo SimpMusic").tag("simpmusic")
+                }
+                .pickerStyle(.segmented)
+            } header: { Text("Barra inferior") } footer: {
+                Text(barStyle == "simpmusic"
+                     ? "Tus pestañas en la barra y Buscar aparte, como SimpMusic. Ajustes y el Jam están arriba en Inicio. En iOS 26 la barra se pliega al bajar por una lista."
+                     : "Las pestañas de siempre.")
             }
             .glassRow()
 

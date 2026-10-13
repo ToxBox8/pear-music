@@ -239,12 +239,13 @@ final class JamService: NSObject, ObservableObject {
                 return
             }
             let name = Self.cleanName(msg.name ?? "")
+            host2?.markGreeted(id)
             names2[id] = name
             current.members.append(name)
             jam = current
             broadcast()
         case "add":
-            guard names2[id] != nil, let e = msg.entry else { return }
+            guard names2[id] != nil, let e = msg.entry, JamV2.acceptable(e), current.entries.count < JamV2.maxEntries else { return }
             if !current.entries.contains(where: { $0.id == e.id }) {
                 current.entries.append(e)
                 jam = current

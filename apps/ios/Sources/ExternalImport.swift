@@ -230,6 +230,8 @@ enum ZipReader {
 
     /// DEFLATE puro (lo que guarda un ZIP) con el framework Compression.
     private static func inflate(_ data: Data, size: Int) -> Data? {
+        // Tope de tamaño: una copia manipulada no puede pedir gigas de memoria (las de verdad pesan pocos MB).
+        guard size > 0, size <= 200 * 1024 * 1024 else { return nil }
         var out = Data(count: size)
         let written = out.withUnsafeMutableBytes { dst in
             data.withUnsafeBytes { src in

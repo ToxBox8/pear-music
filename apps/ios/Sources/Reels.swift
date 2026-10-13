@@ -362,7 +362,7 @@ struct ReelsView: View {
             .disabled(feed.loading)
         }
         .foregroundStyle(.white)
-        .shadow(color: .black.opacity(0.35), radius: 8, y: 2)
+        .shadow(color: .black.opacity(0.55), radius: 8, y: 1)
         .padding(.horizontal, 20)
     }
 
@@ -472,7 +472,7 @@ private struct ReelPage: View {
     private func info(theme: AppTheme, broken: Bool) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(song.title).displayTitle(26).lineLimit(2)
-            Text(song.artist).font(.body.weight(.medium)).foregroundStyle(.white.opacity(0.75)).lineLimit(1)
+            Text(song.artist).font(.body.weight(.medium)).foregroundStyle(.white.opacity(0.85)).lineLimit(1)
             if broken {
                 Label("Este fragmento no se pudo cargar", systemImage: "exclamationmark.triangle.fill")
                     .font(.footnote.weight(.semibold))
@@ -496,7 +496,7 @@ private struct ReelPage: View {
             .padding(.top, 10)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .shadow(color: .black.opacity(0.3), radius: 10, y: 3)
+        .shadow(color: .black.opacity(0.55), radius: 8, y: 1)
     }
 
     private func actions(theme: AppTheme) -> some View {
@@ -535,7 +535,7 @@ private struct ReelPage: View {
             }
             .accessibilityLabel("Más opciones")
         }
-        .shadow(color: .black.opacity(0.35), radius: 8, y: 2)
+        .shadow(color: .black.opacity(0.55), radius: 8, y: 1)
     }
 
     private func togglePlayback() {
@@ -642,7 +642,11 @@ private struct ReelBackground: View {
             }
         }
         .overlay(
-            LinearGradient(colors: [.black.opacity(0.25), .black.opacity(0.1), .black.opacity(0.7)],
+            // Velo: arriba deja ver la carátula; en la franja del título y los botones oscurece lo bastante para que
+            // el blanco se lea aunque la portada sea clara (mismo degradado que Android).
+            LinearGradient(stops: [.init(color: .black.opacity(0.35), location: 0), .init(color: .black.opacity(0.15), location: 0.3),
+                                   .init(color: .black.opacity(0.35), location: 0.5), .init(color: .black.opacity(0.78), location: 0.68),
+                                   .init(color: .black.opacity(0.9), location: 1)],
                            startPoint: .top, endPoint: .bottom)
         )
         .clipped()
