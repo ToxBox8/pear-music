@@ -441,7 +441,7 @@ struct ImportView: View {
                         exportingBackup = true
                     } label: { Label("Exportar copia", systemImage: "square.and.arrow.up") }
                 } header: { Text("Copia de la biblioteca") } footer: {
-                    Text("Archivo library.json de LibreMusic (también el de Android). Se añade lo que no tengas, sin borrar nada.")
+                    Text("Archivo library.json de Pear Music (también el de Android). Se añade lo que no tengas, sin borrar nada.")
                 }
                 .disabled(busy)
 

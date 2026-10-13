@@ -72,6 +72,7 @@ class PlaybackService : MediaLibraryService() {
         Fade.attach(player)
         AutoRadio.attach(player)
         PlayCounter.attach(player)
+        LastQueue.attach(this, player)
         NowPlayingWidget.attach(this, player)
         Eq.attach(player.audioSessionId)
         player.addAnalyticsListener(object : androidx.media3.exoplayer.analytics.AnalyticsListener {
@@ -197,6 +198,21 @@ class PlaybackService : MediaLibraryService() {
         }
 
         /**
+         * «Reproducir» con el reproductor vacío (widget, auriculares, pantalla de bloqueo con la app cerrada):
+         * se retoma la última cola donde se quedó.
+         */
+        override fun onPlaybackResumption(
+            mediaSession: MediaSession,
+            controller: MediaSession.ControllerInfo,
+        ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> {
+            val saved = LastQueue.load(this@PlaybackService)
+                ?: return Futures.immediateFailedFuture(UnsupportedOperationException("No hay nada que retomar"))
+            return Futures.immediateFuture(
+                MediaSession.MediaItemsWithStartPosition(LastQueue.mediaItems(saved), saved.index, saved.positionMs),
+            )
+        }
+
+        /**
          * Desde Android Auto llega una sola canción "<carpeta>/<videoId>": se reproduce la carpeta
          * entera empezando por ella. Desde la app llegan videoIds sueltos (onAddMediaItems).
          */
@@ -239,6 +255,22 @@ class PlaybackService : MediaLibraryService() {
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaLibrarySession? =
         mediaSession
 
+    /**
+     * Tecla multimedia con el servicio recién arrancado (widget o auriculares con la app cerrada): se carga antes la
+     * última cola, para que «reproducir» la retome. Media3 no llama a onPlaybackResumption con estas teclas.
+     */
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent?.action == Intent.ACTION_MEDIA_BUTTON) {
+            val player = mediaSession?.player
+            val saved = LastQueue.load(this)
+            if (player != null && player.mediaItemCount == 0 && saved != null) {
+                player.setMediaItems(LastQueue.mediaItems(saved), saved.index, saved.positionMs)
+                player.prepare()
+            }
+        }
+        return super.onStartCommand(intent, flags, startId)
+    }
+
     /** Si el usuario cierra la app sin música sonando, se para el servicio. */
     override fun onTaskRemoved(rootIntent: Intent?) {
         val player = mediaSession?.player
@@ -248,6 +280,7 @@ class PlaybackService : MediaLibraryService() {
     }
 
     override fun onDestroy() {
+        mediaSession?.player?.let(LastQueue::save)
         SleepTimer.detach()
         Fade.detach()
         AutoRadio.detach()

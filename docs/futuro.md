@@ -5,7 +5,9 @@ lo pendiente, con el motivo y el siguiente paso. Al terminar algo, se quita de a
 
 ## 1. Probar con cable (lo más urgente)
 
-Nada de la rama `ideas-0.9.0` está probado en un móvil: el de pruebas se desconectó el 13-10 a las 07:43.
+Probado el 13-10 por la noche (`docs/pruebas/v0.9.0-manual`): letra, temporizador con la app cerrada, estadísticas,
+radio infinita, ecualizador (se aplica) y atajos. Falta lo de abajo que necesita a Toxbox: widget, copia a Drive,
+TalkBack/letra grande, oír fundido y ecualizador, «al acabar la canción» con la pantalla apagada y lo de 0.8.1.
 
 ### Android (Nothing Phone (2) por USB)
 
@@ -18,7 +20,7 @@ Nada de la rama `ideas-0.9.0` está probado en un móvil: el de pruebas se desco
    - Fundido y ecualizador: con auriculares y con el altavoz; sigue tras cambiar de canción y cerrar la app.
    - Radio infinita: poner una sola canción y dejar que acabe la cola (sin repetidas).
    - Estadísticas: escuchar 30 s y ver que suma, también con la app cerrada.
-   - Copia automática: elegir una carpeta de Drive; aparece `LibreMusic-copia-AAAA-MM-DD.json`; importarla.
+   - Copia automática: elegir una carpeta de Drive; aparece `PearMusic-copia-AAAA-MM-DD.json`; importarla.
    - Widget: añadirlo; cambia con la canción; anterior / play / siguiente con la app cerrada.
    - Atajos: mantener pulsado el icono (con el icono violeta también).
    - TalkBack: recorrer reproductor y Ajustes; letra del sistema al máximo.
@@ -28,10 +30,10 @@ Nada de la rama `ideas-0.9.0` está probado en un móvil: el de pruebas se desco
 
 ### iOS (iPhone por cable)
 
-1. Compilar el `.ipa`: la CI está sin minutos (ver punto 3). Mientras, `apps/ios/scripts/check-linux.sh` sólo
-   comprueba la sintaxis; **los tipos de SwiftUI no se han comprobado nunca** desde «Tus álbumes».
+1. Compilar el `.ipa`: **ya compila** en el repo público (`pear-music`, rama `ios-compila`, ver `docs/contexto.md`).
+   El de prueba está en `~/Documentos/code/libremusic/ipa/PearMusic-ios-1.4.0-prueba.ipa`.
 2. Instalar con AltStore/SideStore y repetir la lista de Android (sin ecualizador ni widget), más:
-   atajos de Siri («Mezcla mis favoritas en LibreMusic»), VoiceOver y Texto más grande.
+   atajos de Siri («Mezcla mis favoritas en Pear Music»), VoiceOver y Texto más grande.
 3. Corregir los errores de compilación que salgan (se esperan algunos: hay mucho código de iOS escrito sin compilar).
 
 ## 2. Tests y depuración que faltan
@@ -48,8 +50,9 @@ Nada de la rama `ideas-0.9.0` está probado en un móvil: el de pruebas se desco
 
 | Qué | Por qué no se hizo | Qué hace falta |
 |---|---|---|
-| **Skills de terceros** (`avdlee/swiftui-agent-skill@swiftui-expert-skill`, `twostraws/swiftui-agent-skill@swiftui-pro`, `wshobson/agents@mobile-android-design`, `momentic-ai/skills@momentic-mobile-test`) | El sistema de permisos de Claude Code bloquea `npx skills add` aunque Toxbox dé permiso | Toxbox las instala con `! npx skills add <paquete> -s <skill> -g -a claude-code -y` (o añade la regla `Bash(npx skills add:*)`); después, **revisar todo el código con ellas** (lo pidió Toxbox) |
-| Compilar iOS | Cuota de GitHub Actions agotada (macOS cuenta ×10) | Esperar al ciclo de facturación, poner un límite de gasto o hacer el repo público. La CI ya sólo compila en `master`/`monorepo` |
+| ~~Skills de terceros~~ | Instaladas por Toxbox y usadas el 13-10 (noche) | — |
+| **Skills de terceros (antes)** (`avdlee/swiftui-agent-skill@swiftui-expert-skill`, `twostraws/swiftui-agent-skill@swiftui-pro`, `wshobson/agents@mobile-android-design`, `momentic-ai/skills@momentic-mobile-test`) | El sistema de permisos de Claude Code bloquea `npx skills add` aunque Toxbox dé permiso | Toxbox las instala con `! npx skills add <paquete> -s <skill> -g -a claude-code -y` (o añade la regla `Bash(npx skills add:*)`); después, **revisar todo el código con ellas** (lo pidió Toxbox) |
+| Compilar iOS | Cuota del repo privado agotada | **Resuelto** con las Actions gratis del repo público `pear-music` (rama `ios-compila`) |
 | Worker de soporte + Discord | Hace falta la sesión de Toxbox en Discord y Cloudflare | En casa: QR de Discord, canal y webhook, `wrangler login`, KV `RATE`, `wrangler secret put DISCORD_WEBHOOK`, `wrangler deploy` (`services/soporte/README.md`) |
 | Integrar en la rama principal | Decisión de Toxbox | `plan-0.8.0` → `ideas-0.9.0` → `monorepo`/`master` |
 

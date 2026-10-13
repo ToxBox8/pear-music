@@ -58,7 +58,13 @@ libremusic/
 │  ├─ PARIDAD.md                           Comparación iOS ↔ Android y diferencias que quedan
 │  ├─ RENDIMIENTO.md                       Cómo se mide el rendimiento en Android y resultados
 │  ├─ RELEASING.md                         Versionado, firma y publicación
+│  ├─ contexto.md                          Relevo entre sesiones: dónde estamos, bloqueos y siguiente paso
+│  ├─ plan.md                              Prompt maestro de Toxbox, orden actual y reglas de pruebas
+│  ├─ pendiente-decision.md                Preguntas abiertas del plan con propuestas
+│  ├─ publicar/                            Para hacer público el código: análisis legal, LICENSE (GPL-3.0), README, SECURITY, lista
+│  ├─ SIGUIENTE-SESION.md                  Prompt para retomar: contexto, reglas, revisión con skills y pruebas por cable
 │  ├─ futuro.md                            Lo que falta: pruebas con cable, tests, bloqueos (skills, CI) y funciones pendientes
+│  └─ pruebas/                             Capturas y mediciones de cada fase (faseN, v0.8.1-*)
 └─ .github/workflows/
    ├─ ios.yml                              .ipa sin firmar y capturas del simulador (macOS; sólo master/monorepo, versiones o a mano)
    ├─ ios-sintaxis.yml                     Sintaxis de Swift en Linux en cualquier rama (barato)
@@ -106,7 +112,7 @@ La web de descarga vive en otro repo: `ToxBox8/libremusic-landing`.
 | `ui/Glass.kt` | Cristal líquido opcional (capa grabada + desenfoque + shader AGSL de refracción, gota de la barra de pestañas, pulsación con rebote) | El cristal de iOS 26 lo da el sistema |
 | `ui/theme/` | `Theme.kt` (temas y Prefs), `Backdrops.kt`, `Type.kt` (Inter), `SfIcons.kt`, `Tokens.kt` (**generado**) | `Theme.swift`, `Backdrops.swift` |
 | `ui/*ViewModel.kt` | Estado de reproductor, biblioteca e inicio | objetos `@EnvironmentObject` |
-| `playback/` | `PlaybackService` (Media3), `Tracks.kt` (resuelve el audio), `BrowseTree` (Android Auto), `SleepTimer` (temporizador para dormir), `Fade.kt` (fundido entre canciones y `VolumeMix`), `Eq.kt` (ecualizador, sólo Android), `AutoRadio` (radio infinita), `PlayCounter` (cuenta escuchas), `NowPlayingWidget` (widget de la pantalla de inicio) | `Player.swift` |
+| `playback/` | `PlaybackService` (Media3), `Tracks.kt` (resuelve el audio), `BrowseTree` (Android Auto), `SleepTimer` (temporizador para dormir), `Fade.kt` (fundido entre canciones y `VolumeMix`), `Eq.kt` (ecualizador, sólo Android), `AutoRadio` (radio infinita), `PlayCounter` (cuenta escuchas), `NowPlayingWidget` (widget de la pantalla de inicio), `LastQueue` (última cola para retomar con la app cerrada) | `Player.swift` |
 | `data/` | `YTClient`, `Song`, `Library` (library.json), `AppleMusic.kt` (y `Matcher`), `ExternalImport.kt` (Spotify, Exportify, SimpMusic, `ImportMatcher`, `ImportJob`), `TabOrder`, `Support` (borradores y envío), `AppIcon` (icono de la app), `Lyrics` (letras de LRCLIB), `PlayStats` (estadísticas, `stats.json`), `AutoBackup` (copia diaria a una carpeta), `Releases` (novedades de tus artistas), `PendingImports` («Sin añadir» de las importaciones), `AppShortcuts` (atajos del icono) | `Client.swift`, `Store.swift`, `AppleMusic.swift` |
 | `download/` | Descargas con Media3 DownloadManager | `DownloadStore` en `Store.swift` |
 | `reels/`, `jam/` | Descubrir y Jam | `Reels.swift`, `Jam*.swift` |
@@ -120,6 +126,7 @@ Tests en `app/src/test`: lógica (YTClient, `Matcher`, descargas, Jam, bibliotec
 - **Capturas:** `ScreenshotTest` (Android) dibuja 26 pantallas con el tamaño y los márgenes seguros del iPhone 16 y la CI las sube a la rama `screenshots`; `ios.yml` hace en el simulador (`-screenshotScenario`) las 15 primeras y las sube a `screenshots-ios` (de la 16 a la 22 —Tus álbumes, Aspecto, colores, pestañas, guía, informar de un error, icono— aún no tienen escenario en iOS). `python3 shared/design/compare_shots.py --out /tmp/paridad` genera la hoja iOS | Android. Antes de integrar un cambio de interfaz, compara y deja `docs/PARIDAD.md` al día.
 - **Android en local (opcional):** con Gradle 8.11.1, JDK 17 y el SDK de Android, `gradle testDebugUnitTest --tests '*ScreenshotTest'` deja las capturas en `app/build/shots/` en un par de minutos.
 - **Probar en un móvil Android:** `gradle assembleDebug` instala `app.libremusic.debug` al lado de la app normal; los cierres se leen con `adb logcat -b crash -d`. Para medir fluidez, la variante `perf` y `scripts/bench.sh` (ver `docs/RENDIMIENTO.md`); compara con la tabla antes de integrar cambios que afecten a la fluidez.
+- **Compilar iOS sin gastar cuota:** el repo privado se queda sin minutos de macOS; el público `ToxBox8/pear-music` los tiene gratis. Rama `ios-compila` con sólo `apps/ios` (commit con `ToxBox8@users.noreply.github.com`, nunca el historial de este repo) y `gh workflow run ios.yml -R ToxBox8/pear-music --ref ios-compila`; pasos en `docs/contexto.md`.
 - **Errores de iOS:** también salen como anotaciones (los dos `xcodebuild` de `ios.yml`). Sin Mac ni CI, `apps/ios/scripts/check-linux.sh` comprueba al menos la sintaxis con Swift para Linux (los tipos de SwiftUI no, porque sólo existen en Apple).
 - **Diseño:** nunca escribas colores, radios o tamaños de marca a mano. Cámbialos en `shared/design/tokens.json` y ejecuta `python3 shared/design/gen_tokens.py`. La CI falla si `Tokens.swift` o `Tokens.kt` no están al día.
 - **Icono:** el de por defecto es `AppIcon-Encendido.svg` (en Android, `drawable/ic_launcher_power.xml`); el violeta alternativo lo dibuja `render_icon.py` (y su SVG). Ejecuta `render_icon.py` tras cambiar cualquiera de los dos. Para añadir otro icono: un `activity-alias` en el manifiesto + `AppIcon.kt`, y un `.appiconset` + `ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES` en `project.yml`.

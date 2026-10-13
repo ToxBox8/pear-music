@@ -173,7 +173,7 @@ fun SupportScreen(draftId: String?) {
             ) {
                 env.app.alert = AlertSpec(
                     "¿Enviar el reporte?",
-                    "Se enviarán tu correo, el texto${if (photos.isEmpty()) "" else ", ${photos.size} ${if (photos.size == 1) "foto" else "fotos"}"} y datos del móvil (modelo, versión de Android y de la app) al canal privado de soporte de LibreMusic.",
+                    "Se enviarán tu correo, el texto${if (photos.isEmpty()) "" else ", ${photos.size} ${if (photos.size == 1) "foto" else "fotos"}"} y datos del móvil (modelo, versión de Android y de la app) al canal privado de soporte de Pear Music.",
                     buttons = listOf(
                         AlertButton("Enviar") { send() },
                         AlertButton("Cancelar", AlertButton.Role.Cancel),

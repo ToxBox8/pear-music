@@ -15,11 +15,11 @@ import java.time.LocalDate
 
 /**
  * Copia automática de la biblioteca: una vez al día (al abrir o salir de la app), `library.json` se copia a una carpeta
- * que elige la persona (Google Drive, Nextcloud, una tarjeta…) como `LibreMusic-copia-AAAA-MM-DD.json`, y se dejan las
+ * que elige la persona (Google Drive, Nextcloud, una tarjeta…) como `PearMusic-copia-AAAA-MM-DD.json`, y se dejan las
  * 7 últimas. Es el mismo archivo que «Exportar copia», así que se recupera con «Importar copia». Igual que iOS.
  */
 object AutoBackup {
-    const val PREFIX = "LibreMusic-copia-"
+    const val PREFIX = "PearMusic-copia-"
     const val KEEP = 7
 
     data class State(val folder: Uri? = null, val folderName: String? = null, val lastDay: String? = null, val error: String? = null)

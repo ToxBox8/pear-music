@@ -1019,7 +1019,7 @@ fun ImportScreen(onDone: () -> Unit) {
             }
             FormSection(
                 "Copia de la biblioteca",
-                footer = "Archivo library.json de LibreMusic (también el de iOS). Se añade lo que no tengas, sin borrar nada.",
+                footer = "Archivo library.json de Pear Music (también el de iOS). Se añade lo que no tengas, sin borrar nada.",
             ) {
                 FormRow("Importar copia", icon = Icons.Rounded.SaveAlt, tint = c.accent, enabled = !busy) { importFile.launch(arrayOf("application/json", "*/*")) }
                 FormRow("Exportar copia", icon = Icons.Rounded.IosShare, tint = c.accent, last = true, enabled = !busy) { exportFile.launch("libremusic-library.json") }

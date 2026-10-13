@@ -17,6 +17,7 @@ Cada app se versiona por separado con [SemVer](https://semver.org/lang/es/). Las
 4. Que en los cambios desde la última versión no hay archivos ni textos con pinta de secreto (keystores, `.env`, `CONTRASEÑAS`, webhooks de Discord, claves privadas, tokens de GitHub o AWS).
 5. Android: que el APK está firmado con la clave de publicación (SHA-256 `9a38c4d7…`), que es la versión del código y que no lleva la URL del webhook.
 6. iOS: que la sintaxis es correcta (`apps/ios/scripts/check-linux.sh`).
+7. Que la web (`../libremusic-landing`, o `LANDING=ruta`) tiene la versión en **Novedades** (`src/config/changelog.ts`). Lo pidió Toxbox: cada versión que sale se cuenta en la web.
 
 Para probar en el móvil antes de publicar: `apps/android/scripts/smoke.sh` (instala la versión de pruebas, abre Inicio, Descubrir y Buscar, guarda capturas y busca cierres; se para si no hay un móvil autorizado o si está bloqueado).
 
@@ -30,7 +31,7 @@ Para probar en el móvil antes de publicar: `apps/android/scripts/smoke.sh` (ins
    git push origin master --tags
    ```
 4. El workflow **Release** compila con el mismo workflow de CI de esa plataforma y crea la GitHub Release `iOS 1.1.0` / `Android 0.1.0` con el binario y su SHA-256.
-5. Actualiza la web de descarga (repo `libremusic-landing`): copia el binario a `public/downloads/` como `LibreMusic.ipa` / `LibreMusic.apk` (este repo es privado, así que los assets de la Release no se pueden enlazar) y actualiza versión, tamaño y SHA-256 en `src/config/downloads.ts`; para iOS, añade la versión a `public/altstore.json` y quita las que apunten a un archivo que ya no existe. Al hacer push a `main`, Cloudflare Workers Builds publica la web sola.
+5. Actualiza la web de descarga (repo `libremusic-landing`): copia el binario a `public/downloads/` como `LibreMusic.ipa` / `LibreMusic.apk` (este repo es privado, así que los assets de la Release no se pueden enlazar) y actualiza versión, tamaño y SHA-256 en `src/config/downloads.ts`; para iOS, añade la versión a `public/altstore.json` y quita las que apunten a un archivo que ya no existe. Añade la versión arriba en `src/config/changelog.ts` (título y 3–6 novedades en lenguaje de usuario, sacadas de `CHANGELOG.md`), quita de `upcoming` lo que ya ha salido y ejecuta `bun scripts/gen-feeds.ts` (`version.json` y el RSS; avisan a quien se suscribió). Al hacer push a `main`, Cloudflare Workers Builds publica la web sola.
 
 Si sólo quieres publicar una plataforma, sube sólo su etiqueta. Las etiquetas también lanzan la CI normal de las dos apps; se puede cancelar, la Release compila por su cuenta.
 

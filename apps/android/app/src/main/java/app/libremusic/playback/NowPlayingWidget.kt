@@ -31,13 +31,14 @@ import kotlinx.coroutines.launch
 /**
  * Widget «Ahora suena» (4×1): carátula, título, artista y anterior / reproducir / siguiente. Lo actualiza
  * [PlaybackService] al cambiar de canción o de estado; los botones mandan teclas multimedia al servicio, así que
- * funcionan con la app cerrada. Sin canción, tocarlo abre la app. Sólo Android por ahora (en iOS haría falta una
+ * funcionan con la app cerrada. Con la app cerrada sigue enseñando la última canción y «reproducir» la retoma; sólo si nunca ha sonado nada, tocarlo abre la app. Sólo Android por ahora (en iOS haría falta una
  * extensión de WidgetKit).
  */
 class NowPlayingWidget : AppWidgetProvider() {
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
-        // Al añadirlo: lo último conocido (o el estado vacío).
-        render(context, last.first, last.second, lastCover)
+        // Al añadirlo (o si el proceso se cerró): lo último conocido; si no, la última cola guardada en pausa.
+        val song = last.first ?: LastQueue.load(context)?.let { it.songs[it.index] }
+        render(context, song, last.second, lastCover)
     }
 
     companion object {
@@ -63,8 +64,12 @@ class NowPlayingWidget : AppWidgetProvider() {
         fun detach(context: Context) {
             scope?.cancel()
             scope = null
-            last = null to false
-            render(context.applicationContext, null, false, null)
+            // El servicio se cierra: se queda la última canción en pausa y «reproducir» la retoma
+            // (onPlaybackResumption), en vez de dejar el widget vacío y que todo abra la app.
+            val app = context.applicationContext
+            val song = LastQueue.load(app)?.let { it.songs[it.index] }
+            last = song to false
+            render(app, song, false, lastCover.takeIf { song?.id == lastCoverId })
         }
 
         private fun update(context: Context, scope: CoroutineScope, song: Song?, playing: Boolean) {
@@ -97,10 +102,15 @@ class NowPlayingWidget : AppWidgetProvider() {
             if (cover != null) v.setImageViewBitmap(R.id.widget_cover, cover) else v.setImageViewResource(R.id.widget_cover, R.drawable.ic_launcher_power)
             v.setImageViewResource(R.id.widget_play, if (playing) R.drawable.ic_widget_pause else R.drawable.ic_widget_play)
             v.setContentDescription(R.id.widget_play, context.getString(R.string.widget_play))
-            if (song != null) {
+            if (song != null && scope != null) {
                 v.setOnClickPendingIntent(R.id.widget_prev, mediaKey(context, KeyEvent.KEYCODE_MEDIA_PREVIOUS))
                 v.setOnClickPendingIntent(R.id.widget_play, mediaKey(context, KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE))
                 v.setOnClickPendingIntent(R.id.widget_next, mediaKey(context, KeyEvent.KEYCODE_MEDIA_NEXT))
+            } else if (song != null) {
+                // Servicio cerrado: cualquier botón retoma la última cola (onPlaybackResumption). Anterior/siguiente
+                // no tendrían cola que mover y el servicio arrancado tiene que ponerse a sonar enseguida.
+                val resume = mediaKey(context, KeyEvent.KEYCODE_MEDIA_PLAY)
+                listOf(R.id.widget_prev, R.id.widget_play, R.id.widget_next).forEach { v.setOnClickPendingIntent(it, resume) }
             } else {
                 // Sin nada sonando los botones también abren la app (no hay cola que controlar).
                 listOf(R.id.widget_prev, R.id.widget_play, R.id.widget_next).forEach { v.setOnClickPendingIntent(it, open) }

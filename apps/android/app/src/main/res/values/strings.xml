@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">LibreMusic</string>
+    <string name="app_name" translatable="false">Pear Music</string>
     <string name="tab_search">Buscar</string>
     <string name="search_hint">Canciones, artistas…</string>
     <string name="search_intro">Busca una canción para empezar a escuchar.</string>
@@ -71,7 +71,7 @@
     <string name="jam_create">Crear un Jam</string>
     <string name="jam_name_hint">Nombre del Jam (opcional)</string>
     <string name="jam_create_button">Crear Jam</string>
-    <string name="jam_wifi_note">Funciona con Android y con iPhone (LibreMusic para iOS 1.2 o posterior).</string>
+    <string name="jam_wifi_note">Funciona con Android y con iPhone (Pear Music para iOS 1.2 o posterior).</string>
     <string name="jam_searching">Buscando el Jam %s en la Wi-Fi…</string>
     <string name="jam_show_qr">Mostrar QR</string>
     <string name="jam_hide_qr">Ocultar QR</string>
@@ -85,8 +85,8 @@
     <string name="jam_added_by">%1$s · añadida por %2$s</string>
     <string name="action_add_jam">Añadir al Jam</string>
     <string name="widget_label">Ahora suena</string>
-    <string name="widget_description">Lo que suena en LibreMusic, con anterior, reproducir y siguiente.</string>
-    <string name="widget_idle_title">LibreMusic</string>
+    <string name="widget_description">Lo que suena en Pear Music, con anterior, reproducir y siguiente.</string>
+    <string name="widget_idle_title">Pear Music</string>
     <string name="widget_idle_subtitle">Toca para abrir</string>
     <string name="widget_prev">Anterior</string>
     <string name="widget_play">Reproducir o pausar</string>

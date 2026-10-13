@@ -989,7 +989,7 @@ fun AboutScreen() {
                 Modifier.size(96.dp).shadowSoft(10.dp, RoundedCornerShape(22.dp), 0.2f).clip(RoundedCornerShape(22.dp)),
             )
             Spacer(Modifier.height(10.dp))
-            Text("LibreMusic", style = Typo.title2, color = c.label)
+            Text("Pear Music", style = Typo.title2, color = c.label)
             Text("Versión ${BuildConfig.VERSION_NAME}", style = Typo.subheadline, color = c.secondaryLabel)
         }
         FormSection(null) {

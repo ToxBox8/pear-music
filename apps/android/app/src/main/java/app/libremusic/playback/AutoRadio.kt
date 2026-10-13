@@ -2,6 +2,7 @@ package app.libremusic.playback
 
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.Timeline
 import app.libremusic.data.Song
 import app.libremusic.data.YTClient
 import kotlinx.coroutines.CoroutineScope
@@ -32,6 +33,11 @@ object AutoRadio {
         val s = CoroutineScope(SupervisorJob() + Dispatchers.Main)
         scope = s
         player.addListener(object : Player.Listener {
+            // Cola nueva (o con la radio ya añadida): aunque vuelva a ser la misma canción de antes, vuelve a tocar
+            // radio. Media3 avisa del cambio de cola antes que del cambio de canción.
+            override fun onTimelineChanged(timeline: Timeline, reason: Int) {
+                if (reason == Player.TIMELINE_CHANGE_REASON_PLAYLIST_CHANGED) lastSeed = null
+            }
             override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) = check(player, s)
         })
     }

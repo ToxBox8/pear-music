@@ -343,7 +343,7 @@ struct AboutView: View {
                         .frame(width: 96, height: 96)
                         .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
                         .shadow(color: .black.opacity(0.2), radius: 10, y: 5)
-                    Text("LibreMusic").font(.title2.bold())
+                    Text("Pear Music").font(.title2.bold())
                     Text("Versión \(Self.version)").font(.subheadline).foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity)

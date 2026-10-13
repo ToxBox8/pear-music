@@ -77,6 +77,16 @@ if [ "$plat" = ios ]; then
     if apps/ios/scripts/check-linux.sh >/dev/null 2>&1; then ok "Sintaxis de iOS correcta (check-linux.sh)."; else bad "Errores de sintaxis en iOS: apps/ios/scripts/check-linux.sh"; fi
 fi
 
+# 7. Web: la versión tiene su entrada en «Novedades» (src/config/changelog.ts de libremusic-landing).
+web="${LANDING:-../libremusic-landing}/src/config/changelog.ts"
+if [ ! -f "$web" ]; then
+    warn "No encuentro la web en ${web%/src/*} (ponla al lado o usa LANDING=ruta): añade la versión a su changelog.ts."
+elif grep -A1 "platform: \"$plat\"" "$web" | grep -q "version: \"$version\""; then
+    ok "La web tiene $version en Novedades."
+else
+    bad "Falta $version en Novedades de la web: añádela arriba en src/config/changelog.ts (y quítala de «upcoming»), luego bun scripts/gen-feeds.ts."
+fi
+
 echo
 if [ $fail -eq 0 ]; then echo "Todo listo para etiquetar $tag."; else echo "Hay cosas que arreglar antes de publicar."; fi
 exit $fail

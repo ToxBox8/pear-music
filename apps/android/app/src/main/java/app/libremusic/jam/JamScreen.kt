@@ -274,8 +274,8 @@ private fun JamSearching(code: String) {
         if (code.isNotEmpty()) { Spacer(Modifier.height(10.dp)); JamCodeText(code, 24f) }
         Spacer(Modifier.height(26.dp))
         Text(
-            if (stalled) "Todavía no aparece. Comprobad que el código es correcto, que estáis en la misma WiFi y que quien lo creó tiene LibreMusic abierta."
-            else "Mantén LibreMusic abierta. Suele tardar unos segundos.",
+            if (stalled) "Todavía no aparece. Comprobad que el código es correcto, que estáis en la misma WiFi y que quien lo creó tiene Pear Music abierta."
+            else "Mantén Pear Music abierta. Suele tardar unos segundos.",
             style = Typo.subheadline, color = c.secondaryLabel, textAlign = TextAlign.Center,
         )
         Spacer(Modifier.weight(1f))

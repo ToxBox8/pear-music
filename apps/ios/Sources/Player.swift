@@ -149,6 +149,7 @@ final class Player: ObservableObject {
     func play(_ song: Song, in list: [Song]) {
         queue = list.isEmpty ? [song] : list
         index = queue.firstIndex(where: { $0.id == song.id }) ?? 0
+        lastRadioSeed = nil // cola nueva: aunque sea la misma canción de antes, vuelve a tocar radio
         load()
     }
     func enqueue(_ song: Song) {

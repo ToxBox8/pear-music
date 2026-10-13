@@ -4,7 +4,7 @@ Qué es LibreMusic, para qué sirve y cómo funciona. Para la organización del 
 
 ## Qué es
 
-LibreMusic es un **cliente de música libre y sin anuncios** para iPhone y Android que reproduce el catálogo de **YouTube Music** sin cuenta, sin publicidad y con reproducción en segundo plano y descargas.
+**Pear Music** (hasta octubre de 2026, LibreMusic; el código y los identificadores siguen usando `libremusic`) es un **cliente de música libre y sin anuncios** para iPhone y Android que reproduce el catálogo de **YouTube Music** sin cuenta, sin publicidad y con reproducción en segundo plano y descargas.
 
 Es un cliente **no oficial**: no está afiliado a YouTube ni a Google, usa una API no oficial (InnerTube) que puede dejar de funcionar, y **no se distribuye en la App Store ni en Google Play**:
 
@@ -71,12 +71,12 @@ La marca es violeta `#8B5CF6`. El icono por defecto es el original de encendido 
 - **iOS:** AVPlayer + AVAudioSession, con Ahora suena, controles de la pantalla de bloqueo y AirPlay.
 - **Android:** Media3 ExoPlayer en un `MediaLibraryService` con notificación multimedia y Android Auto (Favoritas, Descargadas, Recientes y Playlists). Las canciones se identifican como `libremusic://track/<videoId>` y se resuelven a la URL real justo antes de sonar.
 - Atajos: en Android, al mantener pulsado el icono (mezclar favoritas o descargadas, Descubrir, Buscar); en iOS, los mismos como atajos de Siri (App Intents).
-- Android tiene un widget «Ahora suena» (4×1) que actualiza el servicio y manda teclas multimedia; iOS aún no.
+- Android tiene un widget «Ahora suena» (4×1) que actualiza el servicio y manda teclas multimedia; con la app cerrada enseña la última canción y «reproducir» retoma la última cola (`LastQueue`, `onPlaybackResumption`). iOS aún no tiene widget.
 - Una canción suelta completa la cola con su radio, y al empezar la última canción de la cola (bucle apagado) se añaden 20 parecidas (radio infinita, ajuste `autoplay`).
 
 ### Biblioteca y descargas
 
-- La biblioteca (favoritos, playlists, recientes) se guarda en `library.json` con el **mismo formato en las dos apps** (`docs/LIBRARY_FORMAT.md`). Se puede exportar e importar, y copiar sola una vez al día a una carpeta (`LibreMusic-copia-AAAA-MM-DD.json`, las 7 últimas).
+- La biblioteca (favoritos, playlists, recientes) se guarda en `library.json` con el **mismo formato en las dos apps** (`docs/LIBRARY_FORMAT.md`). Se puede exportar e importar, y copiar sola una vez al día a una carpeta (`PearMusic-copia-AAAA-MM-DD.json`, las 7 últimas).
 - Las fotos de portada van en `covers/<id>.jpg`, reducidas a 700 px.
 - **iOS** descarga `.m4a` a `Documents/Downloads`. **Android** usa el DownloadManager de Media3 con la caché indexada por videoId.
 - Las descargas siempre usan la máxima calidad.
@@ -109,7 +109,7 @@ La marca es violeta `#8B5CF6`. El icono por defecto es el original de encendido 
 
 | App | Versión | Estado |
 |---|---|---|
-| iOS | 1.4.0 (sin publicar; publicada: 1.3.1) | Referencia de diseño. Publicada en GitHub Releases (`ios-v1.3.1`) y en la web. Lo de 1.4.0 desde «Tus álbumes» está sin compilar: la CI está parada (cuota de Actions agotada). Falta probarla en un iPhone. |
+| iOS | 1.4.0 (sin publicar; publicada: 1.3.1) | Referencia de diseño. Publicada en GitHub Releases (`ios-v1.3.1`) y en la web. La 1.4.0 compila (13-10, en las Actions gratis del repo público `pear-music`); falta probarla en un iPhone. |
 | Android | 0.8.1 | Misma interfaz que iOS (`docs/PARIDAD.md`). Publicada en GitHub Releases (`android-v0.8.1`, firmada en local con la clave de siempre) y en la web. Probada en un Nothing Phone (2) con Android 16 (0.8.1, sólo en parte). |
 
 Pendientes y fases en `docs/ARCHITECTURE.md` y `CHANGELOG.md`.

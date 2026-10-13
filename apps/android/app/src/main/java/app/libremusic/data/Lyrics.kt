@@ -73,7 +73,7 @@ data class Lyrics(val lines: List<Line>, val plain: String?, val instrumental: B
  */
 object LyricsClient {
     private const val BASE = "https://lrclib.net/api"
-    private const val USER_AGENT = "LibreMusic (https://github.com/ToxBox8/libremusic)"
+    private const val USER_AGENT = "PearMusic (https://github.com/ToxBox8/pear-music)"
     private const val NONE_TTL_MS = 7L * 24 * 3600 * 1000
     private val memory = object : LinkedHashMap<String, Lyrics?>(32, 0.75f, true) {
         override fun removeEldestEntry(eldest: MutableMap.MutableEntry<String, Lyrics?>?) = size > 50

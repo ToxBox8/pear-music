@@ -10,19 +10,19 @@ targets:
     info:
       path: Info.plist
       properties:
-        CFBundleDisplayName: LibreMusic
+        CFBundleDisplayName: Pear Music
         # Versión de la app (ver docs/RELEASING.md). Súbela en cada versión publicada.
         CFBundleShortVersionString: "1.4.0"
         CFBundleVersion: "6"
         UILaunchScreen: {}
         UIBackgroundModes: [audio]
-        NSAppleMusicUsageDescription: LibreMusic lee tus playlists de Apple Music para importarlas.
-        NSLocalNetworkUsageDescription: LibreMusic busca a tus amigos en la misma red para hacer un Jam juntos.
+        NSAppleMusicUsageDescription: Pear Music lee tus playlists de Apple Music para importarlas.
+        NSLocalNetworkUsageDescription: Pear Music busca a tus amigos en la misma red para hacer un Jam juntos.
         NSBonjourServices:
           - _lm-jam._tcp
           - _lm-jam._udp
           - _lm-jam2._tcp
-        NSCameraUsageDescription: LibreMusic usa la cámara para escanear el código QR de un Jam.
+        NSCameraUsageDescription: Pear Music usa la cámara para escanear el código QR de un Jam.
         CFBundleURLTypes:
           - CFBundleURLName: com.example.libremusic
             CFBundleURLSchemes: [libremusic]

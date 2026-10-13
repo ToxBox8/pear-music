@@ -196,8 +196,8 @@ private struct JamSearchingView: View {
                 if let code = jam.joiningCode { JamCodeText(code: code, size: 24) }
             }
             Text(jam.searchStalled
-                 ? "Todavía no aparece. Comprobad que el código es correcto, que estáis en la misma WiFi o con el Bluetooth activado y que quien lo creó tiene LibreMusic abierta."
-                 : "Mantén LibreMusic abierta. Suele tardar unos segundos.")
+                 ? "Todavía no aparece. Comprobad que el código es correcto, que estáis en la misma WiFi o con el Bluetooth activado y que quien lo creó tiene Pear Music abierta."
+                 : "Mantén Pear Music abierta. Suele tardar unos segundos.")
                 .font(.subheadline).foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
@@ -653,7 +653,7 @@ private struct JamScannerView: View {
             default:
                 VStack(spacing: 14) {
                     Image(systemName: "camera.fill").font(.system(size: 34))
-                    Text("LibreMusic no tiene permiso para usar la cámara").font(.headline)
+                    Text("Pear Music no tiene permiso para usar la cámara").font(.headline)
                     Text("Actívalo en Ajustes o escribe el código a mano.")
                         .font(.subheadline).foregroundStyle(.white.opacity(0.72))
                     Button {

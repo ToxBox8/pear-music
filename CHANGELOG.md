@@ -4,10 +4,11 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). C
 
 ## iOS
 
-### [1.4.0] — sin publicar (build 6)
+### [1.4.0] — 2026-10-13 (build 6)
+- La app se llama ahora **Pear Music**. Es la misma app: se actualiza encima y conserva la biblioteca, las descargas y los ajustes.
 - Accesibilidad: con letra grande ya caben todos los botones del reproductor (antes la cola se salía de la pantalla); los interruptores y los botones de reproducción se leen bien con el lector de pantalla.
 - Buscar: cada canción de los resultados tiene «⋯» para abrir su menú con un toque (tocar la fila sigue reproduciéndola).
-- Atajos de Siri y de la app Atajos: «Mezcla mis favoritas en LibreMusic», lo descargado, Descubrir y Buscar.
+- Atajos de Siri y de la app Atajos: «Mezcla mis favoritas en Pear Music», lo descargado, Descubrir y Buscar.
 - Importar: las canciones que no se añaden quedan en la playlist («Sin añadir») para buscarlas otra vez más tarde y elegir la versión buena.
 - Inicio: «Novedades de tus artistas», con lo que han sacado este año los artistas que más escuchas.
 - Copia automática de la biblioteca (Ajustes › Biblioteca): una al día en la carpeta que elijas (Drive, Nextcloud, iCloud…), guardando las 7 últimas.
@@ -73,11 +74,13 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). C
 
 ## Android
 
-### [0.9.0] — sin publicar
+### [0.9.1] — 2026-10-13 (versionCode 11)
+(Incluye todo lo preparado como 0.9.0, que no llegó a publicarse.)
+- La app se llama ahora **Pear Music**. Es la misma app: se actualiza encima y conserva la biblioteca, las descargas y los ajustes.
 - Accesibilidad: con letra grande ya caben todos los botones del reproductor (antes la cola se salía de la pantalla); los interruptores y los botones de reproducción se leen bien con el lector de pantalla.
 - Buscar: cada canción de los resultados tiene «⋯» para abrir su menú con un toque (tocar la fila sigue reproduciéndola).
 - Atajos al mantener pulsado el icono: mezclar favoritas, mezclar lo descargado, Descubrir y Buscar.
-- Widget «Ahora suena» para la pantalla de inicio (4×1): carátula, título y anterior / reproducir / siguiente. Sólo en Android por ahora.
+- Widget «Ahora suena» para la pantalla de inicio (4×1): carátula, título y anterior / reproducir / siguiente. Con la app cerrada sigue enseñando la última canción y «reproducir» la retoma donde se quedó (también desde los auriculares). Sólo en Android por ahora.
 - Importar: las canciones que no se añaden quedan en la playlist («Sin añadir») para buscarlas otra vez más tarde y elegir la versión buena.
 - Inicio: «Novedades de tus artistas», con lo que han sacado este año los artistas que más escuchas.
 - Copia automática de la biblioteca (Ajustes › Biblioteca): una al día en la carpeta que elijas (Drive, Nextcloud, iCloud…), guardando las 7 últimas.

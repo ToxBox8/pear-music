@@ -17,8 +17,8 @@ android {
         minSdk = 26
         targetSdk = 35
         // Versión de la app (ver docs/RELEASING.md). versionCode siempre sube.
-        versionCode = 10
-        versionName = "0.8.1"
+        versionCode = 11
+        versionName = "0.9.1"
     }
 
     signingConfigs {

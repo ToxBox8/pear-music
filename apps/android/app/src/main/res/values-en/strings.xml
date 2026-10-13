@@ -70,7 +70,7 @@
     <string name="jam_create">Create a Jam</string>
     <string name="jam_name_hint">Jam name (optional)</string>
     <string name="jam_create_button">Create Jam</string>
-    <string name="jam_wifi_note">Works with Android and iPhone (LibreMusic for iOS 1.2 or later).</string>
+    <string name="jam_wifi_note">Works with Android and iPhone (Pear Music for iOS 1.2 or later).</string>
     <string name="jam_searching">Looking for Jam %s on the Wi-Fi…</string>
     <string name="jam_show_qr">Show QR</string>
     <string name="jam_hide_qr">Hide QR</string>
@@ -84,8 +84,8 @@
     <string name="jam_added_by">%1$s · added by %2$s</string>
     <string name="action_add_jam">Add to Jam</string>
     <string name="widget_label">Now playing</string>
-    <string name="widget_description">What is playing in LibreMusic, with previous, play and next.</string>
-    <string name="widget_idle_title">LibreMusic</string>
+    <string name="widget_description">What is playing in Pear Music, with previous, play and next.</string>
+    <string name="widget_idle_title">Pear Music</string>
     <string name="widget_idle_subtitle">Tap to open</string>
     <string name="widget_prev">Previous</string>
     <string name="widget_play">Play or pause</string>
