@@ -152,14 +152,13 @@ final class Library: ObservableObject {
         if let data { PlaylistArt.save(data, for: id) } else { PlaylistArt.remove(id) }
         objectWillChange.send()
     }
-    /// Crea una playlist ya rellena (importación). Devuelve su id.
-    @discardableResult
     /// Las playlists del usuario, sin los álbumes guardados (ésos van en «Tus álbumes»).
     var userPlaylists: [Playlist] { playlists.filter { $0.album == nil } }
     /// «Tus álbumes»: los álbumes guardados o descargados desde su página, el último primero.
     var albums: [Playlist] { playlists.filter { $0.album != nil }.reversed() }
     func album(_ browseId: String) -> Playlist? { playlists.first { $0.album?.browseId == browseId } }
 
+    /// Crea una playlist ya rellena (importación). Devuelve su id.
     @discardableResult
     func importPlaylist(name: String, songs: [Song], cover: Data? = nil, album: AlbumInfo? = nil) -> UUID {
         var p = Playlist(name: name, songs: songs)

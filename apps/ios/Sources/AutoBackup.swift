@@ -3,12 +3,12 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 /// Copia automática de la biblioteca: una vez al día (al abrir o salir de la app), `library.json` se copia a una
-/// carpeta que elige la persona (iCloud Drive, Google Drive…) como `LibreMusic-copia-AAAA-MM-DD.json`, y se dejan las
+/// carpeta que elige la persona (iCloud Drive, Google Drive…) como `PearMusic-copia-AAAA-MM-DD.json`, y se dejan las
 /// 7 últimas. Mismo archivo que «Exportar copia» y mismas reglas que `AutoBackup` en Android.
 @MainActor
 final class AutoBackup: ObservableObject {
     static let shared = AutoBackup()
-    static let prefix = "LibreMusic-copia-"
+    static let prefix = "PearMusic-copia-"
     static let keep = 7
 
     @Published private(set) var folderName: String?

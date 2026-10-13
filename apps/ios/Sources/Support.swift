@@ -278,7 +278,7 @@ struct SupportView: View {
             Button("Enviar") { send() }
             Button("Cancelar", role: .cancel) {}
         } message: {
-            Text("Se enviarán tu correo, el texto\(draft.photos.isEmpty ? "" : ", \(draft.photos.count) \(draft.photos.count == 1 ? "foto" : "fotos")") y datos del iPhone (modelo, versión de iOS y de la app) al canal privado de soporte de LibreMusic.")
+            Text("Se enviarán tu correo, el texto\(draft.photos.isEmpty ? "" : ", \(draft.photos.count) \(draft.photos.count == 1 ? "foto" : "fotos")") y datos del iPhone (modelo, versión de iOS y de la app) al canal privado de soporte de Pear Music.")
         }
         .alert("No se pudo enviar", isPresented: Binding(get: { failure != nil }, set: { if !$0 { failure = nil } })) {
             Button("Vale", role: .cancel) {}

@@ -122,7 +122,7 @@ enum LyricsClient {
         var comps = URLComponents(string: "\(base)/search")!
         comps.queryItems = params.map { URLQueryItem(name: $0.key, value: $0.value) }
         var req = URLRequest(url: comps.url!)
-        req.setValue("LibreMusic (https://github.com/ToxBox8/libremusic)", forHTTPHeaderField: "User-Agent")
+        req.setValue("PearMusic (https://github.com/ToxBox8/pear-music)", forHTTPHeaderField: "User-Agent")
         let (data, resp) = try await URLSession.shared.data(for: req)
         guard (resp as? HTTPURLResponse)?.statusCode == 200 else { throw URLError(.badServerResponse) }
         return try JSONDecoder().decode([Candidate].self, from: data)

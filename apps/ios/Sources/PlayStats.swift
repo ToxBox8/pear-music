@@ -78,7 +78,7 @@ final class PlayStats: ObservableObject {
         guard let data = try? Data(contentsOf: url),
               let o = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return }
         for (id, v) in (o["songs"] as? [String: [String: Any]]) ?? [:] {
-            songs[id] = Song(id: id, title: v["title"] as? String ?? "", artist: v["artist"] as? String ?? "", thumbnail: v["thumbnail"] as? String)
+            songs[id] = Song(id: id, title: v["title"] as? String ?? "", artist: v["artist"] as? String ?? "", thumbnail: (v["thumbnail"] as? String).flatMap(URL.init(string:)))
         }
         plays = ((o["plays"] as? [[Any]]) ?? []).compactMap { p in
             guard p.count == 2, let id = p[0] as? String, let at = (p[1] as? NSNumber)?.int64Value else { return nil }
@@ -89,7 +89,7 @@ final class PlayStats: ObservableObject {
     private func save() {
         let o: [String: Any] = [
             "version": 1,
-            "songs": songs.mapValues { s -> [String: Any] in ["title": s.title, "artist": s.artist, "thumbnail": s.thumbnail ?? NSNull()] },
+            "songs": songs.mapValues { s -> [String: Any] in ["title": s.title, "artist": s.artist, "thumbnail": s.thumbnail.map { $0.absoluteString as Any } ?? NSNull()] },
             "plays": plays.map { [$0.id, $0.at] as [Any] },
         ]
         let url = self.url
