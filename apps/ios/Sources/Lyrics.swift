@@ -142,6 +142,10 @@ struct LyricsView: View {
     private enum Load: Equatable { case loading, ready(Lyrics?), failed }
     @State private var load: Load = .loading
     @State private var attempt = 0
+    /// `player.duration` y `player.progress` viven en `player.clock`, que esta vista no observa: se copian aquí para
+    /// volver a buscar la letra al saber la duración y para mover la línea al saltar con la música en pausa.
+    @State private var durationKnown = false
+    @State private var progressTick = 0.0
 
     var body: some View {
         Group {
@@ -171,7 +175,9 @@ struct LyricsView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .task(id: "\(song.id)-\(attempt)-\(player.duration > 0)") {
+        .onReceive(player.clock.$duration) { if ($0 > 0) != durationKnown { durationKnown = $0 > 0 } }
+        .onReceive(player.clock.$progress) { if !player.isPlaying { progressTick = $0 } }
+        .task(id: "\(song.id)-\(attempt)-\(durationKnown)") {
             load = .loading
             do { load = .ready(try await LyricsClient.lyrics(for: song, duration: player.duration)) }
             catch { load = .failed }
@@ -189,7 +195,8 @@ struct LyricsView: View {
     private func synced(_ lyrics: Lyrics) -> some View {
         // El progreso llega cada 0,5 s; entre medias se calcula en cada fotograma para que la línea cambie a tiempo.
         TimelineView(.animation(paused: !player.isPlaying)) { ctx in
-            let current = lyrics.index(at: player.clock.progress(at: ctx.date, playing: player.isPlaying, rate: player.rate))
+            let position = player.isPlaying ? player.clock.progress(at: ctx.date, playing: true, rate: player.rate) : progressTick
+            let current = lyrics.index(at: position)
             SyncedLyricsList(lyrics: lyrics, current: current, reduceMotion: reduceMotion) { player.seek(to: $0) }
         }
     }
