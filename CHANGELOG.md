@@ -4,6 +4,15 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). C
 
 ## iOS
 
+### [1.4.1] — 2026-10-14 (build 7)
+- **Avisos**: se bajan cada vez que vuelves a la app. Una campana en Inicio, junto al Jam, con los avisos de Pear Music (caídas, versiones nuevas, novedades) y un número con los que no has leído. Si dejas activado «Notificar en el móvil», los nuevos llegan también como notificación cuando iOS deja comprobarlo en segundo plano. También en Ajustes › Ayuda y soporte › Avisos.
+- Nueva opción «Barra estilo SimpMusic» (Ajustes › Aspecto › Barra inferior): Buscar aparte en la barra (Inicio ya no lleva buscador con esta barra). En iOS 26 la barra se pliega al bajar y el mini reproductor se pone a su lado.
+- Ajustes puede ir en la barra o arriba en Inicio, junto al Jam (Ajustes › Aspecto › Ajustes). Por defecto, en la barra con la clásica y arriba con la estilo SimpMusic; arriba no entra en el orden de pestañas.
+- Descubrir se lee bien con cualquier carátula: el título y los botones ya no desaparecen sobre portadas claras.
+- La letra sigue la canción también en pausa y vuelve a buscarse al saber la duración.
+- Jam más seguro: nadie en la misma Wi-Fi puede colgar el Jam con mensajes enormes o muchas conexiones; un invitado sólo quita las canciones que añadió.
+- Importar de SimpMusic rechaza copias manipuladas demasiado grandes.
+
 ### [1.4.0] — 2026-10-13 (build 6)
 - La app se llama ahora **Pear Music**. Es la misma app: se actualiza encima y conserva la biblioteca, las descargas y los ajustes.
 - Accesibilidad: con letra grande ya caben todos los botones del reproductor (antes la cola se salía de la pantalla); los interruptores y los botones de reproducción se leen bien con el lector de pantalla.
@@ -73,6 +82,26 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). C
 - Primera versión distribuida desde la web (compilación «air-plata»): biblioteca Nueva 1.1, tema Aire en plata, reproductor Air, Descubrir (reels), Jam con amigos, Buscar en Inicio.
 
 ## Android
+
+### [0.9.5] — 2026-10-14 (versionCode 14)
+- **Avisos al día al abrir la app**: la campana de Inicio baja los avisos cada vez que vuelves a Pear Music, sin esperar a la comprobación de fondo (antes podían tardar hasta un cuarto de hora o más en salir). Lo que ya ves en la campana no te llega después como notificación.
+
+### [0.9.4] — 2026-10-14 (versionCode 13)
+(Incluye todo lo preparado como 0.9.2, que no llegó a publicarse.)
+- **Avisos**: una campana en Inicio, junto al Jam, con los avisos de Pear Music (caídas, versiones nuevas, novedades) y un número con los que no has leído. Si dejas activado «Notificar en el móvil», los nuevos llegan también como notificación (se comprueba cada 15 minutos). También en Ajustes › Ayuda y soporte › Avisos y en la web, en /avisos.
+- Nueva opción «Barra estilo SimpMusic» (Ajustes › Aspecto › Barra inferior): cápsula de cristal con una gota que se arrastra entre pestañas, Buscar aparte en un círculo y, al bajar por una lista, se pliega en un círculo junto al mini reproductor. Igual que SimpMusic 2.2.0. Con esta barra, Inicio no lleva buscador.
+- Ajustes puede ir en la barra o arriba en Inicio, junto al Jam (Ajustes › Aspecto › Ajustes). Por defecto, en la barra con la clásica y arriba con la estilo SimpMusic; arriba no entra en el orden de pestañas.
+- Deslizar entre pestañas va mucho más fluido: la pantalla sigue al dedo sin tirones, al soltar acompaña la velocidad del gesto, se puede atrapar a medio camino y la barra (la gota o la píldora) se mueve a la vez que el dedo.
+- Sin silencios entre canciones: la siguiente canción de la cola se prepara mientras suena la actual.
+- Menos cortes con mala cobertura: se guardan hasta 2 minutos de canción por delante, y retroceder unos segundos es instantáneo.
+- Igualar el volumen (Ajustes › Reproducción, activado): las canciones que suenan muy fuerte bajan y las flojas suben un poco, para no tocar el volumen entre canción y canción.
+- Mejor sonido: el audio va en Opus (unos 160 kbps) en vez de AAC de 128 kbps, al escuchar y en las descargas nuevas.
+- Descubrir se lee bien con cualquier carátula: el título y los botones ya no desaparecen sobre portadas claras.
+- La barra clásica de cristal va más fluida al mover la gota.
+- La lupa de la barra estilo SimpMusic (y el círculo al plegarse) ya no sale negra con el tema claro.
+- Privacidad: otras apps del móvil ya no pueden leer tu biblioteca (sólo Android Auto, el coche y los relojes).
+- Jam más seguro: nadie en la misma Wi-Fi puede colgar el Jam; un invitado sólo quita las canciones que añadió.
+- Importar de SimpMusic rechaza copias manipuladas demasiado grandes.
 
 ### [0.9.1] — 2026-10-13 (versionCode 11)
 (Incluye todo lo preparado como 0.9.0, que no llegó a publicarse.)

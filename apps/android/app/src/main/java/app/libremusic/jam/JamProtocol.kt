@@ -88,16 +88,40 @@ sealed class JamMessage {
 /** Reglas del anfitrión, separadas de la red para poder probarlas. */
 object JamRules {
     const val MAX_PEOPLE = 16
+    /** Topes contra abusos desde la red local (mismos que `JamV2` en iOS). */
+    const val MAX_CONNECTIONS = 24
+    const val MAX_LINE_CHARS = 256 * 1024
+    const val MAX_ENTRIES = 500
+    const val MAX_TEXT = 300
+
+    /** Una canción con datos razonables (un invitado malicioso podría mandar textos enormes). */
+    fun acceptable(e: JamEntry): Boolean =
+        e.song.id.isNotEmpty() && e.song.id.length <= 64 && e.song.title.length <= MAX_TEXT &&
+            e.song.artist.length <= MAX_TEXT && e.by.length <= MAX_TEXT
 
     fun add(state: JamState, entry: JamEntry): JamState =
-        if (state.entries.any { it.song.id == entry.song.id }) state else state.copy(entries = state.entries + entry)
+        if (!acceptable(entry) || state.entries.size >= MAX_ENTRIES || state.entries.any { it.song.id == entry.song.id }) state
+        else state.copy(entries = state.entries + entry)
 
-    fun remove(state: JamState, songId: String): JamState =
-        state.copy(entries = state.entries.filterNot { it.song.id == songId })
+    /** Un invitado sólo quita lo que añadió él (como en iOS); [by] null = el anfitrión, que puede quitar todo. */
+    fun remove(state: JamState, songId: String, by: String? = null): JamState =
+        state.copy(entries = state.entries.filterNot { it.song.id == songId && (by == null || it.by == by) })
+
+    /** Lee una línea sin pasar de [max] caracteres; null al acabar la conexión. Una línea sin fin corta la conexión. */
+    fun readLine(reader: java.io.Reader, max: Int = MAX_LINE_CHARS): String? {
+        val sb = StringBuilder()
+        while (true) {
+            val c = reader.read()
+            if (c == -1) return if (sb.isEmpty()) null else sb.toString()
+            if (c == '\n'.code) return sb.toString()
+            if (sb.length >= max) throw java.io.IOException("Línea demasiado larga")
+            sb.append(c.toChar())
+        }
+    }
 
     /** Nombre único dentro del Jam: «Ana», «Ana (2)»… */
     fun uniqueName(state: JamState, wanted: String): String {
-        val base = wanted.trim().ifEmpty { "Invitado" }
+        val base = wanted.trim().take(24).ifEmpty { "Invitado" }
         if (base !in state.members) return base
         var i = 2
         while ("$base ($i)" in state.members) i++

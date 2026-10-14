@@ -15,8 +15,11 @@ object VolumeMix {
         set(v) { field = v; apply() }
     var fade = 1f
         set(v) { field = v; apply() }
+    /** Igualar el volumen entre canciones (`Normalizer`): baja las que suenan más fuerte que la referencia. */
+    var norm = 1f
+        set(v) { field = v; apply() }
 
-    private fun apply() { player?.volume = (sleep * fade).coerceIn(0f, 1f) }
+    private fun apply() { player?.volume = (sleep * fade * norm).coerceIn(0f, 1f) }
 }
 
 /**

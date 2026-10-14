@@ -12,10 +12,12 @@ targets:
       properties:
         CFBundleDisplayName: Pear Music
         # Versión de la app (ver docs/RELEASING.md). Súbela en cada versión publicada.
-        CFBundleShortVersionString: "1.4.0"
-        CFBundleVersion: "6"
+        CFBundleShortVersionString: "1.4.1"
+        CFBundleVersion: "7"
         UILaunchScreen: {}
-        UIBackgroundModes: [audio]
+        # fetch: comprobar los avisos en segundo plano (BGAppRefreshTask, ver Avisos.swift).
+        UIBackgroundModes: [audio, fetch]
+        BGTaskSchedulerPermittedIdentifiers: [com.example.libremusic.avisos]
         NSAppleMusicUsageDescription: Pear Music lee tus playlists de Apple Music para importarlas.
         NSLocalNetworkUsageDescription: Pear Music busca a tus amigos en la misma red para hacer un Jam juntos.
         NSBonjourServices:

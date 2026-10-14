@@ -52,6 +52,7 @@ class PlaybackService : MediaLibraryService() {
             .setAudioAttributes(audioAttributes, /* handleAudioFocus = */ true)
             .setHandleAudioBecomingNoisy(true)
             .setWakeMode(C.WAKE_MODE_NETWORK)
+            .setLoadControl(audioLoadControl())
             .build()
         // Bucle (no / lista / canción): lo guarda el servicio para que valga también desde la
         // notificación, la pantalla de bloqueo o Android Auto con la app cerrada. Mismo ajuste que iOS.
@@ -70,6 +71,8 @@ class PlaybackService : MediaLibraryService() {
 
         SleepTimer.attach(player)
         Fade.attach(player)
+        Prefetch.attach(player)
+        Normalizer.attach(player)
         AutoRadio.attach(player)
         PlayCounter.attach(player)
         LastQueue.attach(this, player)
@@ -158,11 +161,22 @@ class PlaybackService : MediaLibraryService() {
             else -> BrowseTree.songsIn(parentId, library, downloads)?.map { songItem(parentId, it) }
         }
 
+        /**
+         * ¿Puede este mando recorrer la biblioteca (favoritas, playlists, recientes)? Sólo la propia app, el sistema
+         * y los de confianza (Android Auto, el coche, Wear OS). Cualquier otra app instalada puede controlar la
+         * reproducción, pero no leer qué escuchas.
+         */
+        private fun canBrowse(c: MediaSession.ControllerInfo): Boolean =
+            c.packageName == packageName || c.isTrusted || c.packageName in TRUSTED_BROWSERS
+
+        private fun <T : Any> denied(): ListenableFuture<LibraryResult<T>> =
+            Futures.immediateFuture(LibraryResult.ofError<T>(LibraryResult.RESULT_ERROR_PERMISSION_DENIED))
+
         override fun onGetLibraryRoot(
             session: MediaLibrarySession,
             browser: MediaSession.ControllerInfo,
             params: LibraryParams?,
-        ): ListenableFuture<LibraryResult<MediaItem>> = Futures.immediateFuture(
+        ): ListenableFuture<LibraryResult<MediaItem>> = if (!canBrowse(browser)) denied() else Futures.immediateFuture(
             LibraryResult.ofItem(folderItem(BrowseTree.ROOT, getString(R.string.app_name), MediaMetadata.MEDIA_TYPE_FOLDER_MIXED), params),
         )
 
@@ -174,6 +188,7 @@ class PlaybackService : MediaLibraryService() {
             pageSize: Int,
             params: LibraryParams?,
         ): ListenableFuture<LibraryResult<ImmutableList<MediaItem>>> {
+            if (!canBrowse(browser)) return denied()
             val items = children(parentId)
                 ?: return Futures.immediateFuture(LibraryResult.ofError(LibraryResult.RESULT_ERROR_BAD_VALUE))
             val from = (page * pageSize).coerceAtMost(items.size)
@@ -186,6 +201,7 @@ class PlaybackService : MediaLibraryService() {
             browser: MediaSession.ControllerInfo,
             mediaId: String,
         ): ListenableFuture<LibraryResult<MediaItem>> {
+            if (!canBrowse(browser)) return denied()
             val leaf = BrowseTree.parseLeaf(mediaId)
             val song = leaf?.let { (folder, id) -> BrowseTree.songsIn(folder, library, downloads)?.firstOrNull { it.id == id } }
             return Futures.immediateFuture(
@@ -295,3 +311,12 @@ class PlaybackService : MediaLibraryService() {
         super.onDestroy()
     }
 }
+
+/** Mandos que pueden recorrer la biblioteca además de la app y del sistema. */
+private val TRUSTED_BROWSERS = setOf(
+    "com.google.android.projection.gearhead", // Android Auto
+    "com.android.car.media", // Android Automotive
+    "com.google.android.carassistant",
+    "com.google.android.wearable.app", // Wear OS
+    "com.google.android.apps.wearable.phone",
+)

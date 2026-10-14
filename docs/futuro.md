@@ -53,7 +53,7 @@ TalkBack/letra grande, oír fundido y ecualizador, «al acabar la canción» con
 | ~~Skills de terceros~~ | Instaladas por Toxbox y usadas el 13-10 (noche) | — |
 | **Skills de terceros (antes)** (`avdlee/swiftui-agent-skill@swiftui-expert-skill`, `twostraws/swiftui-agent-skill@swiftui-pro`, `wshobson/agents@mobile-android-design`, `momentic-ai/skills@momentic-mobile-test`) | El sistema de permisos de Claude Code bloquea `npx skills add` aunque Toxbox dé permiso | Toxbox las instala con `! npx skills add <paquete> -s <skill> -g -a claude-code -y` (o añade la regla `Bash(npx skills add:*)`); después, **revisar todo el código con ellas** (lo pidió Toxbox) |
 | Compilar iOS | Cuota del repo privado agotada | **Resuelto** con las Actions gratis del repo público `pear-music` (rama `ios-compila`) |
-| Worker de soporte + Discord | Hace falta la sesión de Toxbox en Discord y Cloudflare | En casa: QR de Discord, canal y webhook, `wrangler login`, KV `RATE`, `wrangler secret put DISCORD_WEBHOOK`, `wrangler deploy` (`services/soporte/README.md`) |
+| ~~Worker de soporte + Discord~~ | **Desplegado** el 13-10 (noche) | — |
 | Integrar en la rama principal | Decisión de Toxbox | `plan-0.8.0` → `ideas-0.9.0` → `monorepo`/`master` |
 
 ## 4. Funciones pendientes
@@ -66,7 +66,7 @@ TalkBack/letra grande, oír fundido y ecualizador, «al acabar la canción» con
 - **Avisos de lanzamientos** como notificación (WorkManager / BGTaskScheduler); hoy sólo es una estantería en Inicio.
 - **Crossfade solapado** de verdad (dos reproductores), si el fundido corto se queda corto.
 - **CarPlay completo**: imposible sin la App Store (permiso `carplay-audio`). Se queda con Ahora suena y los mandos.
-- Subir Android a **0.9.0** (versionCode 11) al publicar; pasar `scripts/prepublicar.sh`.
+- ~~Subir Android a 0.9.0~~: publicado como **0.9.1** (versionCode 11) el 13-10.
 
 ## 5. Web (libremusic-landing)
 

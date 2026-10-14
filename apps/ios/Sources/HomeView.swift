@@ -1,3 +1,4 @@
+import Combine
 import SwiftUI
 
 extension RemoteCollection {
@@ -9,10 +10,19 @@ struct HomeView: View {
     @EnvironmentObject var library: Library
     @EnvironmentObject var jam: JamService
     @AppStorage("searchPlacement") private var searchPlacement = "home"
+    @AppStorage("barStyle") private var barStyle = "classic"
+    @AppStorage("settingsTop.classic") private var settingsTopClassic = false
+    @AppStorage("settingsTop.simpmusic") private var settingsTopSimp = true
+    /// Ajustes arriba (Ajustes › Aspecto › Ajustes): sale de la barra y vive aquí, junto al Jam.
+    private var settingsTop: Bool { barStyle == "simpmusic" ? settingsTopSimp : settingsTopClassic }
+    @State private var showSettings = false
+    @State private var showAvisos = false
+    @ObservedObject private var avisos = AvisosStore.shared
     @State private var query = ""
 
     /// Buscar vive en Inicio (barra arriba) salvo que en Ajustes se elija la pestaña aparte.
-    private var searchInHome: Bool { searchPlacement != "tab" }
+    /// Con la barra estilo SimpMusic, Buscar es el círculo de la barra: Inicio no lleva buscador.
+    private var searchInHome: Bool { searchPlacement != "tab" && barStyle != "simpmusic" }
     private var showingSearch: Bool { searchInHome && !query.isEmpty }
     @State private var shelves: [HomeShelf] = []
     @State private var forYou: [Song] = []
@@ -98,6 +108,21 @@ struct HomeView: View {
                     }
                     .accessibilityLabel(jam.isActive ? "Abrir el Jam" : "Jam con amigos")
                 }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    AvisosBell { showAvisos = true }
+                }
+                if settingsTop {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Button { showSettings = true } label: { Image(systemName: "gearshape") }
+                            .accessibilityLabel("Ajustes")
+                    }
+                }
+            }
+            .sheet(isPresented: $showSettings) { SettingsView() }
+            .navigationDestination(isPresented: $showAvisos) { AvisosView() }
+            .onReceive(avisos.$abrir.filter { $0 }) { _ in
+                avisos.abrir = false
+                showAvisos = true
             }
             .refreshable { await load() }
             .task {

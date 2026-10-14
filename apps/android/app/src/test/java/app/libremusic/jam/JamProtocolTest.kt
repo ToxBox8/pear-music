@@ -45,4 +45,27 @@ class JamProtocolTest {
         assertEquals("Luis (2)", JamRules.uniqueName(state, "Luis"))
         assertEquals("Marta", JamRules.uniqueName(state, " Marta "))
     }
+
+    @Test
+    fun guestsOnlyRemoveTheirOwnSongs() {
+        assertEquals(1, JamRules.remove(state, song.id, by = "Marta").entries.size)
+        assertEquals(0, JamRules.remove(state, song.id, by = "Luis").entries.size)
+    }
+
+    @Test
+    fun limitsAgainstAbuseFromTheNetwork() {
+        val huge = JamEntry(Song("x1", "a".repeat(JamRules.MAX_TEXT + 1), "b", null), "Luis")
+        assertEquals(1, JamRules.add(state, huge).entries.size)
+        val full = state.copy(entries = (1..JamRules.MAX_ENTRIES).map { JamEntry(Song("id$it", "t", "a", null), "Luis") })
+        assertEquals(JamRules.MAX_ENTRIES, JamRules.add(full, JamEntry(Song("nueva", "t", "a", null), "Luis")).entries.size)
+        assertEquals(24, JamRules.uniqueName(state, "n".repeat(100)).length)
+    }
+
+    @Test
+    fun readsBoundedLines() {
+        assertEquals("hola", JamRules.readLine(java.io.StringReader("hola\nadiós")))
+        assertNull(JamRules.readLine(java.io.StringReader("")))
+        val endless = java.io.StringReader("x".repeat(JamRules.MAX_LINE_CHARS + 10))
+        assertTrue(runCatching { JamRules.readLine(endless) }.isFailure)
+    }
 }

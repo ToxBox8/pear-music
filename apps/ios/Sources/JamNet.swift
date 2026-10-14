@@ -21,6 +21,17 @@ struct JamWire: Codable {
 enum JamV2 {
     static let serviceType = "_lm-jam2._tcp"
     static let maxPeople = 16
+    /// Topes contra abusos desde la red local (mismos que `JamRules` en Android).
+    static let maxConnections = 24
+    static let maxLineBytes = 256 * 1024
+    static let maxEntries = 500
+    static let maxText = 300
+
+    /// Una canción con datos razonables (un invitado malicioso podría mandar textos enormes).
+    static func acceptable(_ e: JamEntry) -> Bool {
+        !e.song.id.isEmpty && e.song.id.count <= 64 && e.song.title.count <= maxText && e.song.artist.count <= maxText
+            && e.by.count <= maxText
+    }
 }
 
 /// Una conexión TCP con entramado por líneas (`\n`). Todo ocurre en la cola que se le pasa.
@@ -69,6 +80,8 @@ final class JamLine {
             // Las líneas desconocidas o de versiones futuras se ignoran.
             if let msg = try? JSONDecoder().decode(JamWire.self, from: line) { onMessage?(msg) }
         }
+        // Una línea sin fin (alguien de la red mandando basura) llenaría la memoria: se corta la conexión.
+        if buffer.count > JamV2.maxLineBytes { close() }
     }
 
     func send(_ msg: JamWire) {
@@ -103,6 +116,8 @@ final class JamHostV2 {
     }
 
     private func accept(_ connection: NWConnection) {
+        // Tope de conexiones abiertas: más gente que el máximo del Jam sólo puede ser alguien abusando de la red.
+        guard peers.count < JamV2.maxConnections else { connection.cancel(); return }
         let line = JamLine(connection)
         let id = line.id
         peers[id] = line
@@ -112,7 +127,15 @@ final class JamHostV2 {
             self?.onClose?(id)
         }
         line.start(queue: queue)
+        // Quien no se presenta con el código en 15 s, fuera.
+        queue.asyncAfter(deadline: .now() + 15) { [weak self] in
+            if self?.peers[id] != nil, self?.greeted.contains(id) == false { self?.drop(id) }
+        }
     }
+
+    /// Conexiones que ya se han presentado con el código bueno (sólo se toca en `queue`).
+    private var greeted = Set<UUID>()
+    func markGreeted(_ id: UUID) { queue.async { self.greeted.insert(id) } }
 
     func send(_ msg: JamWire, to id: UUID) {
         queue.async { self.peers[id]?.send(msg) }

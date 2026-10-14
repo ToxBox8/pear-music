@@ -7,6 +7,10 @@ Cada app se versiona por separado con [SemVer](https://semver.org/lang/es/). Las
 | iOS | `apps/ios/project.yml` → `CFBundleShortVersionString` (versión) y `CFBundleVersion` (build, entero que siempre sube) | `ios-vX.Y.Z` | `LibreMusic-ios-X.Y.Z.ipa` |
 | Android | `apps/android/app/build.gradle.kts` → `versionName` y `versionCode` (entero que siempre sube) | `android-vX.Y.Z` | `LibreMusic-android-X.Y.Z.apk` |
 
+## iOS se publica desde el repo público
+
+Lo pidió Toxbox (13-10-2026). El repo privado no tiene minutos de macOS; `ToxBox8/pear-music` sí (gratis). Para cada versión de iOS: copia limpia del código en `main` de `pear-music` (`docs/publicar/CHECKLIST.md`), etiqueta `ios-vX.Y.Z` allí (su `release.yml` compila el `.ipa` y crea la release), y en la web `downloads.ts` y `altstore.json` enlazan a `https://github.com/ToxBox8/pear-music/releases/download/ios-vX.Y.Z/LibreMusic-ios-X.Y.Z.ipa` con el tamaño exacto en bytes. `altstore.json` debe llevar `appPermissions` con los `NS…UsageDescription` de `project.yml`. Android sigue en el repo privado (la clave de firma no está en el público).
+
 ## Antes de publicar
 
 `scripts/prepublicar.sh android [apk]` o `scripts/prepublicar.sh ios` comprueba, sin publicar nada:

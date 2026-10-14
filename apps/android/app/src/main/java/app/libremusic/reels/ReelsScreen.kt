@@ -252,9 +252,9 @@ private fun ReelPage(song: Song, isCurrent: Boolean, state: ReelsState, reelsVm:
             Spacer(Modifier.height(24.dp))
             Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                 Column(Modifier.weight(1f)) {
-                    Text(song.title, style = Typo.display(26f, theme), color = Color.White, maxLines = 2, overflow = TextOverflow.Ellipsis)
+                    Text(song.title, style = Typo.display(26f, theme).copy(shadow = ReelShadow), color = Color.White, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     Spacer(Modifier.height(6.dp))
-                    Text(song.artist, style = Typo.body.medium, color = Color.White.copy(0.75f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(song.artist, style = Typo.body.medium.copy(shadow = ReelShadow), color = Color.White.copy(0.85f), maxLines = 1, overflow = TextOverflow.Ellipsis)
                     if (broken) {
                         Spacer(Modifier.height(6.dp))
                         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -322,9 +322,12 @@ private fun ActionLabel(icon: ImageVector, text: String, tint: Color = Color.Whi
     Column(Modifier.widthIn(min = 56.dp).tactile(label = text, onClick = onClick), horizontalAlignment = Alignment.CenterHorizontally) {
         Box(Modifier.size(48.dp, 40.dp), contentAlignment = Alignment.Center) { Icon(icon, null, tint = tint, modifier = Modifier.size(28.dp)) }
         Spacer(Modifier.height(4.dp))
-        Text(text, style = Typo.caption2.semibold, color = tint)
+        Text(text, style = Typo.caption2.semibold.copy(shadow = ReelShadow), color = tint)
     }
 }
+
+/** Sombra suave bajo los textos blancos de Descubrir, por si la carátula es clara justo ahí. */
+private val ReelShadow = androidx.compose.ui.graphics.Shadow(Color.Black.copy(0.55f), androidx.compose.ui.geometry.Offset(0f, 1f), 8f)
 
 @Composable
 private fun ClipProgress(progress: Float, tint: Color, modifier: Modifier) {
@@ -374,6 +377,15 @@ private fun ReelBackground(url: String?, animating: Boolean) {
             // Sin desenfoque en Android < 12: la carátula muy oscurecida hace de fondo.
             CoverImage(url, Modifier.fillMaxSize().graphicsLayer { alpha = 0.35f }, placeholder = false)
         }
-        Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color.Black.copy(0.25f), Color.Black.copy(0.1f), Color.Black.copy(0.7f)))))
+        // Velo: arriba deja ver la carátula; en la franja del título y los botones oscurece lo bastante para que el
+        // blanco se lea aunque la portada sea clara (≥ 4,5:1 con la sombra del texto).
+        Box(
+            Modifier.fillMaxSize().background(
+                Brush.verticalGradient(
+                    0f to Color.Black.copy(0.35f), 0.3f to Color.Black.copy(0.15f), 0.5f to Color.Black.copy(0.35f),
+                    0.68f to Color.Black.copy(0.78f), 1f to Color.Black.copy(0.9f),
+                ),
+            ),
+        )
     }
 }

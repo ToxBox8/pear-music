@@ -80,6 +80,9 @@ object StreamResolver {
     /** Duración ya conocida (de una URL pedida antes), o null. */
     fun knownDurationMs(id: String): Long? = (cache[id] ?: cache["$id|low"])?.info?.durationMs
 
+    /** Sonoridad de la canción si ya se resolvió (ver [YTClient.StreamInfo.loudnessDb]). */
+    fun loudnessDb(id: String): Double? = (cache[id] ?: cache["$id|low"])?.info?.loudnessDb
+
     /** Tras un error de reproducción, se pide una URL nueva la próxima vez. */
     fun invalidate(id: String) {
         cache.remove(id)

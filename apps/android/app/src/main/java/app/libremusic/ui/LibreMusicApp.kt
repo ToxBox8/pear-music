@@ -1,5 +1,8 @@
 package app.libremusic.ui
 
+import app.libremusic.avisos.AvisosRepo
+import androidx.compose.runtime.snapshotFlow
+import app.libremusic.ui.theme.rememberSettingsTop
 import app.libremusic.data.AppShortcuts
 import app.libremusic.data.TabOrder
 import android.provider.Settings
@@ -52,6 +55,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -82,6 +86,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import app.libremusic.ui.simpbar.FoldStyle
+import app.libremusic.ui.simpbar.GlassBottomBar
+import com.kyant.backdrop.backdrops.layerBackdrop
+import com.kyant.backdrop.backdrops.rememberLayerBackdrop
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -93,6 +102,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.viewmodel.compose.viewModel
 import app.libremusic.jam.JamScreen
 import app.libremusic.reels.ReelsScreen
@@ -151,8 +162,41 @@ fun LibreMusicRoot(
     LaunchedEffect(app.toast) { if (app.toast != null) { delay(2600); app.toast = null } }
 
     val tabOrder by Prefs.tabOrder.collectAsState()
-    val tabs = TabOrder.visible(tabOrder, searchPlacement == "tab").map(Tab::of)
-    LaunchedEffect(searchPlacement) { if (app.tab == Tab.Search && searchPlacement != "tab") app.tab = Tab.Home }
+    val barStyle by Prefs.barStyle.collectAsState()
+    // Barra estilo SimpMusic: en la cápsula van tus pestañas sin Buscar (es un círculo aparte). Ajustes puede ir en
+    // la barra o arriba en Inicio, junto al Jam (Ajustes › Aspecto; por defecto arriba con esta barra y en la barra
+    // con la clásica). Lo que no está en la barra sigue montado para conservar su pila.
+    val simpBar = barStyle == "simpmusic"
+    val settingsTop = rememberSettingsTop()
+    val tabs = TabOrder.visible(tabOrder, !simpBar && searchPlacement == "tab").map(Tab::of)
+        .filter { !(settingsTop && it == Tab.Settings) }
+    val shownTabs = (tabs + listOfNotNull(Tab.Search.takeIf { simpBar }, Tab.Settings.takeIf { settingsTop })).distinct()
+    LaunchedEffect(searchPlacement, simpBar) { if (!simpBar && app.tab == Tab.Search && searchPlacement != "tab") app.tab = Tab.Home }
+    // Deslizar entre pestañas: estado compartido entre el contenido y las barras (ver TabPager).
+    val pager = remember { TabPager() }
+    // Plegada al bajar por una lista; se despliega al subir, al cambiar de pestaña o tocando el círculo.
+    var barCollapsed by remember { mutableStateOf(false) }
+    // Vidrio de Kyant (como Open Menus): necesita Android 13 (shaders de GPU); antes, la barra plana con el mismo
+    // movimiento. El fondo pinta el color del tema y luego las pantallas.
+    val simpGlass = simpBar && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU
+    val bgColor = Libre.colors.background
+    val simpBackdrop = rememberLayerBackdrop { drawRect(bgColor); drawContent() }
+    LaunchedEffect(app.tab, simpBar) { barCollapsed = false }
+    val collapseOnScroll = remember {
+        object : androidx.compose.ui.input.nestedscroll.NestedScrollConnection {
+            override fun onPostScroll(consumed: Offset, available: Offset, source: androidx.compose.ui.input.nestedscroll.NestedScrollSource): Offset {
+                // Como SimpMusic: desplegada sólo con la lista arriba del todo (!canScrollBackward). Bajar la pliega;
+                // si al subir sobra recorrido, la lista ha llegado arriba.
+                if (consumed.y < 0f) barCollapsed = true
+                if (available.y > 0f) barCollapsed = false
+                return Offset.Zero
+            }
+        }
+    }
+    // Atrás desde Buscar o Ajustes cuando no están en la barra vuelve a la última pestaña de la barra.
+    var lastBarTab by remember { mutableStateOf(Tab.Home) }
+    LaunchedEffect(app.tab, tabs) { if (app.tab in tabs) lastBarTab = app.tab }
+    androidx.activity.compose.BackHandler(enabled = app.tab !in tabs) { app.tab = lastBarTab }
     // La app vuelve a abrirse en la última pestaña usada.
     LaunchedEffect(app.tab) { Prefs.setLastTab(app.tab.key) }
     // Atajos del icono de la app (mantener pulsado) y del Asistente.
@@ -168,8 +212,24 @@ fun LibreMusicRoot(
             AppShortcuts.Kind.Downloads ->
                 if (downloadedNow.isEmpty()) app.toast = "Aún no hay nada descargado" else playerVm.play(downloadedNow.shuffled())
             AppShortcuts.Kind.Discover -> app.tab = Tab.Discover
-            AppShortcuts.Kind.Search -> app.tab = if (searchPlacement == "tab") Tab.Search else Tab.Home
+            AppShortcuts.Kind.Search -> app.tab = if (simpBar || searchPlacement == "tab") Tab.Search else Tab.Home
         }
+    }
+
+    // Cada vez que la app pasa a primer plano se bajan los avisos (como Open Menus): la campana de Inicio sale al día
+    // sin esperar a la comprobación de fondo de cada 15 min. Lo que ya se ve en la app no se notifica después.
+    val avisosScope = rememberCoroutineScope()
+    LifecycleEventEffect(Lifecycle.Event.ON_START) {
+        avisosScope.launch { AvisosRepo.refrescarAlAbrir(context.applicationContext) }
+    }
+
+    // Pulsar una notificación de aviso abre Avisos (también con la app ya abierta).
+    val abrirAvisos by AvisosRepo.abrir.collectAsState()
+    LaunchedEffect(abrirAvisos) {
+        if (!abrirAvisos) return@LaunchedEffect
+        AvisosRepo.abrir.value = false
+        app.showPlayer = false
+        app.push(Route.Avisos)
     }
 
     val barsDark = Libre.colors.dark || (app.tab == Tab.Discover && !app.showPlayer)
@@ -187,30 +247,35 @@ fun LibreMusicRoot(
 
                     val hasMini = player.current != null
                     val bottomInset = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() +
-                        (if (hasMini) 62.dp + 48.dp + 8.dp else 62.dp) + 20.dp
+                        (if (simpBar) (if (hasMini) 64.dp + 12.dp + 56.dp else 64.dp) else if (hasMini) 62.dp + 48.dp + 8.dp else 62.dp) + 20.dp
                     CompositionLocalProvider(LocalBottomInset provides bottomInset) {
                       // Deslizar a los lados cambia de pestaña (como Instagram). Lo que esté dentro y se
                       // arrastre en horizontal (carruseles, filas que se deslizan, «atrás» de una pila)
                       // tiene prioridad: si ya se ha quedado el arrastre, no se cambia de pestaña.
-                      val swipe = remember { Animatable(0f) }
-                      var swipeTo by remember { mutableStateOf<Tab?>(null) }
+                      //
+                      // Fluidez (0.9.4): el desplazamiento es un estado que se lee sólo al dibujar (no recompone las
+                      // pantallas ni lanza una corrutina por evento), al soltar sigue un muelle con la velocidad del
+                      // dedo, un toque a mitad de animación la atrapa, y las barras siguen al dedo vía [pager].
                       var contentWidth by remember { mutableStateOf(1f) }
                       val swipeScope = rememberCoroutineScope()
-                      val swipeEnabled = !app.showPlayer && !app.showJam && app.editing == null && !app.showImport
+                      val swipeEnabled = !app.showPlayer && !app.showJam && app.editing == null && !app.showImport && app.tab in tabs
+                      LaunchedEffect(tabs, app.tab) { pager.index = tabs.indexOf(app.tab) }
                       // Con el cristal líquido, las pantallas se graban para que el cristal las refracte.
                       Box(
                           Modifier
                               .fillMaxSize()
-                              .onSizeChanged { contentWidth = it.width.toFloat().coerceAtLeast(1f) }
-                              .pointerInput(tabs, app.tab, swipeEnabled) {
+                              .onSizeChanged { contentWidth = it.width.toFloat().coerceAtLeast(1f); pager.width = contentWidth }
+                              .pointerInput(tabs, swipeEnabled) {
                                   if (!swipeEnabled) return@pointerInput
                                   awaitEachGesture {
                                       val down = awaitFirstDown(requireUnconsumed = false)
+                                      // Atrapar: si la animación anterior iba a otra pestaña, se da por hecha y el
+                                      // dedo sigue desde donde está la pantalla.
+                                      pager.catchSettle { target -> app.tab = target }
                                       val tracker = androidx.compose.ui.input.pointer.util.VelocityTracker()
-                                      val index = tabs.indexOf(app.tab)
                                       var dx = 0f
                                       var dy = 0f
-                                      var claimed = false
+                                      var claimed = pager.offset != 0f
                                       while (true) {
                                           val change = awaitPointerEvent().changes.firstOrNull { it.id == down.id } ?: break
                                           if (!change.pressed) break
@@ -223,55 +288,37 @@ fun LibreMusicRoot(
                                               if (kotlin.math.abs(dx) > slop || kotlin.math.abs(dy) > slop) {
                                                   if (!isHorizontal(dx, dy, slop)) return@awaitEachGesture
                                                   claimed = true
-                                                  swipeTo = tabs.getOrNull(if (dx < 0) index + 1 else index - 1)
                                               }
                                           }
                                           if (claimed) {
                                               change.consume()
                                               tracker.addPosition(change.uptimeMillis, change.position)
-                                              // Sin pestaña a ese lado, se resiste (como al final de una lista).
-                                              val step = if (swipeTo == null) d.x * 0.3f else d.x
-                                              swipeScope.launch { swipe.snapTo(swipe.value + step) }
+                                              pager.dragBy(d.x, tabs)
                                           }
                                       }
                                       if (!claimed) return@awaitEachGesture
                                       val v = tracker.calculateVelocity().x
-                                      val target = swipeTo
-                                      val goes = target != null && (kotlin.math.abs(swipe.value) > contentWidth * 0.33f ||
-                                          (kotlin.math.abs(v) > 800f * density && kotlin.math.sign(v) == kotlin.math.sign(swipe.value)))
-                                      swipeScope.launch {
-                                          val spec = if (reduceMotion) tween<Float>(120) else tween(320, easing = UiEaseOut)
-                                          if (goes && target != null) {
-                                              swipe.animateTo(if (swipe.value < 0) -contentWidth else contentWidth, spec)
-                                              app.tab = target
-                                              swipe.snapTo(0f)
-                                          } else {
-                                              swipe.animateTo(0f, spec)
-                                          }
-                                          swipeTo = null
-                                      }
+                                      pager.settle(swipeScope, v, density, reduceMotion, tabs) { target -> app.tab = target }
                                   }
                               }
+                              .then(if (simpBar) Modifier.nestedScroll(collapseOnScroll) else Modifier)
+                              .then(if (simpGlass) Modifier.layerBackdrop(simpBackdrop) else Modifier)
                               .then(if (glass != null) Modifier.glassSource(glass) else Modifier),
                       ) {
                       CompositionLocalProvider(LocalInsideGlassSource provides (glass != null)) {
-                        // Las pestañas se conservan montadas para no perder el desplazamiento ni la pila.
-                        tabs.forEach { t ->
+                        // Las pestañas se conservan montadas para no perder el desplazamiento ni la pila. Su posición
+                        // se calcula al dibujar: arrastrar no recompone ni vuelve a medir ninguna pantalla, y las que
+                        // no se ven quedan lejos y transparentes (tampoco reciben toques).
+                        shownTabs.forEach { t ->
                             val active = app.tab == t
-                            val neighbor = t == swipeTo
-                            val visible = active || neighbor
                             Box(
                                 Modifier
                                     .fillMaxSize()
                                     .graphicsLayer {
-                                        alpha = if (visible) 1f else 0f
-                                        translationX = when {
-                                            active -> swipe.value
-                                            neighbor -> swipe.value + if (tabs.indexOf(t) > tabs.indexOf(app.tab)) contentWidth else -contentWidth
-                                            else -> 0f
-                                        }
-                                    }
-                                    .then(if (visible) Modifier else Modifier.offset { IntOffset(100_000, 0) }),
+                                        val x = pager.screenX(t, app.tab, tabs)
+                                        alpha = if (x == null) 0f else 1f
+                                        translationX = x ?: 100_000f
+                                    },
                             ) {
                                 CompositionLocalProvider(LocalScreenVisible provides (active && !app.showPlayer)) {
                                 when (t) {
@@ -292,15 +339,29 @@ fun LibreMusicRoot(
                     // En horizontal no pasa de 520 dp y queda centrada, como en el iPhone (si no,
                     // ocupaba todo el ancho y tapaba la lista).
                     val navBottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-                    Column(
+                    if (simpBar) {
+                        val libNow by libraryVm.data.collectAsState()
+                        val song = player.current
+                        GlassBottomBar(
+                            foldStyle = FoldStyle.V220,
+                            barTabs = tabs, selected = app.tab, onSelect = { app.select(it) },
+                            isScrolledToTop = !barCollapsed, backdrop = simpBackdrop, glass = simpGlass,
+                            follow = pager::position,
+                            nowPlaying = song, isPlaying = player.isPlaying, onTogglePlay = { playerVm.togglePlay() },
+                            isLiked = song != null && libNow.favorites.any { it.id == song.id },
+                            onToggleLike = { song?.let { libraryVm.toggleFavorite(it) } },
+                            onOpenPlayer = { app.showPlayer = true },
+                            modifier = Modifier.align(Alignment.BottomCenter).widthIn(max = 520.dp),
+                        )
+                    } else Column(
                         Modifier.align(Alignment.BottomCenter).widthIn(max = 520.dp).padding(horizontal = 21.dp).padding(bottom = maxOf(navBottom - 13.dp, 8.dp)),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         AnimatedVisibility(hasMini, enter = fadeIn() + slideInVertically { it / 2 }, exit = fadeOut() + slideOutVertically { it / 2 }) {
                             MiniPlayerAccessory(onOpen = { app.showPlayer = true })
                         }
-                        if (glass != null) LiquidTabBar(tabs, app.tab, dark = app.tab == Tab.Discover) { app.select(it) }
-                        else TabBar(tabs, app.tab, dark = app.tab == Tab.Discover) { app.select(it) }
+                        if (glass != null) LiquidTabBar(tabs, app.tab, dark = app.tab == Tab.Discover, follow = pager::position) { app.select(it) }
+                        else TabBar(tabs, app.tab, dark = app.tab == Tab.Discover, follow = pager::position) { app.select(it) }
                     }
 
                     // Reproductor completo como hoja.
@@ -371,12 +432,13 @@ fun RouteScreen(route: Route) {
         Route.About -> AboutScreen()
         Route.ManagePlaylists -> ManagePlaylistsScreen()
         Route.ReorderPlaylists -> ReorderPlaylistsScreen()
+        Route.Avisos -> AvisosScreen()
     }
 }
 
 // MARK: Barra de pestañas ------------------------------------------------------------------------
 
-private fun Tab.icon(): ImageVector = when (this) {
+internal fun Tab.icon(): ImageVector = when (this) {
     Tab.Home -> Icons.Rounded.Home
     Tab.Discover -> Icons.Rounded.Subscriptions
     Tab.Search -> Icons.Rounded.Search
@@ -386,10 +448,21 @@ private fun Tab.icon(): ImageVector = when (this) {
 
 /** Barra de pestañas flotante de cristal (iOS 26). En Descubrir se oscurece, como en iOS. */
 @Composable
-private fun TabBar(tabs: List<Tab>, selected: Tab, dark: Boolean, onSelect: (Tab) -> Unit) {
+private fun TabBar(tabs: List<Tab>, selected: Tab, dark: Boolean, follow: () -> Float? = { null }, onSelect: (Tab) -> Unit) {
     val c = Libre.colors
     val isDark = dark || c.dark
     val shape = RoundedCornerShape(31.dp)
+    val reduce = LocalReduceMotion.current
+    val selIndex = tabs.indexOf(selected)
+    // Una sola píldora que se desliza: sigue al dedo al deslizar entre pestañas y va a la nueva al tocar.
+    val pillPos = remember { Animatable(selIndex.toFloat()) }
+    LaunchedEffect(Unit) { snapshotFlow { follow() }.collect { p -> if (p != null) pillPos.snapTo(p.coerceIn(0f, tabs.lastIndex.toFloat())) } }
+    LaunchedEffect(selIndex) {
+        if (selIndex < 0) return@LaunchedEffect
+        if (reduce) pillPos.snapTo(selIndex.toFloat()) else pillPos.animateTo(selIndex.toFloat(), spring(dampingRatio = 0.85f, stiffness = 500f))
+    }
+    val highlight by remember(selIndex) { derivedStateOf { follow()?.roundToInt() ?: selIndex } }
+    val pill = if (isDark) Color.White.copy(0.1f) else Color.Black.copy(0.06f)
     Row(
         Modifier
             .fillMaxWidth()
@@ -397,22 +470,27 @@ private fun TabBar(tabs: List<Tab>, selected: Tab, dark: Boolean, onSelect: (Tab
             .clip(shape)
             .background(if (dark) Color(0xEB0E0E10) else material(c.dark, thick = true))
             .border(0.5.dp, Color.White.copy(alpha = if (isDark) 0.12f else 0.6f), shape)
+            .drawBehind {
+                if (selIndex < 0 && follow() == null) return@drawBehind
+                val pad = 8.dp.toPx()
+                val extra = 5.dp.toPx()
+                val itemW = (size.width - 2 * pad) / tabs.size
+                val h = 54.dp.toPx()
+                drawRoundRect(
+                    pill, Offset(pad + itemW * pillPos.value - extra, (size.height - h) / 2), Size(itemW + 2 * extra, h), CornerRadius(h / 2),
+                )
+            }
             .padding(horizontal = 8.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        tabs.forEach { t ->
-            val on = t == selected
+        tabs.forEachIndexed { i, t ->
+            val on = i == highlight
             val tint = if (on) (if (dark && c.theme == app.libremusic.ui.theme.AppTheme.Air) Color.White else c.accent)
             else if (isDark) Color.White.copy(alpha = 0.85f) else c.label
-            val pill = if (on) (if (isDark) Color.White.copy(0.1f) else Color.Black.copy(0.06f)) else Color.Transparent
             Column(
                 Modifier
                     .weight(1f)
                     .height(54.dp)
-                    .drawBehind {
-                        val extra = 5.dp.toPx()
-                        drawRoundRect(pill, Offset(-extra, 0f), Size(size.width + 2 * extra, size.height), CornerRadius(size.height / 2))
-                    }
                     .tactile(label = t.title) { onSelect(t) },
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
@@ -431,10 +509,10 @@ private fun TabBar(tabs: List<Tab>, selected: Tab, dark: Boolean, onSelect: (Tab
  * se posa con rebote en la pestaña nueva.
  */
 @Composable
-private fun LiquidTabBar(tabs: List<Tab>, selected: Tab, dark: Boolean, onSelect: (Tab) -> Unit) {
+private fun LiquidTabBar(tabs: List<Tab>, selected: Tab, dark: Boolean, follow: () -> Float? = { null }, onSelect: (Tab) -> Unit) {
     val c = Libre.colors
     val isDark = dark || c.dark
-    val source = LocalGlass.current ?: return TabBar(tabs, selected, dark, onSelect)
+    val source = LocalGlass.current ?: return TabBar(tabs, selected, dark, follow, onSelect)
     val reduce = LocalReduceMotion.current
     val scope = rememberCoroutineScope()
     val contentLayer = androidx.compose.ui.graphics.rememberGraphicsLayer()
@@ -457,7 +535,27 @@ private fun LiquidTabBar(tabs: List<Tab>, selected: Tab, dark: Boolean, onSelect
         if (x.value < 0f || reduce) x.snapTo(center(selIndex))
         else if (lift.value == 0f) x.animateTo(center(selIndex), spring(dampingRatio = 0.7f, stiffness = 380f))
     }
-    val highlight = if (lift.value > 0.05f && barWidth > 0f && x.value >= 0f) nearest(x.value) else selIndex
+    // Al deslizar entre pestañas, la píldora sigue al dedo (sin levantar la gota, que es del toque en la barra).
+    LaunchedEffect(Unit) {
+        snapshotFlow { follow() }.collect { p ->
+            if (p != null && barWidth > 0f && lift.value == 0f) {
+                val i = p.coerceIn(0f, tabs.lastIndex.toFloat())
+                x.snapTo(padH + tabWidth() * (i + 0.5f))
+            }
+        }
+    }
+    // derivedStateOf: la gota se mueve en cada fotograma, pero la barra sólo se recompone cuando cambia la pestaña
+    // resaltada (antes se recomponía entera en cada fotograma de la animación).
+    val highlight by remember(selIndex, tabs.size) {
+        derivedStateOf {
+            val p = follow()
+            when {
+                p != null -> p.roundToInt().coerceIn(0, tabs.lastIndex)
+                lift.value > 0.05f && barWidth > 0f && x.value >= 0f -> nearest(x.value)
+                else -> selIndex
+            }
+        }
+    }
     val pill = if (isDark) Color.White.copy(0.1f) else Color.Black.copy(0.06f)
     val shape = RoundedCornerShape(31.dp)
 

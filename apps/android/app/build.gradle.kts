@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
 }
 
@@ -10,15 +9,15 @@ val releaseKeystore: String? = System.getenv("ANDROID_KEYSTORE_PATH")
 
 android {
     namespace = "app.libremusic"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "app.libremusic"
         minSdk = 26
         targetSdk = 35
         // Versión de la app (ver docs/RELEASING.md). versionCode siempre sube.
-        versionCode = 11
-        versionName = "0.9.1"
+        versionCode = 14
+        versionName = "0.9.5"
     }
 
     signingConfigs {
@@ -65,9 +64,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
-    }
 
     buildFeatures {
         compose = true
@@ -110,7 +106,12 @@ dependencies {
     implementation(libs.androidx.media3.exoplayer.hls)
     implementation(libs.androidx.media3.session)
 
+    // Barra estilo SimpMusic: vidrio de Kyant y el plegado de SimpMusic 2.2.0 (ConstraintLayout).
+    implementation(libs.kyant.backdrop)
+    implementation(libs.androidx.constraintlayout.compose)
+
     implementation(libs.okhttp)
+    implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.coil.compose)
 
     // QR del Jam: generar (core) y escanear (embedded)
@@ -126,4 +127,9 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     // Implementación real de org.json para los tests de JVM (en Android la da el sistema)
     testImplementation(libs.org.json)
+}
+
+// AGP 9 trae Kotlin integrado: el destino de la JVM va aquí y no en android { kotlinOptions }.
+kotlin {
+    compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17) }
 }

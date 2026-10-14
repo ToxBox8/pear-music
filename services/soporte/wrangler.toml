@@ -8,4 +8,8 @@ compatibility_date = "2026-09-01"
 # y pegar aquí el id que devuelve.
 [[kv_namespaces]]
 binding = "RATE"
-id = "PENDIENTE_DE_CREAR"
+id = "fa1cbcea406f4dcfb8cf67a77a6c837b"
+
+# Sólo la URL de workers.dev (la que llevan las apps); sin URLs de vista previa.
+workers_dev = true
+preview_urls = false

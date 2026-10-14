@@ -110,6 +110,7 @@ sealed interface Route {
     data object About : Route
     data object ManagePlaylists : Route
     data object ReorderPlaylists : Route
+    data object Avisos : Route
 }
 
 /** Un aviso centrado (UIAlertController .alert). */

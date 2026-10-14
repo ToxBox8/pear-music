@@ -12,13 +12,21 @@ const env = {
 beforeEach(() => {
   sent = [];
   kv.clear();
-  globalThis.fetch = async (url, init) => { sent.push({ url, body: init.body }); return new Response(null, { status: 204 }); };
+  globalThis.fetch = async (url, init) => {
+    if (String(url).startsWith("https://cloudflare-dns.com/")) {
+      // El dominio «nadie.invalid» no existe; el resto tiene MX.
+      const nx = String(url).includes("nadie.invalid");
+      return Response.json(nx ? { Status: 3 } : { Status: 0, Answer: [{ data: "10 mx.ejemplo" }] });
+    }
+    sent.push({ url, body: init.body });
+    return new Response(null, { status: 204 });
+  };
 });
 
 const jpeg = (n) => { const b = new Uint8Array(n); b.set([0xff, 0xd8, 0xff]); return b; };
 function report(extra = {}, photos = []) {
   const f = new FormData();
-  const fields = { email: "ana@example.com", text: "La app se cierra al abrir la cola", platform: "ios",
+  const fields = { email: "ana@gmail.com", text: "La app se cierra al abrir la cola", platform: "ios",
     appVersion: "1.4.0", os: "iOS 26.1", model: "iPhone16,1", deviceId: "dev-1", ...extra };
   for (const [k, v] of Object.entries(fields)) f.append(k, v);
   photos.forEach((p, i) => f.append(`photo${i}`, new Blob([p.bytes], { type: p.type ?? "image/jpeg" }), `f${i}.jpg`));
@@ -47,15 +55,41 @@ test("rechaza un PNG y un archivo grande", async () => {
   assert.equal(sent.length, 0);
 });
 
-test("límite de 5 por dispositivo y hora", async () => {
-  for (let i = 0; i < 5; i++) assert.equal((await worker.fetch(report(), env)).status, 200);
-  const res = await worker.fetch(report(), env);
-  assert.equal(res.status, 429);
-  assert.match((await res.json()).error, /una hora/);
-  assert.equal(sent.length, 5);
+test("uno por hora por dispositivo y por correo; tres por IP", async () => {
+  assert.equal((await worker.fetch(report(), env)).status, 200);
+  const otra = await worker.fetch(report(), env);
+  assert.equal(otra.status, 429);
+  assert.match((await otra.json()).error, /una hora/);
+  // Otro móvil con el mismo correo: también espera.
+  assert.equal((await worker.fetch(report({ deviceId: "dev-2" }), env)).status, 429);
+  // Otro móvil y otro correo desde la misma IP: hasta 3.
+  assert.equal((await worker.fetch(report({ deviceId: "dev-3", email: "luis@gmail.com" }), env)).status, 200);
+  assert.equal((await worker.fetch(report({ deviceId: "dev-4", email: "eva@gmail.com" }), env)).status, 200);
+  assert.equal((await worker.fetch(report({ deviceId: "dev-5", email: "rosa@gmail.com" }), env)).status, 429);
+  assert.equal(sent.length, 3);
+});
+
+test("los contadores no guardan la IP, el correo ni el id del móvil", async () => {
+  await worker.fetch(report(), env);
+  const keys = [...kv.keys()].join(" ");
+  assert.ok(!keys.includes("1.2.3.4") && !keys.includes("ana@gmail.com") && !keys.includes("dev-1"));
+});
+
+test("dominio que no existe", async () => {
+  const res = await worker.fetch(report({ email: "ana@nadie.invalid" }), env);
+  assert.equal(res.status, 400);
+  assert.match((await res.json()).error, /no existe/);
+});
+
+test("si Discord falla no cuenta para el límite", async () => {
+  globalThis.fetch = async (url) => String(url).startsWith("https://cloudflare-dns.com/")
+    ? Response.json({ Status: 0, Answer: [{}] }) : new Response("", { status: 500 });
+  assert.equal((await worker.fetch(report(), env)).status, 502);
+  assert.equal(kv.size, 0);
 });
 
 test("si Discord falla, la app recibe un error (y guarda el borrador)", async () => {
-  globalThis.fetch = async () => new Response("", { status: 500 });
+  globalThis.fetch = async (url) => String(url).startsWith("https://cloudflare-dns.com/")
+    ? Response.json({ Status: 0, Answer: [{}] }) : new Response("", { status: 500 });
   assert.equal((await worker.fetch(report(), env)).status, 502);
 });

@@ -31,6 +31,18 @@ bloques de texto largos miden un poco más o menos.
 | 15 Importar | Sección «Desde la app Música de este iPhone» sólo en iOS; el pie dice «la app Música» / «Apple Music» | MusicKit sólo existe en iOS; cada sistema llama así a la app |
 | 15 Importar | «(también el de Android)» / «(también el de iOS)» en el pie de la copia | Cada app nombra a la otra |
 
+## Pendiente en iOS (Android 0.9.4, 2026-10-14)
+
+Hecho primero en Android porque Toxbox lo pidió para probarlo en su móvil; estado en iOS:
+
+| Qué | Android | iOS |
+|---|---|---|
+| Ajustes arriba o en la barra (Aspecto › Ajustes; `settingsTop.classic` / `settingsTop.simpmusic`) | Hecho | Hecho (falta probarlo en un iPhone) |
+| Igualar el volumen (`normalize`) | Hecho (`loudnessDb` de YouTube) | Falta (AVPlayer: `volume` por canción) |
+| Resolver por adelantado la siguiente canción | Hecho (`Prefetch`) | Falta comprobar si `Player.swift` ya lo hace |
+| Barra que sigue al dedo al deslizar entre pestañas | Hecho (`TabPager`) | No aplica: `TabView` cambia al soltar (diferencia aceptada) |
+| Avisos: campana con no leídos, pantalla y notificación (48 h, una vez) | Hecho (WorkManager cada 15 min) | Hecho (`BGAppRefreshTask`, cuando iOS deja; falta probarlo en un iPhone) |
+
 ## Revisión del 2026-10-13 (Android 0.8.1 · iOS 1.4.0)
 
 Lo nuevo se hizo igual en las dos apps (mismos textos, ajustes y formatos). Android: tests y capturas Roborazzi

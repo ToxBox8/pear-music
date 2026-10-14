@@ -70,7 +70,7 @@ class YTClientTest {
     }
 
     @Test
-    fun picksHighestBitrateAacWithDirectUrl() {
+    fun picksOpusFirstThenAacWithDirectUrl() {
         val formats = JSONArray(
             listOf(
                 JSONObject().put("mimeType", "audio/mp4; codecs=\"mp4a.40.5\"").put("bitrate", 48_000).put("url", "low"),
@@ -79,7 +79,9 @@ class YTClientTest {
                 JSONObject().put("mimeType", "audio/mp4").put("bitrate", 256_000), // cifrada, sin url
             ),
         )
-        assertEquals("high", YTClient.bestAudioUrl(formats))
+        assertEquals("opus", YTClient.bestAudioUrl(formats, opus = true))
+        assertEquals("high", YTClient.bestAudioUrl(formats, opus = false))
+        assertEquals("low", YTClient.bestAudioUrl(formats, lowest = true, opus = false))
         assertNull(YTClient.bestAudioUrl(JSONArray()))
         assertNull(YTClient.bestAudioUrl(null))
     }

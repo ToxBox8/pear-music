@@ -87,6 +87,8 @@ object JamService {
                 register(name, code, myName, socket.localPort)
                 while (!socket.isClosed) {
                     val client = socket.accept()
+                    // Tope de conexiones: más que el máximo del Jam sólo puede ser alguien abusando de la red.
+                    if (peers.size >= JamRules.MAX_CONNECTIONS) { runCatching { client.close() }; continue }
                     scope.launch { servePeer(client) }
                 }
             } catch (e: Exception) {
@@ -119,9 +121,11 @@ object JamService {
         val peer = Peer(socket, BufferedWriter(OutputStreamWriter(socket.getOutputStream(), Charsets.UTF_8)))
         peers += peer
         try {
+            // Quien no se presenta con el código en 15 s, fuera; después ya puede estar callado lo que quiera.
+            socket.soTimeout = 15_000
             val reader = BufferedReader(InputStreamReader(socket.getInputStream(), Charsets.UTF_8))
             while (true) {
-                val line = reader.readLine() ?: break
+                val line = JamRules.readLine(reader) ?: break
                 val jam = _state.value.jam ?: break
                 when (val msg = JamMessage.decode(line)) {
                     is JamMessage.Hello -> {
@@ -135,10 +139,11 @@ object JamService {
                         }
                         val name = JamRules.uniqueName(jam, msg.name)
                         peer.name = name
+                        socket.soTimeout = 0
                         updateHostJam { it.copy(members = it.members + name) }
                     }
                     is JamMessage.Add -> if (peer.name != null) updateHostJam { JamRules.add(it, msg.entry) }
-                    is JamMessage.Remove -> if (peer.name != null) updateHostJam { JamRules.remove(it, msg.songId) }
+                    is JamMessage.Remove -> peer.name?.let { who -> updateHostJam { JamRules.remove(it, msg.songId, who) } }
                     else -> Unit
                 }
             }
@@ -241,7 +246,7 @@ object JamService {
             sendToHost(JamMessage.Hello(myName, code))
             val reader = BufferedReader(InputStreamReader(socket.getInputStream(), Charsets.UTF_8))
             while (true) {
-                val line = reader.readLine() ?: break
+                val line = JamRules.readLine(reader) ?: break
                 when (val msg = JamMessage.decode(line)) {
                     is JamMessage.State -> _state.value = _state.value.copy(
                         phase = JamPhase.Joined,

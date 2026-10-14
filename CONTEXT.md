@@ -31,6 +31,10 @@ La web de descarga es `ToxBox8/libremusic-landing`.
 | **Biblioteca** | Carrusel de playlists con Descargadas y Favoritos (o, si se elige, como filas en «Tu música»), ordenado por recientes, nombre A-Z/Z-A, tamaño o a mano; debajo, en «Tu música», Tus álbumes (los guardados o descargados desde su página, en cuadrícula con buscador), Canciones, Artistas, Recientes y Estadísticas (lo más escuchado este mes, este año o siempre, en `stats.json`, sólo en el móvil). Cada lista tiene un anillo de puntos con lo descargado, filtros, «Descargar todo» y un editor (nombre, foto, icono y color). |
 | **Ajustes** | Buscador arriba y cinco secciones con su valor debajo: Aspecto (tema, reproductor, colores de la portada con presets y barras, orden de pestañas y, sólo en Android, cristal líquido), Reproducción (calidad, seguir con canciones parecidas, ecualizador —sólo Android—, fundido entre canciones, AirPlay/salida), Descargas (canciones, espacio, borrar), Biblioteca (orden de playlists, Descargadas/Favoritos, dónde va Buscar, copia automática, eliminar playlists) y Ayuda y soporte (informar de un error, guía inicial, Acerca de); Avanzado plegado. «Restablecer» por sección. El escarabajo de arriba a la derecha abre «Informar de un error»: correo, texto y hasta 4 capturas que llegan a un canal privado de Discord a través de un Worker de Cloudflare (`services/soporte`), con borradores. |
 
+La barra inferior puede ser la clásica o **estilo SimpMusic** (Ajustes › Aspecto › Barra inferior): cápsula con las pestañas y una gota que se arrastra, Buscar en un círculo aparte (Inicio no lleva buscador) y al bajar por una lista se pliega en un círculo junto al mini reproductor. **Ajustes** puede ir en la barra o arriba en Inicio junto al Jam (Aspecto › Ajustes; por defecto en la barra con la clásica y arriba con la estilo SimpMusic). Deslizar a los lados cambia de pestaña siguiendo al dedo, y la barra se mueve a la vez.
+
+**Avisos:** la campana de Inicio (junto al Jam, con un número de no leídos) abre los avisos de Pear Music, los mismos que la web en `/avisos`. Salen de un canal privado de Discord (el bot del Worker de la web los lee), se bajan cada vez que se abre la app y, con «Notificar en el móvil», llegan como notificación: sólo los de las últimas 48 h y una vez cada uno (Android cada 15 min; iOS cuando el sistema deja). También en Ajustes › Ayuda y soporte › Avisos.
+
 Las pestañas se ordenan en Ajustes › Aspecto › Pestañas (por defecto Descubrir, Inicio, Biblioteca, Ajustes) y la app se abre en la última usada. La primera vez sale una guía de tres pantallas (tema, colores y descargas).
 
 Sobre las pestañas flota el **mini reproductor**: tocarlo abre el reproductor y mantenerlo pulsado deja elegir el tipo de reproductor.
@@ -62,7 +66,7 @@ La marca es violeta `#8B5CF6`. El icono por defecto es el original de encendido 
 ### Música (YouTube Music / InnerTube)
 
 - Búsqueda, sugerencias, inicio (`FEmusic_home`), álbumes y playlists públicas, y radios (`next` con `RDAMVM<id>`) con el cliente web `WEB_REMIX`, sin sesión.
-- El audio se pide con el cliente `VISIONOS`, el único que hoy (2026-10) da URLs directas sin «PO token». Se elige el AAC de más calidad, o el de menos con «Ahorro de datos». Si YouTube no deja reproducir esa subida (sobre todo contenido «para niños»), se busca otra subida de la misma canción y se recuerda mientras la app está abierta.
+- El audio se pide con el cliente `VISIONOS`, el único que hoy (2026-10) da URLs directas sin «PO token». Android elige Opus (~160 kbps) y, si no hay, AAC; iOS, el AAC de más calidad (AVPlayer no reproduce Opus). Con «Ahorro de datos», el de menos. Si YouTube no deja reproducir esa subida (sobre todo contenido «para niños»), se busca otra subida de la misma canción y se recuerda mientras la app está abierta.
 - El `visitorData` se guarda, porque sin él YouTube responde «confirma que no eres un bot».
 - Las URLs caducan (unas 6 h); Android las cachea 3 h.
 
@@ -72,6 +76,7 @@ La marca es violeta `#8B5CF6`. El icono por defecto es el original de encendido 
 - **Android:** Media3 ExoPlayer en un `MediaLibraryService` con notificación multimedia y Android Auto (Favoritas, Descargadas, Recientes y Playlists). Las canciones se identifican como `libremusic://track/<videoId>` y se resuelven a la URL real justo antes de sonar.
 - Atajos: en Android, al mantener pulsado el icono (mezclar favoritas o descargadas, Descubrir, Buscar); en iOS, los mismos como atajos de Siri (App Intents).
 - Android tiene un widget «Ahora suena» (4×1) que actualiza el servicio y manda teclas multimedia; con la app cerrada enseña la última canción y «reproducir» retoma la última cola (`LastQueue`, `onPlaybackResumption`). iOS aún no tiene widget.
+- Android prepara la URL de las dos siguientes canciones mientras suena la actual (sin silencios entre canciones), guarda hasta 2 min por delante y iguala el volumen entre canciones con la sonoridad de YouTube (`normalize`).
 - Una canción suelta completa la cola con su radio, y al empezar la última canción de la cola (bucle apagado) se añaden 20 parecidas (radio infinita, ajuste `autoplay`).
 
 ### Biblioteca y descargas
@@ -109,8 +114,8 @@ La marca es violeta `#8B5CF6`. El icono por defecto es el original de encendido 
 
 | App | Versión | Estado |
 |---|---|---|
-| iOS | 1.4.0 (sin publicar; publicada: 1.3.1) | Referencia de diseño. Publicada en GitHub Releases (`ios-v1.3.1`) y en la web. La 1.4.0 compila (13-10, en las Actions gratis del repo público `pear-music`); falta probarla en un iPhone. |
-| Android | 0.8.1 | Misma interfaz que iOS (`docs/PARIDAD.md`). Publicada en GitHub Releases (`android-v0.8.1`, firmada en local con la clave de siempre) y en la web. Probada en un Nothing Phone (2) con Android 16 (0.8.1, sólo en parte). |
+| iOS | 1.4.1 (preparada; publicada: 1.4.0) | Referencia de diseño. Publicada el 13-10 desde el repo público (`ToxBox8/pear-music`, release `ios-v1.4.0`), en la web y en la fuente de AltStore. Falta probarla en un iPhone. |
+| Android | 0.9.5 (publicada) | Misma interfaz que iOS (`docs/PARIDAD.md`). Publicada el 14-10 en GitHub Releases (`android-v0.9.5`; por la tarde, tras la 0.9.4 de la mañana; firmada en local con la clave de siempre) y en la web. Probada en un Nothing Phone (2) con Android 16 (`docs/pruebas/v0.9.0-manual`). |
 
 Pendientes y fases en `docs/ARCHITECTURE.md` y `CHANGELOG.md`.
 
@@ -128,7 +133,7 @@ Toxbox mandó un prompt maestro (copiado en `docs/plan.md`) y aceptó las propue
 | 3 | Orden de pestañas; la app se abre en la última usada | Hecho |
 | 4 | Ajustes por intención, buscador, Restablecer, guía inicial | Hecho |
 | 4B | Colores de la portada con presets y dos barras, contraste garantizado | Hecho |
-| 4C | Informar de un error → Worker de Cloudflare → Discord | App hecha; **falta desplegar el Worker** (Toxbox, en casa) |
+| 4C | Informar de un error → Worker de Cloudflare → Discord | Hecho y desplegado (13-10); reportes en el servidor privado «Pear Music · soporte» |
 | 2D | Importar de Spotify (enlace o CSV de Exportify) y SimpMusic; emparejado con revisión | Hecho; prueba real 20/20 |
 | 5 | Icono original de encendido por defecto, icono elegible, versión y release | Android 0.8.1 publicado; iOS 1.4.0 espera a la CI |
 

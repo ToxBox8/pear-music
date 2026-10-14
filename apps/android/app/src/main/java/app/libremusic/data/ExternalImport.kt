@@ -138,6 +138,8 @@ data class SimpPlaylist(val name: String, val songs: List<Song>, val cover: Stri
 object SimpMusicBackup {
     /** Nombre de la base de datos dentro del ZIP (`DB_NAME` en SimpMusic). */
     private const val DB = "Music Database"
+    /** Tope de la base de datos dentro del ZIP (las de verdad pesan pocos MB). */
+    private const val MAX_DB_BYTES = 200L * 1024 * 1024
 
     /**
      * Lee el `.backup` (ZIP con la base SQLite de SimpMusic, esquema 27): sus playlists en orden
@@ -151,7 +153,18 @@ object SimpMusicBackup {
                 ZipInputStream(input.buffered()).use { zip ->
                     generateSequence { zip.nextEntry }.forEach { e ->
                         if (!found && e.name.substringAfterLast('/') == DB) {
-                            tmp.outputStream().use { zip.copyTo(it) }
+                            tmp.outputStream().use { out ->
+                                // Tope de tamaño: una copia manipulada no puede llenar el disco.
+                                val buf = ByteArray(64 * 1024)
+                                var total = 0L
+                                while (true) {
+                                    val n = zip.read(buf)
+                                    if (n < 0) break
+                                    total += n
+                                    if (total > MAX_DB_BYTES) throw ImportException("La copia de SimpMusic es demasiado grande.")
+                                    out.write(buf, 0, n)
+                                }
+                            }
                             found = true
                         }
                     }

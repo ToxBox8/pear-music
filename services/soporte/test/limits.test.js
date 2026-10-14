@@ -3,12 +3,13 @@ import assert from "node:assert/strict";
 import { LIMITS, checkReport, discordPayload, isJpeg, rateKey, validEmail } from "../src/limits.js";
 
 const jpeg = (n) => { const b = new Uint8Array(n); b.set([0xff, 0xd8, 0xff]); return b; };
-const ok = { email: "ana@example.com", text: "La cola se vacía sola al cambiar de canción", platform: "android",
+const ok = { email: "ana@gmail.com", text: "La cola se vacía sola al cambiar de canción", platform: "android",
   appVersion: "0.8.1", os: "Android 16", model: "A065", deviceId: "3f2a9c1e-0000", photos: [] };
 
 test("correo", () => {
-  assert.ok(validEmail("ana@example.com"));
+  assert.ok(validEmail("ana@gmail.com"));
   assert.ok(!validEmail("ana@example"));
+  assert.ok(!validEmail("ana@example.com"));
   assert.ok(!validEmail("ana example.com"));
 });
 
@@ -38,5 +39,5 @@ test("mensaje de Discord sin menciones y con los datos", () => {
   const p = discordPayload({ ...ok, text: "@everyone se cuelga" });
   assert.deepEqual(p.allowed_mentions, { parse: [] });
   assert.equal(p.embeds[0].title, "Reporte desde Android 0.8.1");
-  assert.equal(p.embeds[0].fields[0].value, "ana@example.com");
+  assert.equal(p.embeds[0].fields[0].value, "ana@gmail.com");
 });

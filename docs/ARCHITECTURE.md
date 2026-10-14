@@ -59,6 +59,7 @@ Lo único que puede ser distinto entre las dos apps, porque no se puede igualar 
 
 | Diferencia | iOS | Android | Motivo |
 |---|---|---|---|
+| Formato del audio | AAC 128 kbps (HLS o `audio/mp4`) | Opus ~160 kbps (WebM), AAC si no hay | AVPlayer no reproduce WebM/Opus; en Android Opus suena mejor al mismo tamaño |
 | Letra | SF Pro | Inter (algún texto parte línea en otro sitio) | SF Pro sólo se puede usar en Apple |
 | Iconos | SF Symbols | Material redondeados, al mismo tamaño de glifo (`SfIcons.kt` traduce los de `library.json`) | Licencia de SF Symbols |
 | Salida de audio | AirPlay (fila en Ajustes, icono en el reproductor, «iPhone» en Air) | Panel de salida del sistema («Salida de audio», icono de Cast, «Este móvil») | AirPlay sólo existe en Apple |

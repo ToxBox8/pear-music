@@ -347,7 +347,11 @@ object YTClient {
     // region URL de audio: prueba varios clientes hasta que uno devuelva una URL directa
 
     /** [durationMs]: duración de la canción si YouTube la da (Descubrir empieza directo en el estribillo). */
-    data class StreamInfo(val url: String, val userAgent: String, val durationMs: Long? = null)
+    /**
+     * [loudnessDb]: cuánto más fuerte (positivo) o más flojo que la referencia de YouTube suena la canción
+     * (`playerConfig.audioConfig.loudnessDb`); lo usa `Normalizer` para igualar el volumen entre canciones.
+     */
+    data class StreamInfo(val url: String, val userAgent: String, val durationMs: Long? = null, val loudnessDb: Double? = null)
 
     private class Profile(val name: String, val client: JSONObject, val userAgent: String)
 
@@ -383,7 +387,9 @@ object YTClient {
                 val json = post("https://www.youtube.com/youtubei/v1/player?prettyPrint=false", body, headers)
                 val url = bestAudioUrl(json.optJSONObject("streamingData")?.optJSONArray("adaptiveFormats"), lowQuality)
                 val duration = json.optJSONObject("videoDetails")?.optString("lengthSeconds")?.toLongOrNull()?.times(1000)
-                if (url != null) return StreamInfo(url, p.userAgent, duration)
+                val loudness = json.optJSONObject("playerConfig")?.optJSONObject("audioConfig")
+                    ?.optDouble("loudnessDb", Double.NaN)?.takeIf { !it.isNaN() }
+                if (url != null) return StreamInfo(url, p.userAgent, duration, loudness)
                 val status = json.optJSONObject("playabilityStatus")
                 val reason = status?.optString("reason").orEmpty()
                 problems += reason.ifEmpty { "${p.name}: ${status?.optString("status") ?: "sin_estado"}" }
@@ -431,19 +437,26 @@ object YTClient {
         }
     }
 
-    /** El audio AAC (audio/mp4) con más bitrate que traiga URL directa. */
-    /** El audio AAC de más calidad (o el de menos, con «Ahorro de datos»). */
-    fun bestAudioUrl(formats: JSONArray?, lowest: Boolean = false): String? {
+    /**
+     * El audio de más calidad con URL directa (o el de menos, con «Ahorro de datos»). Se prefiere **Opus** (WebM,
+     * ~160 kbps en «Máxima»), que suena mejor que el AAC de 128 kbps al mismo tamaño; si no viene o el móvil no
+     * tiene decodificador de Opus, AAC (audio/mp4). iOS se queda con AAC: AVPlayer no reproduce WebM.
+     */
+    fun bestAudioUrl(formats: JSONArray?, lowest: Boolean = false, opus: Boolean = OpusSupport.available): String? {
         if (formats == null) return null
-        var best: JSONObject? = null
-        for (i in 0 until formats.length()) {
-            val f = formats.optJSONObject(i) ?: continue
-            if (!f.optString("mimeType").startsWith("audio/mp4") || !f.has("url")) continue
-            val current = best
-            val better = if (lowest) f.optInt("bitrate") < (current?.optInt("bitrate") ?: Int.MAX_VALUE)
-            else f.optInt("bitrate") > (current?.optInt("bitrate") ?: -1)
-            if (current == null || better) best = f
+        fun pick(mime: String): JSONObject? {
+            var best: JSONObject? = null
+            for (i in 0 until formats.length()) {
+                val f = formats.optJSONObject(i) ?: continue
+                if (!f.optString("mimeType").startsWith(mime) || !f.has("url")) continue
+                val current = best
+                val better = if (lowest) f.optInt("bitrate") < (current?.optInt("bitrate") ?: Int.MAX_VALUE)
+                else f.optInt("bitrate") > (current?.optInt("bitrate") ?: -1)
+                if (current == null || better) best = f
+            }
+            return best
         }
+        val best = (if (opus) pick("audio/webm") else null) ?: pick("audio/mp4")
         return best?.optString("url")?.ifEmpty { null }
     }
 

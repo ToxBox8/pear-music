@@ -91,6 +91,17 @@ object Prefs {
     val artworkLevel: StateFlow<ArtworkLevel> = _artworkLevel.asStateFlow()
     private val _liquidGlass = MutableStateFlow(false)
     val liquidGlass: StateFlow<Boolean> = _liquidGlass.asStateFlow()
+    /** Barra inferior: «classic» (pestañas como iOS 26) o «simpmusic» (cápsula + Buscar aparte, se pliega). */
+    private val _barStyle = MutableStateFlow("classic")
+    val barStyle: StateFlow<String> = _barStyle.asStateFlow()
+    /**
+     * Ajustes arriba en Inicio (junto al Jam) en vez de en la barra, guardado aparte para cada barra: por defecto en
+     * la barra con la clásica y arriba con la estilo SimpMusic (lo pidió Toxbox). Arriba, sale del orden de pestañas.
+     */
+    private val _settingsTopClassic = MutableStateFlow(false)
+    val settingsTopClassic: StateFlow<Boolean> = _settingsTopClassic.asStateFlow()
+    private val _settingsTopSimp = MutableStateFlow(true)
+    val settingsTopSimp: StateFlow<Boolean> = _settingsTopSimp.asStateFlow()
     /** Orden de las pestañas (`TabOrder`) y la última abierta, para volver a ella al abrir la app. */
     private val _tabOrder = MutableStateFlow(app.libremusic.data.TabOrder.DEFAULT)
     val tabOrder: StateFlow<List<String>> = _tabOrder.asStateFlow()
@@ -104,6 +115,9 @@ object Prefs {
     private val _autoplay = MutableStateFlow(true)
     val autoplay: StateFlow<Boolean> = _autoplay.asStateFlow()
     /** Fundido entre canciones en segundos (0 = no). */
+    /** Igualar el volumen entre canciones con la sonoridad que da YouTube (sólo Android por ahora). */
+    private val _normalize = MutableStateFlow(true)
+    val normalize: StateFlow<Boolean> = _normalize.asStateFlow()
     private val _crossfade = MutableStateFlow(0)
     val crossfade: StateFlow<Int> = _crossfade.asStateFlow()
     private val _matchTolerance = MutableStateFlow(4)
@@ -130,7 +144,11 @@ object Prefs {
         _playlistSort.value = sp.getString("playlistSort", "recent") ?: "recent"
         _scramble.value = sp.getBoolean("scramble", true)
         _quality.value = sp.getString("quality", "max") ?: "max"
+        _normalize.value = sp.getBoolean("normalize", true)
         _liquidGlass.value = sp.getBoolean("liquidGlass", false)
+        _barStyle.value = sp.getString("barStyle", "classic") ?: "classic"
+        _settingsTopClassic.value = sp.getBoolean("settingsTop.classic", false)
+        _settingsTopSimp.value = sp.getBoolean("settingsTop.simpmusic", true)
         _artworkColorsPlayer.value = sp.getBoolean("artworkColorsPlayer", false)
         _artworkColorsApp.value = sp.getBoolean("artworkColorsApp", false)
         _playlistOrder.value = sp.getString("playlistOrder", "").orEmpty().split("\n").filter { it.isNotEmpty() }
@@ -197,11 +215,18 @@ object Prefs {
     fun setPlaylistSort(v: String) { _playlistSort.value = v; sp.edit().putString("playlistSort", v).apply() }
     fun setScramble(v: Boolean) { _scramble.value = v; sp.edit().putBoolean("scramble", v).apply() }
     fun setQuality(v: String) { _quality.value = v; sp.edit().putString("quality", v).apply() }
+    fun setNormalize(v: Boolean) { _normalize.value = v; sp.edit().putBoolean("normalize", v).apply(); app.libremusic.playback.Normalizer.apply() }
     fun setPlaylistOrder(v: List<String>) { _playlistOrder.value = v; sp.edit().putString("playlistOrder", v.joinToString("\n")).apply() }
     fun setSmartPlacement(v: String) { _smartPlacement.value = v; sp.edit().putString("smartPlacement", v).apply() }
     fun setArtworkColorsPlayer(v: Boolean) { _artworkColorsPlayer.value = v; sp.edit().putBoolean("artworkColorsPlayer", v).apply() }
     fun setArtworkColorsApp(v: Boolean) { _artworkColorsApp.value = v; sp.edit().putBoolean("artworkColorsApp", v).apply() }
     fun setLiquidGlass(v: Boolean) { _liquidGlass.value = v; sp.edit().putBoolean("liquidGlass", v).apply() }
+    fun setBarStyle(v: String) { _barStyle.value = v; sp.edit().putString("barStyle", v).apply() }
+    /** Ajustes arriba ([top]) o en la barra, para la barra [style] («classic» o «simpmusic»). */
+    fun setSettingsTop(style: String, top: Boolean) {
+        if (style == "simpmusic") _settingsTopSimp.value = top else _settingsTopClassic.value = top
+        sp.edit().putBoolean("settingsTop.$style", top).apply()
+    }
 }
 
 /** Colores del sistema de iOS (label, secondaryLabel…) para el modo activo, más el acento del tema. */
@@ -364,4 +389,13 @@ fun ProvideLibre(colors: LibreColors, content: @Composable () -> Unit) {
 fun DarkSection(content: @Composable () -> Unit) {
     val c = Libre.colors
     ProvideLibre(LibreColors.of(c.theme, true).copy(accent = c.accent, onAccent = c.onAccent), content)
+}
+
+/** Si Ajustes va arriba en Inicio con la barra que está puesta ahora. */
+@androidx.compose.runtime.Composable
+fun rememberSettingsTop(): Boolean {
+    val style by Prefs.barStyle.collectAsState()
+    val classic by Prefs.settingsTopClassic.collectAsState()
+    val simp by Prefs.settingsTopSimp.collectAsState()
+    return if (style == "simpmusic") simp else classic
 }

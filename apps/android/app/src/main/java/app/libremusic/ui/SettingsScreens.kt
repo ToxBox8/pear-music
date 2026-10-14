@@ -78,6 +78,7 @@ import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.GraphicEq
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.LibraryBooks
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Palette
@@ -294,6 +295,7 @@ internal fun SettingsPage(
 private data class SettingEntry(val title: String, val section: String, val keywords: String, val route: Route?)
 
 private val settingsIndex = listOf(
+    SettingEntry("Avisos", "Ayuda y soporte", "notificaciones campana caídas novedades discord", Route.Avisos),
     SettingEntry("Tema", "Aspecto", "color fondo cristal neón aire sistema apariencia", Route.ThemePicker),
     SettingEntry("Claro u oscuro", "Aspecto", "modo noche oscuro claro automático", Route.ThemePicker),
     SettingEntry("Reproductor", "Aspecto", "casete vinilo air normal", Route.PlayerPicker),
@@ -301,6 +303,7 @@ private val settingsIndex = listOf(
     SettingEntry("Colores de la portada", "Aspecto", "carátula color tinte sutil equilibrado intenso", Route.ArtworkColors),
     SettingEntry("Pestañas", "Aspecto", "orden barra descubrir inicio biblioteca", Route.TabOrderR),
     SettingEntry("Cristal líquido", "Aspecto", "glass transparente ios 26", Route.Appearance),
+    SettingEntry("Barra inferior", "Aspecto", "barra simpmusic cápsula pestañas plegar gota", Route.Appearance),
     SettingEntry("Icono de la app", "Aspecto", "logo encendido violeta lanzador", Route.AppIconR),
     SettingEntry("Calidad al escuchar", "Reproducción", "streaming datos ahorro máxima kbps", Route.Audio),
     SettingEntry("Seguir con canciones parecidas", "Reproducción", "radio infinita autoplay automático cola acabar", Route.Audio),
@@ -383,7 +386,7 @@ fun SettingsScreen() {
             ) { env.app.push(Route.Help) }
         }
         // Lo técnico, plegado: sólo quien lo busca lo ve.
-        FormSection(null, footer = if (advanced) "Las descargas se guardan siempre a la máxima calidad (AAC 128 kbps)." else null) {
+        FormSection(null, footer = if (advanced) "Las descargas se guardan siempre a la máxima calidad (Opus, unos 160 kbps)." else null) {
             FormRow(
                 "Avanzado", subtitle = if (advanced) null else "Calidad de descarga, tolerancia al importar y caché",
                 last = !advanced,
@@ -488,6 +491,30 @@ fun AppearanceScreen() {
                 "Icono de la app", subtitle = remember { app.libremusic.data.AppIcon.current(context) }.title,
                 icon = Icons.Rounded.Apps, iconPalette = 3, chevron = true, last = true,
             ) { env.app.push(Route.AppIconR) }
+        }
+        val barStyle by Prefs.barStyle.collectAsState()
+        val settingsTop = app.libremusic.ui.theme.rememberSettingsTop()
+        FormSection(
+            "Barra inferior",
+            footer = if (barStyle == "simpmusic") "Cápsula con tus pestañas y Buscar aparte, como SimpMusic. Arrastra la gota para cambiar de pestaña; al bajar por una lista se pliega junto al mini reproductor."
+            else "Las pestañas de siempre, como en el iPhone.",
+        ) {
+            Box(Modifier.padding(horizontal = 16.dp, vertical = 10.dp)) {
+                Segmented(listOf("classic" to "Clásica", "simpmusic" to "Estilo SimpMusic"), barStyle) { Prefs.setBarStyle(it) }
+            }
+        }
+        // Se guarda aparte para cada barra: con la clásica va en la barra y con la estilo SimpMusic arriba, salvo
+        // que se cambie aquí.
+        FormSection(
+            "Ajustes",
+            footer = if (settingsTop) "Ajustes está arriba en Inicio, junto al Jam, y no ocupa sitio en la barra."
+            else "Ajustes es una pestaña más de la barra; su sitio se elige en Pestañas.",
+        ) {
+            Box(Modifier.padding(horizontal = 16.dp, vertical = 10.dp)) {
+                Segmented(listOf("bar" to "En la barra", "top" to "Arriba en Inicio"), if (settingsTop) "top" else "bar") {
+                    Prefs.setSettingsTop(barStyle, it == "top")
+                }
+            }
         }
         // Sólo en Android: iOS 26 ya dibuja así sus barras y menús.
         FormSection(null) {
@@ -604,14 +631,18 @@ fun TabOrderScreen() {
     val rowPx = with(androidx.compose.ui.platform.LocalDensity.current) { 56.dp.toPx() }
     var dragging by remember { mutableStateOf<String?>(null) }
     var dragOffset by remember { mutableStateOf(0f) }
+    val settingsTop = app.libremusic.ui.theme.rememberSettingsTop()
     SettingsPage("Pestañas") {
         FormSection(
             "Orden de la barra",
-            footer = "Arrastra ≡ para cambiar el orden; deslizar a los lados sigue el mismo orden. La app se abre en la última pestaña que usaste. Ajustes siempre está en la barra.",
+            footer = "Arrastra ≡ para cambiar el orden; deslizar a los lados sigue el mismo orden. La app se abre en la última pestaña que usaste." +
+                if (settingsTop) " Ajustes está arriba en Inicio y no entra en el orden (se cambia en Aspecto)." else "",
         ) {
             items.forEachIndexed { i, key -> androidx.compose.runtime.key(key) {
                 val isDragging = dragging == key
                 val tab = Tab.of(key)
+                // Ajustes arriba: se ve apagado y sin asa, porque no está en la barra.
+                val fixedTop = settingsTop && tab == Tab.Settings
                 Box(
                     Modifier.zIndex(if (isDragging) 1f else 0f).graphicsLayer {
                         translationY = if (isDragging) dragOffset else 0f
@@ -619,8 +650,9 @@ fun TabOrderScreen() {
                     },
                 ) {
                     FormRow(
-                        tab.title, icon = tab.settingsIcon(), tint = c.label, last = i == items.lastIndex,
-                        trailing = {
+                        tab.title, subtitle = if (fixedTop) "Arriba en Inicio" else null, icon = tab.settingsIcon(), tint = c.label,
+                        last = i == items.lastIndex, enabled = !fixedTop,
+                        trailing = if (fixedTop) null else { {
                             Box(
                                 Modifier.size(44.dp).semanticsButton("Mover ${tab.title}") {}.pointerInput(key) {
                                     detectDragGestures(
@@ -638,7 +670,7 @@ fun TabOrderScreen() {
                                 },
                                 contentAlignment = Alignment.Center,
                             ) { Icon(Icons.Rounded.DragHandle, null, tint = c.tertiaryLabel, modifier = Modifier.size(24.dp)) }
-                        },
+                        } },
                     )
                 }
             } }
@@ -904,11 +936,15 @@ fun AudioScreen() {
     val crossfade by Prefs.crossfade.collectAsState()
     val equalizer by Prefs.equalizer.collectAsState()
     val autoplay by Prefs.autoplay.collectAsState()
+    val normalize by Prefs.normalize.collectAsState()
     val context = LocalContext.current
     SettingsPage("Reproducción") {
-        FormSection("Calidad al escuchar", footer = "«Máxima» usa AAC a 128 kbps; «Ahorro de datos», 48 kbps. Se aplica desde la siguiente canción.") {
+        FormSection("Calidad al escuchar", footer = "«Máxima» usa Opus a unos 160 kbps; «Ahorro de datos», unos 50 kbps. Se aplica desde la siguiente canción.") {
             FormRow("Máxima", subtitle = "Mejor sonido; gasta más datos", checked = quality == "max") { Prefs.setQuality("max") }
             FormRow("Ahorro de datos", subtitle = "Para escuchar con datos móviles", checked = quality == "low", last = true) { Prefs.setQuality("low") }
+        }
+        FormSection(null, footer = "Usa la sonoridad que YouTube mide de cada canción: las que suenan más fuerte bajan y las más flojas suben un poco, para no tocar el volumen entre canción y canción.") {
+            FormRow("Igualar el volumen", last = true, trailing = { IosToggle(normalize, { Prefs.setNormalize(it) }, label = "Igualar el volumen") })
         }
         FormSection(null, footer = "Cuando se acaba lo que estás escuchando y el bucle está apagado, se añaden canciones parecidas a la última.") {
             FormRow("Seguir con canciones parecidas", last = true, trailing = { IosToggle(autoplay, { Prefs.setAutoplay(it) }, label = "Seguir con canciones parecidas") })
@@ -965,6 +1001,9 @@ fun HelpScreen() {
     val env = LocalEnv.current
     SettingsPage("Ayuda y soporte") {
         FormSection(null) {
+            FormRow("Avisos", subtitle = "Caídas, versiones nuevas y novedades de Pear Music", icon = Icons.Rounded.Notifications, iconPalette = 4, chevron = true) {
+                env.app.push(Route.Avisos)
+            }
             FormRow("Informar de un error", subtitle = "Cuéntanos qué ha fallado; puedes añadir capturas", icon = Icons.Rounded.BugReport, iconPalette = 0, chevron = true) {
                 env.app.push(Route.Support(null))
             }

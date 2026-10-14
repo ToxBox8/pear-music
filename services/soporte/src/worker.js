@@ -2,15 +2,17 @@
 // La URL del webhook sólo vive en el secreto DISCORD_WEBHOOK (npx wrangler secret put DISCORD_WEBHOOK);
 // nunca en el repositorio ni en las apps.
 import { LIMITS, checkReport, discordPayload, rateKey } from "./limits.js";
+import { domainReceivesMail, hashId } from "./spam.js";
 
 const json = (status, body) =>
   new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json; charset=utf-8" } });
 
-async function bump(env, key, max) {
-  const n = parseInt((await env.RATE.get(key)) ?? "0", 10);
-  if (n >= max) return false;
+/** Contadores de la hora: se miran antes de enviar y sólo suben si el reporte llega a Discord. */
+async function count(env, key) {
+  return parseInt((await env.RATE.get(key)) ?? "0", 10);
+}
+async function bump(env, key, n) {
   await env.RATE.put(key, String(n + 1), { expirationTtl: 3700 });
-  return true;
 }
 
 export default {
@@ -47,10 +49,21 @@ export default {
     const problem = checkReport(report);
     if (problem) return json(400, { error: problem });
 
+    const domain = report.email.trim().toLowerCase().split("@")[1];
+    if (!(await domainReceivesMail(domain))) {
+      return json(400, { error: "Ese correo no existe (su dominio no recibe correo). Revisa que esté bien escrito." });
+    }
+
+    // Uno por hora por móvil y por correo; las claves llevan un resumen (hash), no la IP ni el correo.
     const ip = request.headers.get("cf-connecting-ip") ?? "0";
-    if (!(await bump(env, rateKey("dev", report.deviceId), LIMITS.perDevicePerHour)) ||
-        !(await bump(env, rateKey("ip", ip), LIMITS.perIpPerHour))) {
-      return json(429, { error: "Has enviado muchos reportes seguidos. Prueba dentro de una hora." });
+    const keys = [
+      [rateKey("dev", await hashId(report.deviceId)), LIMITS.perDevicePerHour],
+      [rateKey("mail", await hashId(report.email)), LIMITS.perEmailPerHour],
+      [rateKey("ip", await hashId(ip)), LIMITS.perIpPerHour],
+    ];
+    const counts = await Promise.all(keys.map(([k]) => count(env, k)));
+    if (counts.some((n, i) => n >= keys[i][1])) {
+      return json(429, { error: "Ya has enviado un reporte hace poco. Puedes mandar otro dentro de una hora." });
     }
 
     const out = new FormData();
@@ -58,6 +71,7 @@ export default {
     photos.forEach((p, i) => out.append(`files[${i}]`, new Blob([p], { type: "image/jpeg" }), `foto-${i + 1}.jpg`));
     const res = await fetch(env.DISCORD_WEBHOOK, { method: "POST", body: out });
     if (!res.ok) return json(502, { error: "El servidor de soporte no responde. Prueba más tarde." });
+    await Promise.all(keys.map(([k], i) => bump(env, k, counts[i])));
     return json(200, { ok: true });
   },
 };

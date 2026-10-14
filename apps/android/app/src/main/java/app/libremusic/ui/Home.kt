@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -192,8 +193,12 @@ fun HomeScreen() {
     val searchPlacement by Prefs.searchPlacement.collectAsState()
     val jam by JamService.state.collectAsState()
     val jamActive = jam.phase == JamPhase.Hosting || jam.phase == JamPhase.Joined
+    val barStyle by app.libremusic.ui.theme.Prefs.barStyle.collectAsState()
+    val settingsTop = app.libremusic.ui.theme.rememberSettingsTop()
     LaunchedEffect(Unit) { env.home.loadIfNeeded() }
-    val showingSearch = searchPlacement != "tab" && st.query.isNotEmpty()
+    // Con la barra estilo SimpMusic, Buscar es el círculo de la barra: Inicio no lleva buscador.
+    val hasSearch = searchPlacement != "tab" && barStyle != "simpmusic"
+    val showingSearch = hasSearch && st.query.isNotEmpty()
 
     // Cabecera como la de iOS (título grande + barra de búsqueda siempre visible): al bajar, el saludo
     // se encoge hasta la barra de arriba, y el botón del Jam y el buscador se quedan fijos.
@@ -201,7 +206,6 @@ fun HomeScreen() {
     val density = LocalDensity.current
     val titleHeight = 52.dp
     val titlePx = with(density) { titleHeight.toPx() }
-    val hasSearch = searchPlacement != "tab"
     val searchHeight = if (hasSearch) 48.dp else 0.dp
     val collapse by remember {
         derivedStateOf { if (listState.firstVisibleItemIndex > 0) 1f else (listState.firstVisibleItemScrollOffset / titlePx).coerceIn(0f, 1f) }
@@ -273,11 +277,16 @@ fun HomeScreen() {
                     greeting(), style = Typo.headline, color = c.label, maxLines = 1,
                     modifier = Modifier.align(Alignment.Center).graphicsLayer { alpha = ((collapse - 0.6f) / 0.4f).coerceIn(0f, 1f) },
                 )
-                Box(Modifier.align(Alignment.CenterEnd)) {
+                Row(Modifier.align(Alignment.CenterEnd), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     ToolbarButton(
                         JamIcon(filled = jamActive), if (jamActive) "Abrir el Jam" else "Jam con amigos",
                         tint = if (jamActive) c.accent else c.label,
                     ) { env.app.showJam = true }
+                    AvisosBell()
+                    // Ajustes arriba (Ajustes › Aspecto): sale de la barra y vive aquí, junto al Jam.
+                    if (settingsTop) {
+                        ToolbarButton(Icons.Rounded.Settings, "Ajustes", tint = c.label) { env.app.select(Tab.Settings) }
+                    }
                 }
             }
             // La altura se calcula al medir (no al componer): el desplazamiento no recompone la cabecera.

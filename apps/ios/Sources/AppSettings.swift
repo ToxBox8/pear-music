@@ -112,7 +112,7 @@ struct SettingPreview<Content: View>: View {
 // MARK: - Ajustes (Fase 4)
 /// Dónde está cada opción, para el buscador de Ajustes.
 private enum SettingsDestination: Hashable {
-    case theme, player, artwork, tabs, icon, playback, downloads, library, manage, about, help, support, advanced
+    case theme, player, artwork, tabs, bar, icon, playback, downloads, library, manage, about, help, support, advanced, avisos
 }
 
 private struct SettingEntry: Identifiable {
@@ -130,6 +130,7 @@ private let settingsIndex: [SettingEntry] = [
     SettingEntry(title: "Efecto en los títulos", section: "Aspecto", keywords: "símbolos animación scramble", destination: .player),
     SettingEntry(title: "Colores de la portada", section: "Aspecto", keywords: "carátula color tinte sutil equilibrado intenso", destination: .artwork),
     SettingEntry(title: "Pestañas", section: "Aspecto", keywords: "orden barra descubrir inicio biblioteca", destination: .tabs),
+    SettingEntry(title: "Barra inferior", section: "Aspecto", keywords: "barra simpmusic plegar buscar", destination: .bar),
     SettingEntry(title: "Icono de la app", section: "Aspecto", keywords: "logo encendido violeta pantalla de inicio", destination: .icon),
     SettingEntry(title: "Calidad al escuchar", section: "Reproducción", keywords: "streaming datos ahorro máxima kbps", destination: .playback),
     SettingEntry(title: "Seguir con canciones parecidas", section: "Reproducción", keywords: "radio infinita autoplay automático cola acabar", destination: .playback),
@@ -141,6 +142,7 @@ private let settingsIndex: [SettingEntry] = [
     SettingEntry(title: "Descargadas y Favoritos", section: "Biblioteca", keywords: "carrusel tu música", destination: .library),
     SettingEntry(title: "Dónde está Buscar", section: "Biblioteca", keywords: "buscar pestaña inicio barra", destination: .library),
     SettingEntry(title: "Eliminar playlists", section: "Biblioteca", keywords: "borrar quitar", destination: .manage),
+    SettingEntry(title: "Avisos", section: "Ayuda y soporte", keywords: "notificaciones campana caídas novedades discord", destination: .avisos),
     SettingEntry(title: "Informar de un error", section: "Ayuda y soporte", keywords: "bug fallo problema soporte reporte escarabajo contacto", destination: .support),
     SettingEntry(title: "Guía inicial", section: "Ayuda y soporte", keywords: "tutorial bienvenida empezar", destination: .help),
     SettingEntry(title: "Acerca de", section: "Ayuda y soporte", keywords: "versión créditos licencia", destination: .about),
@@ -279,6 +281,7 @@ struct SettingsView: View {
         case .player: PlayerSettings()
         case .artwork: ArtworkColorsSettings()
         case .tabs: TabOrderSettings()
+        case .bar: AspectSettings()
         case .icon: AppIconSettings()
         case .playback: AudioSettings()
         case .downloads: DownloadsSettings()
@@ -286,6 +289,7 @@ struct SettingsView: View {
         case .manage: ManagePlaylistsView()
         case .about: AboutView()
         case .support: SupportView()
+        case .avisos: AvisosView()
         case .help, .advanced: HelpSettings()
         }
     }
@@ -297,6 +301,9 @@ struct SettingsView: View {
 
 // MARK: Aspecto
 struct AspectSettings: View {
+    @AppStorage("barStyle") private var barStyle = "classic"
+    @AppStorage("settingsTop.classic") private var settingsTopClassic = false
+    @AppStorage("settingsTop.simpmusic") private var settingsTopSimp = true
     @AppStorage("theme") private var themeID = AppTheme.glass.rawValue
     @AppStorage("appearance") private var appearance = "system"
     @AppStorage("deck") private var deckID = DeckStyle.normal.rawValue
@@ -335,6 +342,37 @@ struct AspectSettings: View {
                 NavigationLink { AppIconSettings() } label: {
                     SettingsRow(icon: "app.badge", palette: 3, title: "Icono de la app", value: nil, subtitle: AppIcon.current.title)
                 }
+            }
+            .glassRow()
+
+            Section {
+                Picker("Barra inferior", selection: $barStyle) {
+                    Text("Clásica").tag("classic")
+                    Text("Estilo SimpMusic").tag("simpmusic")
+                }
+                .pickerStyle(.segmented)
+            } header: { Text("Barra inferior") } footer: {
+                Text(barStyle == "simpmusic"
+                     ? "Tus pestañas en la barra y Buscar aparte, como SimpMusic. En iOS 26 la barra se pliega al bajar por una lista."
+                     : "Las pestañas de siempre.")
+            }
+            .glassRow()
+
+            // Se guarda aparte para cada barra: con la clásica va en la barra y con la estilo SimpMusic arriba.
+            let settingsTop = Binding(
+                get: { barStyle == "simpmusic" ? settingsTopSimp : settingsTopClassic },
+                set: { if barStyle == "simpmusic" { settingsTopSimp = $0 } else { settingsTopClassic = $0 } }
+            )
+            Section {
+                Picker("Ajustes", selection: settingsTop) {
+                    Text("En la barra").tag(false)
+                    Text("Arriba en Inicio").tag(true)
+                }
+                .pickerStyle(.segmented)
+            } header: { Text("Ajustes") } footer: {
+                Text(settingsTop.wrappedValue
+                     ? "Ajustes está arriba en Inicio, junto al Jam, y no ocupa sitio en la barra."
+                     : "Ajustes es una pestaña más de la barra; su sitio se elige en Pestañas.")
             }
             .glassRow()
 
@@ -476,13 +514,24 @@ struct ArtworkPreview: View {
 /// Se arrastran para cambiar el orden; Ajustes se puede mover pero no quitar.
 struct TabOrderSettings: View {
     @AppStorage("tabOrder") private var tabOrderRaw = ""
+    @AppStorage("barStyle") private var barStyle = "classic"
+    @AppStorage("settingsTop.classic") private var settingsTopClassic = false
+    @AppStorage("settingsTop.simpmusic") private var settingsTopSimp = true
 
     var body: some View {
         let order = TabOrder.decode(tabOrderRaw)
+        // Ajustes arriba en Inicio: se ve apagado y no se mueve, porque no está en la barra.
+        let settingsTop = barStyle == "simpmusic" ? settingsTopSimp : settingsTopClassic
         Form {
             Section {
                 ForEach(order, id: \.self) { key in
-                    Label(TabOrder.title(key), systemImage: TabOrder.symbol(key))
+                    let fixed = settingsTop && key == TabOrder.settings
+                    VStack(alignment: .leading, spacing: 2) {
+                        Label(TabOrder.title(key), systemImage: TabOrder.symbol(key))
+                        if fixed { Text("Arriba en Inicio").font(.footnote).foregroundStyle(.secondary) }
+                    }
+                    .opacity(fixed ? 0.5 : 1)
+                    .moveDisabled(fixed)
                 }
                 .onMove { from, to in
                     var o = order
@@ -490,7 +539,8 @@ struct TabOrderSettings: View {
                     tabOrderRaw = TabOrder.encode(o)
                 }
             } header: { Text("Orden de la barra") } footer: {
-                Text("Arrastra ≡ para cambiar el orden; deslizar a los lados sigue el mismo orden. La app se abre en la última pestaña que usaste. Ajustes siempre está en la barra.")
+                Text("Arrastra ≡ para cambiar el orden; deslizar a los lados sigue el mismo orden. La app se abre en la última pestaña que usaste."
+                     + (settingsTop ? " Ajustes está arriba en Inicio y no entra en el orden (se cambia en Aspecto)." : ""))
             }
             .glassRow()
 
@@ -675,6 +725,10 @@ struct HelpSettings: View {
     var body: some View {
         Form {
             Section {
+                NavigationLink { AvisosView() } label: {
+                    SettingsRow(icon: "bell.badge.fill", palette: 4, title: "Avisos", value: nil,
+                                subtitle: "Caídas, versiones nuevas y novedades de Pear Music")
+                }
                 NavigationLink { SupportView() } label: {
                     SettingsRow(icon: "ladybug.fill", palette: 0, title: "Informar de un error", value: nil,
                                 subtitle: "Cuéntanos qué ha fallado; puedes añadir capturas")

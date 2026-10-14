@@ -7,14 +7,17 @@ export const LIMITS = {
   maxTotalBytes: 6_500_000, // por debajo de los 8–10 MB que admite un mensaje de Discord sin mejoras
   minText: 10,
   maxText: 4000,
-  perDevicePerHour: 5,
-  perIpPerHour: 15,
+  // Un reporte por hora por móvil y por correo (lo pidió Toxbox); por IP algo más, porque una casa o una
+  // universidad comparten IP.
+  perDevicePerHour: 1,
+  perEmailPerHour: 1,
+  perIpPerHour: 3,
 };
 
-const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+import { emailProblem, textProblem } from "./spam.js";
 
 export function validEmail(email) {
-  return typeof email === "string" && email.length <= 254 && EMAIL.test(email.trim());
+  return emailProblem(email) === null;
 }
 
 /** ¿Empieza como un JPEG (FF D8 FF)? No basta con el tipo que dice el cliente. */
@@ -27,10 +30,13 @@ export function isJpeg(bytes) {
  * Devuelve null si vale, o el motivo del rechazo (se le enseña al usuario).
  */
 export function checkReport(r) {
-  if (!validEmail(r.email)) return "El correo no es válido.";
+  const badEmail = emailProblem(r.email);
+  if (badEmail) return badEmail;
   const text = (r.text ?? "").trim();
   if (text.length < LIMITS.minText) return "Cuenta un poco más qué ha pasado.";
   if (text.length > LIMITS.maxText) return `El texto es demasiado largo (máximo ${LIMITS.maxText} caracteres).`;
+  const badText = textProblem(text);
+  if (badText) return badText;
   if (!["ios", "android"].includes(r.platform)) return "Plataforma desconocida.";
   if (!r.deviceId || r.deviceId.length > 64) return "Falta el identificador del dispositivo.";
   const photos = r.photos ?? [];
@@ -54,7 +60,7 @@ export function rateKey(kind, id, now = Date.now()) {
 export function discordPayload(r) {
   const field = (name, value) => ({ name, value: String(value || "—").slice(0, 1024), inline: true });
   return {
-    username: "LibreMusic · soporte",
+    username: "Pear Music · soporte",
     allowed_mentions: { parse: [] },
     embeds: [
       {

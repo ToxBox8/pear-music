@@ -11,12 +11,18 @@ app ──POST multipart /report──▶ Worker (valida, limita) ──webhook�
   (UUID anónimo de la instalación) y hasta 4 fotos `photo0…photo3` (JPEG, reescaladas a 1600 px, sin EXIF).
 - **Qué comprueba el Worker** (`src/limits.js`, mismos límites que las apps): correo válido, texto de 10 a 4000
   caracteres, ≤ 4 fotos, ≤ 1,5 MB cada una y ≤ 6,5 MB en total, que sean JPEG de verdad (por sus bytes), y
-  5 reportes por dispositivo y 15 por IP cada hora (Workers KV). Responde `200 {ok}`, o `4xx/5xx {error}` con
+  1 reporte por hora por dispositivo y por correo y 3 por IP (Workers KV, con las claves en SHA-256: no se guarda la IP
+  ni el correo). Además (`src/spam.js`): correos desechables, de prueba o de relleno, dominio sin MX (DNS sobre HTTPS a
+  1.1.1.1) y texto sin sentido o con más de 2 enlaces. Responde `200 {ok}`, o `4xx/5xx {error}` con
   un texto que la app enseña tal cual.
 - **Discord:** un mensaje con un embed (correo, sistema, modelo, versión y texto) y las fotos adjuntas, sin
   menciones (`allowed_mentions: []`). Los webhooks admiten 10 archivos y unos 8–10 MB por mensaje en un servidor
   sin mejoras; con 4 fotos de ≤ 1,5 MB queda margen.
 - **Coste:** el plan gratuito de Workers (100 000 peticiones al día) y de KV basta; no hay servidor que mantener.
+
+## Estado
+
+Desplegado el 13-10-2026 en la cuenta de la web. KV `RATE` = `fa1cbcea…`. Los reportes van al servidor privado de Discord «Pear Music · soporte», canal `#soporte-pear-music`. Para volver a desplegar: `npx wrangler login --device` (el login normal falla) y `npx wrangler deploy`.
 
 ## Desplegar (lo hace Toxbox, una vez)
 

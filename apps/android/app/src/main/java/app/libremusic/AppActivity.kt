@@ -33,6 +33,7 @@ class AppActivity : ComponentActivity() {
         jamCode = JamLink.codeFrom(intent?.dataString)
         app.libremusic.data.AppShortcuts.handle(intent)
         app.libremusic.data.AppShortcuts.publish(this)
+        abrirAvisosSi(intent)
         askForNotifications()
         setContent {
             LibreMusicTheme {
@@ -53,6 +54,13 @@ class AppActivity : ComponentActivity() {
         super.onNewIntent(intent)
         JamLink.codeFrom(intent.dataString)?.let { jamCode = it }
         app.libremusic.data.AppShortcuts.handle(intent)
+        abrirAvisosSi(intent)
+    }
+
+    private fun abrirAvisosSi(intent: Intent?) {
+        if (intent?.getBooleanExtra(app.libremusic.avisos.AvisosWorker.EXTRA_ABRIR_AVISOS, false) == true) {
+            app.libremusic.avisos.AvisosRepo.abrir.value = true
+        }
     }
 
     /** Android 13+: sin este permiso no se ve la notificación con los controles de la música. */

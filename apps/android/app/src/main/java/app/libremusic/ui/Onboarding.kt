@@ -146,7 +146,7 @@ private fun DownloadsStep() {
     Segmented(listOf("max" to "Máxima", "low" to "Ahorro de datos"), quality) { Prefs.setQuality(it) }
     Spacer(Modifier.height(8.dp))
     Text(
-        if (quality == "low") "Gasta menos datos móviles (48 kbps)." else "Mejor sonido (AAC 128 kbps).",
+        if (quality == "low") "Gasta menos datos móviles (48 kbps)." else "Mejor sonido (Opus, unos 160 kbps).",
         style = Typo.footnote, color = c.secondaryLabel, textAlign = TextAlign.Start,
     )
 }
