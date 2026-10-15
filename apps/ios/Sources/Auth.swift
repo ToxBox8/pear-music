@@ -68,9 +68,9 @@ enum Auth {
     }
 }
 
-// MARK: - Estado de la cuenta
+// MARK: - Estado de la sesión de YouTube Music (no es la cuenta de Pear Music, que está en Account.swift)
 @MainActor
-final class Account: ObservableObject {
+final class YTAccount: ObservableObject {
     @Published private(set) var isLoggedIn = false
 
     init() {

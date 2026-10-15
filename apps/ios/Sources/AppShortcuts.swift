@@ -13,28 +13,28 @@ final class ShortcutRouter: ObservableObject {
 /// App Intents no necesita ningún permiso de Apple, así que funciona también instalada con AltStore o SideStore.
 @available(iOS 16.0, *)
 struct ShuffleFavoritesIntent: AppIntent {
-    static let title: LocalizedStringResource = L("Mezclar mis favoritas")
+    static let title: LocalizedStringResource = "Mezclar mis favoritas"
     static let openAppWhenRun = true
     @MainActor func perform() async throws -> some IntentResult { ShortcutRouter.shared.pending = .favorites; return .result() }
 }
 
 @available(iOS 16.0, *)
 struct ShuffleDownloadsIntent: AppIntent {
-    static let title: LocalizedStringResource = L("Mezclar lo descargado")
+    static let title: LocalizedStringResource = "Mezclar lo descargado"
     static let openAppWhenRun = true
     @MainActor func perform() async throws -> some IntentResult { ShortcutRouter.shared.pending = .downloads; return .result() }
 }
 
 @available(iOS 16.0, *)
 struct OpenDiscoverIntent: AppIntent {
-    static let title: LocalizedStringResource = L("Abrir Descubrir")
+    static let title: LocalizedStringResource = "Abrir Descubrir"
     static let openAppWhenRun = true
     @MainActor func perform() async throws -> some IntentResult { ShortcutRouter.shared.pending = .discover; return .result() }
 }
 
 @available(iOS 16.0, *)
 struct OpenSearchIntent: AppIntent {
-    static let title: LocalizedStringResource = L("Buscar música")
+    static let title: LocalizedStringResource = "Buscar música"
     static let openAppWhenRun = true
     @MainActor func perform() async throws -> some IntentResult { ShortcutRouter.shared.pending = .search; return .result() }
 }
@@ -42,9 +42,9 @@ struct OpenSearchIntent: AppIntent {
 @available(iOS 16.0, *)
 struct LibreMusicShortcuts: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
-        AppShortcut(intent: ShuffleFavoritesIntent(), phrases: [L("Mezcla mis favoritas en {0}", .applicationName), L("Pon mis favoritas en {0}", .applicationName)])
-        AppShortcut(intent: ShuffleDownloadsIntent(), phrases: [L("Pon lo descargado en {0}", .applicationName)])
-        AppShortcut(intent: OpenDiscoverIntent(), phrases: [L("Abre Descubrir en {0}", .applicationName)])
-        AppShortcut(intent: OpenSearchIntent(), phrases: [L("Busca música en {0}", .applicationName)])
+        AppShortcut(intent: ShuffleFavoritesIntent(), phrases: ["Mezcla mis favoritas en \(.applicationName)", "Pon mis favoritas en \(.applicationName)"])
+        AppShortcut(intent: ShuffleDownloadsIntent(), phrases: ["Pon lo descargado en \(.applicationName)"])
+        AppShortcut(intent: OpenDiscoverIntent(), phrases: ["Abre Descubrir en \(.applicationName)"])
+        AppShortcut(intent: OpenSearchIntent(), phrases: ["Busca música en \(.applicationName)"])
     }
 }
