@@ -1,4 +1,4 @@
-# LibreMusic (cliente no oficial de YouTube Music)
+# Pear Music para iOS (cliente no oficial de YouTube Music)
 
 Compilación en la nube (GitHub Actions) + instalación desde Linux.
 

@@ -1,0 +1,971 @@
+1	\n\nS'actualitza a sobre amb AltStore o SideStore: no perds la biblioteca ni les cançons baixades.
+2	\n\nS'actualitza a sobre: no perds la biblioteca ni les cançons baixades.
+3	 (tiquet #{0}). Et respondrem a Avisos.
+4	 Configuració és a dalt a Inici i no entra en l'ordre (es canvia a Aspecte).
+5	 Les {0} que falten queden a la llista, a «Sense afegir», per buscar-les una altra vegada.
+6	 · Cerca 
+7	 · Colors {0}
+8	 · més probable
+9	 · tiquet #{0}
+10	 · títols amb efecte
+11	 · {0} sense connexió
+12	. Gràcies!
+13	1 cançó
+14	A continuació
+15	A mà
+16	A mà…
+17	Aa
+18	Obre Descobrix a {0}
+19	Obre el Jam (la icona de les tres persones)
+20	Obre Configuració
+21	Obre Descobrix
+22	Obre el Jam
+23	Obre l'enllaç
+24	Obre el reproductor
+25	Accessos ràpids
+26	Accepta les condicions per continuar
+27	Accepte les condicions d'ús
+28	Quant a
+29	Activada
+30	Actualitza la llista guardada
+31	Activa-ho a Configuració o escriu el codi a mà.
+32	Administració
+33	Afecta totes les persones que fan servir Pear Music així que obrin l'app.
+34	Ara no, continua
+35	Ara sona
+36	Ara sona gran
+37	Estalvi de dades
+38	Air
+39	AirPods Max
+40	AirPods Pro
+41	Ajust fi
+42	Configuració
+43	Configuració és una pestanya més de la barra; el seu lloc es tria a Pestanyes.
+44	Configuració és a dalt a Inici, al costat del Jam, i no ocupa lloc a la barra.
+45	En acabar la cançó
+46	En canviar de cançó, el títol apareix entre símbols que s'ordenen
+47	En importar d'Spotify o Apple Music, quant pot variar la durada d'una cançó per donar-la per bona
+48	Quan sona una cançó, l'app i els menús agafen colors semblants als de la portada, com a Descobrix.
+49	Aleatori
+50	Alguna foto no s'ha pogut afegir
+51	Alguna foto no s'ha pogut afegir.
+52	Altaveus, HomePod i Apple TV
+53	Altaveus, auriculars i televisors amb Bluetooth o Chromecast
+54	Altaveu xicotet
+55	Anterior
+56	Abans d'esborrar es demana confirmació.
+57	Abans de començar
+58	Apagada
+59	Apareixen com a files a «La teua música», sobre Cançons.
+60	Apareixen amb la portada gran al carrusel de Llistes.
+61	Apel·lació
+62	Apel·lació enviada. Et respondrem per correu.
+63	Apel·la
+64	Apple Music o Spotify: obre la llista → Compartix → Copia l'enllaç. Ha de ser pública. D'Spotify arriben fins a unes 100 cançons; per a llistes més llargues, fes servir el CSV d'Exportify.
+65	Apunta al QR del Jam
+66	Fitxer library.json de Pear Music (també el d'Android). S'afig el que no tingues, sense esborrar res.
+67	Fitxer library.json de Pear Music (també el d'iOS). S'afig el que no tingues, sense esborrar res.
+68	Arrossega les carpetes per canviar l'ordre.
+69	Arrossega les llistes, Baixades i Preferides per posar-les on vulgues.
+70	Arrossega per canviar l'ordre
+71	Arrossega per canviar l'ordre del carrusel. En moure alguna cosa, Llistes s'ordena «A mà».
+72	Arrossega ≡ per canviar l'ordre del carrusel. En moure alguna cosa, Llistes s'ordena «A mà».
+73	Arrossega ≡ per canviar l'ordre.
+74	Arrossega ≡ per canviar l'ordre; lliscar als costats segueix el mateix ordre. Llisca Descobrix cap a l'esquerra per amagar-la (i cap a la dreta per tornar-la a posar). L'app s'obre a l'última pestanya que vas fer servir.
+75	A dalt a Inici
+76	Arrossega'l a un altre solc per canviar la posició
+77	Artista
+78	Artista {0}
+79	Artistes
+80	Aspecte
+81	Aspecte dels ginys
+82	Així et veuran els altres
+83	Enrere
+84	Auriculars
+85	Automàtic
+86	Avançat
+87	Avís
+88	Avisos
+89	Avisos de Pear Music publicats al web
+90	Avisos importants
+91	Avisos, {0} sense llegir
+92	Ajuda i suport
+93	Ajudes a millorar Pear Music
+94	Afegida a la llista
+95	Afegides recentment
+96	Afig
+97	Afig als teus àlbums
+98	Afig a preferides
+99	Afig a la cua
+100	Afig a una llista
+101	Afig a una llista
+102	Afig al Jam
+103	Afig captures
+104	Afig una llista
+105	Afig {0} a la pantalla d'inici
+106	Afig {0} al Jam
+107	Encara no has guardat res
+108	Encara no has marcat preferides aquí.
+109	Encara no hi ha cançons. Afig la primera i apareixerà al mòbil de tothom.
+110	Encara no hi ha escoltes en este període. Compta cada cançó que sona almenys 30 segons.
+111	Encara no hi ha preferides
+112	Encara no hi ha res baixat
+113	Encara sense còpia
+114	Baixos i bombos amb més cos
+115	Barra a dalt a Inici
+116	Barra inferior
+117	Barres, botons i menús de vidre que refracten el que hi ha darrere, com iOS 26
+118	Biblioteca
+119	Biblioteca exportada.
+120	Biblioteca guardada
+121	Biblioteca guardada al núvol
+122	Bloqueig
+123	Bloqueig total
+124	Bluetooth
+125	Esborra la biblioteca, les baixades, les estadístiques i la configuració, i tanca l'app. No es pot desfer.
+126	Esborranys
+127	Esborra
+128	Esborra el compte
+129	Esborrar el compte elimina a l'instant el teu correu i la còpia del núvol. La biblioteca d'este mòbil es queda.
+130	Esborra-ho tot
+131	Esborra totes les meues dades
+132	Botons del color de la cançó i fons i menús amb un toc
+133	Botó de pànic
+134	Braç
+135	Bona nit
+136	Bona tarda
+137	Bon dia
+138	Cerca cançons, àlbums o artistes
+139	Cerca música a {0}
+140	Cerca un àlbum o entra en un artista i prem «Afig als teus àlbums» o «Baixa-ho tot».
+141	Cerca una cançó per afegir-la
+142	Buscant el Jam
+143	Cercant a YouTube Music… {0} de {1}
+144	Buscant música per a tu…
+145	Cerca
+146	Cerca artistes
+147	Cerca a Configuració
+148	Cerca a les llistes
+149	Cerca als teus àlbums
+150	Cerca a {0}
+151	Cerca música
+152	Torna a cercar
+153	Cerca té la seua pestanya a la barra de baix, just després d'Inici.
+154	Cerca té la seua pestanya a la barra de baix.
+155	Bústia de suggeriments
+156	CSV d'Exportify (Spotify)
+157	Memòria cau buidada
+158	Cada cançó comença i acaba al seu volum.
+159	Qualitat
+160	Qualitat en escoltar
+161	Qualitat en escoltar sense baixar
+162	Qualitat de baixada
+163	Qualitat de baixada, tolerància en importar i memòria cau
+164	Qualitat màxima
+165	Canvia el fons, les targetes, el color i la lletra de tota l'app. Ho pots canviar quan vulgues a Configuració › Aspecte.
+166	Canvia entre no repetir, repetir la llista i repetir la cançó
+167	Canvia el correu
+168	Canvia la foto
+169	Canvia el reproductor
+170	Canal
+171	Canal, registre i botó de pànic
+172	Cancel·la
+173	Cancel·la el bloqueig pendent
+174	Cancel·la la baixada; el que ja s'ha baixat es queda
+175	Cançons
+176	Cançons baixades
+177	Cançons més escoltades
+178	Cançons que t'agraden (SimpMusic)
+179	Cançons, artistes…
+180	Cançons, àlbums, artistes…
+181	Cançó que sona
+182	Cançó sense identificador
+183	Captures
+184	Carpeta
+185	Caràtula de {0}
+186	Caràtula gran i controls (4×2).
+187	Caràtula, títol i controls en una fila (4×1).
+188	Casset
+189	Casset amb bobines que gires amb el dit, vinil que es pot «scratchejar» o l'Air platejat. Mantín premut el minireproductor per canviar.
+190	Casset: gira una bobina o arrossega la cinta per avançar o rebobinar. Vinil: gira el disc amb el dit o mou el braç. Amb l'iPhone en horitzontal, el casset o el vinil ocupen tota la pantalla. També el pots canviar mantenint premut el minireproductor.
+191	Casset: gira una bobina o arrossega la cinta per avançar o rebobinar. Vinil: gira el disc amb el dit o mou el braç. Amb el mòbil en horitzontal, el casset o el vinil ocupen tota la pantalla. També el pots canviar mantenint premut el minireproductor.
+192	Cast
+193	Caigudes i versions urgents
+194	Caigudes, versions noves i novetats de Pear Music
+195	Tanca
+196	Tanca l'avís
+197	Tanca les històries
+198	Tanca el reproductor
+199	Tanca la sessió
+200	Cinta
+201	Clar
+202	Clar o fosc
+203	Clau copiada
+204	Clau de recuperació
+205	Clau pública copiada
+206	Client no oficial de YouTube Music. Fa servir una API no oficial de YouTube, així que pot deixar de funcionar si YouTube la canvia. Les baixades es guarden en este iPhone.
+207	Client no oficial de YouTube Music. Fa servir una API no oficial de YouTube, així que pot deixar de funcionar si YouTube la canvia. Les baixades es guarden en este mòbil.
+208	Clàssica
+209	Cotxe
+210	Cua
+211	Color
+212	Color {0}
+213	Colors de la portada
+214	Colors de la portada al reproductor
+215	Colors de la portada a la resta de l'app
+216	Compartix
+217	Components inspirats en The Kitchen de dqnamo
+218	Compressió no admesa.
+219	Comprova cada 15 minuts si hi ha avisos nous. Només es demana la llista d'avisos, sense enviar res teu.
+220	Comprova de tant en tant si hi ha avisos nous. Només es demana la llista d'avisos, sense enviar res teu.
+221	Comprova la connexió i torna-ho a provar.
+222	Amb això encès i el mòbil connectat per cable (adb forward tcp:8765 tcp:8765), la pàgina amagada del web demana aquí una clau de 5 minuts. Només escolta dins del mòbil i s'apaga sola als 10 minuts. La clau pública va una vegada a PANEL_PUBLIC_KEY del Worker.
+223	Confirma el bloqueig pendent
+224	Continua
+225	Contrasenya
+226	Còpia automàtica
+227	Còpia de SimpMusic
+228	Còpia de SimpMusic (.backup)
+229	Còpia de la biblioteca
+230	Còpia guardada
+231	Copia
+232	Copia la clau pública
+233	Copia el registre
+234	Correu
+235	Crea una llista amb + o porta les teues des d'Apple Music.
+236	Crea una llista a Biblioteca
+237	Crea una llista o guarda un àlbum per triar-lo.
+238	Crea
+239	Crea un Jam
+240	Crea el meu compte
+241	Crea una llista amb {0}
+242	Crea'n un
+243	Vidre líquid
+244	Vidre, Aire, Neó o Sistema, i colors que ixen de la portada. Tot a Configuració › Aspecte.
+245	Crèdits
+246	Quan hi hagi alguna cosa important sortirà aquí.
+247	Quan s'acaba el que escoltes i la repetició està apagada, s'afigen cançons semblants a l'última.
+248	Compte
+249	Compte esborrat
+250	Compte creat
+251	Explica què feies i què esperaves que passara. Com més concret, millor (mínim {0} caràcters).
+252	Quant
+253	Quant s'assemblen els botons al color de la portada
+254	Quant es tenyeixen els fons i els menús
+255	Explica'ns què ha fallat; pots afegir captures
+256	Explica'ns què t'agradaria que fes Pear Music
+257	Càpsula amb les pestanyes i Cerca a part, com SimpMusic. Arrossega la gota per canviar de pestanya; en baixar per una llista es plega al costat del minireproductor.
+258	Codi QR del Jam
+259	Codi de 6 xifres
+260	Codi del Jam, 6 caràcters
+261	Codi per unir-se
+262	Dades exportades
+263	De la importació. Toca per tornar-les a cercar.
+264	Deixa de baixar; el que ja s'ha baixat es queda
+265	Deixaran d'estar disponibles sense connexió, també en altres llistes que les tinguin.
+266	Deixaran d'estar disponibles sense connexió. Les llistes i les preferides no es toquen.
+267	Desactivada
+268	Desactivat
+269	Desactiva
+270	Desactiva el temporitzador
+271	Baixa alguna cosa per escoltar-la sense connexió
+272	Baixa cançons amb la fletxa de cada fila o amb «Baixa-ho tot» en una llista.
+273	Baixa cançons, àlbums i llistes a la màxima qualitat.
+274	Baixa una cançó amb la fletxa, o una llista o un àlbum sencer amb «Baixa-ho tot». Es guarden en este iPhone a la màxima qualitat i les tens a Biblioteca › Baixades, també sense connexió.
+275	Baixa una cançó amb la fletxa, o una llista o un àlbum sencer amb «Baixa-ho tot». Es guarden en este mòbil a la màxima qualitat i les tens a Biblioteca › Baixades, també sense connexió.
+276	Baixada
+277	Baixades
+278	Baixades i Preferides
+279	Baixat
+280	Baixant
+281	Baixant Pear Music {0}…
+282	Baixant {0} %
+283	Baixa
+284	Baixa les {0} que falten
+285	Baixa-ho tot
+286	Baixades
+287	Descarta
+288	Descarta {0}
+289	Desconegut
+290	Descobrix
+291	Descobrix, Inici, Biblioteca, Configuració
+292	Des de l'app Música d'este iPhone
+293	Des d'un fitxer
+294	Des d'un enllaç
+295	Llisca una estona a Descobrix
+296	Desplega la barra ({0})
+297	Disc
+298	Disponible sense connexió
+299	Dos coses, per separat. Pots canviar la segona quan vulgues a Configuració › Ajuda i suport › Les teues dades.
+300	On
+301	On cercar
+302	On és Cerca
+303	Equalitzador
+304	Edita
+305	Edita la cua
+306	Edita l'ordre de les llistes
+307	Edita la llista
+308	Edita les llistes
+309	Efecte als títols
+310	El Jam és ple.
+311	El Jam s'acabarà per a tothom.
+312	L'amfitrió
+313	L'amfitrió ha acabat el Jam.
+314	El fitxer està tallat.
+315	El fitxer porta la teua biblioteca, estadístiques, lletres, esborranys de suport i configuració; no les cançons baixades.
+316	El fitxer no és un ZIP vàlid.
+317	El fitxer no té cançons.
+318	La repetició (no repetir, repetir llista o cançó) es canvia al reproductor.
+319	El codi no és vàlid.
+320	El servidor de suport no respon ({0}). Prova-ho més tard.
+321	El servidor no respon ({0}). Prova-ho més tard.
+322	El so tal com és
+323	El suport està en pausa mentre resolem un incident. El teu informe es queda a Esborranys.
+324	El tema canvia el fons, les targetes, el color i la lletra. Els fons agafen els colors de la caràtula i s'animen més mentre sona música.
+325	El text i les icones mantenen sempre un contrast llegible, encara que la portada siga molt clara o molt viva.
+326	Triada
+327	Tria la carpeta
+328	Tria una foto
+329	Tria el teu tema
+330	Elimina
+331	Elimina l'esborrany
+332	Elimina la baixada
+333	Elimina la llista
+334	Elimina llistes
+335	Eliminar una llista no esborra les seues cançons de Preferides ni de Baixades.
+336	Elimina {0}
+337	Comença
+338	Comença a escoltar
+339	Comença de zero
+340	A Llistes (portada gran)
+341	Als teus àlbums
+342	En directe
+343	Al reproductor
+344	A la resta de l'app
+345	A la barra
+346	En manteniment
+347	A la teua biblioteca: {0}
+348	A «La teua música» (fila)
+349	Encesa
+350	Enllaç d'Spotify o Apple Music
+351	Entra
+352	Enviat ({0} camps)
+353	Envia
+354	Envia ara
+355	Envia l'apel·lació
+356	Envia dades de rendiment (opcional)
+357	Equilibrat
+358	Esta clau no té el format correcte.
+359	Escanegeu-lo amb la càmera de l'iPhone o des de Biblioteca → + → Jam amb amics.
+360	Escanegeu-lo amb la càmera del mòbil o des de Biblioteca → + → Jam amb amics.
+361	Escaneja el QR
+362	Escriu la teua clau de recuperació
+363	Escriu el teu nom per crear un Jam o unir-t'hi.
+364	Escolta el que vulgues
+365	Escolta una cançó
+366	Escoltat fa poc
+367	Escoltat recentment
+368	Escolta-la sencera
+369	Escolta les meues baixades
+370	Espai utilitzat
+371	Esta app
+372	Estadístiques
+373	Estem preparant coses només per a qui tinga compte. T'avisarem a Avisos.
+374	Este artista no té cançons ni àlbums disponibles.
+375	Este any
+376	Este fragment no s'ha pogut carregar
+377	Este mes
+378	Este mòbil
+379	Estil SimpMusic
+380	Estos són els últims avisos guardats.
+381	Exageració del color
+382	Explica per què és un informe de veritat. El llegirà una persona i et respondrà per correu.
+383	Exporta o esborra tot el que l'app guarda de tu
+384	Exporta una còpia
+385	Exporta les meues dades
+386	Error en reproduir: temps d'espera esgotat
+387	Error en reproduir: {0}
+388	Falta la clau de recuperació.
+389	Preferides
+390	Preferides
+391	Fixa un àlbum o una llista amb la xinxeta
+392	Fixat a dalt a Biblioteca i Inici
+393	Fixats
+394	Fixa a dalt
+395	Fons amb la caràtula desenfocada i controls del seu color
+396	Foto
+397	Fragments de cançons que et poden agradar, a pantalla completa. Llisca per a la següent i toca dos vegades per a «M'agrada». Si no el fas servir, llisca'l cap a l'esquerra a Configuració › Aspecte › Pestanyes.
+398	Fragments de cançons que et poden agradar, a pantalla completa. Llisca per a la següent i toca dos vegades per a «M'agrada». Si no el fas servir, llisca'l cap a l'esquerra a Configuració › Aspecte › Pestanyes. Toca la pestanya Descobrix.
+399	Fos
+400	Fos entre cançons
+401	Gasta menys dades mòbils (48 kbps).
+402	Gira una bobina o arrossega la cinta per avançar o rebobinar
+403	Guarda cançons per veure'n els artistes
+404	Guarda una preferida amb el cor
+405	Guardada a Biblioteca com a «{0}»
+406	Guardada a la teua biblioteca
+407	Guarda ara al núvol
+408	Guarda com a llista
+409	Guarda a la biblioteca
+410	Guarda la llista
+411	Guarda i ix
+412	Guarda-la al gestor de contrasenyes o apunta-la. És el que xifra la teua biblioteca: sense ella no es pot 
+413	Guarda-la al gestor de contrasenyes o apunta-la. És el que xifra la teua biblioteca: sense ella no es pot recuperar la còpia del núvol en un altre mòbil. Pear Music no la guarda i no la pot recuperar.
+414	Guia inicial
+415	Gira'l per avançar o retrocedir
+416	Fes una còpia ara
+417	Fins a {0}. Es redueixen i se'ls treu la ubicació i les altres dades de la foto abans d'enviar-les.
+418	Fes-la teua
+419	Fet
+420	Història {0} de {1}: {2}. {3}
+421	Icona
+422	Iguala el volum
+423	Importat: {0} preferides i {1} llistes noves.
+424	Important «{0}»
+425	Important
+426	Importa
+427	Importa 1 llista
+428	Importa una còpia
+429	Importa d'Apple Music
+430	Importa una llista
+431	Importa {0} llistes
+432	Informa d'un error
+433	Informa d'un error · Guia inicial · Versió {0}
+434	Inici
+435	Instrumental
+436	Intens
+437	Jam
+438	Jam amb amics
+439	Jam amb els teus amics
+440	Jam en directe · {0}
+441	Jam sense connexió
+442	Jam {0}, codi {1}
+443	LRCLIB ha respost {0}
+444	La barra de cerca és sempre a dalt a Inici i la pestanya Cerca desapareix.
+445	La barra de cerca és sempre a dalt a Inici.
+446	La qualitat en escoltar torna a «Màxima», es treu el fos i es torna a continuar amb cançons semblants.
+447	La qualitat en escoltar torna a «Màxima» i es treuen l'equalitzador i el fos; es torna a continuar amb cançons semblants.
+448	La cançó baixa de volum en els seus últims {0} s i la següent entra suaument. Útil per a llistes variades; en àlbums que van seguits, millor «No».
+449	La clau de recuperació no és la d'este compte.
+450	La còpia de SimpMusic és massa gran.
+451	La còpia de SimpMusic està malmesa.
+452	La còpia és massa gran. A SimpMusic, fes la còpia sense les baixades.
+453	La còpia no té llistes.
+454	El compte està en pausa mentre resolem un incident.
+455	La baixada no coincideix amb la publicada i no s'ha instal·lat, per seguretat.
+456	L'he guardada
+457	La lletra, al compàs
+458	La llista s'ha quedat buida.
+459	La llista és buida o no és pública.
+460	La llista que tries a sota, per posar-la a sonar d'un toc (2×2).
+461	La primera fixada a Biblioteca
+462	La que vas guardar en crear el compte. 26 lletres i números; tant és majúscules o guions.
+463	La que ix al giny «Llista fixada».
+464	Les cançons baixades es queden a Baixades.
+465	Les cançons ja són de YouTube Music: arriben exactes, sense cercar. No es baixa res.
+466	Les quatre últimes cançons que vas escoltar (4×2).
+467	Els comptes estaran disponibles molt aviat
+468	Les baixades es guarden en este iPhone a la màxima qualitat i es veuen a Biblioteca › Baixades. Per baixar una llista o un àlbum sencer, fes servir «Baixa-ho tot» a la seua pàgina.
+469	Les baixades es guarden en este mòbil a la màxima qualitat i es veuen a Biblioteca › Baixades. Per baixar una llista o un àlbum sencer, fes servir «Baixa-ho tot» a la seua pàgina.
+470	Les baixades es guarden sempre a la màxima qualitat (AAC 128 kbps), així sonen igual sense connexió.
+471	Les baixades es guarden sempre a la màxima qualitat (Opus, uns 160 kbps).
+472	Les pestanyes de sempre, com a l'iPhone.
+473	Les pestanyes de sempre.
+474	Les llistes es tornen a ordenar per recents, Baixades i Preferides tornen al carrusel i Cerca a Inici. No s'esborra cap llista.
+475	Les últimes {0} línies, només a la memòria. Mai no porten dades personals.
+476	Llig les llistes de la teua biblioteca (cal tenir «Sincronitza la biblioteca» activat a Configuració → Música).
+477	Llig les condicions
+478	Lletra
+479	Lletra Inter, de Rasmus Andersson (OFL)
+480	Lletra de LRCLIB
+481	Llegint la llista…
+482	Allibera memòria; es tornen a baixar en veure-les
+483	Fet
+484	Clau del tauler per USB
+485	Emporta-te-la sense connexió
+486	L'has creat tu · {0}
+487	El que han tret este any
+488	El que més escoltes
+489	El que has escoltat últimament, ràdios fetes per a tu, les novetats dels teus artistes i el que fixes a dalt. La campana porta els avisos de Pear Music.
+490	El que has escoltat últimament, ràdios fetes per a tu, les novetats dels teus artistes i el que fixes a dalt. La campana porta els avisos de Pear Music. Toca la pestanya Inici.
+491	Logotip
+492	Línia massa llarga
+493	Envia ja el resum d'esta setmana amb els camps marcats (els obligatoris sempre hi van: identificador, plataforma, variant, versió i setmana). El resum setmanal continua eixint sol si la telemetria està activada.
+494	Envia'm un codi
+495	Mantín Pear Music oberta. Sol trigar uns segons.
+496	Mantín premut per esborrar les baixades
+497	Mantín premut per esborrar les estadístiques
+498	Mantín premut per buidar la cua
+499	Mantín premuda una cançó a Cerca o Inici per afegir-la.
+500	Mantín premut per confirmar
+501	Marcada
+502	M'agrada
+503	Millor so (AAC 128 kbps).
+504	Millor so (Opus, uns 160 kbps).
+505	Millor so; gasta més dades
+506	Menú
+507	Barreja les meues preferides a {0}
+508	Barreja preferides
+509	Barreja preferides o baixades, Descobrix i Cerca (4×1).
+510	Barreja el que he baixat
+511	Barreja les meues preferides
+512	Torna a barrejar
+513	Mentre sona una cançó, l'app agafa colors semblants als de la portada. Tria quant; el text sempre es llig bé.
+514	Mentrestant no es pot cercar, actualitzar ni enviar res. La teua música baixada continua aquí.
+515	Mentrestant, tot funciona sense compte.
+516	Minuts per sessió
+517	Model i sistema, versió, quant triga a obrir-se, fluïdesa, memòria i minuts d'ús, amb un identificador aleatori. 
+518	Model i sistema, versió, quant triga a obrir-se, fluïdesa, memòria i minuts d'ús, amb un identificador aleatori. Un resum a la setmana; res del que escoltes ni cerques. Només serveix perquè l'app vaja millor; s'esborra als 90 dies.
+519	Mode
+520	Mode segur
+521	Mosaic
+522	Mostra Descobrix
+523	Mou
+524	Mostra el codi QR
+525	Molt aviat, avantatges
+526	Més
+527	Més aguts
+528	Més brillantor i detall
+529	Més greus
+530	Més opcions
+531	Més opcions de {0}
+532	Màxima
+533	Música
+534	Res no coincideix amb «{0}»
+535	Cal Android 12 o posterior
+536	Cap (no afegir)
+537	Cap cançó d'esta llista està baixada.
+538	Cap cançó baixada
+539	Nivell
+540	No
+541	No disponible per escoltar
+542	No trobades
+543	No és una còpia de SimpMusic (a SimpMusic: Configuració › Còpia de seguretat).
+544	No hi ha avisos
+545	No hi ha esborranys
+546	Ara mateix no hi ha fragments
+547	No hi ha lletra per a esta cançó
+548	No hi ha res per reprendre
+549	No hi ha llistes
+550	No hi ha llistes a la biblioteca d'este iPhone.
+551	No hi ha resultats per a «{0}»
+552	No hi ha senzills ni EP.
+553	No hi ha àlbums.
+554	No la necessites per a res: Pear Music funciona igual sense. Però si te'n fas un ens ajudes moltíssim a millorar l'app, i tu t'emportes la teua música allà on vages.
+555	No sembla un CSV d'Exportify (falta la columna «Track URI»).
+556	No queda cap cançó per afegir
+557	No s'han trobat cançons. La llista és pública?
+558	No s'ha trobat cap Jam amb el codi {0}. Comproveu que esteu a la mateixa wifi.
+559	No s'han pogut carregar
+560	No s'han pogut carregar les cançons
+561	No s'han pogut carregar les recomanacions.
+562	No s'han pogut exportar les dades
+563	No s'ha pogut obrir el port 8765
+564	No s'ha pogut anunciar el Jam a la wifi ({0}).
+565	No s'ha pogut cercar a la wifi ({0}).
+566	No s'ha pogut cercar. Revisa la connexió.
+567	No s'ha pogut carregar l'artista. Revisa la connexió.
+568	No s'ha pogut carregar la lletra
+569	No s'ha pogut connectar amb el Jam.
+570	No s'ha pogut crear el Jam en esta xarxa.
+571	No s'ha pogut baixar «{0}»: {1}
+572	No s'ha pogut baixar. Prova amb una altra connexió.
+573	No s'ha pogut enviar
+574	No s'ha pogut exportar la biblioteca.
+575	No s'ha pogut guardar la còpia
+576	No s'ha pogut guardar la còpia. Torna a triar la carpeta.
+577	No s'ha pogut llegir este fitxer de biblioteca.
+578	No s'ha pogut llegir la còpia.
+579	No s'ha pogut llegir la llista.
+580	No s'ha pogut llegir la llista. Prova amb el CSV d'Exportify.
+581	No s'ha pogut obtenir l'àudio: {0}
+582	No s'ha pogut reproduir: {0}
+583	No s'ha pogut fer servir esta carpeta
+584	No s'ha pogut fer servir esta carpeta.
+585	No es pot canviar: així sonen igual sense connexió
+586	No tinc la clau: comença de zero
+587	Nom
+588	Nom (A-Z)
+589	Nom (Z-A)
+590	Nom del Jam
+591	Normal
+592	Notifica al mòbil
+593	Novetats dels teus artistes
+594	Llista nova
+595	Mai
+596	Nre. de cançons
+597	Amagada · llisca cap a la dreta per posar-la
+598	Amaga
+599	Amaga Descobrix
+600	Amaga els primers passos
+601	Oferix treure les baixades
+602	Opacitat
+603	Opcional · gratis
+604	Opcional · guarda la teua biblioteca xifrada al núvol
+605	Opcional, p. ex. Viatge a la platja
+606	Opcions del Jam
+607	Ordre de fàbrica
+608	Ordre de la barra
+609	Ordena
+610	Ordena de la A a la Z
+611	Ordena de la Z a la A
+612	Ordena les llistes
+613	Ordena les llistes per
+614	Ordena per
+615	Fosc
+616	Tauler
+617	Paquet
+618	Per a l'altaveu del mòbil o un de portàtil
+619	Per escoltar amb dades mòbils
+620	Per a la pantalla d'inici del mòbil
+621	Per poder respondre't. No es fa servir per a res més. La resposta també t'arriba a Avisos, només a tu.
+622	Per revisar
+623	Per a tu
+624	Pausa
+625	Posa en pausa la baixada de la llista
+626	Posa en pausa
+627	Pear Dev
+628	Pear Music
+629	Pear Music és un projecte personal i gratuït, sense relació amb YouTube ni Google. És necessari per fer servir l'app.
+630	Pear Music no té comptes ni servidor amb les teues dades: tot és en este mòbil. 
+631	Pear Music no té comptes ni servidor amb les teues dades: tot és en este mòbil. El fitxer porta la teua biblioteca, estadístiques, lletres, esborranys de suport i configuració; no les cançons baixades.
+632	Pear Music no té permís per fer servir la càmera
+633	Pear Music {0}
+634	Demana el bloqueig total
+635	Apega l'enllaç d'una llista d'Spotify (Compartix → Copia l'enllaç).
+636	Apega un enllaç de music.apple.com (Compartix → Copia l'enllaç).
+637	Apega
+638	Permet instal·lar apps de Pear Music i torna a prémer Baixa.
+639	Personalitzat
+640	Pestanya a part
+641	Pestanyes
+642	Demana el codi a qui l'ha creat o escaneja el seu QR.
+643	Llista d'Apple Music
+644	Llista d'Spotify
+645	Llista fixada
+646	Llista importada
+647	Llistes
+648	Llistes amb la teua foto, icona i color, preferides i baixades en un lloc. Fixa a dalt el que més escoltes i obre la discografia completa de cada artista.
+649	Llistes i preferides en un minut, també entre iPhone i Android.
+650	Podràs tornar a entrar amb el codi mentre continue obert.
+651	Posa el que he baixat a {0}
+652	Posa les meues preferides a {0}
+653	Per exemple: en prémer «Baixa-ho tot» en un àlbum, l'app es tanca.
+654	Per exemple: poder ordenar les meues llistes per artista.
+655	Per què és un informe de veritat
+656	Per mida
+657	Perquè vas escoltar «{0}»
+658	Primers passos
+659	Progrés
+660	Progrés: {0} de {1}
+661	Publica un dels estats signats al PC. Avís: bàner que caduca sol. Mode segur: apaga actualitzacions, cerca, suport, telemetria i compte. Bloqueig: pantalla de manteniment; es confirma als 10 min amb un altre codi. Normal: tot torna a funcionar.
+662	Publica
+663	Publica este nivell
+664	Pots tancar l'app: en tornar, la importació continua on s'havia quedat.
+665	Posició
+666	Passa-la a un altre mòbil
+667	Treu
+668	Treu dels teus àlbums
+669	Treu de preferides
+670	Treu la foto
+671	Treu {0}
+672	Què ha passat
+673	Què s'envia exactament
+674	Què t'agradaria que fes Pear Music i per a què et serviria (mínim {0} caràcters).
+675	Reprèn · {0} de {1}
+676	Recents
+677	Recorda-m'ho demà
+678	Recorregut: {0}. {1}
+679	Reformula
+680	Registre
+681	Registre copiat
+682	Torna-ho a provar
+683	Torna a provar la baixada
+684	Repeteix la cançó
+685	Repeteix la llista
+686	Repetició: no
+687	Informe enviat
+688	Reproducció
+689	Reproduïx
+690	Reproduïx a continuació
+691	Reproductor
+692	Reproductor multimèdia
+693	Reproductors amb personalitat
+694	Resposta de Pear Music
+695	Resposta inesperada del servidor.
+696	Restablix
+697	Restablix {0}
+698	Revisa el correu: hi falta alguna cosa (per exemple, l'@ o el domini).
+699	Revisa el missatge
+700	Revisa la connexió i torna-ho a provar.
+701	Revisa la connexió i torna-ho a provar.
+702	SENSE CONNEXIÓ
+703	Saber quants sou ens diu on posar l'esforç.
+704	Eixida d'àudio
+705	Eixida d'àudio: {0}
+706	Ix del Jam
+707	Ix sense guardar
+708	Omet
+709	Omet el recorregut
+710	Omet la guia
+711	S'aplica a l'instant, també al que sona per Bluetooth.
+712	S'esborren el text i les fotos. No es pot desfer.
+713	S'esborren el teu correu i la còpia del núvol. No es pot desfer.
+714	S'esborrarà la còpia del núvol que no pots obrir i es crearà una clau nova. La biblioteca d'este mòbil no es toca.
+715	S'esborrarà la llista i la seua portada. No es pot desfer.
+716	S'esborraran les teues llistes, preferides, baixades, estadístiques i configuració d'este mòbil, i l'app es tancarà. 
+717	S'esborraran les teues llistes, preferides, baixades, estadístiques i configuració d'este mòbil, i l'app es tancarà. Si vols conservar alguna cosa, exporta abans les teues dades.
+718	Es tornen a cercar a YouTube Music (de vegades apareixen versions noves). Tria la bona i s'afig a la llista.
+719	S'ha tallat a mitges; continua on s'havia quedat.
+720	Se'n guarda una al dia i es deixen les {0} últimes. Per recuperar-la: Biblioteca › Importa › Importa una còpia.
+721	Es guarden en este mòbil fins que els envies o els elimines.
+722	Es guarden només en este mòbil i no ixen a la còpia de la biblioteca.
+723	S'ha perdut la connexió amb l'amfitrió.
+724	S'atura en acabar la cançó
+725	S'atura d'aquí a {0} min
+726	S'atura d'aquí a {0} s
+727	S'ha perdut la connexió
+728	S'ha perdut la connexió amb {0}.
+729	Continua
+730	Continua amb cançons semblants
+731	Segur
+732	Sessió tancada
+733	Si hi ha foto, es mostra en lloc de la icona.
+734	Si l'actives, un cop a la setmana s'envia un resum de rendiment: model i sistema, versió, quant 
+735	Si l'actives, un cop a la setmana s'envia un resum de rendiment: model i sistema, versió, quant triga a obrir-se, fluïdesa (FPS i estrebades), memòria i minuts d'ús, amb un identificador aleatori que no és el del teu compte. Res del que escoltes ni cerques. S'esborra als 90 dies; en apagar-la s'esborra a l'instant.
+736	Si vols conservar alguna cosa, exporta abans les teues dades.
+737	Continua amb les que falten
+738	Següent
+739	Sense anuncis, sense límits i sense compte obligatori.
+740	Sense afegir
+741	Sense afegir: {0}
+742	Sense connexió
+743	Sense connexió amb el servidor d'estat.
+744	Sense connexió. Prova-ho quan tingues internet.
+745	Sense descripció
+746	Sense triar
+747	Sense icona
+748	Encara no hi ha línies
+749	Sense marcar
+750	Sense permís per llegir l'app Música. Activa-ho a Configuració → Pear Music.
+751	Sense rastreig ni publicitat. Tu decideixes què comparteixes.
+752	Sense resultats
+753	Sense acabar
+754	Senzills i EP
+755	Deixa de fixar
+756	Spotify no deixa veure esta llista. És pública?
+757	Spotify: exporta la llista a exportify.app (gratis, entra amb el teu compte d'Spotify) i tria el .csv; porta totes les cançons i el seu ISRC, que aparella millor. SimpMusic: Configuració › Còpia de seguretat, i tria el fitxer .backup; les seues cançons ja són de YouTube Music, així que arriben exactes.
+758	Suggeriment enviat
+759	Subtil
+760	Només per a tu
+761	Només tu tens la clau. Ni tan sols nosaltres la podem llegir.
+762	Només {0} de moment
+763	També pots mantenir premuda la pantalla d'inici › Ginys › Pear Music. Se'ls pot canviar la mida.
+764	Et donem la benvinguda a Pear Music
+765	Te l'hem enviat a {0}. Caduca d'aquí a 10 minuts.
+766	Telemetria
+767	Telemetria de rendiment
+768	Tema
+769	Tema, reproductor (casset, vinil, Air), el teu compte opcional, les teues dades i ajuda.
+770	Tema, reproductor (casset, vinil, Air), ginys, el teu compte opcional, les teues dades i ajuda.
+771	Temporitzador per dormir
+772	Acaba el Jam
+773	Acaba d'ordenar
+774	Acaba sense guardar
+775	Tipus
+776	Toca el cor d'una cançó per guardar-la aquí.
+777	Toca la cua i tria Lletra: segueix la cançó línia a línia i es guarda per veure-la sense connexió.
+778	Toca les dubtoses per triar la versió correcta. Les que deixis sense triar no s'afigen.
+779	Toca el que està ressaltat per continuar
+780	Toca per canviar-la
+781	Toca per continuar · mantín premut per aturar
+782	Tota la música de YouTube Music, gratis i sense anuncis. Amb la pantalla apagada, sense connexió i amb un Jam per escoltar amb els amics.
+783	Totes
+784	Totes encaixen amb la seua versió a YouTube Music.
+785	Encara no apareix. Comproveu que el codi és correcte, que esteu a la mateixa wifi o amb el Bluetooth activat i que qui l'ha creat té Pear Music oberta.
+786	Encara no apareix. Comproveu que el codi és correcte, que esteu a la mateixa wifi i que qui l'ha creat té Pear Music oberta.
+787	Encara no hi ha res aquí
+788	Encara no hi ha llistes
+789	Encara no tens àlbums
+790	Tolerància
+791	Tolerància de durada
+792	Porta del núvol
+793	Porta la meua biblioteca
+794	S'han portat {0} preferides i {1} llistes
+795	La teua biblioteca viatja xifrada amb la clau de recuperació: el servidor no la pot llegir.
+796	La teua biblioteca, a la teua manera
+797	La teua biblioteca, xifrada al núvol
+798	La teua clau de recuperació
+799	El teu correu
+800	El teu compte de Pear Music
+801	La teua idea
+802	El teu llançador no deixa afegir-lo des d'aquí: mantín premuda la pantalla d'inici › Ginys
+803	La teua música
+804	El teu nom
+805	Els teus artistes
+806	Les teues dades
+807	Les teues dades són teues
+808	Les teues preferides
+809	Les pestanyes a la barra i Cerca a part, com SimpMusic. A iOS 26 la barra es plega en baixar per una llista.
+810	Les teues llistes
+811	Les teues llistes, preferides i baixades, també sense connexió. Fixa a dalt el que més escoltes amb la xinxeta i toca un artista per veure tota la seua discografia.
+812	Les teues llistes, preferides i baixades, també sense connexió. Fixa a dalt el que més escoltes amb la xinxeta i toca un artista per veure tota la seua discografia. Toca la pestanya Biblioteca.
+813	Els teus àlbums
+814	Un fitxer .zip amb tot el que l'app guarda de tu
+815	Un resum a la setmana; res del que escoltes ni cerques. Només serveix perquè l'app vaja millor; s'esborra als 90 dies.
+816	Una còpia al dia de les teues preferides, llistes i àlbums a la carpeta que tries. Tria'n una que se sincronitzi (Google Drive, Nextcloud…) per no perdre res en canviar de mòbil.
+817	Una còpia al dia de les teues preferides, llistes i àlbums a la carpeta que tries. Tria'n una que se sincronitzi (iCloud Drive, Google Drive…) per no perdre res en canviar de mòbil.
+818	Una llista a la qual tothom afig cançons des del seu mòbil, iPhone o Android, a la mateixa wifi. Amb el QR s'hi entra a l'instant.
+819	Una llista compartida amb qui siga amb tu, encara que tinga un Android. Escaneja el QR per entrar a l'instant, o escriu el codi.
+820	Una llista compartida amb qui siga amb tu, encara que tinga un iPhone. Escaneja el QR per entrar a l'instant, o escriu el codi.
+821	Una llista que feu entre tots. Funciona amb gent que és a prop, a la mateixa wifi o amb el Bluetooth activat.
+822	Una llista que feu entre tots. Funciona amb gent que és a prop, a la mateixa wifi.
+823	Unix la còpia amb el que hi ha en este mòbil, sense esborrar res
+824	Unir-me a un
+825	Fa servir la sonoritat que YouTube mesura de cada cançó: les que sonen més fort baixen i les més fluixes pugen una mica, per no tocar el volum entre cançó i cançó.
+826	Buida la memòria cau de caràtules
+827	Buida el registre
+828	Buida o importada
+829	D'acord
+830	Velocitat
+831	Velocitat {0}
+832	Mostra la caràtula
+833	Mostra la clau de recuperació
+834	Mostra la cua
+835	Mostra el perfil de {0}
+836	Mostra l'estat i l'auditoria
+837	Mostra la lletra
+838	Mostra-les totes
+839	Mostra-ho tot
+840	Mostra'ls tots: {0}
+841	Mostra les teues cançons de {0}
+842	Versió
+843	Versió del sistema
+844	Versió {0}
+845	Versió {0} i crèdits
+846	Vinil
+847	Previsualització dels colors de la portada
+848	Veus clares
+849	Veus i pòdcasts més presents
+850	Torna a l'inici
+851	Torna a entrar al teu compte.
+852	Torna a veure la benvinguda, el recorregut i les històries
+853	Tornen el tema Vidre, el reproductor Normal, els colors de la portada apagats i l'ordre de pestanyes de fàbrica.
+854	Ginys
+855	Ja està al Jam
+856	Ja no està fixat
+857	Ja tinc una clau (d'un altre mòbil)
+858	ara mateix
+859	barra simpmusic càpsula pestanyes plegar gota
+860	barra simpmusic plegar cercar
+861	bluetooth chromecast altaveu airplay
+862	esborrar treure
+863	error fallada problema suport informe marieta contacte
+864	cercar pestanya inici barra
+865	carrusel la teua música
+866	caràtula color tint subtil equilibrat intens
+867	casset vinil air normal
+868	clar o fosc segons l'iPhone
+869	color fons vidre neó aire sistema aparença
+870	còpia seguretat backup drive nextcloud guardar exportar
+871	còpia seguretat backup icloud drive guardar exportar
+872	fos transició suau volum talls
+873	compte correu núvol sincronitzar còpia xifrada clau recuperació iniciar sessió
+874	l'amfitrió
+875	el del teu compte. Res del que escoltes ni cerques. S'esborra als 90 dies; en apagar-la s'esborra a l'instant.
+876	aparellar importar spotify segons coincidència
+877	a Inici
+878	a la seua pestanya
+879	espai fora de línia sense connexió esborrar
+880	vidre transparent ios 26
+881	greus aguts veus baixos so eq altaveu
+882	fa {0} dies
+883	fa {0} h
+884	fa {0} min
+885	memòria imatges portades
+886	mode nit fosc clar automàtic
+887	notificacions campana caigudes novetats discord
+888	amagar treure desactivar descobrix feed fragments reels
+889	ordre a-z recents a mà
+890	ordre barra descobrix inici biblioteca
+891	privacitat rgpd exportar esborrar dades eliminar zip
+892	ràdio infinita reproducció automàtica cua acabar
+893	recuperar la còpia del núvol en un altre mòbil. Pear Music no la guarda i no la pot recuperar.
+894	resta de l'app
+895	eixida àudio altaveu homepod apple tv bluetooth
+896	streaming dades estalvi màxima kbps
+897	suggeriment idea proposta millora bústia
+898	símbols animació scramble
+899	triga a obrir-se, fluïdesa (FPS i estrebades), memòria i minuts d'ús, amb un identificador aleatori que no és 
+900	telemetria rendiment dades consentiment privacitat fps
+901	tutorial benvinguda començar
+902	versió crèdits llicència
+903	ginys giny personalització pantalla d'inici escriptori ara sona recents accessos ràpids llista fixada tema
+904	{0}\n\nL'hem guardat a Esborranys perquè l'envies més tard.
+905	{0}\n\nPots reformular-lo o, si creus que és un error, apel·lar.
+906	{0} %
+907	{0} bé · {1} per revisar · {2} no trobades
+908	{0} cançons, iguals que a SimpMusic. No s'ha baixat res.
+909	{0} de {1} cançons. Ja està a la teua Biblioteca; no s'ha baixat res (fes servir «Baixa-ho tot» si la vols sense connexió).
+910	{0} de {1} · Pausa
+911	{0} de {1} · es marquen soles
+912	{0} ha acabat el Jam.
+913	{0} llistes importades
+914	{0} · afegida per {1}
+915	{0} · {1}
+916	{0} · {1} sense connexió
+917	{0}, ja està al Jam
+918	{0}, {1} i {2} més
+919	{0}. Mantín premut per confirmar
+920	«Màxima» fa servir AAC a 128 kbps; «Estalvi de dades», 48 kbps. S'aplica des de la cançó següent.
+921	«Màxima» fa servir Opus a uns 160 kbps; «Estalvi de dades», uns 50 kbps. S'aplica des de la cançó següent.
+922	«{0}» importada
+923	Vols esborrar totes les teues dades?
+924	Vols esborrar el teu compte?
+925	Vols eliminar l'esborrany?
+926	Vols eliminar «{0}»?
+927	Vols començar de zero?
+928	Vols enviar l'informe?
+929	Vols enviar el suggeriment?
+930	Vols guardar la llista abans de eixir?
+931	Vols treure «{0}» dels teus àlbums?
+932	Vols restablir {0}?
+933	Àlbum
+934	Àlbums
+935	Última còpia al núvol
+936	Última còpia: {0}
+937	éxitos del momento
+938	…
+939	❌ Error {0}
+940	clar o fosc segons el mòbil
+942	Triat
+943	Tria la llengua
+944	Espanya
+945	Llengua
+946	Tota l'app canvia a l'instant. El que encara no està traduït es veu en castellà.
+947	llengua idioma language español valencià galego euskara english esperanto
+948	Aire
+949	Plata amb Helvetica negra i un anell de punts.
+950	Vidre
+951	Llum difusa amb els colors de la caràtula.
+952	Neó
+953	Graella synthwave que avança mentre sona.
+954	Sistema
+955	Sense efectes ni fons animats.
+957	Codi {0}
+958	Persones: {0}
+959	Llistes: 
+960	S'enviaran el teu correu, el text i dades de l'iPhone (model, versió d'iOS i de l'app) al canal privat de suport de Pear Music.
+961	S'enviaran el teu correu, el text i dades del mòbil (model, versió d'Android i de l'app) al canal privat de suport de Pear Music.
+962	S'enviaran el teu correu, el text, {0} foto(s) i dades de l'iPhone (model, versió d'iOS i de l'app) al canal privat de suport de Pear Music.
+963	S'enviaran el teu correu, el text, {0} foto(s) i dades del mòbil (model, versió d'Android i de l'app) al canal privat de suport de Pear Music.
+964	Gràcies! És el tiquet #{0}. Et respondrem a Avisos (només a tu) i al correu que has posat.
+965	Gràcies! Et respondrem a Avisos (només a tu) i al correu que has posat.
+966	«{0}» utilitza sempre el mode clar.
+967	«{0}» utilitza sempre el mode fosc.
+968	Vols llevar les baixades de «{0}»?
+969	Vols llevar les baixades?
+970	Barra inferior de SimpMusic, de maxrave-dev (GPL-3.0)
+971	Barra inferior inspirada en SimpMusic, de maxrave-dev (GPL-3.0)
+972	ahir
+973	S'està baixant Pear Music {0}… {1} %

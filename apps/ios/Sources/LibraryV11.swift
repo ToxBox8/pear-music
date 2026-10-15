@@ -48,8 +48,8 @@ enum SmartList: String, Identifiable {
 
     var title: String {
         switch self {
-        case .downloads: return "Descargadas"
-        case .favorites: return "Favoritos"
+        case .downloads: return L("Descargadas")
+        case .favorites: return L("Favoritos")
         }
     }
     var symbol: String {
@@ -131,6 +131,9 @@ struct LibraryV11View: View {
 
     @AppStorage("playlistOrder") private var orderRaw = ""
     @AppStorage("smartPlacement") private var placement = "playlists"
+    @AppStorage("musicOrder") private var musicRaw = ""
+    @State private var editingMusic = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var showReorder = false
 
     /// Claves del carrusel en orden (playlists y, si van ahí, Descargadas y Favoritos).
@@ -145,6 +148,7 @@ struct LibraryV11View: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 34) {
                     header(songs)
+                    PinnedRow()
                     playlistsSection
                     musicSection(songs)
                 }
@@ -153,10 +157,10 @@ struct LibraryV11View: View {
             }
             .themed()
             .toolbar(.hidden, for: .navigationBar)
-            .alert("Nueva playlist", isPresented: $showNew) {
-                TextField("Nombre", text: $newName)
-                Button("Crear") { library.createPlaylist(newName); newName = "" }
-                Button("Cancelar", role: .cancel) { newName = "" }
+            .alert(L("Nueva playlist"), isPresented: $showNew) {
+                TextField(L("Nombre"), text: $newName)
+                Button(L("Crear")) { library.createPlaylist(newName); newName = "" }
+                Button(L("Cancelar"), role: .cancel) { newName = "" }
             }
             .sheet(isPresented: $showImport) { ImportView() }
             .sheet(item: $editing) { PlaylistEditor(playlistID: $0.id) }
@@ -169,7 +173,7 @@ struct LibraryV11View: View {
     private func header(_ songs: [Song]) -> some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Biblioteca").displayTitle(40)
+                Text(L("Biblioteca")).displayTitle(40)
                 Text(summary(songs)).font(.subheadline).foregroundStyle(.secondary)
             }
             Spacer(minLength: 12)
@@ -177,7 +181,7 @@ struct LibraryV11View: View {
                 Button { showNew = true } label: { Label("Nueva playlist", systemImage: "plus.rectangle.on.rectangle") }
                 Button { showImport = true } label: { Label("Importar de Apple Music", systemImage: "square.and.arrow.down") }
                 Divider()
-                Button { jam.showSheet = true } label: { Label("Jam con amigos", systemImage: "person.2.wave.2") }
+                Button { jam.showSheet = true } label: { Label("Jam con amigos", systemImage: "person.3") }
             } label: {
                 Image(systemName: "plus")
                     .font(.system(size: 17, weight: .semibold))
@@ -186,7 +190,7 @@ struct LibraryV11View: View {
                     .clipShape(Circle())
                     .foregroundStyle(.primary)
             }
-            .accessibilityLabel("Añadir playlist")
+            .accessibilityLabel(L("Añadir playlist"))
         }
         .padding(.horizontal, inset)
     }
@@ -194,20 +198,20 @@ struct LibraryV11View: View {
     private func summary(_ songs: [Song]) -> String {
         let n = songs.count
         let off = downloads.songs.count
-        if n == 0 { return "Aún no has guardado nada" }
+        if n == 0 { return L("Aún no has guardado nada") }
         let base = songCount(n)
-        return off > 0 ? "\(base) · \(off) sin conexión" : base
+        return off > 0 ? L("{0} · {1} sin conexión", base, off) : base
     }
 
     // MARK: Playlists
     private var playlistsSection: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .firstTextBaseline) {
-                Text("Playlists").displayTitle(24)
+                Text(L("Playlists")).displayTitle(24)
                 Spacer()
                 if library.userPlaylists.count > 1 {
                     Menu {
-                        Picker("Ordenar por", selection: $sort) {
+                        Picker(L("Ordenar por"), selection: $sort) {
                             Label("Añadidas recientemente", systemImage: "clock").tag("recent")
                             Label("Nombre (A-Z)", systemImage: "textformat").tag("name")
                             Label("Nombre (Z-A)", systemImage: "textformat").tag("nameDesc")
@@ -215,7 +219,7 @@ struct LibraryV11View: View {
                         }
                         Divider()
                         Button { showReorder = true } label: {
-                            Label("A mano…", systemImage: sort == "custom" ? "checkmark" : "line.3.horizontal")
+                            Label(L("A mano…"), systemImage: sort == "custom" ? "checkmark" : "line.3.horizontal")
                         }
                     } label: {
                         Image(systemName: "arrow.up.arrow.down")
@@ -223,10 +227,10 @@ struct LibraryV11View: View {
                             .frame(width: 36, height: 36)
                             .contentShape(Rectangle())
                     }
-                    .accessibilityLabel("Ordenar playlists")
+                    .accessibilityLabel(L("Ordenar playlists"))
                 }
                 NavigationLink { PlaylistsListView() } label: {
-                    Text("Ver todas").font(.subheadline.weight(.semibold))
+                    Text(L("Ver todas")).font(.subheadline.weight(.semibold))
                 }
             }
             .padding(.horizontal, inset)
@@ -251,7 +255,7 @@ struct LibraryV11View: View {
             .carouselScroll(inset: inset)
 
             if library.userPlaylists.isEmpty {
-                Text("Crea una playlist con + o tráete las tuyas desde Apple Music.")
+                Text(L("Crea una playlist con + o tráete las tuyas desde Apple Music."))
                     .font(.subheadline).foregroundStyle(.secondary)
                     .padding(.horizontal, inset)
             }
@@ -305,7 +309,7 @@ struct LibraryV11View: View {
                     .frame(width: PlaylistCardV11.side, height: PlaylistCardV11.side)
                     .overlay {
                         VStack(spacing: 12) {
-                            Image(systemName: "person.2.wave.2.fill").font(.system(size: 48, weight: .bold))
+                            Image(systemName: "person.3.fill").font(.system(size: 48, weight: .bold))
                             Text(state.code).font(.system(size: 20, weight: .bold, design: .monospaced)).tracking(3)
                         }
                         .foregroundStyle(.white)
@@ -314,7 +318,7 @@ struct LibraryV11View: View {
                     .shadow(color: .black.opacity(0.14), radius: 16, y: 9)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(state.name).font(.callout.bold()).lineLimit(1)
-                    Text(jam.isActive ? "Jam en directo · \(state.members.count)" : "Jam sin conexión")
+                    Text(jam.isActive ? L("Jam en directo · {0}", state.members.count) : L("Jam sin conexión"))
                         .font(.caption).foregroundStyle(.secondary).lineLimit(1)
                 }
             }
@@ -323,7 +327,7 @@ struct LibraryV11View: View {
         }
         .buttonStyle(TactileButtonStyle())
         .carouselFade()
-        .accessibilityLabel("Jam \(state.name), código \(state.code)")
+        .accessibilityLabel(L("Jam {0}, código {1}", state.name, state.code))
     }
 
     private var newTile: some View {
@@ -334,8 +338,8 @@ struct LibraryV11View: View {
                     .frame(width: PlaylistCardV11.side, height: PlaylistCardV11.side)
                     .overlay(Image(systemName: "plus").font(.system(size: 30, weight: .medium)).foregroundStyle(.secondary))
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Nueva playlist").font(.callout.bold())
-                    Text("Vacía o importada").font(.caption).foregroundStyle(.secondary)
+                    Text(L("Nueva playlist")).font(.callout.bold())
+                    Text(L("Vacía o importada")).font(.caption).foregroundStyle(.secondary)
                 }
             }
             .frame(width: PlaylistCardV11.side, alignment: .leading)
@@ -346,45 +350,80 @@ struct LibraryV11View: View {
         .contextMenu {
             Button { showNew = true } label: { Label("Nueva playlist", systemImage: "plus.rectangle.on.rectangle") }
             Button { showImport = true } label: { Label("Importar de Apple Music", systemImage: "square.and.arrow.down") }
-            Button { jam.showSheet = true } label: { Label("Jam con amigos", systemImage: "person.2.wave.2") }
+            Button { jam.showSheet = true } label: { Label("Jam con amigos", systemImage: "person.3") }
         }
     }
 
     // MARK: El resto de la música
+    /// «Tu música» en el orden de `musicOrder`. Mantener pulsada una carpeta entra en el modo edición (como la
+    /// pantalla de inicio): las filas tiemblan y se arrastran; «Hecho» sale. Lo pidió Toxbox. Igual en Android.
     private func musicSection(_ songs: [Song]) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Tu música").displayTitle(24)
-                .padding(.horizontal, inset)
-                .padding(.bottom, 8)
+        let order = MusicOrder.decode(musicRaw).filter { placement == "music" || ($0 != "downloads" && $0 != "favorites") }
+        return VStack(alignment: .leading, spacing: 4) {
+            HStack(alignment: .lastTextBaseline) {
+                Text(L("Tu música")).displayTitle(24)
+                Spacer()
+                if editingMusic { Button(L("Hecho")) { withAnimation(.uiEaseOut(0.25)) { editingMusic = false } }.font(.body.weight(.semibold)) }
+            }
+            .padding(.horizontal, inset)
+            .padding(.bottom, editingMusic ? 0 : 8)
+            if editingMusic {
+                Text(L("Arrastra las carpetas para cambiar el orden.")).font(.footnote).foregroundStyle(.secondary)
+                    .padding(.horizontal, inset).padding(.bottom, 8)
+            }
             VStack(spacing: 0) {
-                if placement == "music" {
-                    // Descargadas y Favoritos como filas (Ajustes › Apariencia › Biblioteca).
-                    LibraryLinkRow(title: SmartList.downloads.title, count: downloads.songs.count, symbol: "arrow.down.circle") {
-                        SmartListV11View(kind: .downloads)
-                    }
-                    LibraryLinkRow(title: SmartList.favorites.title, count: library.favorites.count, symbol: "heart") {
-                        SmartListV11View(kind: .favorites)
-                    }
-                }
-                LibraryLinkRow(title: "Tus álbumes", count: library.albums.count, symbol: "square.stack") {
-                    AlbumsListView()
-                }
-                LibraryLinkRow(title: "Canciones", count: songs.count, symbol: "music.note") {
-                    SongListV11View(title: "Canciones", songs: songs.sorted {
-                        $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending
-                    })
-                }
-                LibraryLinkRow(title: "Artistas", count: Set(songs.map { primaryArtist($0.artist) }).count, symbol: "music.mic") {
-                    ArtistsView(artists: Self.artists(songs))
-                }
-                LibraryLinkRow(title: "Recientes", count: library.recents.count, symbol: "clock") {
-                    SongListV11View(title: "Recientes", songs: library.recents)
-                }
-                LibraryLinkRow(title: "Estadísticas", count: PlayStats.shared.plays.filter { $0.at >= PlayStats.since(.month) }.count, symbol: "chart.bar", last: true) {
-                    StatsView()
+                ForEach(Array(order.enumerated()), id: \.element) { i, key in
+                    musicRow(key, songs, last: i == order.count - 1)
+                        .rotationEffect(.degrees(editingMusic && !reduceMotion ? (i % 2 == 0 ? 0.45 : -0.45) : 0))
+                        .animation(editingMusic && !reduceMotion ? .easeInOut(duration: 0.32).repeatForever(autoreverses: true) : .default, value: editingMusic)
+                        .simultaneousGesture(LongPressGesture(minimumDuration: 0.5).onEnded { _ in
+                            withAnimation(.uiEaseOut(0.25)) { editingMusic = true }
+                        })
+                        .draggable(key) { Text(key).hidden() }
+                        .dropDestination(for: String.self) { items, _ in
+                            guard editingMusic, let from = items.first, from != key else { return false }
+                            var all = MusicOrder.decode(musicRaw)
+                            all.removeAll { $0 == from }
+                            all.insert(from, at: all.firstIndex(of: key) ?? all.endIndex)
+                            withAnimation(.uiEaseOut(0.25)) { musicRaw = all.joined(separator: ",") }
+                            return true
+                        }
                 }
             }
             .padding(.horizontal, inset)
+        }
+    }
+
+    @ViewBuilder private func musicRow(_ key: String, _ songs: [Song], last: Bool) -> some View {
+        switch key {
+        case "downloads":
+            LibraryLinkRow(title: SmartList.downloads.title, count: downloads.songs.count, symbol: "arrow.down.circle", last: last, editing: editingMusic) {
+                SmartListV11View(kind: .downloads)
+            }
+        case "favorites":
+            LibraryLinkRow(title: SmartList.favorites.title, count: library.favorites.count, symbol: "heart", last: last, editing: editingMusic) {
+                SmartListV11View(kind: .favorites)
+            }
+        case "albums":
+            LibraryLinkRow(title: L("Tus álbumes"), count: library.albums.count, symbol: "square.stack", last: last, editing: editingMusic) { AlbumsListView() }
+        case "songs":
+            LibraryLinkRow(title: L("Canciones"), count: songs.count, symbol: "music.note", last: last, editing: editingMusic) {
+                SongListV11View(title: L("Canciones"), songs: songs.sorted {
+                    $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending
+                })
+            }
+        case "artists":
+            LibraryLinkRow(title: L("Artistas"), count: Set(songs.map { primaryArtist($0.artist) }).count, symbol: "music.mic", last: last, editing: editingMusic) {
+                ArtistsView(artists: Self.artists(songs))
+            }
+        case "recents":
+            LibraryLinkRow(title: L("Recientes"), count: library.recents.count, symbol: "clock", last: last, editing: editingMusic) {
+                SongListV11View(title: L("Recientes"), songs: library.recents)
+            }
+        default:
+            LibraryLinkRow(title: L("Estadísticas"), count: PlayStats.shared.plays.filter { $0.at >= PlayStats.since(.month) }.count, symbol: "chart.bar", last: last, editing: editingMusic) {
+                StatsView()
+            }
         }
     }
 }
@@ -395,10 +434,20 @@ private struct LibraryLinkRow<Destination: View>: View {
     let count: Int
     let symbol: String
     var last = false
+    /// Modo edición de «Tu música»: sin navegar, con el asa en vez del chevron.
+    var editing = false
     @ViewBuilder let destination: () -> Destination
 
     var body: some View {
-        NavigationLink { LazyDestination(build: destination) } label: {
+        if editing {
+            content.accessibilityHint(L("Arrastra para cambiar el orden"))
+        } else {
+            NavigationLink { LazyDestination(build: destination) } label: { content }
+                .buttonStyle(RowHighlightStyle())
+        }
+    }
+
+    private var content: some View {
             VStack(spacing: 0) {
                 HStack(spacing: 14) {
                     Image(systemName: symbol)
@@ -409,15 +458,13 @@ private struct LibraryLinkRow<Destination: View>: View {
                     Text(title).font(.title3.weight(.semibold))
                     Spacer()
                     Text("\(count)").font(.subheadline).foregroundStyle(.secondary).monospacedDigit()
-                    Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(.tertiary)
+                    Image(systemName: editing ? "line.3.horizontal" : "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(.tertiary)
                 }
                 .padding(.vertical, 13)
                 .contentShape(Rectangle())
                 if !last { Divider() }
             }
             .foregroundStyle(.primary)
-        }
-        .buttonStyle(RowHighlightStyle())
     }
 }
 
@@ -445,7 +492,7 @@ struct PlaylistCardV11: View {
                     Text(songCount(playlist.songs.count))
                     if offline > 0 && offline == playlist.songs.count {
                         Image(systemName: "arrow.down.circle.fill").imageScale(.small)
-                            .accessibilityLabel("Descargada")
+                            .accessibilityLabel(L("Descargada"))
                     }
                 }
                 .font(.caption).foregroundStyle(.secondary).lineLimit(1)
@@ -496,7 +543,7 @@ struct DownloadGlyphButton: View {
         }
         .buttonStyle(TactileButtonStyle())
         .disabled(done || busy)
-        .accessibilityLabel(done ? "Descargada" : busy ? "Descargando" : failed ? "Reintentar descarga" : "Descargar")
+        .accessibilityLabel(done ? L("Descargada") : busy ? L("Descargando") : failed ? L("Reintentar descarga") : L("Descargar"))
     }
 }
 
@@ -518,7 +565,7 @@ struct FavoriteGlyphButton: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(TactileButtonStyle())
-        .accessibilityLabel(fav ? "Quitar de favoritos" : "Añadir a favoritos")
+        .accessibilityLabel(fav ? L("Quitar de favoritos") : L("Añadir a favoritos"))
     }
 }
 
@@ -561,7 +608,7 @@ struct SongRowV11: View {
                     Image(systemName: "ellipsis").font(.body.weight(.semibold)).foregroundStyle(.secondary)
                         .frame(width: 44, height: 44).contentShape(Rectangle())
                 }
-                .accessibilityLabel("Más opciones de \(song.title)")
+                .accessibilityLabel(L("Más opciones de {0}", song.title))
             } else {
                 DownloadGlyphButton(song: song)
             }
@@ -609,7 +656,7 @@ private struct CollectionHeader<Cover: View>: View {
     private func subtitle(offline: Int) -> String {
         let n = songs.count
         let base = songCount(n)
-        return offline > 0 ? "\(base) · \(offline) sin conexión" : base
+        return offline > 0 ? L("{0} · {1} sin conexión", base, offline) : base
     }
 }
 
@@ -619,9 +666,9 @@ private enum SongFilter: String, CaseIterable, Identifiable {
     var id: String { rawValue }
     var title: String {
         switch self {
-        case .all: return "Todas"
-        case .downloaded: return "Descargadas"
-        case .favorites: return "Favoritas"
+        case .all: return L("Todas")
+        case .downloaded: return L("Descargadas")
+        case .favorites: return L("Favoritas")
         }
     }
 }
@@ -666,9 +713,12 @@ private struct CollectionDetailV11<Cover: View>: View {
     var filters = true
     /// «Descargar todo» (id de la playlist o "favorites"): sólo en playlists y Favoritos, nil en el resto.
     var bulkOwner: String? = nil
-    var emptyText = "Todavía no hay nada aquí"
+    var emptyText = L("Todavía no hay nada aquí")
     var onRemove: ((Song) -> Void)? = nil
     var onEdit: (() -> Void)? = nil
+    /// Fijar arriba en Biblioteca e Inicio (nil = sin el botón).
+    var pinned: Bool? = nil
+    var onPin: (() -> Void)? = nil
     /// Playlist importada con canciones sin añadir: fila «Sin añadir» encima de las canciones.
     var pendingFor: UUID? = nil
     @ViewBuilder let cover: (CGFloat) -> Cover
@@ -737,9 +787,13 @@ private struct CollectionDetailV11<Cover: View>: View {
         .onAppear { if onRemove != nil { TabSwipe.rowSwipeScreens += 1 } }
         .onDisappear { if onRemove != nil { TabSwipe.rowSwipeScreens -= 1 } }
         .toolbar {
+            if let onPin, let pinned {
+                Button(action: onPin) { Image(systemName: pinned ? "pin.fill" : "pin") }
+                    .accessibilityLabel(pinned ? L("Soltar de arriba") : L("Fijar arriba"))
+            }
             if let onEdit {
                 Button(action: onEdit) { Image(systemName: "pencil.circle") }
-                    .accessibilityLabel("Editar playlist")
+                    .accessibilityLabel(L("Editar playlist"))
             }
         }
         .miniPlayer()
@@ -749,8 +803,8 @@ private struct CollectionDetailV11<Cover: View>: View {
         let text: String = {
             if songs.isEmpty { return emptyText }
             switch filter {
-            case .downloaded: return "Ninguna canción de esta lista está descargada."
-            case .favorites: return "Aún no has marcado favoritas aquí."
+            case .downloaded: return L("Ninguna canción de esta lista está descargada.")
+            case .favorites: return L("Aún no has marcado favoritas aquí.")
             case .all: return emptyText
             }
         }()
@@ -782,23 +836,23 @@ struct DownloadAllButton: View {
         HStack(spacing: 6) {
             mainButton(total: total, done: done, running: running, paused: paused, complete: complete)
             if running || paused {
-                Button("Cancelar") { downloads.cancelBulk(owner) }
+                Button(L("Cancelar")) { downloads.cancelBulk(owner) }
                     .font(.subheadline.weight(.semibold))
                     .frame(minHeight: 44)
                     .padding(.horizontal, 8)
-                    .accessibilityHint("Deja de descargar; lo ya descargado se queda")
+                    .accessibilityHint(L("Deja de descargar; lo ya descargado se queda"))
                     .transition(.opacity.combined(with: .move(edge: .trailing)))
             }
         }
         .animation(.uiEaseOut(0.2), value: running)
         .animation(.uiEaseOut(0.2), value: paused)
-        .confirmationDialog("¿Quitar las descargas\(title.map { " de «\($0)»" } ?? "")?", isPresented: $confirmRemove, titleVisibility: .visible) {
-            Button("Quitar \(songCount(done))", role: .destructive) {
+        .confirmationDialog(title.map { L("¿Quitar las descargas de «{0}»?", $0) } ?? L("¿Quitar las descargas?"), isPresented: $confirmRemove, titleVisibility: .visible) {
+            Button(L("Quitar {0}", songCount(done)), role: .destructive) {
                 songs.forEach { downloads.remove($0) }
             }
-            Button("Cancelar", role: .cancel) {}
+            Button(L("Cancelar"), role: .cancel) {}
         } message: {
-            Text("Dejarán de estar disponibles sin conexión, también en otras listas que las tengan.")
+            Text(L("Dejarán de estar disponibles sin conexión, también en otras listas que las tengan."))
         }
     }
 
@@ -811,22 +865,22 @@ struct DownloadAllButton: View {
             HStack(spacing: 8) {
                 if running {
                     ProgressView().controlSize(.small)
-                    Text("\(done) de \(total) · Pausar").monospacedDigit()
+                    Text(L("{0} de {1} · Pausar", done, total)).monospacedDigit()
                 } else if paused {
                     Image(systemName: "play.circle")
-                    Text("Reanudar · \(done) de \(total)").monospacedDigit()
+                    Text(L("Reanudar · {0} de {1}", done, total)).monospacedDigit()
                 } else if complete {
                     Image(systemName: "checkmark.circle.fill")
-                    Text("Disponible sin conexión")
+                    Text(L("Disponible sin conexión"))
                 } else {
                     Image(systemName: "arrow.down.circle")
-                    Text(done > 0 ? "Descargar las \(total - done) que faltan" : "Descargar todo")
+                    Text(done > 0 ? L("Descargar las {0} que faltan", total - done) : L("Descargar todo"))
                 }
             }
         }
         .buttonStyle(PillButtonStyle(prominent: false))
         .disabled(total == 0)
-        .accessibilityHint(running ? "Pausa la descarga de la lista" : paused ? "Sigue con las que faltan" : complete ? "Ofrece quitar las descargas" : "")
+        .accessibilityHint(running ? L("Pausa la descarga de la lista") : paused ? L("Sigue con las que faltan") : complete ? L("Ofrece quitar las descargas") : "")
     }
 }
 
@@ -843,9 +897,15 @@ struct PlaylistV11View: View {
                 title: p.name,
                 songs: p.songs,
                 bulkOwner: p.id.uuidString,
-                emptyText: "Mantén pulsada una canción en Buscar o Inicio para añadirla.",
+                emptyText: L("Mantén pulsada una canción en Buscar o Inicio para añadirla."),
                 onRemove: { library.remove(songID: $0.id, from: p.id) },
                 onEdit: { editing = true },
+                pinned: p.pinned ?? false,
+                onPin: {
+                    if let i = library.playlists.firstIndex(where: { $0.id == p.id }) {
+                        library.playlists[i].pinned = (p.pinned ?? false) ? nil : true
+                    }
+                },
                 pendingFor: p.id,
                 cover: { side in PlaylistCover(playlist: p, size: side, radius: 0) }
             )
@@ -867,7 +927,7 @@ struct SmartListV11View: View {
                 title: kind.title,
                 songs: downloads.songs,
                 filters: false,
-                emptyText: "Descarga canciones con la flecha de cada fila o con «Descargar todo» en una playlist.",
+                emptyText: L("Descarga canciones con la flecha de cada fila o con «Descargar todo» en una playlist."),
                 onRemove: { downloads.remove($0) },
                 cover: { side in SmartCover(kind: kind, size: side) }
             )
@@ -877,7 +937,7 @@ struct SmartListV11View: View {
                 songs: library.favorites,
                 filters: false,
                 bulkOwner: "favorites",
-                emptyText: "Toca el corazón de una canción para guardarla aquí.",
+                emptyText: L("Toca el corazón de una canción para guardarla aquí."),
                 onRemove: { library.toggleFavorite($0) },
                 cover: { side in SmartCover(kind: kind, size: side) }
             )
@@ -894,7 +954,7 @@ struct SongListV11View: View {
         CollectionDetailV11(
             title: title,
             songs: songs,
-            emptyText: "Todavía no hay nada aquí",
+            emptyText: L("Todavía no hay nada aquí"),
             cover: { side in
                 CoverImage(url: songs.first?.thumb(Int(side * 3)))
             }
@@ -917,6 +977,21 @@ struct ReorderPlaylistsView: View {
     var body: some View {
         NavigationStack {
             List {
+                Section(L("Ordenar por")) {
+                    ForEach([("recent", L("Añadidas recientemente")), ("name", L("Nombre (A-Z)")), ("nameDesc", L("Nombre (Z-A)")), ("count", L("Nº de canciones")), ("custom", L("A mano"))], id: \.0) { item in
+                        Button {
+                            sort = item.0
+                            keys = LibraryOrder.keys(library.userPlaylists, sort: sort, order: LibraryOrder.decode(orderRaw), smartInPlaylists: placement != "music")
+                        } label: {
+                            HStack {
+                                Text(item.1).foregroundStyle(.primary)
+                                Spacer()
+                                if sort == item.0 { Image(systemName: "checkmark").foregroundStyle(.tint) }
+                            }
+                        }
+                    }
+                }
+                .glassRow()
                 Section {
                     ForEach(keys, id: \.self) { key in row(key) }
                         .onMove { from, to in
@@ -925,15 +1000,15 @@ struct ReorderPlaylistsView: View {
                             sort = "custom"
                         }
                 } footer: {
-                    Text("Arrastra para cambiar el orden del carrusel. Al mover algo, Playlists se ordena «A mano».")
+                    Text(L("Arrastra para cambiar el orden del carrusel. Al mover algo, Playlists se ordena «A mano»."))
                 }
                 .glassRow()
             }
             .environment(\.editMode, .constant(.active))
             .themed()
-            .navigationTitle("Ordenar playlists")
+            .navigationTitle(L("Editar playlists"))
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Hecho") { dismiss() } } }
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button(L("Hecho")) { dismiss() } } }
             .onAppear {
                 keys = LibraryOrder.keys(library.userPlaylists, sort: sort, order: LibraryOrder.decode(orderRaw), smartInPlaylists: placement != "music")
             }
@@ -960,6 +1035,45 @@ struct ReorderPlaylistsView: View {
                         Text(p.name).font(.body.weight(.medium)).lineLimit(1)
                         Text(songCount(p.songs.count)).font(.caption).foregroundStyle(.secondary)
                     }
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Fijados (Fase 3.3)
+/// Los álbumes y playlists con la chincheta, arriba en Biblioteca e Inicio; mantener pulsado suelta. Igual que
+/// `PinnedRow` en Android.
+struct PinnedRow: View {
+    @EnvironmentObject var library: Library
+
+    var body: some View {
+        let pinned = library.playlists.filter { $0.pinned == true }
+        if !pinned.isEmpty {
+            VStack(alignment: .leading, spacing: 10) {
+                Text(L("Fijados")).font(.title2.bold()).padding(.horizontal)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    LazyHStack(alignment: .top, spacing: 14) {
+                        ForEach(pinned) { p in
+                            NavigationLink(value: p.id) {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    PlaylistCover(playlist: p, size: 132)
+                                    Text(p.name).font(.subheadline.weight(.semibold)).lineLimit(1)
+                                    Text(p.album.map { [$0.artist, $0.year].compactMap { $0 }.joined(separator: " · ") } ?? songCount(p.songs.count))
+                                        .font(.caption).foregroundStyle(.secondary).lineLimit(1)
+                                }
+                                .frame(width: 132, alignment: .leading)
+                                .foregroundStyle(.primary)
+                            }
+                            .buttonStyle(TactileButtonStyle())
+                            .contextMenu {
+                                Button { library.playlists.firstIndex(where: { $0.id == p.id }).map { library.playlists[$0].pinned = nil } } label: {
+                                    Label("Soltar de arriba", systemImage: "pin.slash")
+                                }
+                            }
+                        }
+                    }
+                    .padding(.horizontal)
                 }
             }
         }

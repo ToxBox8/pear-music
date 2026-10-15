@@ -1,0 +1,4 @@
+// Canal dev: pruebas y administración (panel, registro, botón de pánico). No se publica.
+PRODUCT_BUNDLE_IDENTIFIER = com.example.libremusic.dev
+APP_DISPLAY_NAME = Pear Dev
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) CHANNEL_DEV

@@ -17,16 +17,16 @@ struct SearchResultsView: View {
     var body: some View {
         LazyVStack(alignment: .leading, spacing: 26) {
             if trimmed.isEmpty {
-                note("Busca canciones, álbumes o artistas")
+                note(L("Busca canciones, álbumes o artistas"))
             } else if loading && results.isEmpty {
                 ProgressView().frame(maxWidth: .infinity).padding(.top, 48)
             } else if failed {
-                note("No se pudo buscar. Revisa tu conexión.")
+                note(L("No se pudo buscar. Revisa tu conexión."))
             } else if results.isEmpty && !loading && shownQuery == trimmed {
-                note("No hay resultados para «\(trimmed)»")
+                note(L("No hay resultados para «{0}»", trimmed))
             } else {
                 if !results.artists.isEmpty {
-                    resultSection("Artistas") {
+                    resultSection(L("Artistas")) {
                         ScrollView(.horizontal, showsIndicators: false) {
                             LazyHStack(alignment: .top, spacing: 14) {
                                 ForEach(results.artists) { a in
@@ -39,7 +39,7 @@ struct SearchResultsView: View {
                     }
                 }
                 if !results.albums.isEmpty {
-                    resultSection("Álbumes") {
+                    resultSection(L("Álbumes")) {
                         ScrollView(.horizontal, showsIndicators: false) {
                             LazyHStack(alignment: .top, spacing: 14) {
                                 ForEach(results.albums) { c in
@@ -52,7 +52,7 @@ struct SearchResultsView: View {
                     }
                 }
                 if !results.songs.isEmpty {
-                    resultSection("Canciones") {
+                    resultSection(L("Canciones")) {
                         LazyVStack(spacing: 0) {
                             ForEach(results.songs) { song in
                                 SongRowV11(song: song, context: results.songs, more: true)
@@ -122,7 +122,7 @@ struct ArtistCard: View {
         .frame(width: 112)
         .foregroundStyle(.primary)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Artista \(artist.name)")
+        .accessibilityLabel(L("Artista {0}", artist.name))
     }
 }
 
@@ -157,6 +157,7 @@ struct AlbumCard: View {
 
 struct ArtistView: View {
     let artist: RemoteArtist
+    @EnvironmentObject var library: Library
     @State private var page: ArtistPage?
     @State private var loading = true
 
@@ -175,6 +176,15 @@ struct ArtistView: View {
                     if let songs = page?.songs, !songs.isEmpty {
                         PlayShuffleBar(songs: songs).padding(.horizontal).padding(.top, 4)
                     }
+                    // Lo que tienes guardado de este artista (lo que antes se abría desde «Tu música › Artistas»).
+                    let name = page?.name ?? artist.name
+                    let mine = library.allSongs().filter { primaryArtist($0.artist).caseInsensitiveCompare(name) == .orderedSame }
+                    if !mine.isEmpty {
+                        NavigationLink { SongListV11View(title: name, songs: mine) } label: {
+                            Text(L("En tu biblioteca: {0}", songCount(mine.count))).font(.subheadline.weight(.semibold))
+                        }
+                        .padding(8)
+                    }
                 }
                 .frame(maxWidth: .infinity)
 
@@ -182,7 +192,7 @@ struct ArtistView: View {
                     ProgressView().frame(maxWidth: .infinity).padding(.top, 20)
                 } else if let page {
                     if !page.songs.isEmpty {
-                        section("Canciones más escuchadas") {
+                        section(L("Canciones más escuchadas")) {
                             LazyVStack(spacing: 0) {
                                 ForEach(page.songs) { song in
                                     SongRowV11(song: song, context: page.songs)
@@ -191,14 +201,14 @@ struct ArtistView: View {
                             }
                         }
                     }
-                    if !page.albums.isEmpty { albumRow("Álbumes", page.albums) }
-                    if !page.singles.isEmpty { albumRow("Singles y EP", page.singles) }
+                    if !page.albums.isEmpty { albumRow(L("Álbumes"), page.albums, kind: .album, page: page) }
+                    if !page.singles.isEmpty { albumRow(L("Singles y EP"), page.singles, kind: .single, page: page) }
                     if page.songs.isEmpty && page.albums.isEmpty && page.singles.isEmpty {
-                        Text("Este artista no tiene canciones ni álbumes disponibles.")
+                        Text(L("Este artista no tiene canciones ni álbumes disponibles."))
                             .foregroundStyle(.secondary).frame(maxWidth: .infinity)
                     }
                 } else {
-                    Text("No se pudo cargar el artista. Revisa tu conexión.")
+                    Text(L("No se pudo cargar el artista. Revisa tu conexión."))
                         .foregroundStyle(.secondary).frame(maxWidth: .infinity)
                 }
             }
@@ -213,8 +223,12 @@ struct ArtistView: View {
         .miniPlayer()
     }
 
-    private func albumRow(_ title: String, _ items: [RemoteCollection]) -> some View {
-        section(title) {
+    private func albumRow(_ title: String, _ items: [RemoteCollection], kind: Discography.Kind, page: ArtistPage) -> some View {
+        section(title, trailing: {
+            // «Ver todo»: la discografía completa (YouTube Music + MusicBrainz), siempre: el carrusel nunca la trae entera.
+            NavigationLink { DiscographyView(page: page, kind: kind) } label: { Text(L("Ver todo")) }
+                .accessibilityLabel(L("Ver todos: {0}", title))
+        }) {
             ScrollView(.horizontal, showsIndicators: false) {
                 LazyHStack(alignment: .top, spacing: 14) {
                     ForEach(items) { c in
@@ -229,9 +243,101 @@ struct ArtistView: View {
 
     @ViewBuilder
     private func section<C: View>(_ title: String, @ViewBuilder content: () -> C) -> some View {
+        section(title, trailing: { EmptyView() }, content: content)
+    }
+
+    @ViewBuilder
+    private func section<T: View, C: View>(_ title: String, @ViewBuilder trailing: () -> T, @ViewBuilder content: () -> C) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(title).font(.title3.bold()).padding(.horizontal)
+            HStack {
+                Text(title).font(.title3.bold())
+                Spacer()
+                trailing()
+            }
+            .padding(.horizontal)
             content()
         }
+    }
+}
+
+// MARK: - Discografía completa (Fase 3.1), como DiscographyScreen en Android
+/// Todos los álbumes o todos los singles y EP: lo de YouTube Music («Ver todo», se puede escuchar) y, detrás, lo que
+/// MusicBrainz conoce y YouTube Music no tiene, atenuado como «No disponible para escuchar».
+struct DiscographyView: View {
+    let page: ArtistPage
+    @State var kind: Discography.Kind
+    @State private var albums: [Discography.Item]?
+    @State private var singles: [Discography.Item]?
+
+    init(page: ArtistPage, kind: Discography.Kind) {
+        self.page = page
+        _kind = State(initialValue: kind)
+    }
+
+    var body: some View {
+        let list = kind == .album ? albums : singles
+        ScrollView {
+            VStack(spacing: 18) {
+                Picker(L("Tipo"), selection: $kind) {
+                    Text(L("Álbumes")).tag(Discography.Kind.album)
+                    Text(L("Singles y EP")).tag(Discography.Kind.single)
+                }
+                .pickerStyle(.segmented)
+                .padding(.horizontal)
+                if let list {
+                    if list.isEmpty {
+                        Text(kind == .album ? L("No hay álbumes.") : L("No hay singles ni EP.")).foregroundStyle(.secondary).padding(.top, 32)
+                    } else {
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 14)], spacing: 18) {
+                            ForEach(Array(list.enumerated()), id: \.offset) { _, item in
+                                switch item {
+                                case .playable(let c):
+                                    NavigationLink(value: c) { AlbumCard(collection: c, showArtist: false) }.buttonStyle(TactileButtonStyle())
+                                case .missing(let r):
+                                    MissingAlbumCard(release: r)
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+                } else {
+                    ProgressView().padding(.top, 32)
+                }
+            }
+            .padding(.vertical, 12)
+        }
+        .navigationTitle(page.name)
+        .navigationBarTitleDisplayMode(.inline)
+        .themed()
+        .task {
+            var ytAlbums = page.albums
+            var ytSingles = page.singles
+            if let ref = page.albumsMore, let all = try? await YTClient.discography(ref, artist: page.name) { ytAlbums = all }
+            if let ref = page.singlesMore, let all = try? await YTClient.discography(ref, artist: page.name) { ytSingles = all }
+            // Primero lo de YouTube Music (rápido); luego se completa con MusicBrainz (1 petición por segundo).
+            albums = ytAlbums.map(Discography.Item.playable)
+            singles = ytSingles.map(Discography.Item.playable)
+            let mb = await Discography.musicBrainz(page.name) ?? []
+            albums = Discography.merge(ytAlbums, mb, kind: .album)
+            singles = Discography.merge(ytSingles, mb, kind: .single)
+        }
+        .miniPlayer()
+    }
+}
+
+/// Un disco que existe (MusicBrainz) pero no está en YouTube Music: atenuado y sin acción.
+private struct MissingAlbumCard: View {
+    let release: Discography.MbRelease
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            RoundedRectangle(cornerRadius: 14, style: .continuous).fill(.quaternary)
+                .frame(width: 150, height: 150)
+                .overlay { Image(systemName: "opticaldisc").font(.system(size: 40)).foregroundStyle(.tertiary) }
+            Text(release.title).font(.subheadline.weight(.semibold)).foregroundStyle(.secondary).lineLimit(1)
+            Text([release.year, L("No disponible para escuchar")].filter { !$0.isEmpty }.joined(separator: " · "))
+                .font(.caption).foregroundStyle(.tertiary).lineLimit(1)
+        }
+        .frame(width: 150, alignment: .leading)
+        .accessibilityElement(children: .combine)
     }
 }

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""Dibuja el icono de LibreMusic (mismo diseño que AppIcon.svg) con Pillow y lo exporta
-a los tamaños de iOS y Android. Así no hace falta ningún conversor de SVG.
+"""Dibuja con Pillow el logo antiguo (violeta, de cuando la app se llamaba LibreMusic; mismo diseño que AppIcon.svg)
+para la evolución de la marca, y copia el de Pear Music (AppIcon-Encendido.png) a los tamaños de iOS y Android.
+Así no hace falta ningún conversor de SVG.
 
     python3 shared/design/render_icon.py
 """
@@ -185,40 +186,18 @@ def render(dark: bool) -> Image.Image:
 def main():
     light, dark = render(False), render(True)
     ios = ROOT / "apps/ios/Sources/Assets.xcassets"
-    # Desde 0.8.1 este icono (nota y bobina, violeta) es el alternativo «Violeta»; el de por defecto es el
-    # original de encendido (AppIcon-Encendido.svg/.png), que se copia tal cual.
-    light.save(ios / "AppIcon-Violeta.appiconset/AppIcon.png")
-    dark.save(ios / "AppIcon-Violeta.appiconset/AppIcon-Dark.png")
+    # Este icono (nota y bobina, violeta) es el logo antiguo: ya no va en las apps y sólo se guarda aquí para la
+    # «evolución de la marca» del README y la web. El de Pear Music es el de encendido (AppIcon-Encendido.svg/.png),
+    # que se copia tal cual.
+    light.save(ROOT / "shared/design/AppIcon.png")
+    dark.save(ROOT / "shared/design/AppIcon-Dark.png")
     power = Image.open(ROOT / "shared/design/AppIcon-Encendido.png").convert("RGB")
     power.save(ios / "AppIcon.appiconset/AppIcon.png")
     power.save(ios / "AppIcon.appiconset/AppIcon-Dark.png")
     power.resize((384, 384), Image.LANCZOS).save(ios / "Logo.imageset/Logo.png")
-    light.resize((384, 384), Image.LANCZOS).save(ios / "IconPreviewViolet.imageset/IconPreviewViolet.png")
-    light.save(ROOT / "shared/design/AppIcon.png")
-    dark.save(ROOT / "shared/design/AppIcon-Dark.png")
 
-    # Android: el icono violeta como alternativo (mipmap ic_launcher_violet*) y logo para Acerca de. El de
-    # por defecto es un vector (drawable/ic_launcher_power.xml).
-    res = ROOT / "apps/android/app/src/main/res"
-    sizes = {"mdpi": 48, "hdpi": 72, "xhdpi": 96, "xxhdpi": 144, "xxxhdpi": 192}
-    mask = Image.new("L", (1024, 1024), 0)
-    ImageDraw.Draw(mask).rounded_rectangle([0, 0, 1023, 1023], radius=230, fill=255)
-    rounded = light.convert("RGBA")
-    rounded.putalpha(mask)
-    round_mask = Image.new("L", (1024, 1024), 0)
-    ImageDraw.Draw(round_mask).ellipse([0, 0, 1023, 1023], fill=255)
-    circ = light.convert("RGBA")
-    circ.putalpha(round_mask)
-    for name, px in sizes.items():
-        d = res / f"mipmap-{name}"
-        d.mkdir(parents=True, exist_ok=True)
-        rounded.resize((px, px), Image.LANCZOS).save(d / "ic_launcher_violet.png")
-        circ.resize((px, px), Image.LANCZOS).save(d / "ic_launcher_violet_round.png")
-        # Icono adaptativo: el sistema recorta el centro (72 de 108 dp), así que se amplía 1,5×.
-        fg = int(px * 108 / 48)
-        full = light.resize((fg, fg), Image.LANCZOS)
-        full.save(d / "ic_launcher_full.png")
-    drawable = res / "drawable-nodpi"
+    # Android: el icono de la app es un vector (drawable/ic_launcher_power.xml); aquí sólo el logo de Acerca de.
+    drawable = ROOT / "apps/android/app/src/main/res/drawable-nodpi"
     drawable.mkdir(parents=True, exist_ok=True)
     power.resize((512, 512), Image.LANCZOS).save(drawable / "logo.png")
     print("Iconos generados")

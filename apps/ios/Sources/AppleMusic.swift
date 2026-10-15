@@ -32,9 +32,9 @@ enum AppleMusicImporter {
         case badLink, noTracks, denied
         var errorDescription: String? {
             switch self {
-            case .badLink: return "Pega un enlace de music.apple.com (Compartir → Copiar enlace)."
-            case .noTracks: return "No se encontraron canciones. ¿La playlist es pública?"
-            case .denied: return "Sin permiso para leer la app Música. Actívalo en Ajustes → Pear Music."
+            case .badLink: return L("Pega un enlace de music.apple.com (Compartir → Copiar enlace).")
+            case .noTracks: return L("No se encontraron canciones. ¿La playlist es pública?")
+            case .denied: return L("Sin permiso para leer la app Música. Actívalo en Ajustes → Pear Music.")
             }
         }
     }
@@ -66,7 +66,7 @@ enum AppleMusicImporter {
             }
         }
 
-        var name = "Playlist de Apple Music"
+        var name = L("Playlist de Apple Music")
         if let ld = script(in: html, attribute: #"type="application/ld+json""#),
            let obj = try? JSONSerialization.jsonObject(with: Data(ld.utf8)) as? [String: Any] {
             if let n = obj["name"] as? String { name = n }

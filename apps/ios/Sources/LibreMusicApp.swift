@@ -1,4 +1,6 @@
+import Combine
 import SwiftUI
+import UserNotifications
 import UIKit
 
 @main
@@ -9,8 +11,17 @@ struct LibreMusicApp: App {
     @StateObject private var engine = ThemeEngine()
     @StateObject private var jam = JamService()
 
+    /// Idioma elegido (Cierre 1.0): al cambiarlo se vuelve a dibujar todo con los textos nuevos.
+    @AppStorage("language") private var language = ""
+
     init() {
+        I18n.load()
         Demo.prepare()
+        // Avisos: tarea en segundo plano (hay que registrarla al arrancar), notificaciones y copia guardada.
+        AvisosStore.registrarFondo()
+        UNUserNotificationCenter.current().delegate = AvisosNotificationDelegate.shared
+        AvisosStore.shared.cargarCopia()
+        if AvisosStore.shared.notificar { AvisosStore.programarFondo() }
         let d = UserDefaults.standard
         // Instalación nueva: Cristal, que respeta el modo claro/oscuro del móvil. Los temas
         // retirados en la 1.3 (Partículas, ASCII, Malla…) y el antiguo interruptor «cristal
@@ -18,6 +29,8 @@ struct LibreMusicApp: App {
         let stored = d.string(forKey: "theme")
         // Guía inicial sólo en instalaciones nuevas (aún no hay tema guardado), como en Android.
         if d.object(forKey: "onboarded") == nil { d.set(stored != nil, forKey: "onboarded") }
+        // «Primeros pasos» sólo en instalaciones nuevas (quien ya usaba la app ya sabe).
+        if d.object(forKey: "firstSteps") == nil { d.set(stored != nil ? "hidden" : "", forKey: "firstSteps") }
         if stored == nil {
             let old = d.object(forKey: "glass") as? Bool
             d.set(old == false ? AppTheme.plain.rawValue : Tokens.defaultTheme, forKey: "theme")
@@ -40,6 +53,7 @@ struct LibreMusicApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
+                .id(language)
                 .environmentObject(player)
                 .environmentObject(library)
                 .environmentObject(downloads)
@@ -63,8 +77,17 @@ struct RootView: View {
     @AppStorage("tabOrder") private var tabOrderRaw = ""
     /// Barra inferior: «classic» o «simpmusic» (Ajustes › Aspecto › Barra inferior; mismo ajuste que Android).
     @AppStorage("barStyle") private var barStyle = "classic"
+    /// Ajustes arriba en Inicio (junto al Jam) o en la barra, aparte para cada barra (Ajustes › Aspecto › Ajustes):
+    /// por defecto en la barra con la clásica y arriba con la estilo SimpMusic. Mismo ajuste que Android.
+    @AppStorage("settingsTop.classic") private var settingsTopClassic = false
+    @AppStorage("settingsTop.simpmusic") private var settingsTopSimp = true
     @AppStorage("lastTab") private var lastTab = ""
     @AppStorage("onboarded") private var onboarded = true
+    @AppStorage("termsAcceptedAt") private var termsAcceptedAt = 0.0
+    @AppStorage("showDiscover") private var showDiscover = true
+    @AppStorage("introStage") private var introStage = ""
+    @AppStorage("openAccountAfterIntro") private var openAccountAfterIntro = false
+    @State private var showAccount = false
     @State private var tab = RootView.startTab()
     @State private var demoImport = Demo.current?.showImport ?? false
 
@@ -72,7 +95,8 @@ struct RootView: View {
     private static func startTab() -> String {
         if let demo = Demo.current { return demo.tab.rawValue }
         let d = UserDefaults.standard
-        let visible = TabOrder.visible(TabOrder.decode(d.string(forKey: "tabOrder") ?? ""), searchTab: d.string(forKey: "searchPlacement") == "tab")
+        let visible = TabOrder.visible(TabOrder.decode(d.string(forKey: "tabOrder") ?? ""), searchTab: d.string(forKey: "searchPlacement") == "tab",
+                                       discover: d.object(forKey: "showDiscover") as? Bool ?? true)
         return TabOrder.tag(TabOrder.start(last: d.string(forKey: "lastTab") ?? "", visible: visible))
     }
 
@@ -83,14 +107,16 @@ struct RootView: View {
 
     /// Orden de las pestañas (Ajustes › Aspecto › Pestañas), también para deslizar a la anterior o la siguiente.
     private var tabOrder: [String] {
-        simpBar ? barTabs : TabOrder.visible(TabOrder.decode(tabOrderRaw), searchTab: searchPlacement == "tab").map(TabOrder.tag)
+        simpBar ? barTabs : TabOrder.visible(TabOrder.decode(tabOrderRaw), searchTab: searchPlacement == "tab", discover: showDiscover)
+            .filter { !(settingsTop && $0 == TabOrder.settings) }.map(TabOrder.tag)
     }
 
-    /// Barra estilo SimpMusic: en la barra van tus pestañas sin Ajustes (que pasa a Inicio, junto al Jam) y Buscar
-    /// va aparte.
+    /// Barra estilo SimpMusic: en la barra van tus pestañas y Buscar va aparte. Ajustes, en la barra o arriba en Inicio.
     private var simpBar: Bool { barStyle == "simpmusic" }
+    private var settingsTop: Bool { simpBar ? settingsTopSimp : settingsTopClassic }
     private var barTabs: [String] {
-        TabOrder.visible(TabOrder.decode(tabOrderRaw), searchTab: false).filter { $0 != TabOrder.settings }.map(TabOrder.tag)
+        TabOrder.visible(TabOrder.decode(tabOrderRaw), searchTab: false, discover: showDiscover)
+            .filter { !(settingsTop && $0 == TabOrder.settings) }.map(TabOrder.tag)
     }
 
     @ViewBuilder private var tabView: some View {
@@ -120,12 +146,39 @@ struct RootView: View {
     var body: some View {
         tabView
         .onChange(of: tab) { lastTab = TabOrder.key($0) }
-        .onChange(of: barStyle) { _ in if simpBar && TabOrder.key(tab) == TabOrder.settings { tab = TabOrder.tag(TabOrder.home) } }
+        .onChange(of: barStyle) { _ in if settingsTop && TabOrder.key(tab) == TabOrder.settings { tab = TabOrder.tag(TabOrder.home) } }
+        .onChange(of: settingsTop) { top in if top && TabOrder.key(tab) == TabOrder.settings { tab = TabOrder.tag(TabOrder.home) } }
         .onChange(of: searchPlacement) { if !simpBar && $0 != "tab" && tab == TabOrder.search { tab = TabOrder.home } }
-        // Primera vez: guía de tres pantallas (también desde Ajustes › Ayuda y soporte).
-        .fullScreenCover(isPresented: Binding(get: { !onboarded && Demo.current == nil }, set: { if !$0 { onboarded = true } })) {
-            OnboardingView()
+        // Bienvenida (también desde Ajustes › Ayuda y soporte). Quien ya usaba la app antes de la 2.0 sólo ve la
+        // pantalla de privacidad, una vez. Después: recorrido sobre la app → historias → (cuenta, si la pidió).
+        .fullScreenCover(isPresented: Binding(get: { (!onboarded || termsAcceptedAt == 0) && Demo.current == nil },
+                                              set: { if !$0 { onboarded = true } }),
+                         onDismiss: { if introStage.isEmpty, openAccountAfterIntro { openAccountAfterIntro = false; showAccount = true } }) {
+            OnboardingView(privacyOnly: onboarded)
         }
+        .overlay {
+            if onboarded && termsAcceptedAt > 0 && introStage == "tour" && Demo.current == nil {
+                TourOverlay(select: { tab = TabOrder.tag($0) }, onDone: { withAnimation(.uiEaseOut(0.3)) { introStage = "stories" } })
+            }
+        }
+        .overlay {
+            if onboarded && termsAcceptedAt > 0 && introStage == "stories" && Demo.current == nil {
+                StoriesView(onDone: {
+                    withAnimation(.uiEaseOut(0.3)) { introStage = "" }
+                    if openAccountAfterIntro { openAccountAfterIntro = false; showAccount = true }
+                })
+                .transition(.opacity)
+            }
+        }
+        .sheet(isPresented: $showAccount) { NavigationStack { AccountView() }.environmentObject(library) }
+        // Primeros pasos: se marcan solos (Intro.swift).
+        .onChange(of: tab) { if $0 == TabOrder.tag("discover") { FirstSteps.mark("discover") } }
+        // Descubrir apagado mientras se estaba en ella: a Inicio.
+        .onChange(of: showDiscover) { if !$0 && tab == TabOrder.tag("discover") { tab = TabOrder.tag(TabOrder.home) } }
+        .onChange(of: jam.showSheet) { if $0 { FirstSteps.mark("jam") } }
+        .onChange(of: library.favorites.count) { if $0 > 0 { FirstSteps.mark("favorite") } }
+        .onChange(of: downloads.downloadedIDs.count) { if $0 > 0 { FirstSteps.mark("download") } }
+        .onChange(of: library.playlists.contains { $0.pinned == true }) { if $0 { FirstSteps.mark("pin") } }
         // Deslizar a los lados cambia de pestaña (como Instagram y como en Android).
         .simultaneousGesture(
             DragGesture(minimumDistance: 30, coordinateSpace: .global).onEnded { v in
@@ -135,9 +188,16 @@ struct RootView: View {
         )
         .sheet(isPresented: $jam.showSheet) { JamSheet() }
         .sheet(isPresented: $demoImport) { ImportView() }
-        .task { Demo.apply(player: player, jam: jam) }
+        .task {
+            Demo.apply(player: player, jam: jam)
+            // Hasta 1.4.1 se podía elegir el icono violeta («logo antiguo»). Ya no viene en la app: quien lo
+            // tuviera vuelve al de encendido (iOS enseña su aviso de cambio de icono una vez).
+            if UIApplication.shared.alternateIconName != nil { try? await UIApplication.shared.setAlternateIconName(nil) }
+        }
         // libremusic://jam/CÓDIGO: el QR del Jam escaneado con la cámara del iPhone.
         .onOpenURL { jam.handle(url: $0) }
+        .modifier(UpdateAlert())
+        .overlay { IncidentOverlay() }
         .modifier(NowPlayingAccessory())
         .sheet(isPresented: $player.showFullPlayer) {
             PlayerView()
@@ -160,12 +220,21 @@ struct RootView: View {
             case .search: tab = TabOrder.tag(simpBar || searchPlacement == "tab" ? "search" : "home")
             }
         }
+        // Notificación de aviso pulsada: a Inicio, que abre Avisos.
+        .onReceive(AvisosStore.shared.$abrir.filter { $0 }) { _ in tab = TabOrder.tag("home") }
         // Copia automática de la biblioteca (una al día) al abrir y al salir de la app.
         .onChange(of: scenePhase) { phase in
             if phase != .inactive { AutoBackup.shared.backup(library: library) }
+            // Avisos al día cada vez que se vuelve a la app, sin esperar al trabajo de fondo.
+            if phase == .active { Task { await AvisosStore.shared.refrescarAlAbrir() } }
+            // Estado de incidencias firmado (Fase 4): al abrir; sin red, se queda el último válido.
+            if phase == .active { Task { await Incident.shared.refresh() } }
+            // Telemetría, sólo con consentimiento: mide mientras la app está a la vista y manda un resumen a la semana (Fase 4b).
+            if phase == .active { Telemetry.shared.foreground() }
+            if phase == .background { Telemetry.shared.background() }
         }
         .onChange(of: player.current?.id) { _ in
-            if let s = player.current { library.markPlayed(s) }
+            if let s = player.current { library.markPlayed(s); FirstSteps.mark("play") }
             Task { await engine.update(for: player.current) }
         }
     }
@@ -256,7 +325,7 @@ enum TabSwipe {
 }
 
 /// «1 canción», «12 canciones».
-func songCount(_ n: Int) -> String { n == 1 ? "1 canción" : "\(n) canciones" }
+func songCount(_ n: Int) -> String { n == 1 ? L("1 canción") : "\(n) canciones" }
 
 func timeString(_ s: Double) -> String {
     guard s.isFinite, s >= 0 else { return "0:00" }
@@ -272,8 +341,8 @@ struct SearchView: View {
             ScrollView { SearchResultsView(query: query) }
                 .scrollDismissesKeyboard(.interactively)
                 .themed()
-                .navigationTitle("Buscar")
-                .searchable(text: $query, prompt: "Canciones, álbumes, artistas…")
+                .navigationTitle(L("Buscar"))
+                .searchable(text: $query, prompt: L("Canciones, álbumes, artistas…"))
                 .navigationDestination(for: RemoteCollection.self) { CollectionView(collection: $0) }
                 .navigationDestination(for: RemoteArtist.self) { ArtistView(artist: $0) }
                 .miniPlayer()
@@ -292,14 +361,14 @@ struct SongMenuItems: View {
     var body: some View {
         if jam.isActive {
             Button { jam.add(song) } label: {
-                Label(jam.contains(song) ? "Ya está en el Jam" : "Añadir al Jam", systemImage: "person.2.wave.2")
+                Label(jam.contains(song) ? "Ya está en el Jam" : "Añadir al Jam", systemImage: "person.3")
             }
             .disabled(jam.contains(song))
         }
         Button { player.playNext(song) } label: { Label("Reproducir a continuación", systemImage: "text.insert") }
         Button { player.enqueue(song) } label: { Label("Añadir a la cola", systemImage: "text.append") }
         Button { library.toggleFavorite(song) } label: {
-            Label(library.isFavorite(song) ? "Quitar de favoritos" : "Añadir a favoritos",
+            Label(library.isFavorite(song) ? L("Quitar de favoritos") : L("Añadir a favoritos"),
                   systemImage: library.isFavorite(song) ? "heart.slash" : "heart")
         }
         if !library.userPlaylists.isEmpty {
@@ -387,7 +456,7 @@ struct MiniPlayerBar: View {
                     .frame(width: compact ? 28 : 38, height: compact ? 28 : 38)
                     .clipShape(RoundedRectangle(cornerRadius: compact ? 7 : 9, style: .continuous))
                 }
-                .accessibilityLabel("Abrir reproductor")
+                .accessibilityLabel(L("Abrir reproductor"))
 
                 VStack(alignment: .leading, spacing: 1) {
                     Text(song.title).font(.subheadline.weight(.semibold)).lineLimit(1)
@@ -404,19 +473,19 @@ struct MiniPlayerBar: View {
                         .font(compact ? .body : .title3)
                         .frame(width: 34, height: 34).contentShape(Rectangle())
                 }
-                .accessibilityLabel(player.isPlaying ? "Pausar" : "Reproducir")
+                .accessibilityLabel(player.isPlaying ? L("Pausar") : L("Reproducir"))
                 if !compact {
                     Button { player.next() } label: {
                         Image(systemName: "forward.fill").font(.body)
                             .frame(width: 30, height: 34).contentShape(Rectangle())
                     }
-                    .accessibilityLabel("Siguiente")
+                    .accessibilityLabel(L("Siguiente"))
                 }
             }
             .foregroundStyle(.primary)
             .buttonStyle(TactileButtonStyle())
             .contextMenu {
-                Picker("Reproductor", selection: $deckID) {
+                Picker(L("Reproductor"), selection: $deckID) {
                     ForEach(DeckStyle.allCases) { d in Label(d.name, systemImage: d.symbol).tag(d.rawValue) }
                 }
                 Button { player.showFullPlayer = true } label: {
@@ -478,7 +547,7 @@ struct PlayerView: View {
 
     var body: some View {
         if deck == .air, !showQueue, let song = player.current {
-            AirPlayerView(song: song, showQueue: $showQueue)
+            AirPlayerView(song: song, showQueue: $showQueue, onLyrics: { panel = .lyrics; withAnimation(.uiEaseOut(0.25)) { showQueue = true } })
                 .background { AirPaper() }
                 .transition(.opacity)
         } else {
@@ -491,9 +560,9 @@ struct PlayerView: View {
             Capsule().fill(.secondary.opacity(0.4)).frame(width: 40, height: 5).padding(.top, 8)
 
             if showQueue {
-                Picker("Panel", selection: $panel) {
-                    Text("Cola").tag(PlayerPanel.queue)
-                    Text("Letra").tag(PlayerPanel.lyrics)
+                Picker(L("Panel"), selection: $panel) {
+                    Text(L("Cola")).tag(PlayerPanel.queue)
+                    Text(L("Letra")).tag(PlayerPanel.lyrics)
                 }
                 .pickerStyle(.segmented)
                 .padding(.horizontal, 20)
@@ -565,7 +634,7 @@ struct PlayerView: View {
         } label: {
             Image(systemName: "ellipsis").font(.title3).foregroundStyle(.primary).frame(width: 44, height: 44).contentShape(Rectangle())
         }
-        .accessibilityLabel("Más opciones de \(song.title)")
+        .accessibilityLabel(L("Más opciones de {0}", song.title))
     }
 
     private func compactHeader(_ song: Song) -> some View {
@@ -583,13 +652,13 @@ struct PlayerView: View {
             SleepTimerButton()
             songMoreButton(song)
             Menu {
-                Picker("Reproductor", selection: $deckID) {
+                Picker(L("Reproductor"), selection: $deckID) {
                     ForEach(DeckStyle.allCases) { d in Label(d.name, systemImage: d.symbol).tag(d.rawValue) }
                 }
             } label: {
                 Image(systemName: deck.symbol).font(.title3).frame(width: 44, height: 44)
             }
-            .accessibilityLabel("Cambiar reproductor")
+            .accessibilityLabel(L("Cambiar reproductor"))
         }
         .padding(.horizontal, 16)
     }
@@ -609,7 +678,7 @@ struct PlayerView: View {
             // Se encoge un poco en pausa, como un objeto que "descansa".
             .scaleEffect(player.isPlaying ? 1 : 0.9)
             .animation(.spring(response: 0.45, dampingFraction: 0.8), value: player.isPlaying)
-            .accessibilityLabel("Carátula de \(song.title)")
+            .accessibilityLabel(L("Carátula de {0}", song.title))
     }
 
     private var controls: some View {
@@ -620,7 +689,7 @@ struct PlayerView: View {
                 Button { player.previous() } label: {
                     Image(systemName: "backward.fill").font(.title).frame(width: 56, height: 56).contentShape(Rectangle())
                 }
-                .accessibilityLabel("Anterior")
+                .accessibilityLabel(L("Anterior"))
                 Button { player.toggle() } label: {
                     if glass {
                         Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
@@ -631,11 +700,11 @@ struct PlayerView: View {
                     }
                 }
                 .buttonStyle(TactileButtonStyle(lip: glass))
-                .accessibilityLabel(player.isPlaying ? "Pausar" : "Reproducir")
+                .accessibilityLabel(player.isPlaying ? L("Pausar") : L("Reproducir"))
                 Button { player.next() } label: {
                     Image(systemName: "forward.fill").font(.title).frame(width: 56, height: 56).contentShape(Rectangle())
                 }
-                .accessibilityLabel("Siguiente")
+                .accessibilityLabel(L("Siguiente"))
             }
 
             secondaryControls
@@ -659,7 +728,7 @@ struct PlayerView: View {
                         .animation(.spring(response: 0.3, dampingFraction: 0.5), value: fav)
                         .frame(width: 44, height: 44)
                 }
-                .accessibilityLabel(fav ? "Quitar de favoritos" : "Añadir a favoritos")
+                .accessibilityLabel(fav ? L("Quitar de favoritos") : L("Añadir a favoritos"))
                 DownloadButton(song: song)
             }
             RoutePicker().frame(width: 44, height: 44)
@@ -667,7 +736,7 @@ struct PlayerView: View {
             Button { withAnimation(.uiEaseOut(0.25)) { showQueue.toggle() } } label: {
                 Image(systemName: showQueue ? "music.note" : "list.bullet").frame(width: 44, height: 44)
             }
-            .accessibilityLabel(showQueue ? "Ver carátula" : "Ver cola")
+            .accessibilityLabel(showQueue ? L("Ver carátula") : L("Ver cola"))
         }
         .font(.title3)
         .buttonStyle(TactileButtonStyle())
@@ -678,12 +747,12 @@ struct PlayerView: View {
         return VStack(spacing: 10) {
             HStack {
                 VStack(alignment: .leading, spacing: 1) {
-                    Text("A continuación").font(.headline)
+                    Text(L("A continuación")).font(.headline)
                     Text(songCount(upcoming)).font(.caption).foregroundStyle(.secondary)
                 }
                 Spacer()
                 if upcoming > 0 {
-                    Button(editingQueue ? "Listo" : "Editar") {
+                    Button(editingQueue ? L("Listo") : L("Editar")) {
                         withAnimation(.uiEaseOut(0.2)) { editingQueue.toggle() }
                     }
                     .font(.subheadline.weight(.semibold))
@@ -780,6 +849,6 @@ struct RepeatButton: View {
         }
         .buttonStyle(TactileButtonStyle())
         .accessibilityLabel(player.repeatMode.label)
-        .accessibilityHint("Cambia entre no repetir, repetir lista y repetir canción")
+        .accessibilityHint(L("Cambia entre no repetir, repetir lista y repetir canción"))
     }
 }

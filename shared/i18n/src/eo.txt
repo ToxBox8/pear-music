@@ -1,0 +1,971 @@
+1	\n\nĜi ĝisdatiĝas surloke per AltStore aŭ SideStore: vi ne perdas vian bibliotekon nek elŝutitajn kantojn.
+2	\n\nĜi ĝisdatiĝas surloke: vi ne perdas vian bibliotekon nek elŝutitajn kantojn.
+3	 (bileto #{0}). Ni respondos en Avizoj.
+4	 Agordoj estas supre en Hejmo kaj ne eniras la ordon (ŝanĝu ĝin en Aspekto).
+5	 La {0} mankantaj restas en la ludlisto, en «Ne aldonitaj», por serĉi ilin denove.
+6	 · Serĉi 
+7	 · Koloroj {0}
+8	 · plej verŝajna
+9	 · bileto #{0}
+10	 · titoloj kun efekto
+11	 · {0} senkonekte
+12	. Dankon!
+13	1 kanto
+14	Sekve
+15	Permane
+16	Permane…
+17	Aa
+18	Malfermi Malkovri en {0}
+19	Malfermu la Jam (la piktogramo kun tri homoj)
+20	Malfermi Agordojn
+21	Malfermi Malkovri
+22	Malfermi la Jam
+23	Malfermi ligilon
+24	Malfermi ludilon
+25	Rapidaj alirejoj
+26	Akceptu la kondiĉojn por daŭrigi
+27	Mi akceptas la uzkondiĉojn
+28	Pri
+29	Ŝaltita
+30	Ĝisdatigi konservitan ludliston
+31	Ŝaltu ĝin en Agordoj aŭ tajpu la kodon permane.
+32	Administrado
+33	Ĝi tuŝas ĉiujn, kiuj uzas Pear Music, tuj kiam ili malfermas la apon.
+34	Ne nun, daŭrigi
+35	Nun ludas
+36	Nun ludas (granda)
+37	Datumŝparo
+38	Air
+39	AirPods Max
+40	AirPods Pro
+41	Fajna agordo
+42	Agordoj
+43	Agordoj estas unu plia langeto de la breto; ĝian lokon elektu en Langetoj.
+44	Agordoj estas supre en Hejmo, apud la Jam, kaj ne okupas lokon en la breto.
+45	Kiam la kanto finiĝas
+46	Kiam la kanto ŝanĝiĝas, la titolo aperas inter simboloj, kiuj ordiĝas
+47	Kiam vi importas el Spotify aŭ Apple Music, kiom la daŭro de kanto povas diferenci por akcepti ĝin
+48	Dum kanto ludas, la apo kaj la menuoj prenas kolorojn similajn al ĝia kovrilo, kiel en Malkovri.
+49	Hazarde
+50	Iu foto ne povis esti aldonita
+51	Iu foto ne povis esti aldonita.
+52	Laŭtparoliloj, HomePod kaj Apple TV
+53	Laŭtparoliloj, aŭdiloj kaj televidiloj per Bluetooth aŭ Chromecast
+54	Malgranda laŭtparolilo
+55	Antaŭa
+56	Antaŭ forigo oni petas konfirmon.
+57	Antaŭ ol komenci
+58	Malŝaltita
+59	Ili aperas kiel vicoj en «Via muziko», super Kantoj.
+60	Ili aperas kun granda kovrilo en la karuselo de Ludlistoj.
+61	Apelacio
+62	Apelacio sendita. Ni respondos retpoŝte.
+63	Apelacii
+64	Apple Music aŭ Spotify: malfermu la ludliston → Kunhavigi → Kopii ligilon. Ĝi devas esti publika. El Spotify venas ĝis ĉirkaŭ 100 kantoj; por pli longaj listoj, uzu la CSV de Exportify.
+65	Celu al la QR de la Jam
+66	Dosiero library.json de Pear Music (ankaŭ tiu de Android). Aldoniĝas tio, kion vi ne havas, sen forigi ion.
+67	Dosiero library.json de Pear Music (ankaŭ tiu de iOS). Aldoniĝas tio, kion vi ne havas, sen forigi ion.
+68	Trenu la dosierujojn por ŝanĝi la ordon.
+69	Trenu la ludlistojn, Elŝutitajn kaj Ŝatatajn por meti ilin kien vi volas.
+70	Trenu por ŝanĝi la ordon
+71	Trenu por ŝanĝi la ordon de la karuselo. Post movo, Ludlistoj ordiĝas «Permane».
+72	Trenu ≡ por ŝanĝi la ordon de la karuselo. Post movo, Ludlistoj ordiĝas «Permane».
+73	Trenu ≡ por ŝanĝi la ordon.
+74	Trenu ≡ por ŝanĝi la ordon; flanka glitado sekvas la saman ordon. Glitigu Malkovri maldekstren por kaŝi ĝin (kaj dekstren por remeti ĝin). La apo malfermiĝas en la lasta langeto, kiun vi uzis.
+75	Supre en Hejmo
+76	Trenu ĝin al alia sulko por ŝanĝi la pozicion
+77	Artisto
+78	Artisto {0}
+79	Artistoj
+80	Aspekto
+81	Aspekto de la fenestraĵoj
+82	Tiel la aliaj vidos vin
+83	Reen
+84	Aŭdiloj
+85	Aŭtomata
+86	Altnivela
+87	Avizo
+88	Avizoj
+89	Avizoj de Pear Music publikigitaj en la retejo
+90	Gravaj avizoj
+91	Avizoj, {0} nelegitaj
+92	Helpo kaj subteno
+93	Vi helpas plibonigi Pear Music
+94	Aldonita al la ludlisto
+95	Lastatempe aldonitaj
+96	Aldoni
+97	Aldoni al Viaj albumoj
+98	Aldoni al ŝatataj
+99	Aldoni al la vico
+100	Aldoni al ludlisto
+101	Aldoni al ludlisto
+102	Aldoni al la Jam
+103	Aldoni ekrankopiojn
+104	Aldoni ludliston
+105	Aldoni {0} al la hejmekrano
+106	Aldoni {0} al la Jam
+107	Vi ankoraŭ nenion konservis
+108	Vi ankoraŭ ne markis ŝatatajn ĉi tie.
+109	Ankoraŭ ne estas kantoj. Aldonu la unuan kaj ĝi aperos en ĉies telefono.
+110	Ankoraŭ neniu aŭskultado en ĉi tiu periodo. Ĉiu kanto, kiu ludas almenaŭ 30 sekundojn, kalkuliĝas.
+111	Ankoraŭ ne estas ŝatataj
+112	Ankoraŭ nenio elŝutita
+113	Ankoraŭ sen kopio
+114	Basoj kaj tamburoj kun pli da korpo
+115	Breto supre en Hejmo
+116	Malsupra breto
+117	Vitraj bretoj, butonoj kaj menuoj, kiuj refraktas tion, kio estas malantaŭe, kiel iOS 26
+118	Biblioteko
+119	Biblioteko eksportita.
+120	Biblioteko konservita
+121	Biblioteko konservita en la nubo
+122	Blokado
+123	Plena blokado
+124	Bluetooth
+125	Forigas la bibliotekon, la elŝutaĵojn, la statistikojn kaj la agordojn, kaj fermas la apon. Ne malfareblas.
+126	Malnetoj
+127	Forigi
+128	Forigi la konton
+129	Forigo de la konto tuj forviŝas vian retpoŝtadreson kaj la nuban kopion. La biblioteko en ĉi tiu telefono restas.
+130	Forigi ĉion
+131	Forigi ĉiujn miajn datumojn
+132	Butonoj laŭ la koloro de la kanto, kaj fonoj kaj menuoj kun nuanco
+133	Panika butono
+134	Brako
+135	Bonan nokton
+136	Bonan posttagmezon
+137	Bonan matenon
+138	Serĉu kantojn, albumojn aŭ artistojn
+139	Serĉi muzikon en {0}
+140	Serĉu albumon aŭ eniru artiston kaj premu «Aldoni al Viaj albumoj» aŭ «Elŝuti ĉion».
+141	Serĉu kanton por aldoni ĝin
+142	Serĉante la Jam
+143	Serĉante en YouTube Music… {0} el {1}
+144	Serĉante muzikon por vi…
+145	Serĉi
+146	Serĉi artistojn
+147	Serĉi en Agordoj
+148	Serĉi en ludlistoj
+149	Serĉi en viaj albumoj
+150	Serĉi en {0}
+151	Serĉi muzikon
+152	Serĉi denove
+153	Serĉi havas sian propran langeton en la malsupra breto, tuj post Hejmo.
+154	Serĉi havas sian propran langeton en la malsupra breto.
+155	Kesto por sugestoj
+156	CSV de Exportify (Spotify)
+157	Kaŝmemoro malplenigita
+158	Ĉiu kanto komenciĝas kaj finiĝas je sia propra laŭteco.
+159	Kvalito
+160	Aŭskulta kvalito
+161	Aŭskulta kvalito sen elŝuti
+162	Elŝuta kvalito
+163	Elŝuta kvalito, toleremo dum importo kaj kaŝmemoro
+164	Maksimuma kvalito
+165	Ŝanĝas la fonon, la kartojn, la koloron kaj la tiparon de la tuta apo. Vi povas ŝanĝi ĝin iam ajn en Agordoj › Aspekto.
+166	Ŝanĝas inter ne ripeti, ripeti liston kaj ripeti kanton
+167	Ŝanĝi la retpoŝtadreson
+168	Ŝanĝi foton
+169	Ŝanĝi ludilon
+170	Kanalo
+171	Kanalo, protokolo kaj panika butono
+172	Nuligi
+173	Nuligi la atendantan blokadon
+174	Nuligi la elŝuton; jam elŝutitaĵo restas
+175	Kantoj
+176	Elŝutitaj kantoj
+177	Plej aŭskultitaj kantoj
+178	Kantoj, kiujn vi ŝatas (SimpMusic)
+179	Kantoj, artistoj…
+180	Kantoj, albumoj, artistoj…
+181	Ludanta kanto
+182	Kanto sen identigilo
+183	Ekrankopioj
+184	Dosierujo
+185	Kovrilo de {0}
+186	Granda kovrilo kaj regiloj (4×2).
+187	Kovrilo, titolo kaj regiloj en unu vico (4×1).
+188	Kasedo
+189	Kasedo kun bobenoj, kiujn vi turnas per fingro, vinilo, sur kiu oni povas «scratch»-i, aŭ la arĝenta Air. Longe premu la etan ludilon por ŝanĝi.
+190	Kasedo: turnu bobenon aŭ trenu la bendon por antaŭen- aŭ malantaŭenruli. Vinilo: turnu la diskon per fingro aŭ movu la brakon. Kun la iPhone horizontale, la kasedo aŭ la vinilo okupas la tutan ekranon. Vi ankaŭ povas ŝanĝi ĝin longe premante la etan ludilon.
+191	Kasedo: turnu bobenon aŭ trenu la bendon por antaŭen- aŭ malantaŭenruli. Vinilo: turnu la diskon per fingro aŭ movu la brakon. Kun la telefono horizontale, la kasedo aŭ la vinilo okupas la tutan ekranon. Vi ankaŭ povas ŝanĝi ĝin longe premante la etan ludilon.
+192	Cast
+193	Paneoj kaj urĝaj versioj
+194	Paneoj, novaj versioj kaj novaĵoj de Pear Music
+195	Fermi
+196	Fermi la avizon
+197	Fermi la rakontojn
+198	Fermi la ludilon
+199	Elsaluti
+200	Bendo
+201	Hela
+202	Hela aŭ malhela
+203	Ŝlosilo kopiita
+204	Restariga ŝlosilo
+205	Publika ŝlosilo kopiita
+206	Neoficiala kliento de YouTube Music. Ĝi uzas neoficialan API de YouTube, do ĝi povas ĉesi funkcii, se YouTube ŝanĝas ĝin. Elŝutaĵoj konserviĝas en ĉi tiu iPhone.
+207	Neoficiala kliento de YouTube Music. Ĝi uzas neoficialan API de YouTube, do ĝi povas ĉesi funkcii, se YouTube ŝanĝas ĝin. Elŝutaĵoj konserviĝas en ĉi tiu telefono.
+208	Klasika
+209	Aŭto
+210	Vico
+211	Koloro
+212	Koloro {0}
+213	Koloroj de la kovrilo
+214	Koloroj de la kovrilo en la ludilo
+215	Koloroj de la kovrilo en la resto de la apo
+216	Kunhavigi
+217	Komponantoj inspiritaj de The Kitchen de dqnamo
+218	Nesubtenata densigo.
+219	Kontrolas ĉiujn 15 minutojn, ĉu estas novaj avizoj. Oni petas nur la liston de avizoj, sen sendi ion vian.
+220	Kontrolas de tempo al tempo, ĉu estas novaj avizoj. Oni petas nur la liston de avizoj, sen sendi ion vian.
+221	Kontrolu la konekton kaj reprovu.
+222	Kiam tio estas ŝaltita kaj la telefono konektita per kablo (adb forward tcp:8765 tcp:8765), la kaŝita paĝo de la retejo petas ĉi tie 5-minutan ŝlosilon. Ĝi aŭskultas nur interne de la telefono kaj malŝaltiĝas mem post 10 minutoj. La publika ŝlosilo iras unufoje en PANEL_PUBLIC_KEY de la Worker.
+223	Konfirmi la atendantan blokadon
+224	Daŭrigi
+225	Pasvorto
+226	Aŭtomata kopio
+227	Kopio de SimpMusic
+228	Kopio de SimpMusic (.backup)
+229	Kopio de la biblioteko
+230	Kopio konservita
+231	Kopii
+232	Kopii la publikan ŝlosilon
+233	Kopii la protokolon
+234	Retpoŝto
+235	Kreu ludliston per + aŭ alportu viajn el Apple Music.
+236	Kreu ludliston en Biblioteko
+237	Kreu ludliston aŭ konservu albumon por elekti ĝin.
+238	Krei
+239	Krei Jam
+240	Krei mian konton
+241	Krei ludliston kun {0}
+242	Krei unu
+243	Likva vitro
+244	Vitro, Aero, Neono aŭ Sistemo, kaj koloroj prenitaj el la kovrilo. Ĉio en Agordoj › Aspekto.
+245	Kreditoj
+246	Kiam estos io grava, ĝi aperos ĉi tie.
+247	Kiam finiĝas tio, kion vi aŭskultas, kaj ripetado estas malŝaltita, aldoniĝas kantoj similaj al la lasta.
+248	Konto
+249	Konto forigita
+250	Konto kreita
+251	Rakontu, kion vi faris kaj kion vi atendis. Ju pli konkreta, des pli bone (almenaŭ {0} signoj).
+252	Kiom
+253	Kiom la butonoj similas al la koloro de la kovrilo
+254	Kiom la fonoj kaj menuoj kolorigiĝas
+255	Rakontu al ni, kio misfunkciis; vi povas aldoni ekrankopiojn
+256	Rakontu al ni, kion vi ŝatus, ke Pear Music faru
+257	Kapsulo kun viaj langetoj kaj Serĉi aparte, kiel SimpMusic. Trenu la guton por ŝanĝi langeton; kiam vi rulumas malsupren en listo, ĝi faldiĝas apud la eta ludilo.
+258	QR-kodo de la Jam
+259	6-cifera kodo
+260	Kodo de la Jam, 6 signoj
+261	Kodo por aliĝi
+262	Datumoj eksportitaj
+263	El la importo. Tuŝu por serĉi ilin denove.
+264	Ĉesi elŝuti; jam elŝutitaĵo restas
+265	Ili ne plu estos disponeblaj senkonekte, ankaŭ en aliaj listoj, kiuj enhavas ilin.
+266	Ili ne plu estos disponeblaj senkonekte. Ludlistoj kaj ŝatataj ne tuŝiĝas.
+267	Malŝaltita
+268	Malŝaltita
+269	Malŝalti
+270	Malŝalti la tempigilon
+271	Elŝutu ion por aŭskulti senkonekte
+272	Elŝutu kantojn per la sago de ĉiu vico aŭ per «Elŝuti ĉion» en ludlisto.
+273	Elŝutu kantojn, albumojn kaj ludlistojn je maksimuma kvalito.
+274	Elŝutu kanton per ĝia sago, aŭ tutan ludliston aŭ albumon per «Elŝuti ĉion». Ili konserviĝas en ĉi tiu iPhone je maksimuma kvalito kaj troviĝas en Biblioteko › Elŝutitaj, ankaŭ senkonekte.
+275	Elŝutu kanton per ĝia sago, aŭ tutan ludliston aŭ albumon per «Elŝuti ĉion». Ili konserviĝas en ĉi tiu telefono je maksimuma kvalito kaj troviĝas en Biblioteko › Elŝutitaj, ankaŭ senkonekte.
+276	Elŝutita
+277	Elŝutitaj
+278	Elŝutitaj kaj Ŝatataj
+279	Elŝutita
+280	Elŝutante
+281	Elŝutante Pear Music {0}…
+282	Elŝutante {0} %
+283	Elŝuti
+284	Elŝuti la {0} mankantajn
+285	Elŝuti ĉion
+286	Elŝutaĵoj
+287	Forĵeti
+288	Forĵeti {0}
+289	Nekonata
+290	Malkovri
+291	Malkovri, Hejmo, Biblioteko, Agordoj
+292	El la apo Muziko de ĉi tiu iPhone
+293	El dosiero
+294	El ligilo
+295	Glitumu iom en Malkovri
+296	Malfaldi la breton ({0})
+297	Disko
+298	Disponebla senkonekte
+299	Du aferoj, aparte. Vi povas ŝanĝi la duan iam ajn en Agordoj › Helpo kaj subteno › Viaj datumoj.
+300	Kie
+301	Kie serĉi
+302	Kie estas Serĉi
+303	Egaligilo
+304	Redakti
+305	Redakti la vicon
+306	Redakti la ordon de la ludlistoj
+307	Redakti ludliston
+308	Redakti ludlistojn
+309	Efekto en titoloj
+310	La Jam estas plena.
+311	La Jam finiĝos por ĉiuj.
+312	La gastiganto
+313	La gastiganto finis la Jam.
+314	La dosiero estas detranĉita.
+315	La dosiero enhavas vian bibliotekon, statistikojn, kantotekstojn, malnetojn de subteno kaj agordojn; ne la elŝutitajn kantojn.
+316	La dosiero ne estas valida ZIP.
+317	La dosiero ne havas kantojn.
+318	Ripetado (ne ripeti, ripeti liston aŭ kanton) ŝanĝiĝas en la ludilo.
+319	La kodo ne validas.
+320	La subtena servilo ne respondas ({0}). Provu poste.
+321	La servilo ne respondas ({0}). Provu poste.
+322	La sono tia, kia ĝi estas
+323	Subteno estas paŭzita dum ni solvas incidenton. Via raporto restas en Malnetoj.
+324	La etoso ŝanĝas la fonon, la kartojn, la koloron kaj la tiparon. La fonoj prenas la kolorojn de la kovrilo kaj moviĝas pli dum muziko ludas.
+325	Teksto kaj piktogramoj ĉiam havas legeblan kontraston, eĉ se la kovrilo estas tre hela aŭ tre vigla.
+326	Elektita
+327	Elekti dosierujon
+328	Elekti foton
+329	Elektu vian etoson
+330	Forigi
+331	Forigi la malneton
+332	Forigi elŝutaĵon
+333	Forigi ludliston
+334	Forigi ludlistojn
+335	Forigo de ludlisto ne forigas ĝiajn kantojn el Ŝatataj nek el Elŝutaĵoj.
+336	Forigi {0}
+337	Komenci
+338	Komenci aŭskulti
+339	Komenci de nulo
+340	En Ludlistoj (granda kovrilo)
+341	En Viaj albumoj
+342	Viva
+343	En la ludilo
+344	En la resto de la apo
+345	En la breto
+346	En prizorgado
+347	En via biblioteko: {0}
+348	En «Via muziko» (vico)
+349	Ŝaltita
+350	Ligilo de Spotify aŭ Apple Music
+351	Ensaluti
+352	Sendita ({0} kampoj)
+353	Sendi
+354	Sendi nun
+355	Sendi apelacion
+356	Sendi rendimentajn datumojn (nedeviga)
+357	Ekvilibra
+358	Tiu ŝlosilo ne havas la ĝustan formaton.
+359	Skanu per la fotilo de la iPhone aŭ el Biblioteko → + → Jam kun amikoj.
+360	Skanu per la fotilo de la telefono aŭ el Biblioteko → + → Jam kun amikoj.
+361	Skani QR
+362	Tajpu vian restarigan ŝlosilon
+363	Tajpu vian nomon por krei aŭ aliĝi al Jam.
+364	Aŭskultu kion ajn vi volas
+365	Aŭskultu kanton
+366	Antaŭ nelonge aŭskultita
+367	Lastatempe aŭskultitaj
+368	Aŭskulti la tutan
+369	Aŭskulti miajn elŝutaĵojn
+370	Uzata spaco
+371	Ĉi tiu apo
+372	Statistikoj
+373	Ni preparas aferojn nur por tiuj, kiuj havas konton. Ni sciigos vin en Avizoj.
+374	Ĉi tiu artisto ne havas disponeblajn kantojn aŭ albumojn.
+375	Ĉi-jare
+376	Ĉi tiu fragmento ne povis ŝargiĝi
+377	Ĉi-monate
+378	Ĉi tiu telefono
+379	Stilo de SimpMusic
+380	Jen la lastaj konservitaj avizoj.
+381	Pliigo de koloro
+382	Klarigu, kial ĝi estas vera raporto. Homo legos ĝin kaj respondos al vi retpoŝte.
+383	Eksportu aŭ forigu ĉion, kion la apo konservas pri vi
+384	Eksporti kopion
+385	Eksporti miajn datumojn
+386	Ludado malsukcesis: tempolimo pasis
+387	Ludado malsukcesis: {0}
+388	Mankas la restariga ŝlosilo.
+389	Ŝatataj
+390	Ŝatataj
+391	Fiksu albumon aŭ ludliston per la pinglo
+392	Fiksita supre en Biblioteko kaj Hejmo
+393	Fiksitaj
+394	Fiksi supre
+395	Fono kun malklarigita kovrilo kaj regiloj de ĝia koloro
+396	Foto
+397	Fragmentoj de kantoj, kiuj eble plaĉos al vi, plenekrane. Glitigu por la sekva kaj tuŝu dufoje por «Ŝati». Se vi ne uzas ĝin, glitigu ĝin maldekstren en Agordoj › Aspekto › Langetoj.
+398	Fragmentoj de kantoj, kiuj eble plaĉos al vi, plenekrane. Glitigu por la sekva kaj tuŝu dufoje por «Ŝati». Se vi ne uzas ĝin, glitigu ĝin maldekstren en Agordoj › Aspekto › Langetoj. Tuŝu la langeton Malkovri.
+399	Transfandiĝo
+400	Transfandiĝo inter kantoj
+401	Uzas malpli da poŝtelefonaj datumoj (48 kbps).
+402	Turnu bobenon aŭ trenu la bendon por antaŭen- aŭ malantaŭenruli
+403	Konservu kantojn por vidi iliajn artistojn
+404	Konservu ŝatatan per la koro
+405	Konservita en Biblioteko kiel «{0}»
+406	Konservita en via biblioteko
+407	Konservi nun en la nubo
+408	Konservi kiel ludliston
+409	Konservi en biblioteko
+410	Konservi liston
+411	Konservi kaj eliri
+412	Konservu ĝin en via pasvortadministrilo aŭ notu ĝin. Ĝi ĉifras vian bibliotekon: sen ĝi oni ne povas 
+413	Konservu ĝin en via pasvortadministrilo aŭ notu ĝin. Ĝi ĉifras vian bibliotekon: sen ĝi oni ne povas restarigi la nuban kopion en alia telefono. Pear Music ne konservas ĝin kaj ne povas restarigi ĝin.
+414	Komenca gvidilo
+415	Turnu ĝin por antaŭeniri aŭ malantaŭeniri
+416	Fari kopion nun
+417	Ĝis {0}. Ili malgrandiĝas kaj perdas lokon kaj aliajn foto-datumojn antaŭ ol esti senditaj.
+418	Faru ĝin via
+419	Farite
+420	Rakonto {0} el {1}: {2}. {3}
+421	Piktogramo
+422	Egaligi la laŭtecon
+423	Importitaj: {0} ŝatataj kaj {1} novaj ludlistoj.
+424	Importante «{0}»
+425	Grava
+426	Importi
+427	Importi 1 ludliston
+428	Importi kopion
+429	Importi el Apple Music
+430	Importi ludliston
+431	Importi {0} ludlistojn
+432	Raporti eraron
+433	Raporti eraron · Komenca gvidilo · Versio {0}
+434	Hejmo
+435	Instrumenta
+436	Intensa
+437	Jam
+438	Jam kun amikoj
+439	Jam kun viaj amikoj
+440	Viva Jam · {0}
+441	Jam senkonekte
+442	Jam {0}, kodo {1}
+443	LRCLIB respondis {0}
+444	La serĉbreto ĉiam estas supre en Hejmo kaj la langeto Serĉi malaperas.
+445	La serĉbreto ĉiam estas supre en Hejmo.
+446	La aŭskulta kvalito revenas al «Maksimuma», la transfandiĝo foriĝas kaj similaj kantoj denove sekvas.
+447	La aŭskulta kvalito revenas al «Maksimuma», la egaligilo kaj la transfandiĝo foriĝas; similaj kantoj denove sekvas.
+448	La kanto mallaŭtiĝas en siaj lastaj {0} s kaj la sekva eniras glate. Utila por miksitaj listoj; por albumoj, kiuj sekvas unu la alian, prefere «Ne».
+449	La restariga ŝlosilo ne apartenas al ĉi tiu konto.
+450	La kopio de SimpMusic estas tro granda.
+451	La kopio de SimpMusic estas difektita.
+452	La kopio estas tro granda. En SimpMusic, faru la kopion sen la elŝutaĵoj.
+453	La kopio ne havas ludlistojn.
+454	La konto estas paŭzita dum ni solvas incidenton.
+455	La elŝutaĵo ne kongruas kun la publikigita kaj ne estis instalita, pro sekureco.
+456	Mi konservis ĝin
+457	La kantoteksto, laŭ la takto
+458	La listo malpleniĝis.
+459	La ludlisto estas malplena aŭ ne publika.
+460	La ludlisto, kiun vi elektas sube, por ludi ĝin per unu tuŝo (2×2).
+461	La unua fiksita en Biblioteko
+462	Tiu, kiun vi konservis, kiam vi kreis la konton. 26 literoj kaj ciferoj; majuskloj aŭ streketoj ne gravas.
+463	Tiu, kiu aperas en la fenestraĵo «Fiksita ludlisto».
+464	Elŝutitaj kantoj restas en Elŝutitaj.
+465	La kantoj jam estas el YouTube Music: ili alvenas ekzakte, sen serĉi. Nenio elŝutiĝas.
+466	La kvar lastaj kantoj, kiujn vi aŭskultis (4×2).
+467	Kontoj baldaŭ estos disponeblaj
+468	Elŝutaĵoj konserviĝas en ĉi tiu iPhone je maksimuma kvalito kaj videblas en Biblioteko › Elŝutitaj. Por elŝuti tutan liston aŭ albumon, uzu «Elŝuti ĉion» en ĝia paĝo.
+469	Elŝutaĵoj konserviĝas en ĉi tiu telefono je maksimuma kvalito kaj videblas en Biblioteko › Elŝutitaj. Por elŝuti tutan liston aŭ albumon, uzu «Elŝuti ĉion» en ĝia paĝo.
+470	Elŝutaĵoj ĉiam konserviĝas je maksimuma kvalito (AAC 128 kbps), do ili sonas same senkonekte.
+471	Elŝutaĵoj ĉiam konserviĝas je maksimuma kvalito (Opus, ĉirkaŭ 160 kbps).
+472	La kutimaj langetoj, kiel en la iPhone.
+473	La kutimaj langetoj.
+474	Ludlistoj denove ordiĝas laŭ lastatempaj, Elŝutitaj kaj Ŝatataj revenas al la karuselo kaj Serĉi al Hejmo. Neniu ludlisto foriĝas.
+475	La lastaj {0} linioj, nur en memoro. Ili neniam enhavas personajn datumojn.
+476	Legas la ludlistojn de via biblioteko (bezonas «Sinkronigi bibliotekon» ŝaltita en Agordoj → Muziko).
+477	Legi la kondiĉojn
+478	Kantoteksto
+479	Tiparo Inter, de Rasmus Andersson (OFL)
+480	Kantoteksto de LRCLIB
+481	Legante la ludliston…
+482	Liberigas memoron; ili reelŝutiĝas kiam vi vidas ilin
+483	Farite
+484	Ŝlosilo de la panelo per USB
+485	Kunportu ĝin senkonekte
+486	Kreita de vi · {0}
+487	Kion ili eldonis ĉi-jare
+488	Kion vi plej aŭskultas
+489	Kion vi laste aŭskultis, radioj faritaj por vi, novaĵoj de viaj artistoj kaj kion vi fiksas supre. La sonorilo alportas la avizojn de Pear Music.
+490	Kion vi laste aŭskultis, radioj faritaj por vi, novaĵoj de viaj artistoj kaj kion vi fiksas supre. La sonorilo alportas la avizojn de Pear Music. Tuŝu la langeton Hejmo.
+491	Emblemo
+492	Tro longa linio
+493	Sendas nun la resumon de ĉi tiu semajno kun la markitaj kampoj (la devigaj ĉiam iras: identigilo, platformo, varianto, versio kaj semajno). La semajna resumo plu sendiĝas mem, se telemetrio estas ŝaltita.
+494	Sendu al mi kodon
+495	Tenu Pear Music malfermita. Kutime ĝi daŭras kelkajn sekundojn.
+496	Tenu premite por forigi la elŝutaĵojn
+497	Tenu premite por forigi la statistikojn
+498	Tenu premite por malplenigi la vicon
+499	Longe premu kanton en Serĉi aŭ Hejmo por aldoni ĝin.
+500	Tenu premite por konfirmi
+501	Markita
+502	Ŝati
+503	Pli bona sono (AAC 128 kbps).
+504	Pli bona sono (Opus, ĉirkaŭ 160 kbps).
+505	Pli bona sono; uzas pli da datumoj
+506	Menuo
+507	Miksu miajn ŝatatajn en {0}
+508	Miksi ŝatatajn
+509	Miksi ŝatatajn aŭ elŝutitajn, Malkovri kaj Serĉi (4×1).
+510	Miksi la elŝutitaĵon
+511	Miksi miajn ŝatatajn
+512	Miksi denove
+513	Dum kanto ludas, la apo prenas kolorojn similajn al ĝia kovrilo. Elektu kiom; la teksto ĉiam bone legeblas.
+514	Intertempe oni ne povas serĉi, ĝisdatigi nek sendi ion. Via elŝutita muziko ankoraŭ estas ĉi tie.
+515	Intertempe ĉio funkcias sen konto.
+516	Minutoj por sesio
+517	Modelo kaj sistemo, versio, kiom longe ĝi bezonas por malfermiĝi, flueco, memoro kaj minutoj de uzado, kun hazarda identigilo. 
+518	Modelo kaj sistemo, versio, kiom longe ĝi bezonas por malfermiĝi, flueco, memoro kaj minutoj de uzado, kun hazarda identigilo. Unu resumo semajne; nenio el tio, kion vi aŭskultas aŭ serĉas. Ĝi servas nur por ke la apo funkciu pli bone; ĝi foriĝas post 90 tagoj.
+519	Reĝimo
+520	Sekura reĝimo
+521	Mozaiko
+522	Montri Malkovri
+523	Movi
+524	Montri la QR-kodon
+525	Baldaŭ, avantaĝoj
+526	Pli
+527	Pli da altaj tonoj
+528	Pli da brilo kaj detalo
+529	Pli da basoj
+530	Pli da opcioj
+531	Pli da opcioj por {0}
+532	Maksimuma
+533	Muziko
+534	Nenio kongruas kun «{0}»
+535	Bezonas Android 12 aŭ pli novan
+536	Neniu (ne aldoni)
+537	Neniu kanto de ĉi tiu listo estas elŝutita.
+538	Neniu elŝutita kanto
+539	Nivelo
+540	Ne
+541	Ne disponebla por aŭskulti
+542	Ne trovitaj
+543	Ĝi ne estas kopio de SimpMusic (en SimpMusic: Agordoj › Sekurkopio).
+544	Neniuj avizoj
+545	Neniuj malnetoj
+546	Nun ne estas fragmentoj
+547	Ne estas kantoteksto por ĉi tiu kanto
+548	Estas nenio por daŭrigi
+549	Neniuj ludlistoj
+550	Ne estas ludlistoj en la biblioteko de ĉi tiu iPhone.
+551	Neniuj rezultoj por «{0}»
+552	Neniuj unuopaĵoj aŭ EP-oj.
+553	Neniuj albumoj.
+554	Vi tute ne bezonas ĝin: Pear Music funkcias same sen ĝi. Sed se vi kreas unu, vi multe helpas nin plibonigi la apon, kaj vi kunportas vian muzikon kien ajn vi iras.
+555	Ĝi ne aspektas kiel CSV de Exportify (mankas la kolumno «Track URI»).
+556	Restas neniu kanto por aldoni
+557	Neniuj kantoj troviĝis. Ĉu la ludlisto estas publika?
+558	Neniu Jam troviĝis kun la kodo {0}. Kontrolu, ke vi estas en la sama Wi-Fi.
+559	Ne povis ŝargiĝi
+560	La kantoj ne povis ŝargiĝi
+561	La rekomendoj ne povis ŝargiĝi.
+562	La datumoj ne povis esti eksportitaj
+563	La pordo 8765 ne povis malfermiĝi
+564	La Jam ne povis esti anoncita en la Wi-Fi ({0}).
+565	Ne eblis serĉi en la Wi-Fi ({0}).
+566	Ne eblis serĉi. Kontrolu vian konekton.
+567	La artisto ne povis ŝargiĝi. Kontrolu vian konekton.
+568	La kantoteksto ne povis ŝargiĝi
+569	Ne eblis konektiĝi al la Jam.
+570	La Jam ne povis esti kreita en ĉi tiu reto.
+571	«{0}» ne povis esti elŝutita: {1}
+572	Ne eblis elŝuti. Provu kun alia konekto.
+573	Ne eblis sendi
+574	La biblioteko ne povis esti eksportita.
+575	La kopio ne povis esti konservita
+576	La kopio ne povis esti konservita. Elektu la dosierujon denove.
+577	Tiu biblioteka dosiero ne povis esti legita.
+578	La kopio ne povis esti legita.
+579	La ludlisto ne povis esti legita.
+580	La ludlisto ne povis esti legita. Provu per la CSV de Exportify.
+581	La sono ne povis esti akirita: {0}
+582	Ne eblis ludi: {0}
+583	Tiu dosierujo ne povis esti uzata
+584	Tiu dosierujo ne povis esti uzata.
+585	Ne ŝanĝebla: tiel ili sonas same senkonekte
+586	Mi ne havas la ŝlosilon: komenci de nulo
+587	Nomo
+588	Nomo (A-Z)
+589	Nomo (Z-A)
+590	Nomo de la Jam
+591	Normala
+592	Sciigi en la telefono
+593	Novaĵoj de viaj artistoj
+594	Nova ludlisto
+595	Neniam
+596	Nombro de kantoj
+597	Kaŝita · glitigu dekstren por remeti ĝin
+598	Kaŝi
+599	Kaŝi Malkovri
+600	Kaŝi la unuajn paŝojn
+601	Proponas forigi la elŝutaĵojn
+602	Opakeco
+603	Nedeviga · senpaga
+604	Nedeviga · konservu vian bibliotekon ĉifrita en la nubo
+605	Nedeviga, ekz. Vojaĝo al la strando
+606	Opcioj de la Jam
+607	Defaŭlta ordo
+608	Ordo de la breto
+609	Ordigi
+610	Ordigi de A ĝis Z
+611	Ordigi de Z ĝis A
+612	Ordigi ludlistojn
+613	Ordigi ludlistojn laŭ
+614	Ordigi laŭ
+615	Malhela
+616	Panelo
+617	Pakaĵo
+618	Por la laŭtparolilo de la telefono aŭ portebla
+619	Por aŭskulti per poŝtelefonaj datumoj
+620	Por la hejmekrano de la telefono
+621	Por ke ni povu respondi al vi. Ĝi ne estas uzata por io alia. La respondo ankaŭ venas al vi en Avizoj, nur al vi.
+622	Por kontroli
+623	Por vi
+624	Paŭzo
+625	Paŭzigas la elŝuton de la listo
+626	Paŭzigi
+627	Pear Dev
+628	Pear Music
+629	Pear Music estas persona kaj senpaga projekto, sen rilato al YouTube nek Google. Necesa por uzi la apon.
+630	Pear Music ne havas kontojn nek servilon kun viaj datumoj: ĉio estas en ĉi tiu telefono. 
+631	Pear Music ne havas kontojn nek servilon kun viaj datumoj: ĉio estas en ĉi tiu telefono. La dosiero enhavas vian bibliotekon, statistikojn, kantotekstojn, malnetojn de subteno kaj agordojn; ne la elŝutitajn kantojn.
+632	Pear Music ne rajtas uzi la fotilon
+633	Pear Music {0}
+634	Peti plenan blokadon
+635	Algluu la ligilon de ludlisto de Spotify (Kunhavigi → Kopii ligilon).
+636	Algluu ligilon de music.apple.com (Kunhavigi → Kopii ligilon).
+637	Alglui
+638	Permesu instali apojn de Pear Music kaj denove premu Elŝuti.
+639	Propra
+640	Aparta langeto
+641	Langetoj
+642	Petu la kodon de tiu, kiu kreis ĝin, aŭ skanu ĝian QR.
+643	Ludlisto de Apple Music
+644	Ludlisto de Spotify
+645	Fiksita ludlisto
+646	Importita ludlisto
+647	Ludlistoj
+648	Ludlistoj kun via foto, piktogramo kaj koloro, ŝatataj kaj elŝutaĵoj en unu loko. Fiksu supre tion, kion vi plej aŭskultas, kaj malfermu la tutan diskografion de ĉiu artisto.
+649	Ludlistoj kaj ŝatataj en unu minuto, ankaŭ inter iPhone kaj Android.
+650	Vi povos reeniri per la kodo dum ĝi restas malfermita.
+651	Ludu la elŝutitaĵon en {0}
+652	Ludu miajn ŝatatajn en {0}
+653	Ekzemple: kiam mi premas «Elŝuti ĉion» en albumo, la apo fermiĝas.
+654	Ekzemple: povi ordigi miajn ludlistojn laŭ artisto.
+655	Kial ĝi estas vera raporto
+656	Laŭ grandeco
+657	Ĉar vi aŭskultis «{0}»
+658	Unuaj paŝoj
+659	Progreso
+660	Progreso: {0} el {1}
+661	Publikigas unu el la statoj subskribitaj en la komputilo. Avizo: standardo, kiu eksvalidiĝas mem. Sekura reĝimo: malŝaltas ĝisdatigojn, serĉon, subtenon, telemetrion kaj konton. Blokado: prizorga ekrano; konfirmiĝas post 10 min per alia kodo. Normala: ĉio denove funkcias.
+662	Publikigi
+663	Publikigi ĉi tiun nivelon
+664	Vi povas fermi la apon: kiam vi revenos, la importo daŭros de kie ĝi haltis.
+665	Pozicio
+666	Transportu ĝin al alia telefono
+667	Forigi
+668	Forigi el Viaj albumoj
+669	Forigi el ŝatataj
+670	Forigi la foton
+671	Forigi {0}
+672	Kio okazis
+673	Kio ekzakte estas sendata
+674	Kion vi ŝatus, ke Pear Music faru, kaj por kio ĝi utilus al vi (almenaŭ {0} signoj).
+675	Daŭrigi · {0} el {1}
+676	Lastatempaj
+677	Memorigu min morgaŭ
+678	Trairo: {0}. {1}
+679	Reformuli
+680	Protokolo
+681	Protokolo kopiita
+682	Reprovi
+683	Reprovi la elŝuton
+684	Ripeti kanton
+685	Ripeti liston
+686	Ripeti: ne
+687	Raporto sendita
+688	Ludado
+689	Ludi
+690	Ludi sekve
+691	Ludilo
+692	Plurmedia ludilo
+693	Ludiloj kun personeco
+694	Respondo de Pear Music
+695	Neatendita respondo de la servilo.
+696	Restarigi
+697	Restarigi {0}
+698	Kontrolu la retpoŝtadreson: io mankas (ekzemple, la @ aŭ la domajno).
+699	Kontrolu la mesaĝon
+700	Kontrolu la konekton kaj reprovu.
+701	Kontrolu la konekton kaj reprovu.
+702	SENKONEKTE
+703	Scii kiom vi estas diras al ni, kien meti la penon.
+704	Sona eligo
+705	Sona eligo: {0}
+706	Eliri el la Jam
+707	Eliri sen konservi
+708	Preterlasi
+709	Preterlasi la trairon
+710	Preterlasi la gvidilon
+711	Aplikiĝas tuj, ankaŭ al tio, kio ludas per Bluetooth.
+712	La teksto kaj ĝiaj fotoj foriĝas. Ne malfareblas.
+713	Via retpoŝtadreso kaj la nuba kopio foriĝas. Ne malfareblas.
+714	La nuba kopio, kiun vi ne povas malfermi, foriĝos kaj nova ŝlosilo kreiĝos. La biblioteko de ĉi tiu telefono ne tuŝiĝas.
+715	La ludlisto kaj ĝia kovrilo foriĝos. Ne malfareblas.
+716	Viaj ludlistoj, ŝatataj, elŝutaĵoj, statistikoj kaj agordoj de ĉi tiu telefono foriĝos, kaj la apo fermiĝos. 
+717	Viaj ludlistoj, ŝatataj, elŝutaĵoj, statistikoj kaj agordoj de ĉi tiu telefono foriĝos, kaj la apo fermiĝos. Se vi volas konservi ion, unue eksportu viajn datumojn.
+718	Ili denove serĉiĝas en YouTube Music (foje aperas novaj versioj). Elektu la ĝustan kaj ĝi aldoniĝas al la ludlisto.
+719	Ĝi ĉesis duonvoje; daŭrigu de kie ĝi haltis.
+720	Unu konserviĝas ĉiutage kaj la {0} lastaj restas. Por restarigi ĝin: Biblioteko › Importi › Importi kopion.
+721	Ili konserviĝas en ĉi tiu telefono ĝis vi sendas aŭ forigas ilin.
+722	Ili konserviĝas nur en ĉi tiu telefono kaj ne aperas en la kopio de la biblioteko.
+723	La konekto kun la gastiganto perdiĝis.
+724	Haltas kiam la kanto finiĝas
+725	Haltas post {0} min
+726	Haltas post {0} s
+727	La konekto perdiĝis
+728	La konekto kun {0} perdiĝis.
+729	Daŭrigi
+730	Daŭrigi per similaj kantoj
+731	Sekura
+732	Elsalutis
+733	Se estas foto, ĝi montriĝas anstataŭ la piktogramo.
+734	Se vi ŝaltas ĝin, unufoje semajne sendiĝas rendimenta resumo: modelo kaj sistemo, versio, kiom longe ĝi 
+735	Se vi ŝaltas ĝin, unufoje semajne sendiĝas rendimenta resumo: modelo kaj sistemo, versio, kiom longe ĝi bezonas por malfermiĝi, flueco (FPS kaj skuoj), memoro kaj minutoj de uzado, kun hazarda identigilo, kiu ne estas tiu de via konto. Nenio el tio, kion vi aŭskultas aŭ serĉas. Ĝi foriĝas post 90 tagoj; malŝaltante ĝin, ĝi foriĝas tuj.
+736	Se vi volas konservi ion, unue eksportu viajn datumojn.
+737	Daŭrigi kun la mankantaj
+738	Sekva
+739	Sen reklamoj, sen limoj kaj sen deviga konto.
+740	Ne aldonitaj
+741	Ne aldonitaj: {0}
+742	Senkonekte
+743	Neniu konekto kun la stata servilo.
+744	Neniu konekto. Provu kiam vi havos interreton.
+745	Sen priskribo
+746	Ne elektita
+747	Sen piktogramo
+748	Ankoraŭ neniuj linioj
+749	Nemarkita
+750	Neniu permeso legi la apon Muziko. Ŝaltu ĝin en Agordoj → Pear Music.
+751	Sen spurado nek reklamoj. Vi decidas, kion vi kunhavigas.
+752	Neniuj rezultoj
+753	Nefinita
+754	Unuopaĵoj kaj EP-oj
+755	Malfiksi
+756	Spotify ne lasas vidi tiun ludliston. Ĉu ĝi estas publika?
+757	Spotify: eksportu la ludliston ĉe exportify.app (senpage, ensalutu per via Spotify-konto) kaj elektu la .csv; ĝi alportas ĉiujn kantojn kaj ilian ISRC, kiu kongruigas pli bone. SimpMusic: Agordoj › Sekurkopio, kaj elektu la dosieron .backup; ĝiaj kantoj jam estas el YouTube Music, do ili alvenas ekzakte.
+758	Sugesto sendita
+759	Subtila
+760	Nur por vi
+761	Nur vi havas la ŝlosilon. Eĉ ni ne povas legi ĝin.
+762	Nur {0} nuntempe
+763	Vi ankaŭ povas longe premi la hejmekranon › Fenestraĵoj › Pear Music. Ili estas grandecŝanĝeblaj.
+764	Bonvenon al Pear Music
+765	Ni sendis ĝin al {0}. Ĝi eksvalidiĝos post 10 minutoj.
+766	Telemetrio
+767	Rendimenta telemetrio
+768	Etoso
+769	Etoso, ludilo (kasedo, vinilo, Air), via nedeviga konto, viaj datumoj kaj helpo.
+770	Etoso, ludilo (kasedo, vinilo, Air), fenestraĵoj, via nedeviga konto, viaj datumoj kaj helpo.
+771	Dorma tempigilo
+772	Fini la Jam
+773	Fini la ordigon
+774	Fini sen konservi
+775	Tipo
+776	Tuŝu la koron de kanto por konservi ĝin ĉi tie.
+777	Tuŝu la vicon kaj elektu Kantoteksto: ĝi sekvas la kanton linion post linio kaj konserviĝas por vidi senkonekte.
+778	Tuŝu la dubindajn por elekti la ĝustan version. Tiuj, kiujn vi lasas neelektitaj, ne aldoniĝas.
+779	Tuŝu la emfazitan por daŭrigi
+780	Tuŝu por ŝanĝi ĝin
+781	Tuŝu por daŭrigi · tenu por paŭzi
+782	Ĉiu muziko de YouTube Music, senpage kaj sen reklamoj. Kun malŝaltita ekrano, senkonekte kaj kun Jam por aŭskulti kun viaj amikoj.
+783	Ĉiuj
+784	Ĉiuj kongruas kun sia versio en YouTube Music.
+785	Ĝi ankoraŭ ne aperas. Kontrolu, ke la kodo estas ĝusta, ke vi estas en la sama Wi-Fi aŭ kun Bluetooth ŝaltita, kaj ke tiu, kiu kreis ĝin, havas Pear Music malfermita.
+786	Ĝi ankoraŭ ne aperas. Kontrolu, ke la kodo estas ĝusta, ke vi estas en la sama Wi-Fi kaj ke tiu, kiu kreis ĝin, havas Pear Music malfermita.
+787	Ankoraŭ nenio ĉi tie
+788	Ankoraŭ neniuj ludlistoj
+789	Vi ankoraŭ ne havas albumojn
+790	Toleremo
+791	Toleremo de daŭro
+792	Alporti el la nubo
+793	Alporti mian bibliotekon
+794	Alportitaj {0} ŝatataj kaj {1} ludlistoj
+795	Via biblioteko vojaĝas ĉifrita per via restariga ŝlosilo: la servilo ne povas legi ĝin.
+796	Via biblioteko, laŭ via maniero
+797	Via biblioteko, ĉifrita en la nubo
+798	Via restariga ŝlosilo
+799	Via retpoŝtadreso
+800	Via konto de Pear Music
+801	Via ideo
+802	Via lanĉilo ne permesas aldoni ĝin de ĉi tie: longe premu la hejmekranon › Fenestraĵoj
+803	Via muziko
+804	Via nomo
+805	Viaj artistoj
+806	Viaj datumoj
+807	Viaj datumoj estas viaj
+808	Viaj ŝatataj
+809	Viaj langetoj en la breto kaj Serĉi aparte, kiel SimpMusic. En iOS 26 la breto faldiĝas kiam vi rulumas malsupren en listo.
+810	Viaj ludlistoj
+811	Viaj ludlistoj, ŝatataj kaj elŝutaĵoj, ankaŭ senkonekte. Fiksu supre tion, kion vi plej aŭskultas, per la pinglo kaj tuŝu artiston por vidi lian tutan diskografion.
+812	Viaj ludlistoj, ŝatataj kaj elŝutaĵoj, ankaŭ senkonekte. Fiksu supre tion, kion vi plej aŭskultas, per la pinglo kaj tuŝu artiston por vidi lian tutan diskografion. Tuŝu la langeton Biblioteko.
+813	Viaj albumoj
+814	Dosiero .zip kun ĉio, kion la apo konservas pri vi
+815	Unu resumo semajne; nenio el tio, kion vi aŭskultas aŭ serĉas. Ĝi servas nur por ke la apo funkciu pli bone; ĝi foriĝas post 90 tagoj.
+816	Ĉiutaga kopio de viaj ŝatataj, ludlistoj kaj albumoj en la dosierujo, kiun vi elektas. Elektu tian, kiu sinkroniĝas (Google Drive, Nextcloud…), por perdi nenion kiam vi ŝanĝas telefonon.
+817	Ĉiutaga kopio de viaj ŝatataj, ludlistoj kaj albumoj en la dosierujo, kiun vi elektas. Elektu tian, kiu sinkroniĝas (iCloud Drive, Google Drive…), por perdi nenion kiam vi ŝanĝas telefonon.
+818	Ludlisto, al kiu ĉiuj aldonas kantojn el sia telefono, iPhone aŭ Android, en la sama Wi-Fi. Per la QR oni eniras tuj.
+819	Ludlisto kunhavigita kun tiu, kiu estas kun vi, eĉ se tiu havas Android. Skanu la QR por eniri tuj, aŭ tajpu la kodon.
+820	Ludlisto kunhavigita kun tiu, kiu estas kun vi, eĉ se tiu havas iPhone. Skanu la QR por eniri tuj, aŭ tajpu la kodon.
+821	Ludlisto, kiun vi faras kune. Ĝi funkcias kun homoj proksimaj, en la sama Wi-Fi aŭ kun Bluetooth ŝaltita.
+822	Ludlisto, kiun vi faras kune. Ĝi funkcias kun homoj proksimaj, en la sama Wi-Fi.
+823	Kunigas la kopion kun tio en ĉi tiu telefono, sen forigi ion
+824	Aliĝi al unu
+825	Uzas la laŭtecon, kiun YouTube mezuras por ĉiu kanto: la pli laŭtaj mallaŭtiĝas kaj la pli mallaŭtaj iom laŭtiĝas, por ne tuŝi la laŭtecon inter kantoj.
+826	Malplenigi la kaŝmemoron de kovriloj
+827	Malplenigi la protokolon
+828	Malplena aŭ importita
+829	Bone
+830	Rapido
+831	Rapido {0}
+832	Vidi la kovrilon
+833	Vidi la restarigan ŝlosilon
+834	Vidi la vicon
+835	Vidi la profilon de {0}
+836	Vidi staton kaj kontrolon
+837	Vidi la kantotekston
+838	Vidi ĉiujn
+839	Vidi ĉion
+840	Vidi ĉiujn: {0}
+841	Vidi viajn kantojn de {0}
+842	Versio
+843	Versio de la sistemo
+844	Versio {0}
+845	Versio {0} kaj kreditoj
+846	Vinilo
+847	Antaŭrigardo de la koloroj de la kovrilo
+848	Klaraj voĉoj
+849	Voĉoj kaj podkastoj pli ĉeestaj
+850	Reen al la komenco
+851	Ensalutu denove al via konto.
+852	Revidi la bonvenigon, la trairon kaj la rakontojn
+853	Revenas la etoso Vitro, la ludilo Normala, la koloroj de la kovrilo malŝaltitaj kaj la defaŭlta ordo de langetoj.
+854	Fenestraĵoj
+855	Jam en la Jam
+856	Ne plu fiksita
+857	Mi jam havas ŝlosilon (de alia telefono)
+858	ĵus
+859	breto simpmusic kapsulo langetoj faldi guto
+860	breto simpmusic faldi serĉi
+861	bluetooth chromecast laŭtparolilo airplay
+862	forigi
+863	cimo eraro problemo subteno raporto kokcinelo kontakto
+864	serĉi langeto hejmo breto
+865	karuselo via muziko
+866	kovrilo koloro nuanco subtila ekvilibra intensa
+867	kasedo vinilo air normala
+868	hela aŭ malhela laŭ la iPhone
+869	koloro fono vitro neono aero sistemo aspekto
+870	kopio sekurkopio backup drive nextcloud konservi eksporti
+871	kopio sekurkopio backup icloud drive konservi eksporti
+872	transfandiĝo transiro glata laŭteco paŭzoj
+873	konto retpoŝto nubo sinkronigi kopio ĉifrita ŝlosilo restarigo ensaluti
+874	la gastiganto
+875	tiu de via konto. Nenio el tio, kion vi aŭskultas aŭ serĉas. Ĝi foriĝas post 90 tagoj; malŝaltante ĝin, ĝi foriĝas tuj.
+876	kongruigi importi spotify sekundoj kongruo
+877	en Hejmo
+878	en sia langeto
+879	spaco senkonekte forigi
+880	vitro travidebla ios 26
+881	basoj altaj voĉoj sono eq laŭtparolilo
+882	antaŭ {0} tagoj
+883	antaŭ {0} h
+884	antaŭ {0} min
+885	memoro bildoj kovriloj
+886	nokta reĝimo malhela hela aŭtomata
+887	sciigoj sonorilo paneoj novaĵoj discord
+888	kaŝi forigi malŝalti malkovri fluo fragmentoj reels
+889	ordo a-z lastatempaj permane
+890	ordo breto malkovri hejmo biblioteko
+891	privateco gdpr eksporti forigi datumoj zip
+892	senfina radio aŭtomata ludado vico fino
+893	restarigi la nuban kopion en alia telefono. Pear Music ne konservas ĝin kaj ne povas restarigi ĝin.
+894	resto de la apo
+895	sona eligo laŭtparolilo homepod apple tv bluetooth
+896	fluigo datumoj ŝparo maksimuma kbps
+897	sugesto ideo propono plibonigo kesto
+898	simboloj animacio scramble
+899	bezonas por malfermiĝi, flueco (FPS kaj skuoj), memoro kaj minutoj de uzado, kun hazarda identigilo, kiu ne estas 
+900	telemetrio rendimento datumoj konsento privateco fps
+901	gvidilo bonvenigo komenci
+902	versio kreditoj permesilo
+903	fenestraĵoj fenestraĵo personigo hejmekrano labortablo nun ludas lastatempaj rapidaj alirejoj fiksita ludlisto etoso
+904	{0}\n\nNi konservis ĝin en Malnetoj por ke vi sendu ĝin poste.
+905	{0}\n\nVi povas reformuli ĝin aŭ, se vi opinias, ke tio estas eraro, apelacii.
+906	{0} %
+907	{0} bone · {1} por kontroli · {2} ne trovitaj
+908	{0} kantoj, samaj kiel en SimpMusic. Nenio estis elŝutita.
+909	{0} el {1} kantoj. Ĝi jam estas en via Biblioteko; nenio estis elŝutita (uzu «Elŝuti ĉion», se vi volas ĝin senkonekte).
+910	{0} el {1} · Paŭzigi
+911	{0} el {1} · markiĝas aŭtomate
+912	{0} finis la Jam.
+913	{0} ludlistoj importitaj
+914	{0} · aldonita de {1}
+915	{0} · {1}
+916	{0} · {1} senkonekte
+917	{0}, jam en la Jam
+918	{0}, {1} kaj {2} pliaj
+919	{0}. Tenu premite por konfirmi
+920	«Maksimuma» uzas AAC je 128 kbps; «Datumŝparo», 48 kbps. Aplikiĝas ekde la sekva kanto.
+921	«Maksimuma» uzas Opus je ĉirkaŭ 160 kbps; «Datumŝparo», ĉirkaŭ 50 kbps. Aplikiĝas ekde la sekva kanto.
+922	«{0}» importita
+923	Ĉu forigi ĉiujn viajn datumojn?
+924	Ĉu forigi vian konton?
+925	Ĉu forigi la malneton?
+926	Ĉu forigi «{0}»?
+927	Ĉu komenci de nulo?
+928	Ĉu sendi la raporton?
+929	Ĉu sendi la sugeston?
+930	Ĉu konservi la liston antaŭ ol eliri?
+931	Ĉu forigi «{0}» el Viaj albumoj?
+932	Ĉu restarigi {0}?
+933	Albumo
+934	Albumoj
+935	Lasta nuba kopio
+936	Lasta kopio: {0}
+937	éxitos del momento
+938	…
+939	❌ Eraro {0}
+940	hela aŭ malhela laŭ la telefono
+942	Elektita
+943	Elektu vian lingvon
+944	Hispanio
+945	Lingvo
+946	La tuta apo ŝanĝiĝas tuj. Kio ankoraŭ ne estas tradukita, aperas hispane.
+947	lingvo idioma language español català valencià galego euskara english
+948	Aero
+949	Arĝento kun nigra Helvetica kaj ringo de punktoj.
+950	Vitro
+951	Difuza lumo kun la koloroj de la kovrilo.
+952	Neono
+953	Synthwave-krado, kiu antaŭeniras dum muziko ludas.
+954	Sistemo
+955	Sen efektoj nek animaciitaj fonoj.
+957	Kodo {0}
+958	Homoj: {0}
+959	Ludlistoj: 
+960	Via retpoŝtadreso, la teksto kaj datumoj de la iPhone (modelo, versio de iOS kaj de la apo) sendiĝos al la privata subtena kanalo de Pear Music.
+961	Via retpoŝtadreso, la teksto kaj datumoj de la telefono (modelo, versio de Android kaj de la apo) sendiĝos al la privata subtena kanalo de Pear Music.
+962	Via retpoŝtadreso, la teksto, {0} foto(j) kaj datumoj de la iPhone (modelo, versio de iOS kaj de la apo) sendiĝos al la privata subtena kanalo de Pear Music.
+963	Via retpoŝtadreso, la teksto, {0} foto(j) kaj datumoj de la telefono (modelo, versio de Android kaj de la apo) sendiĝos al la privata subtena kanalo de Pear Music.
+964	Dankon! Ĝi estas la bileto #{0}. Ni respondos en Avizoj (nur al vi) kaj al la retpoŝtadreso, kiun vi skribis.
+965	Dankon! Ni respondos en Avizoj (nur al vi) kaj al la retpoŝtadreso, kiun vi skribis.
+966	«{0}» ĉiam uzas la helan reĝimon.
+967	«{0}» ĉiam uzas la malhelan reĝimon.
+968	Ĉu forigi la elŝutaĵojn de «{0}»?
+969	Ĉu forigi la elŝutaĵojn?
+970	Malsupra breto de SimpMusic, de maxrave-dev (GPL-3.0)
+971	Malsupra breto inspirita de SimpMusic, de maxrave-dev (GPL-3.0)
+972	hieraŭ
+973	Elŝutante Pear Music {0}… {1} %

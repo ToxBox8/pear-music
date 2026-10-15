@@ -75,7 +75,13 @@ struct ArtistPage {
     let songs: [Song]
     let albums: [RemoteCollection]
     let singles: [RemoteCollection]
+    /// «Ver todo» de cada sección (página de discografía de YouTube Music), si la hay.
+    var albumsMore: BrowseRef? = nil
+    var singlesMore: BrowseRef? = nil
 }
+
+/// Una página de YouTube Music a la que se llega con browseId + params (p. ej. la discografía completa).
+struct BrowseRef: Hashable { let browseId: String; let params: String? }
 
 struct RemotePlaylist: Identifiable {
     let id: String          // playlistId (sin el prefijo "VL")
@@ -183,6 +189,8 @@ enum YTClient {
     /// Canciones, álbumes y artistas a la vez (tres búsquedas filtradas en paralelo). Sólo falla si
     /// fallan las tres; si una falla, su sección sale vacía.
     static func searchAll(_ query: String) async throws -> SearchResults {
+        // Modo seguro (Fase 4): sin búsqueda remota; la música guardada y descargada sigue funcionando.
+        if Incident.restricted { throw YTError.detail("La búsqueda está en pausa mientras resolvemos un incidente.") }
         async let songs = try? search(query)
         async let albums = try? searchBrowsable(query, filter: .albums)
         async let artists = try? searchBrowsable(query, filter: .artists)
@@ -242,6 +250,7 @@ enum YTClient {
         }
         var songs: [Song] = []
         var carousels: [[RemoteCollection]] = []
+        var more: [BrowseRef?] = []
         collect(json, key: "musicShelfRenderer") { shelf in
             if songs.isEmpty { songs = parseSongs(shelf) }
         }
@@ -254,11 +263,43 @@ enum YTClient {
                 let year = parts.last ?? ""
                 items.append(RemoteCollection(id: c.id, title: c.title, subtitle: [kind, name, year].filter { !$0.isEmpty }.joined(separator: " • "), thumbnail: c.thumbnail))
             }
-            if !items.isEmpty { carousels.append(items) }
+            if !items.isEmpty {
+                carousels.append(items)
+                // «Ver todo» de la sección: la página de discografía completa (lo que hace SimpMusic).
+                let header = (shelf["header"] as? [String: Any])?["musicCarouselShelfBasicHeaderRenderer"] as? [String: Any]
+                let button = (header?["moreContentButton"] as? [String: Any])?["buttonRenderer"] as? [String: Any]
+                let end = (button?["navigationEndpoint"] as? [String: Any])?["browseEndpoint"] as? [String: Any]
+                more.append((end?["browseId"] as? String).map { BrowseRef(browseId: $0, params: end?["params"] as? String) })
+            }
         }
         return ArtistPage(name: name, thumbnail: headerThumb ?? artist.thumbnail,
                           songs: songs.map { Song(id: $0.id, title: $0.title, artist: $0.artist.isEmpty ? name : $0.artist, thumbnail: $0.thumbnail) },
-                          albums: carousels.first ?? [], singles: carousels.count > 1 ? carousels[1] : [])
+                          albums: carousels.first ?? [], singles: carousels.count > 1 ? carousels[1] : [],
+                          albumsMore: more.first ?? nil, singlesMore: more.count > 1 ? more[1] : nil)
+    }
+
+    /// Discografía completa de una sección («Ver todo»): YouTube Music la devuelve entera en una cuadrícula.
+    static func discography(_ ref: BrowseRef, artist name: String) async throws -> [RemoteCollection] {
+        var body: [String: Any] = ["browseId": ref.browseId]
+        if let p = ref.params { body["params"] = p }
+        let json = try await browse(body)
+        var out: [RemoteCollection] = []
+        var seen = Set<String>()
+        collect(json, key: "musicTwoRowItemRenderer") { item in
+            guard case .collection(let c)? = parseTwoRow(item), c.id.hasPrefix("MPREb"), seen.insert(c.id).inserted else { return }
+            let parts = c.subtitle.components(separatedBy: " • ")
+            let kind = parts.count > 1 ? parts[0] : "Álbum"
+            out.append(RemoteCollection(id: c.id, title: c.title, subtitle: [kind, name, parts.last ?? ""].filter { !$0.isEmpty }.joined(separator: " • "), thumbnail: c.thumbnail))
+        }
+        return out
+    }
+
+    /// El artista con ese nombre exacto (sin tildes ni mayúsculas), para abrir su perfil desde un álbum o una canción.
+    static func findArtist(_ name: String) async -> RemoteArtist? {
+        let key = Discography.normalize(name)
+        guard let artists = try? await searchAll(name).artists else { return nil }
+        return artists.first { Discography.normalize($0.name) == key }
+            ?? artists.first.flatMap { !key.isEmpty && Discography.normalize($0.name).hasPrefix(key) ? $0 : nil }
     }
 
     static func suggestions(_ query: String) async throws -> [String] {

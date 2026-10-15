@@ -35,8 +35,8 @@ struct PendingImportRow: View {
                 HStack(spacing: 12) {
                     Image(systemName: "text.magnifyingglass").font(.title3).foregroundStyle(Color.accentColor)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Sin añadir: \(songCount(l.count))").font(.body.weight(.medium))
-                        Text("De la importación. Toca para buscarlas otra vez.").font(.caption).foregroundStyle(.secondary)
+                        Text(L("Sin añadir: {0}", songCount(l.count))).font(.body.weight(.medium))
+                        Text(L("De la importación. Toca para buscarlas otra vez.")).font(.caption).foregroundStyle(.secondary)
                     }
                 }
             }
@@ -59,7 +59,7 @@ struct PendingImportView: View {
     var body: some View {
         Form {
             if tracks.isEmpty {
-                Text("No queda ninguna canción por añadir").foregroundStyle(.secondary)
+                Text(L("No queda ninguna canción por añadir")).foregroundStyle(.secondary)
             } else {
                 Section {
                     Button { Task { await search() } } label: {
@@ -68,8 +68,8 @@ struct PendingImportView: View {
                     .buttonStyle(.borderedProminent)
                     .disabled(searching)
                 } footer: {
-                    Text(searching ? "Buscando en YouTube Music… \(done) de \(tracks.count)"
-                         : "Se buscan otra vez en YouTube Music (a veces aparecen versiones nuevas). Elige la buena y se añade a la playlist.")
+                    Text(searching ? L("Buscando en YouTube Music… {0} de {1}", done, tracks.count)
+                         : L("Se buscan otra vez en YouTube Music (a veces aparecen versiones nuevas). Elige la buena y se añade a la playlist."))
                 }
                 Section(songCount(tracks.count)) {
                     ForEach(tracks, id: \.self) { t in
@@ -98,7 +98,7 @@ struct PendingImportView: View {
                                 } label: {
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(c.song.title)
-                                        Text(c.song.artist + (j == 0 ? " · más probable" : "")).font(.footnote).foregroundStyle(.secondary)
+                                        Text(c.song.artist + (j == 0 ? L(" · más probable") : "")).font(.footnote).foregroundStyle(.secondary)
                                     }
                                 }
                                 .padding(.leading, 16)
@@ -108,7 +108,7 @@ struct PendingImportView: View {
                 }
             }
         }
-        .navigationTitle("Sin añadir")
+        .navigationTitle(L("Sin añadir"))
         .navigationBarTitleDisplayMode(.inline)
         .themed()
     }
@@ -118,7 +118,7 @@ struct PendingImportView: View {
         var parts = [t.artist].filter { !$0.isEmpty }
         if d > 0 { parts.append(String(format: "%d:%02d", d / 60, d % 60)) }
         var s = parts.joined(separator: " · ")
-        if let m { s += "\n" + (m.candidates.isEmpty ? "Sin resultados" : "\(m.candidates.count) posibles") }
+        if let m { s += "\n" + (m.candidates.isEmpty ? L("Sin resultados") : "\(m.candidates.count) posibles") }
         return s
     }
 

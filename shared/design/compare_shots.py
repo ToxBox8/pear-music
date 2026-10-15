@@ -91,7 +91,7 @@ def main() -> int:
     sheet_h = 60 + rows * (LABEL_H + cell_h + GAP)
     sheet = Image.new("RGB", (sheet_w, sheet_h), BG)
     draw = ImageDraw.Draw(sheet)
-    draw.text((GAP, 18), "LibreMusic · iOS (izquierda) | Android (derecha)", font=title_f, fill=INK)
+    draw.text((GAP, 18), "Pear Music · iOS (izquierda) | Android (derecha)", font=title_f, fill=INK)
 
     for k, name in enumerate(names):
         a, b = ios.get(name), android.get(name)

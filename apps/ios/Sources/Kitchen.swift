@@ -125,10 +125,10 @@ struct DownloadButton: View {
                     .frame(width: 15, height: 15)
                     if typeSize < .xxLarge {
                         switch p {
-                        case .idle: Text("Descargar")
-                        case .busy: Text("Descargando \(pct) %").monospacedDigit()
-                        case .done: Text("Descargado")
-                        case .failed: Text("Reintentar")
+                        case .idle: Text(L("Descargar"))
+                        case .busy: Text(L("Descargando {0} %", pct)).monospacedDigit()
+                        case .done: Text(L("Descargado"))
+                        case .failed: Text(L("Reintentar"))
                         }
                     }
                 }
@@ -146,7 +146,7 @@ struct DownloadButton: View {
         .buttonStyle(TactileButtonStyle())
         .disabled(p == .busy || p == .done)
         .animation(.uiEaseOut(0.26), value: p)
-        .accessibilityLabel(p == .idle ? "Descargar" : p == .busy ? "Descargando" : p == .done ? "Descargado" : "Reintentar descarga")
+        .accessibilityLabel(p == .idle ? L("Descargar") : p == .busy ? L("Descargando") : p == .done ? L("Descargado") : L("Reintentar descarga"))
         .accessibilityHint(p == .failed ? (downloads.lastError ?? "") : "")
     }
 }
@@ -192,12 +192,12 @@ struct HoldToConfirmButton: View {
             }
         }
         .accessibilityElement(children: .combine)
-        .accessibilityHint("Mantén pulsado para confirmar")
+        .accessibilityHint(L("Mantén pulsado para confirmar"))
         .accessibilityAction { complete() }
     }
 
     private var content: some View {
-        Label(confirmed ? "Hecho" : title, systemImage: confirmed ? "checkmark" : systemImage)
+        Label(confirmed ? L("Hecho") : title, systemImage: confirmed ? "checkmark" : systemImage)
             .font(.subheadline.weight(.semibold))
     }
 
@@ -400,7 +400,7 @@ struct CassetteView: View {
             .foregroundStyle(ink)
         }
         .accessibilityElement()
-        .accessibilityLabel("Progreso")
+        .accessibilityLabel(L("Progreso"))
         .accessibilityValue("\(timeString(clock.progress)) de \(timeString(clock.duration))")
     }
 
@@ -413,13 +413,13 @@ struct CassetteView: View {
             HStack(spacing: width * 0.05) {
                 Button { restart() } label: { CassetteKey(icon: "arrow.counterclockwise", size: small, big: false) }
                     .disabled(clock.progress <= 0)
-                    .accessibilityLabel("Volver al inicio")
+                    .accessibilityLabel(L("Volver al inicio"))
                 Button { player.toggle() } label: {
                     CassetteKey(icon: player.isPlaying ? "pause.fill" : "play.fill", size: big, big: true)
                 }
-                .accessibilityLabel(player.isPlaying ? "Pausa" : "Reproducir")
+                .accessibilityLabel(player.isPlaying ? L("Pausa") : L("Reproducir"))
                 Button { player.next() } label: { CassetteKey(icon: "forward.fill", size: small, big: false) }
-                    .accessibilityLabel("Siguiente")
+                    .accessibilityLabel(L("Siguiente"))
             }
             .buttonStyle(TactileButtonStyle())
         }
@@ -570,8 +570,8 @@ private struct TapeWindow: View {
                     onWindEnd()
                 })
             .accessibilityElement()
-            .accessibilityLabel("Cinta")
-            .accessibilityHint("Gira una bobina o arrastra la cinta para avanzar o rebobinar")
+            .accessibilityLabel(L("Cinta"))
+            .accessibilityHint(L("Gira una bobina o arrastra la cinta para avanzar o rebobinar"))
         }
     }
 

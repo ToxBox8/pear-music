@@ -20,8 +20,9 @@ enum TabOrder {
     static func encode(_ order: [String]) -> String { order.joined(separator: ",") }
 
     /// Las pestañas que se ven, con Buscar detrás de Inicio si va aparte.
-    static func visible(_ order: [String], searchTab: Bool) -> [String] {
-        searchTab ? order.flatMap { $0 == home ? [home, search] : [$0] } : order
+    /// `discover: false` la quita (Ajustes › Aspecto › Pestañas › Descubrir, Fase 3.3), como en Android.
+    static func visible(_ order: [String], searchTab: Bool, discover: Bool = true) -> [String] {
+        (searchTab ? order.flatMap { $0 == home ? [home, search] : [$0] } : order).filter { discover || $0 != "discover" }
     }
 
     /// Pestaña al abrir: la última usada, si sigue visible. La primera vez, Inicio: abrir en Descubrir
@@ -34,11 +35,11 @@ enum TabOrder {
 
     static func title(_ key: String) -> String {
         switch key {
-        case discover: return "Descubrir"
-        case home: return "Inicio"
-        case search: return "Buscar"
-        case library: return "Biblioteca"
-        default: return "Ajustes"
+        case discover: return L("Descubrir")
+        case home: return L("Inicio")
+        case search: return L("Buscar")
+        case library: return L("Biblioteca")
+        default: return L("Ajustes")
         }
     }
 
@@ -95,9 +96,9 @@ struct ResetSection: View {
             }
         } footer: { Text(what) }
         .glassRow()
-        .confirmationDialog("¿Restablecer \(section)?", isPresented: $confirm, titleVisibility: .visible) {
-            Button("Restablecer", role: .destructive) { withAnimation(.uiEaseOut(0.25)) { reset() } }
-            Button("Cancelar", role: .cancel) {}
+        .confirmationDialog(L("¿Restablecer {0}?", section), isPresented: $confirm, titleVisibility: .visible) {
+            Button(L("Restablecer"), role: .destructive) { withAnimation(.uiEaseOut(0.25)) { reset() } }
+            Button(L("Cancelar"), role: .cancel) {}
         } message: { Text(what) }
     }
 }
@@ -112,7 +113,7 @@ struct SettingPreview<Content: View>: View {
 // MARK: - Ajustes (Fase 4)
 /// Dónde está cada opción, para el buscador de Ajustes.
 private enum SettingsDestination: Hashable {
-    case theme, player, artwork, tabs, bar, icon, playback, downloads, library, manage, about, help, support, advanced
+    case theme, player, artwork, tabs, bar, playback, downloads, library, manage, about, help, support, advanced, avisos, myData, account, language
 }
 
 private struct SettingEntry: Identifiable {
@@ -123,33 +124,39 @@ private struct SettingEntry: Identifiable {
     var id: String { section + title }
 }
 
-private let settingsIndex: [SettingEntry] = [
-    SettingEntry(title: "Tema", section: "Aspecto", keywords: "color fondo cristal neón aire sistema apariencia", destination: .theme),
-    SettingEntry(title: "Claro u oscuro", section: "Aspecto", keywords: "modo noche oscuro claro automático", destination: .theme),
-    SettingEntry(title: "Reproductor", section: "Aspecto", keywords: "casete vinilo air normal", destination: .player),
-    SettingEntry(title: "Efecto en los títulos", section: "Aspecto", keywords: "símbolos animación scramble", destination: .player),
-    SettingEntry(title: "Colores de la portada", section: "Aspecto", keywords: "carátula color tinte sutil equilibrado intenso", destination: .artwork),
-    SettingEntry(title: "Pestañas", section: "Aspecto", keywords: "orden barra descubrir inicio biblioteca", destination: .tabs),
-    SettingEntry(title: "Barra inferior", section: "Aspecto", keywords: "barra simpmusic plegar buscar", destination: .bar),
-    SettingEntry(title: "Icono de la app", section: "Aspecto", keywords: "logo encendido violeta pantalla de inicio", destination: .icon),
-    SettingEntry(title: "Calidad al escuchar", section: "Reproducción", keywords: "streaming datos ahorro máxima kbps", destination: .playback),
-    SettingEntry(title: "Seguir con canciones parecidas", section: "Reproducción", keywords: "radio infinita autoplay automático cola acabar", destination: .playback),
-    SettingEntry(title: "Fundido entre canciones", section: "Reproducción", keywords: "crossfade transición suave volumen cortes", destination: .playback),
-    SettingEntry(title: "Copia automática", section: "Biblioteca", keywords: "copia seguridad backup icloud drive guardar exportar", destination: .library),
-    SettingEntry(title: "AirPlay", section: "Reproducción", keywords: "salida audio altavoz homepod apple tv bluetooth", destination: .playback),
-    SettingEntry(title: "Canciones descargadas", section: "Descargas", keywords: "espacio offline sin conexión borrar", destination: .downloads),
-    SettingEntry(title: "Ordenar playlists", section: "Biblioteca", keywords: "orden a-z recientes a mano", destination: .library),
-    SettingEntry(title: "Descargadas y Favoritos", section: "Biblioteca", keywords: "carrusel tu música", destination: .library),
-    SettingEntry(title: "Dónde está Buscar", section: "Biblioteca", keywords: "buscar pestaña inicio barra", destination: .library),
-    SettingEntry(title: "Eliminar playlists", section: "Biblioteca", keywords: "borrar quitar", destination: .manage),
-    SettingEntry(title: "Informar de un error", section: "Ayuda y soporte", keywords: "bug fallo problema soporte reporte escarabajo contacto", destination: .support),
-    SettingEntry(title: "Guía inicial", section: "Ayuda y soporte", keywords: "tutorial bienvenida empezar", destination: .help),
-    SettingEntry(title: "Acerca de", section: "Ayuda y soporte", keywords: "versión créditos licencia", destination: .about),
-    SettingEntry(title: "Vaciar caché de carátulas", section: "Avanzado", keywords: "memoria imágenes portadas", destination: .advanced),
-    SettingEntry(title: "Tolerancia de duración", section: "Avanzado", keywords: "emparejar importar spotify segundos coincidencia", destination: .advanced),
-]
+private var settingsIndex: [SettingEntry] { [
+    SettingEntry(title: L("Tema"), section: L("Aspecto"), keywords: L("color fondo cristal neón aire sistema apariencia"), destination: .theme),
+    SettingEntry(title: L("Claro u oscuro"), section: L("Aspecto"), keywords: L("modo noche oscuro claro automático"), destination: .theme),
+    SettingEntry(title: L("Reproductor"), section: L("Aspecto"), keywords: L("casete vinilo air normal"), destination: .player),
+    SettingEntry(title: L("Efecto en los títulos"), section: L("Aspecto"), keywords: L("símbolos animación scramble"), destination: .player),
+    SettingEntry(title: L("Colores de la portada"), section: L("Aspecto"), keywords: L("carátula color tinte sutil equilibrado intenso"), destination: .artwork),
+    SettingEntry(title: L("Pestañas"), section: L("Aspecto"), keywords: L("orden barra descubrir inicio biblioteca"), destination: .tabs),
+    SettingEntry(title: L("Descubrir"), section: L("Aspecto"), keywords: L("ocultar quitar desactivar descubrir feed fragmentos reels"), destination: .tabs),
+    SettingEntry(title: L("Barra inferior"), section: L("Aspecto"), keywords: L("barra simpmusic plegar buscar"), destination: .bar),
+    SettingEntry(title: L("Calidad al escuchar"), section: L("Reproducción"), keywords: L("streaming datos ahorro máxima kbps"), destination: .playback),
+    SettingEntry(title: L("Seguir con canciones parecidas"), section: L("Reproducción"), keywords: L("radio infinita autoplay automático cola acabar"), destination: .playback),
+    SettingEntry(title: L("Fundido entre canciones"), section: L("Reproducción"), keywords: L("crossfade transición suave volumen cortes"), destination: .playback),
+    SettingEntry(title: L("Copia automática"), section: L("Biblioteca"), keywords: L("copia seguridad backup icloud drive guardar exportar"), destination: .library),
+    SettingEntry(title: "AirPlay", section: L("Reproducción"), keywords: L("salida audio altavoz homepod apple tv bluetooth"), destination: .playback),
+    SettingEntry(title: L("Canciones descargadas"), section: L("Descargas"), keywords: L("espacio offline sin conexión borrar"), destination: .downloads),
+    SettingEntry(title: L("Ordenar playlists"), section: L("Biblioteca"), keywords: L("orden a-z recientes a mano"), destination: .library),
+    SettingEntry(title: L("Descargadas y Favoritos"), section: L("Biblioteca"), keywords: L("carrusel tu música"), destination: .library),
+    SettingEntry(title: L("Dónde está Buscar"), section: L("Biblioteca"), keywords: L("buscar pestaña inicio barra"), destination: .library),
+    SettingEntry(title: L("Eliminar playlists"), section: L("Biblioteca"), keywords: L("borrar quitar"), destination: .manage),
+    SettingEntry(title: L("Avisos"), section: L("Ayuda y soporte"), keywords: L("notificaciones campana caídas novedades discord"), destination: .avisos),
+    SettingEntry(title: L("Cuenta"), section: L("Ajustes"), keywords: L("cuenta correo nube sincronizar copia cifrada clave recuperación iniciar sesión"), destination: .account),
+    SettingEntry(title: L("Telemetría"), section: L("Ayuda y soporte"), keywords: L("telemetría rendimiento datos consentimiento privacidad fps"), destination: .myData),
+    SettingEntry(title: L("Tus datos"), section: L("Ayuda y soporte"), keywords: L("privacidad rgpd exportar borrar datos eliminar zip"), destination: .myData),
+    SettingEntry(title: L("Idioma"), section: L("Ajustes"), keywords: L("idioma lengua language català valencià galego euskara english esperanto"), destination: .language),
+    SettingEntry(title: L("Informar de un error"), section: L("Ayuda y soporte"), keywords: L("bug fallo problema soporte reporte escarabajo contacto"), destination: .support),
+    SettingEntry(title: L("Guía inicial"), section: L("Ayuda y soporte"), keywords: L("tutorial bienvenida empezar"), destination: .help),
+    SettingEntry(title: L("Acerca de"), section: L("Ayuda y soporte"), keywords: L("versión créditos licencia"), destination: .about),
+    SettingEntry(title: L("Vaciar caché de carátulas"), section: L("Avanzado"), keywords: L("memoria imágenes portadas"), destination: .advanced),
+    SettingEntry(title: L("Tolerancia de duración"), section: L("Avanzado"), keywords: L("emparejar importar spotify segundos coincidencia"), destination: .advanced),
+] }
 
 struct SettingsView: View {
+    @ObservedObject private var account = Account.shared
     @AppStorage("theme") private var themeID = AppTheme.glass.rawValue
     @AppStorage("deck") private var deckID = DeckStyle.normal.rawValue
     @AppStorage("quality") private var quality = "max"
@@ -173,14 +180,17 @@ struct SettingsView: View {
             Form {
                 if query.trimmingCharacters(in: .whitespaces).isEmpty { sections } else { results }
             }
-            .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Buscar en Ajustes")
+            .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: L("Buscar en Ajustes"))
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
+                ToolbarItemGroup(placement: .navigationBarTrailing) {
+                    // Carta junto al escarabajo: el buzón de sugerencias (lo pidió Toxbox).
+                    NavigationLink { SupportView(suggestion: true) } label: { Image(systemName: "envelope") }
+                        .accessibilityLabel(L("Buzón de sugerencias"))
                     NavigationLink { SupportView() } label: { Image(systemName: "ladybug") }
-                        .accessibilityLabel("Informar de un error")
+                        .accessibilityLabel(L("Informar de un error"))
                 }
             }
-            .navigationTitle("Ajustes")
+            .navigationTitle(L("Ajustes"))
             .themed()
             .demoRoute(.themePicker) { AppearanceSettings() }
             .miniPlayer()
@@ -189,27 +199,39 @@ struct SettingsView: View {
 
     @ViewBuilder private var sections: some View {
         Section {
+            NavigationLink { AccountView() } label: {
+                SettingsRow(icon: "person.crop.circle.fill", palette: 4, title: L("Cuenta"), value: nil,
+                            subtitle: account.state.email ?? L("Opcional · guarda tu biblioteca cifrada en la nube"))
+            }
+        }
+        .glassRow()
+        Section {
             NavigationLink { AspectSettings() } label: {
-                SettingsRow(icon: "paintpalette.fill", palette: 1, title: "Aspecto", value: nil,
-                            subtitle: "\(theme.name) · \((DeckStyle(rawValue: deckID) ?? .normal).name)"
-                                + ((artworkPlayer || artworkApp) && level.enabled ? " · Colores \(level.title.lowercased())" : ""))
+                SettingsRow(icon: "paintpalette.fill", palette: 1, title: L("Aspecto"), value: nil,
+                            subtitle: L("{0} · {1}", theme.name, (DeckStyle(rawValue: deckID) ?? .normal).name)
+                                + ((artworkPlayer || artworkApp) && level.enabled ? L(" · Colores {0}", level.title.lowercased()) : ""))
+            }
+            // Idioma (Cierre 1.0).
+            NavigationLink { LanguageSettings() } label: {
+                SettingsRow(icon: "globe", palette: 3, title: L("Idioma"), value: nil,
+                            subtitle: I18n.langs.first { $0.id == I18n.current }?.name ?? L("Español"))
             }
             NavigationLink { AudioSettings() } label: {
-                SettingsRow(icon: "waveform", palette: 3, title: "Reproducción", value: nil,
-                            subtitle: quality == "low" ? "Ahorro de datos" : "Calidad máxima")
+                SettingsRow(icon: "waveform", palette: 3, title: L("Reproducción"), value: nil,
+                            subtitle: quality == "low" ? L("Ahorro de datos") : L("Calidad máxima"))
             }
             NavigationLink { DownloadsSettings() } label: {
-                SettingsRow(icon: "arrow.down.circle.fill", palette: 2, title: "Descargas", value: nil,
-                            subtitle: downloads.songs.isEmpty ? "Ninguna canción descargada"
-                                : "\(songCount(downloads.songs.count)) · \(ByteCountFormatter.string(fromByteCount: downloads.totalBytes(), countStyle: .file))")
+                SettingsRow(icon: "arrow.down.circle.fill", palette: 2, title: L("Descargas"), value: nil,
+                            subtitle: downloads.songs.isEmpty ? L("Ninguna canción descargada")
+                                : L("{0} · {1}", songCount(downloads.songs.count), ByteCountFormatter.string(fromByteCount: downloads.totalBytes(), countStyle: .file)))
             }
             NavigationLink { LibrarySettings() } label: {
-                SettingsRow(icon: "books.vertical.fill", palette: 0, title: "Biblioteca", value: nil,
-                            subtitle: "Playlists: \(Self.sortTitle(playlistSort).lowercased()) · Buscar \(searchPlacement == "tab" ? "en su pestaña" : "en Inicio")")
+                SettingsRow(icon: "books.vertical.fill", palette: 0, title: L("Biblioteca"), value: nil,
+                            subtitle: L("Playlists: ") + Self.sortTitle(playlistSort).lowercased() + L(" · Buscar ") + (searchPlacement == "tab" ? L("en su pestaña") : L("en Inicio")))
             }
             NavigationLink { HelpSettings() } label: {
-                SettingsRow(icon: "info.circle.fill", palette: 6, title: "Ayuda y soporte", value: nil,
-                            subtitle: "Informar de un error · Guía inicial · Versión \(AboutView.version)")
+                SettingsRow(icon: "info.circle.fill", palette: 6, title: L("Ayuda y soporte"), value: nil,
+                            subtitle: L("Informar de un error · Guía inicial · Versión {0}", AboutView.version))
             }
         }
         .glassRow()
@@ -217,18 +239,18 @@ struct SettingsView: View {
         // Lo técnico, plegado: sólo quien lo busca lo ve.
         Section {
             DisclosureGroup(isExpanded: $advanced.animation(.uiEaseOut(0.25))) {
-                LabeledContent("Calidad de descarga", value: "Máxima")
+                LabeledContent(L("Calidad de descarga"), value: L("Máxima"))
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Tolerancia de duración")
-                    Text("Al importar de Spotify o Apple Music, cuánto puede durar distinta una canción para darla por buena")
+                    Text(L("Tolerancia de duración"))
+                    Text(L("Al importar de Spotify o Apple Music, cuánto puede durar distinta una canción para darla por buena"))
                         .font(.footnote).foregroundStyle(.secondary)
-                    Picker("Tolerancia", selection: $tolerance) {
+                    Picker(L("Tolerancia"), selection: $tolerance) {
                         ForEach([2, 4, 6, 10], id: \.self) { Text("±\($0) s").tag($0) }
                     }
                     .pickerStyle(.segmented)
                 }
                 .padding(.vertical, 4)
-                Button(cacheCleared ? "Caché vaciada" : "Vaciar caché de carátulas") {
+                Button(cacheCleared ? L("Caché vaciada") : L("Vaciar caché de carátulas")) {
                     imageMemory.removeAllObjects()
                     URLCache.shared.removeAllCachedResponses()
                     cacheCleared = true
@@ -236,12 +258,12 @@ struct SettingsView: View {
                 .disabled(cacheCleared)
             } label: {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Avanzado")
-                    if !advanced { Text("Calidad de descarga, tolerancia al importar y caché").font(.footnote).foregroundStyle(.secondary) }
+                    Text(L("Avanzado"))
+                    if !advanced { Text(L("Calidad de descarga, tolerancia al importar y caché")).font(.footnote).foregroundStyle(.secondary) }
                 }
             }
         } footer: {
-            if advanced { Text("Las descargas se guardan siempre a la máxima calidad (AAC 128 kbps), así suenan igual sin conexión.") }
+            if advanced { Text(L("Las descargas se guardan siempre a la máxima calidad (AAC 128 kbps), así suenan igual sin conexión.")) }
         }
         .glassRow()
     }
@@ -281,25 +303,30 @@ struct SettingsView: View {
         case .artwork: ArtworkColorsSettings()
         case .tabs: TabOrderSettings()
         case .bar: AspectSettings()
-        case .icon: AppIconSettings()
         case .playback: AudioSettings()
         case .downloads: DownloadsSettings()
         case .library: LibrarySettings()
         case .manage: ManagePlaylistsView()
         case .about: AboutView()
         case .support: SupportView()
+        case .language: LanguageSettings()
+        case .avisos: AvisosView()
         case .help, .advanced: HelpSettings()
+        case .myData: MyDataView()
+        case .account: AccountView()
         }
     }
 
     static func sortTitle(_ sort: String) -> String {
-        ["name": "A-Z", "nameDesc": "Z-A", "count": "Por tamaño", "custom": "A mano"][sort] ?? "Recientes"
+        ["name": "A-Z", "nameDesc": "Z-A", "count": L("Por tamaño"), "custom": L("A mano")][sort] ?? L("Recientes")
     }
 }
 
 // MARK: Aspecto
 struct AspectSettings: View {
     @AppStorage("barStyle") private var barStyle = "classic"
+    @AppStorage("settingsTop.classic") private var settingsTopClassic = false
+    @AppStorage("settingsTop.simpmusic") private var settingsTopSimp = true
     @AppStorage("theme") private var themeID = AppTheme.glass.rawValue
     @AppStorage("appearance") private var appearance = "system"
     @AppStorage("deck") private var deckID = DeckStyle.normal.rawValue
@@ -315,50 +342,65 @@ struct AspectSettings: View {
         let level = ArtworkLevel(intensity: intensity, opacity: opacity)
         let mode: String = {
             if let forced = theme.scheme { return forced == .dark ? "oscuro" : "claro" }
-            return ["light": "claro", "dark": "oscuro"][appearance] ?? "claro u oscuro según el iPhone"
+            return ["light": "claro", "dark": "oscuro"][appearance] ?? L("claro u oscuro según el iPhone")
         }()
         Form {
             Section {
                 NavigationLink { AppearanceSettings() } label: {
-                    SettingsRow(icon: "paintpalette.fill", palette: 1, title: "Tema", value: nil, subtitle: "\(theme.name) · \(mode)")
+                    SettingsRow(icon: "paintpalette.fill", palette: 1, title: L("Tema"), value: nil, subtitle: "\(theme.name) · \(mode)")
                 }
                 NavigationLink { PlayerSettings() } label: {
-                    SettingsRow(icon: "play.circle.fill", palette: 0, title: "Reproductor", value: nil,
-                                subtitle: (DeckStyle(rawValue: deckID) ?? .normal).name + (scramble ? " · títulos con efecto" : ""))
+                    SettingsRow(icon: "play.circle.fill", palette: 0, title: L("Reproductor"), value: nil,
+                                subtitle: (DeckStyle(rawValue: deckID) ?? .normal).name + (scramble ? L(" · títulos con efecto") : ""))
                 }
                 NavigationLink { ArtworkColorsSettings() } label: {
-                    SettingsRow(icon: "sparkles", palette: 5, title: "Colores de la portada", value: nil,
-                                subtitle: !(artworkPlayer || artworkApp) || !level.enabled ? "Desactivado"
-                                    : level.title + " · " + [artworkPlayer ? "reproductor" : nil, artworkApp ? "resto de la app" : nil].compactMap { $0 }.joined(separator: " y "))
+                    SettingsRow(icon: "sparkles", palette: 5, title: L("Colores de la portada"), value: nil,
+                                subtitle: !(artworkPlayer || artworkApp) || !level.enabled ? L("Desactivado")
+                                    : level.title + " · " + [artworkPlayer ? "reproductor" : nil, artworkApp ? L("resto de la app") : nil].compactMap { $0 }.joined(separator: " y "))
                 }
                 NavigationLink { TabOrderSettings() } label: {
-                    SettingsRow(icon: "arrow.left.arrow.right", palette: 7, title: "Pestañas", value: nil,
+                    SettingsRow(icon: "arrow.left.arrow.right", palette: 7, title: L("Pestañas"), value: nil,
                                 subtitle: TabOrder.decode(tabOrderRaw).map(TabOrder.title).joined(separator: ", "))
-                }
-                NavigationLink { AppIconSettings() } label: {
-                    SettingsRow(icon: "app.badge", palette: 3, title: "Icono de la app", value: nil, subtitle: AppIcon.current.title)
                 }
             }
             .glassRow()
 
             Section {
-                Picker("Barra inferior", selection: $barStyle) {
-                    Text("Clásica").tag("classic")
-                    Text("Estilo SimpMusic").tag("simpmusic")
+                Picker(L("Barra inferior"), selection: $barStyle) {
+                    Text(L("Clásica")).tag("classic")
+                    Text(L("Estilo SimpMusic")).tag("simpmusic")
                 }
                 .pickerStyle(.segmented)
-            } header: { Text("Barra inferior") } footer: {
+            } header: { Text(L("Barra inferior")) } footer: {
                 Text(barStyle == "simpmusic"
-                     ? "Tus pestañas en la barra y Buscar aparte, como SimpMusic. Ajustes y el Jam están arriba en Inicio. En iOS 26 la barra se pliega al bajar por una lista."
-                     : "Las pestañas de siempre.")
+                     ? L("Tus pestañas en la barra y Buscar aparte, como SimpMusic. En iOS 26 la barra se pliega al bajar por una lista.")
+                     : L("Las pestañas de siempre."))
             }
             .glassRow()
 
-            ResetSection(section: "Aspecto", what: "Vuelven el tema Cristal, el reproductor Normal, los colores de la portada apagados y el orden de pestañas de fábrica.") {
+            // Se guarda aparte para cada barra: con la clásica va en la barra y con la estilo SimpMusic arriba.
+            let settingsTop = Binding(
+                get: { barStyle == "simpmusic" ? settingsTopSimp : settingsTopClassic },
+                set: { if barStyle == "simpmusic" { settingsTopSimp = $0 } else { settingsTopClassic = $0 } }
+            )
+            Section {
+                Picker(L("Ajustes"), selection: settingsTop) {
+                    Text(L("En la barra")).tag(false)
+                    Text(L("Arriba en Inicio")).tag(true)
+                }
+                .pickerStyle(.segmented)
+            } header: { Text(L("Ajustes")) } footer: {
+                Text(settingsTop.wrappedValue
+                     ? L("Ajustes está arriba en Inicio, junto al Jam, y no ocupa sitio en la barra.")
+                     : L("Ajustes es una pestaña más de la barra; su sitio se elige en Pestañas."))
+            }
+            .glassRow()
+
+            ResetSection(section: L("Aspecto"), what: L("Vuelven el tema Cristal, el reproductor Normal, los colores de la portada apagados y el orden de pestañas de fábrica.")) {
                 SettingsReset.appearance()
             }
         }
-        .navigationTitle("Aspecto")
+        .navigationTitle(L("Aspecto"))
         .navigationBarTitleDisplayMode(.inline)
         .themed()
     }
@@ -386,34 +428,34 @@ struct ArtworkColorsSettings: View {
             }
 
             Section {
-                Toggle(isOn: $artworkPlayer) { titled("En el reproductor", "Fondo con la carátula desenfocada y controles de su color") }
-                Toggle(isOn: $artworkApp) { titled("En el resto de la app", "Botones del color de la canción y fondos y menús con un toque") }
-            } header: { Text("Dónde") } footer: {
-                Text("Al sonar una canción, la app y los menús toman colores parecidos a los de su portada, como Descubrir.")
+                Toggle(isOn: $artworkPlayer) { titled(L("En el reproductor"), L("Fondo con la carátula desenfocada y controles de su color")) }
+                Toggle(isOn: $artworkApp) { titled(L("En el resto de la app"), L("Botones del color de la canción y fondos y menús con un toque")) }
+            } header: { Text(L("Dónde")) } footer: {
+                Text(L("Al sonar una canción, la app y los menús toman colores parecidos a los de su portada, como Descubrir."))
             }
             .glassRow()
 
             Section {
-                Picker("Nivel", selection: presetBinding) {
-                    Text("No").tag("off")
+                Picker(L("Nivel"), selection: presetBinding) {
+                    Text(L("No")).tag("off")
                     ForEach(ArtworkLevel.presets, id: \.name) { Text($0.name).tag($0.name) }
                 }
                 .pickerStyle(.segmented)
                 DisclosureGroup(isExpanded: $fine.animation(.uiEaseOut(0.25))) {
-                    slider("Exageración del color", "Cuánto se parecen los botones al color de la portada", $intensity)
-                    slider("Opacidad", "Cuánto se tiñen los fondos y los menús", $opacity)
+                    slider(L("Exageración del color"), L("Cuánto se parecen los botones al color de la portada"), $intensity)
+                    slider(L("Opacidad"), L("Cuánto se tiñen los fondos y los menús"), $opacity)
                 } label: {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Ajuste fino")
-                        if level.title == "Personalizado" { Text("Personalizado").font(.footnote).foregroundStyle(.secondary) }
+                        Text(L("Ajuste fino"))
+                        if level.title == "Personalizado" { Text(L("Personalizado")).font(.footnote).foregroundStyle(.secondary) }
                     }
                 }
-            } header: { Text("Cuánto") } footer: {
-                Text("El texto y los iconos mantienen siempre un contraste legible, aunque la portada sea muy clara o muy viva.")
+            } header: { Text(L("Cuánto")) } footer: {
+                Text(L("El texto y los iconos mantienen siempre un contraste legible, aunque la portada sea muy clara o muy viva."))
             }
             .glassRow()
         }
-        .navigationTitle("Colores de la portada")
+        .navigationTitle(L("Colores de la portada"))
         .navigationBarTitleDisplayMode(.inline)
         .themed()
     }
@@ -440,7 +482,7 @@ struct ArtworkColorsSettings: View {
             HStack {
                 Text(title)
                 Spacer()
-                Text("\(Int((value.wrappedValue * 100).rounded())) %").foregroundStyle(.secondary).monospacedDigit()
+                Text(L("{0} %", Int((value.wrappedValue * 100).rounded()))).foregroundStyle(.secondary).monospacedDigit()
             }
             Text(help).font(.footnote).foregroundStyle(.secondary)
             Slider(value: value, in: 0...1).accessibilityLabel(title)
@@ -463,16 +505,16 @@ struct ArtworkPreview: View {
             HStack(spacing: 12) {
                 RoundedRectangle(cornerRadius: 8, style: .continuous).fill(art).frame(width: 44, height: 44)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Canción que suena").font(.callout.weight(.semibold))
-                    Text("Artista").font(.footnote).foregroundStyle(.secondary)
+                    Text(L("Canción que suena")).font(.callout.weight(.semibold))
+                    Text(L("Artista")).font(.footnote).foregroundStyle(.secondary)
                 }
                 Spacer()
                 Image(systemName: "heart.fill").foregroundStyle(accent)
             }
             HStack(spacing: 8) {
-                Text("Reproducir").font(.subheadline.weight(.semibold)).foregroundStyle(.white)
+                Text(L("Reproducir")).font(.subheadline.weight(.semibold)).foregroundStyle(.white)
                     .frame(maxWidth: .infinity, minHeight: 36).background(accent, in: Capsule())
-                Text("Menú").font(.subheadline.weight(.semibold))
+                Text(L("Menú")).font(.subheadline.weight(.semibold))
                     .frame(maxWidth: .infinity, minHeight: 36).background(Color.primary.opacity(0.08), in: Capsule())
             }
         }
@@ -484,7 +526,7 @@ struct ArtworkPreview: View {
         .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(Color.primary.opacity(0.1), lineWidth: 0.5))
         .animation(.uiEaseOut(0.25), value: level)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Vista previa de los colores de la portada")
+        .accessibilityLabel(L("Vista previa de los colores de la portada"))
     }
 }
 
@@ -492,21 +534,54 @@ struct ArtworkPreview: View {
 /// Se arrastran para cambiar el orden; Ajustes se puede mover pero no quitar.
 struct TabOrderSettings: View {
     @AppStorage("tabOrder") private var tabOrderRaw = ""
+    @AppStorage("barStyle") private var barStyle = "classic"
+    @AppStorage("settingsTop.classic") private var settingsTopClassic = false
+    @AppStorage("settingsTop.simpmusic") private var settingsTopSimp = true
+    @AppStorage("showDiscover") private var showDiscover = true
+    @State private var swipe: CGFloat = 0
 
     var body: some View {
         let order = TabOrder.decode(tabOrderRaw)
+        // Ajustes arriba en Inicio: se ve apagado y no se mueve, porque no está en la barra.
+        let settingsTop = barStyle == "simpmusic" ? settingsTopSimp : settingsTopClassic
         Form {
             Section {
                 ForEach(order, id: \.self) { key in
-                    Label(TabOrder.title(key), systemImage: TabOrder.symbol(key))
+                    let fixed = settingsTop && key == TabOrder.settings
+                    // Descubrir se oculta deslizándola a la izquierda (lo pidió Toxbox): queda difuminada.
+                    let hidden = key == "discover" && !showDiscover
+                    VStack(alignment: .leading, spacing: 2) {
+                        Label(TabOrder.title(key), systemImage: TabOrder.symbol(key))
+                        if fixed { Text(L("Arriba en Inicio")).font(.footnote).foregroundStyle(.secondary) }
+                        if hidden { Text(L("Oculta · desliza a la derecha para ponerla")).font(.footnote).foregroundStyle(.secondary) }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .contentShape(Rectangle())
+                    .offset(x: key == "discover" ? swipe : 0)
+                    .opacity(fixed || hidden ? 0.45 : 1)
+                    .moveDisabled(fixed)
+                    .gesture(DragGesture(minimumDistance: 12)
+                        .onChanged { v in
+                            guard abs(v.translation.width) > abs(v.translation.height) else { return }
+                            swipe = hidden ? min(max(v.translation.width, 0), 120) : max(min(v.translation.width, 0), -120)
+                        }
+                        .onEnded { _ in
+                            if !hidden && swipe < -70 { showDiscover = false }
+                            if hidden && swipe > 70 { showDiscover = true }
+                            withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) { swipe = 0 }
+                        }, including: key == "discover" ? .all : .subviews)
+                    .accessibilityAction(named: hidden ? L("Mostrar Descubrir") : L("Ocultar Descubrir")) {
+                        if key == "discover" { showDiscover.toggle() }
+                    }
                 }
                 .onMove { from, to in
                     var o = order
                     o.move(fromOffsets: from, toOffset: to)
                     tabOrderRaw = TabOrder.encode(o)
                 }
-            } header: { Text("Orden de la barra") } footer: {
-                Text("Arrastra ≡ para cambiar el orden; deslizar a los lados sigue el mismo orden. La app se abre en la última pestaña que usaste. Ajustes siempre está en la barra.")
+            } header: { Text(L("Orden de la barra")) } footer: {
+                Text(L("Arrastra ≡ para cambiar el orden; deslizar a los lados sigue el mismo orden. Desliza Descubrir a la izquierda para ocultarla (y a la derecha para volver a ponerla). La app se abre en la última pestaña que usaste.")
+                     + (settingsTop ? L(" Ajustes está arriba en Inicio y no entra en el orden (se cambia en Aspecto).") : ""))
             }
             .glassRow()
 
@@ -515,8 +590,8 @@ struct TabOrderSettings: View {
                     withAnimation(.uiEaseOut(0.25)) { tabOrderRaw = TabOrder.encode(TabOrder.defaultOrder) }
                 } label: {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Orden de fábrica")
-                        Text("Descubrir, Inicio, Biblioteca, Ajustes").font(.footnote).foregroundStyle(.secondary)
+                        Text(L("Orden de fábrica"))
+                        Text(L("Descubrir, Inicio, Biblioteca, Ajustes")).font(.footnote).foregroundStyle(.secondary)
                     }
                 }
                 .disabled(order == TabOrder.defaultOrder)
@@ -524,70 +599,7 @@ struct TabOrderSettings: View {
             .glassRow()
         }
         .environment(\.editMode, .constant(.active))
-        .navigationTitle("Pestañas")
-        .navigationBarTitleDisplayMode(.inline)
-        .themed()
-    }
-}
-
-// MARK: Icono de la app (Fase 5)
-/// El original de encendido (por defecto) o el violeta. Mismas claves que `AppIcon` en Android.
-enum AppIcon: String, CaseIterable, Identifiable {
-    case power, violet
-    var id: String { rawValue }
-    var title: String { self == .power ? "Encendido" : "Violeta" }
-    /// Nombre del icono alternativo en el catálogo (nil = el principal).
-    var alternateName: String? { self == .power ? nil : "AppIcon-Violeta" }
-    /// Vista previa (no se puede pintar un AppIcon desde el código).
-    var preview: String { self == .power ? "Logo" : "IconPreviewViolet" }
-
-    static var current: AppIcon { UIApplication.shared.alternateIconName == nil ? .power : .violet }
-}
-
-/// iOS avisa con una alerta del sistema cada vez que se cambia el icono; no se puede evitar.
-struct AppIconSettings: View {
-    @State private var current = AppIcon.current
-    @State private var failed = false
-
-    var body: some View {
-        Form {
-            Section {
-                HStack(spacing: 16) {
-                    ForEach(AppIcon.allCases) { icon in
-                        Button {
-                            guard icon != current, UIApplication.shared.supportsAlternateIcons else { return }
-                            UIApplication.shared.setAlternateIconName(icon.alternateName) { error in
-                                Task { @MainActor in
-                                    if error == nil { current = icon } else { failed = true }
-                                }
-                            }
-                        } label: {
-                            VStack(spacing: 10) {
-                                Image(icon.preview).resizable().scaledToFit()
-                                    .frame(width: 112, height: 112)
-                                    .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
-                                    .overlay(RoundedRectangle(cornerRadius: 26, style: .continuous)
-                                        .strokeBorder(icon == current ? AnyShapeStyle(.tint) : AnyShapeStyle(Color.primary.opacity(0.12)), lineWidth: icon == current ? 3 : 1))
-                                Text(icon.title + (icon == .power ? " (original)" : ""))
-                                    .font(.subheadline.weight(icon == current ? .semibold : .regular))
-                                    .foregroundStyle(.primary)
-                                Image(systemName: "checkmark.circle.fill").foregroundStyle(.tint).opacity(icon == current ? 1 : 0)
-                            }
-                            .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(TactileButtonStyle())
-                        .accessibilityLabel("Icono \(icon.title)")
-                        .accessibilityAddTraits(icon == current ? .isSelected : [])
-                    }
-                }
-                .padding(.vertical, 8)
-                .listRowBackground(Color.clear)
-            } footer: {
-                Text("iOS enseña un aviso cada vez que cambias el icono. El de la pantalla de inicio cambia al momento.")
-            }
-        }
-        .alert("No se pudo cambiar el icono", isPresented: $failed) { Button("Vale", role: .cancel) {} }
-        .navigationTitle("Icono de la app")
+        .navigationTitle(L("Pestañas"))
         .navigationBarTitleDisplayMode(.inline)
         .themed()
     }
@@ -602,53 +614,53 @@ struct AudioSettings: View {
     var body: some View {
         Form {
             Section {
-                Picker("Calidad", selection: $quality) {
+                Picker(L("Calidad"), selection: $quality) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Máxima")
-                        Text("Mejor sonido; gasta más datos").font(.footnote).foregroundStyle(.secondary)
+                        Text(L("Máxima"))
+                        Text(L("Mejor sonido; gasta más datos")).font(.footnote).foregroundStyle(.secondary)
                     }.tag("max")
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Ahorro de datos")
-                        Text("Para escuchar con datos móviles").font(.footnote).foregroundStyle(.secondary)
+                        Text(L("Ahorro de datos"))
+                        Text(L("Para escuchar con datos móviles")).font(.footnote).foregroundStyle(.secondary)
                     }.tag("low")
                 }
                 .pickerStyle(.inline)
                 .labelsHidden()
-            } header: { Text("Calidad al escuchar") } footer: {
-                Text("«Máxima» usa AAC a 128 kbps; «Ahorro de datos», 48 kbps. Se aplica desde la siguiente canción.")
+            } header: { Text(L("Calidad al escuchar")) } footer: {
+                Text(L("«Máxima» usa AAC a 128 kbps; «Ahorro de datos», 48 kbps. Se aplica desde la siguiente canción."))
             }
             .glassRow()
 
             Section {
-                Toggle("Seguir con canciones parecidas", isOn: $autoplay)
+                Toggle(L("Seguir con canciones parecidas"), isOn: $autoplay)
             } footer: {
-                Text("Cuando se acaba lo que estás escuchando y el bucle está apagado, se añaden canciones parecidas a la última.")
+                Text(L("Cuando se acaba lo que estás escuchando y el bucle está apagado, se añaden canciones parecidas a la última."))
             }
             .glassRow()
 
             Section {
-                Picker("Fundido", selection: $crossfade) {
-                    ForEach(Fade.options, id: \.self) { s in Text(s == 0 ? "No" : "\(s) s").tag(s) }
+                Picker(L("Fundido"), selection: $crossfade) {
+                    ForEach(Fade.options, id: \.self) { s in Text(s == 0 ? L("No") : "\(s) s").tag(s) }
                 }
                 .pickerStyle(.segmented)
-            } header: { Text("Fundido entre canciones") } footer: {
-                Text(crossfade == 0 ? "Cada canción empieza y acaba a su volumen." : "La canción baja de volumen en sus últimos \(crossfade) s y la siguiente entra suavemente. Útil para listas variadas; en álbumes que van seguidos, mejor «No».")
+            } header: { Text(L("Fundido entre canciones")) } footer: {
+                Text(crossfade == 0 ? L("Cada canción empieza y acaba a su volumen.") : L("La canción baja de volumen en sus últimos {0} s y la siguiente entra suavemente. Útil para listas variadas; en álbumes que van seguidos, mejor «No».", crossfade))
             }
             .glassRow()
 
             Section {
                 HStack {
-                    SettingsRow(icon: "airplayaudio", palette: 7, title: "AirPlay", value: nil, subtitle: "Altavoces, HomePod y Apple TV")
+                    SettingsRow(icon: "airplayaudio", palette: 7, title: "AirPlay", value: nil, subtitle: L("Altavoces, HomePod y Apple TV"))
                     RoutePicker().frame(width: 44, height: 44)
                 }
             } footer: {
-                Text("El bucle (no repetir, repetir lista o canción) se cambia en el reproductor.")
+                Text(L("El bucle (no repetir, repetir lista o canción) se cambia en el reproductor."))
             }
             .glassRow()
 
-            ResetSection(section: "Reproducción", what: "La calidad al escuchar vuelve a «Máxima» se quita el fundido y se vuelve a seguir con canciones parecidas.") { SettingsReset.playback() }
+            ResetSection(section: L("Reproducción"), what: L("La calidad al escuchar vuelve a «Máxima» se quita el fundido y se vuelve a seguir con canciones parecidas.")) { SettingsReset.playback() }
         }
-        .navigationTitle("Reproducción")
+        .navigationTitle(L("Reproducción"))
         .navigationBarTitleDisplayMode(.inline)
         .themed()
     }
@@ -661,24 +673,24 @@ struct DownloadsSettings: View {
     var body: some View {
         Form {
             Section {
-                LabeledContent("Canciones", value: "\(downloads.songs.count)")
-                LabeledContent("Espacio usado", value: ByteCountFormatter.string(fromByteCount: downloads.totalBytes(), countStyle: .file))
+                LabeledContent(L("Canciones"), value: "\(downloads.songs.count)")
+                LabeledContent(L("Espacio usado"), value: ByteCountFormatter.string(fromByteCount: downloads.totalBytes(), countStyle: .file))
             } footer: {
-                Text("Las descargas se guardan en este iPhone a la máxima calidad y se ven en Biblioteca › Descargadas. Para bajar una lista o un álbum entero, usa «Descargar todo» en su página.")
+                Text(L("Las descargas se guardan en este iPhone a la máxima calidad y se ven en Biblioteca › Descargadas. Para bajar una lista o un álbum entero, usa «Descargar todo» en su página."))
             }
             .glassRow()
 
             if !downloads.songs.isEmpty {
                 Section {
-                    HoldToConfirmButton(title: "Mantén para borrar las descargas") { downloads.removeAll() }
+                    HoldToConfirmButton(title: L("Mantén para borrar las descargas")) { downloads.removeAll() }
                         .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                 } footer: {
-                    Text("Dejarán de estar disponibles sin conexión. Las playlists y los favoritos no se tocan.")
+                    Text(L("Dejarán de estar disponibles sin conexión. Las playlists y los favoritos no se tocan."))
                 }
                 .glassRow()
             }
         }
-        .navigationTitle("Descargas")
+        .navigationTitle(L("Descargas"))
         .navigationBarTitleDisplayMode(.inline)
         .themed()
     }
@@ -691,22 +703,44 @@ struct HelpSettings: View {
     var body: some View {
         Form {
             Section {
+                NavigationLink { AvisosView() } label: {
+                    SettingsRow(icon: "bell.badge.fill", palette: 4, title: L("Avisos"), value: nil,
+                                subtitle: L("Caídas, versiones nuevas y novedades de Pear Music"))
+                }
                 NavigationLink { SupportView() } label: {
-                    SettingsRow(icon: "ladybug.fill", palette: 0, title: "Informar de un error", value: nil,
-                                subtitle: "Cuéntanos qué ha fallado; puedes añadir capturas")
+                    SettingsRow(icon: "ladybug.fill", palette: 0, title: L("Informar de un error"), value: nil,
+                                subtitle: L("Cuéntanos qué ha fallado; puedes añadir capturas"))
+                }
+                // Buzón de sugerencias (Cierre 1.0, lo pidió Toxbox): como el soporte, pero para ideas.
+                NavigationLink { SupportView(suggestion: true) } label: {
+                    SettingsRow(icon: "envelope.open.fill", palette: 5, title: L("Buzón de sugerencias"), value: nil,
+                                subtitle: L("Cuéntanos qué te gustaría que hiciera Pear Music"))
                 }
                 Button { onboarded = false } label: {
-                    SettingsRow(icon: "graduationcap.fill", palette: 2, title: "Guía inicial", value: nil,
-                                subtitle: "Vuelve a ver los tres pasos del principio: tema, colores y descargas")
+                    SettingsRow(icon: "graduationcap.fill", palette: 2, title: L("Guía inicial"), value: nil,
+                                subtitle: L("Vuelve a ver la bienvenida, el recorrido y las historias"))
                 }
                 .foregroundStyle(.primary)
+                NavigationLink { MyDataView() } label: {
+                    SettingsRow(icon: "lock.fill", palette: 5, title: L("Tus datos"), value: nil,
+                                subtitle: L("Exporta o borra todo lo que la app guarda de ti"))
+                }
                 NavigationLink { AboutView() } label: {
-                    SettingsRow(icon: "info.circle.fill", palette: 6, title: "Acerca de", value: nil, subtitle: "Versión \(AboutView.version) y créditos")
+                    SettingsRow(icon: "info.circle.fill", palette: 6, title: L("Acerca de"), value: nil, subtitle: L("Versión {0} y créditos", AboutView.version))
                 }
             }
             .glassRow()
+            if Channel.adminTools {
+                Section(L("Pear Dev")) {
+                    NavigationLink { AdminView() } label: {
+                        SettingsRow(icon: "lock.shield.fill", palette: 1, title: L("Administración"), value: nil,
+                                    subtitle: L("Canal, registro y botón de pánico"))
+                    }
+                }
+                .glassRow()
+            }
         }
-        .navigationTitle("Ayuda y soporte")
+        .navigationTitle(L("Ayuda y soporte"))
         .navigationBarTitleDisplayMode(.inline)
         .themed()
     }
@@ -716,7 +750,12 @@ struct HelpSettings: View {
 /// Tres pantallas la primera vez —tema, colores de la portada y descargas— que dejan la app configurada sin
 /// entrar a Ajustes. Mismos pasos y textos que `OnboardingScreen` en Android.
 struct OnboardingView: View {
+    /// Quien ya usaba la app antes de la 2.0 sólo ve la pantalla de privacidad, una vez.
+    var privacyOnly = false
     @AppStorage("onboarded") private var onboarded = true
+    @AppStorage("termsAcceptedAt") private var termsAcceptedAt = 0.0
+    @AppStorage("introStage") private var introStage = ""
+    @AppStorage("openAccountAfterIntro") private var openAccountAfterIntro = false
     @AppStorage("theme") private var themeID = AppTheme.glass.rawValue
     @AppStorage("appearance") private var appearance = "system"
     @AppStorage("artworkColorsPlayer") private var artworkPlayer = false
@@ -726,43 +765,143 @@ struct OnboardingView: View {
     @AppStorage("quality") private var quality = "max"
     @EnvironmentObject var engine: ThemeEngine
     @State private var page = 0
+    @State private var terms = false
+    @State private var telemetry = Telemetry.shared.enabled
+    @State private var forward = true
+
+    private enum Page { case language, welcome, privacy, theme, colors, downloads }
+    private var pages: [Page] { privacyOnly ? [.privacy] : [.language, .welcome, .privacy, .theme, .colors, .downloads] }
+    private var current: Page { pages[page] }
+    private var last: Bool { page == pages.count - 1 }
+
+    private func finish() {
+        if termsAcceptedAt == 0 { termsAcceptedAt = Date().timeIntervalSince1970 }
+        if !privacyOnly { introStage = "tour"; onboarded = true }
+    }
+    private func go(_ delta: Int) {
+        forward = delta > 0
+        withAnimation(.uiEaseOut(0.3)) { page += delta }
+    }
 
     var body: some View {
         VStack(spacing: 0) {
             HStack {
-                if page > 0 { Button("Atrás") { withAnimation(.uiEaseOut(0.3)) { page -= 1 } } }
+                if page > 0 { Button(L("Atrás")) { go(-1) } }
                 Spacer()
-                Button("Saltar") { onboarded = true }
+                // Las condiciones no se saltan: «Saltar» sólo aparece después de aceptarlas.
+                if terms && current != .language && current != .welcome && current != .privacy { Button(L("Saltar")) { finish() } }
             }
             .frame(height: 52)
             .padding(.horizontal, 20)
 
-            TabView(selection: $page) {
-                step(0) { themeStep }
-                step(1) { colorsStep }
-                step(2) { downloadsStep }
-            }
-            .tabViewStyle(.page(indexDisplayMode: .never))
-
-            HStack(spacing: 8) {
-                ForEach(0..<3) { i in
-                    Capsule().fill(i == page ? AnyShapeStyle(.tint) : AnyShapeStyle(.tertiary))
-                        .frame(width: i == page ? 22 : 8, height: 8)
+            ZStack {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 0) {
+                        switch current {
+                        case .language:
+                            // Primero el idioma (Cierre 1.0): el subtítulo, también en los otros idiomas.
+                            Text(L("Elige tu idioma")).font(.largeTitle.bold()).padding(.top, 8)
+                            Text(L("Choose your language · Tria la llengua · Escolle o idioma · Aukeratu hizkuntza · Elektu vian lingvon"))
+                                .foregroundStyle(.secondary).padding(.top, 8).padding(.bottom, 12)
+                            Form { LanguagePicker() }
+                                .scrollDisabled(true)
+                                .frame(height: 520)
+                                .scrollContentBackground(.hidden)
+                                .padding(.horizontal, -20)
+                        case .welcome: welcomeStep
+                        case .privacy: privacyStep
+                        case .theme: themeStep
+                        case .colors: colorsStep
+                        case .downloads: downloadsStep
+                        }
+                    }
+                    .padding(.horizontal, 20)
                 }
+                .id(page)
+                .transition(.asymmetric(insertion: .move(edge: forward ? .trailing : .leading).combined(with: .opacity),
+                                        removal: .move(edge: forward ? .leading : .trailing).combined(with: .opacity)))
             }
-            .animation(.uiEaseOut(0.25), value: page)
-            .padding(.vertical, 14)
+            .frame(maxHeight: .infinity)
+
+            if pages.count > 1 {
+                HStack(spacing: 8) {
+                    ForEach(pages.indices, id: \.self) { i in
+                        Capsule().fill(i == page ? AnyShapeStyle(.tint) : AnyShapeStyle(.tertiary))
+                            .frame(width: i == page ? 22 : 8, height: 8)
+                    }
+                }
+                .animation(.uiEaseOut(0.25), value: page)
+                .padding(.vertical, 14)
+            }
 
             Button {
-                if page < 2 { withAnimation(.uiEaseOut(0.3)) { page += 1 } } else { onboarded = true }
+                if current == .privacy { termsAcceptedAt = Date().timeIntervalSince1970 }
+                if last { finish() } else { go(1) }
             } label: {
-                Text(page < 2 ? "Siguiente" : "Empezar").frame(maxWidth: .infinity)
+                Text(buttonTitle).frame(maxWidth: .infinity)
             }
             .buttonStyle(PillButtonStyle(prominent: true))
+            .disabled(current == .privacy && !terms)
             .padding(.horizontal, 20)
             .padding(.bottom, 8)
         }
+        .onAppear { terms = termsAcceptedAt > 0 }
         .themed()
+    }
+
+    private var buttonTitle: String {
+        switch current {
+        case .language: return L("Siguiente")
+        case .welcome: return L("Empezar")
+        case .privacy: return !terms ? L("Acepta las condiciones para seguir") : (last ? L("Seguir") : L("Ahora no, seguir"))
+        default: return last ? L("Empezar a escuchar") : L("Siguiente")
+        }
+    }
+
+    @ViewBuilder private var welcomeStep: some View {
+        Image("Logo").resizable().scaledToFit().frame(width: 104, height: 104)
+            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+            .shadow(color: .black.opacity(0.25), radius: 14, y: 6)
+            .padding(.top, 36)
+        Text(L("Te damos la bienvenida a Pear Music")).font(.largeTitle.bold()).padding(.top, 26)
+        Text(L("Toda la música de YouTube Music, gratis y sin anuncios. Con la pantalla apagada, sin conexión y con un Jam para escuchar con tus amigos."))
+            .foregroundStyle(.secondary).padding(.top, 10).padding(.bottom, 26)
+        welcomePoint("music.note", 1, L("Escucha lo que quieras"), L("Sin anuncios, sin límites y sin cuenta obligatoria."))
+        welcomePoint("arrow.down.circle.fill", 2, L("Llévatela sin conexión"), L("Descarga canciones, álbumes y playlists a máxima calidad."))
+        welcomePoint("checkmark.shield.fill", 5, L("Tus datos son tuyos"), L("Sin rastreo ni publicidad. Tú decides qué compartes."))
+    }
+
+    private func welcomePoint(_ icon: String, _ palette: Int, _ title: String, _ text: String) -> some View {
+        HStack(spacing: 14) {
+            GradientIcon(systemName: icon, palette: palette, size: 40)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title).font(.headline)
+                Text(text).font(.subheadline).foregroundStyle(.secondary)
+            }
+        }
+        .padding(.vertical, 9)
+    }
+
+    /// Condiciones (obligatorias) y telemetría (opcional), por separado y sin marcar; debajo, la cuenta opcional.
+    @ViewBuilder private var privacyStep: some View {
+        header(L("Antes de empezar"), L("Dos cosas, por separado. Puedes cambiar la segunda cuando quieras en Ajustes › Ayuda y soporte › Tus datos."))
+        ConsentBox(checked: $terms, title: L("Acepto las condiciones de uso"),
+                   text: L("Pear Music es un proyecto personal y gratuito, sin relación con YouTube ni Google. Es necesario para usar la app."),
+                   link: ("Leer las condiciones", URL(string: "https://libremusic-landing.8toxbox8-69a.workers.dev/legal")!))
+        ConsentBox(checked: Binding(get: { telemetry }, set: { telemetry = $0; Telemetry.shared.setConsent($0) }),
+                   title: L("Enviar datos de rendimiento (opcional)"),
+                   text: L("Modelo y sistema, versión, cuánto tarda en abrir, fluidez, memoria y minutos de uso, con un identificador aleatorio. Un resumen a la semana; nada de lo que escuchas ni buscas. Sirve sólo para que la app vaya mejor; se borra a los 90 días."),
+                   link: ("Qué se envía exactamente", URL(string: "https://libremusic-landing.8toxbox8-69a.workers.dev/privacidad")!))
+            .padding(.top, 10)
+        AccountPitch().padding(.top, 22)
+        Button {
+            termsAcceptedAt = Date().timeIntervalSince1970
+            openAccountAfterIntro = true
+            if privacyOnly || last { finish() } else { go(1) }
+        } label: { Text(L("Crear mi cuenta")).frame(maxWidth: .infinity) }
+        .buttonStyle(PillButtonStyle(prominent: false))
+        .disabled(!terms)
+        .padding(.vertical, 12)
     }
 
     private func step<C: View>(_ i: Int, @ViewBuilder content: () -> C) -> some View {
@@ -779,7 +918,7 @@ struct OnboardingView: View {
     }
 
     @ViewBuilder private var themeStep: some View {
-        header("Elige tu tema", "Cambia el fondo, las tarjetas, el color y la letra de toda la app. Puedes cambiarlo cuando quieras en Ajustes › Aspecto.")
+        header(L("Elige tu tema"), L("Cambia el fondo, las tarjetas, el color y la letra de toda la app. Puedes cambiarlo cuando quieras en Ajustes › Aspecto."))
         let theme = AppTheme(rawValue: themeID) ?? .glass
         LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 14) {
             ForEach(AppTheme.ordered) { t in
@@ -791,10 +930,10 @@ struct OnboardingView: View {
                 .accessibilityAddTraits(t == theme ? .isSelected : [])
             }
         }
-        Picker("Modo", selection: $appearance) {
-            Text("Automático").tag("system")
-            Text("Claro").tag("light")
-            Text("Oscuro").tag("dark")
+        Picker(L("Modo"), selection: $appearance) {
+            Text(L("Automático")).tag("system")
+            Text(L("Claro")).tag("light")
+            Text(L("Oscuro")).tag("dark")
         }
         .pickerStyle(.segmented)
         .disabled(theme.scheme != nil)
@@ -802,11 +941,11 @@ struct OnboardingView: View {
     }
 
     @ViewBuilder private var colorsStep: some View {
-        header("Colores de la portada", "Mientras suena una canción, la app toma colores parecidos a los de su portada. Elige cuánto; el texto siempre se lee bien.")
+        header(L("Colores de la portada"), L("Mientras suena una canción, la app toma colores parecidos a los de su portada. Elige cuánto; el texto siempre se lee bien."))
         let on = artworkApp || artworkPlayer
         let level = ArtworkLevel(intensity: intensity, opacity: opacity)
         ArtworkPreview(art: engine.palette[0], level: on ? level : .off)
-        Picker("Nivel", selection: Binding(
+        Picker(L("Nivel"), selection: Binding(
             get: { on && level.enabled ? (ArtworkLevel.presets.first { $0.name == level.title }?.name ?? "") : "off" },
             set: { name in
                 let enable = name != "off"
@@ -815,7 +954,7 @@ struct OnboardingView: View {
                 if let l = ArtworkLevel.presets.first(where: { $0.name == name })?.level { intensity = l.intensity; opacity = l.opacity }
             }
         )) {
-            Text("No").tag("off")
+            Text(L("No")).tag("off")
             ForEach(ArtworkLevel.presets, id: \.name) { Text($0.name).tag($0.name) }
         }
         .pickerStyle(.segmented)
@@ -823,15 +962,44 @@ struct OnboardingView: View {
     }
 
     @ViewBuilder private var downloadsStep: some View {
-        header("Descargas", "Descarga una canción con su flecha, o una playlist o un álbum entero con «Descargar todo». Se guardan en este iPhone a la máxima calidad y las tienes en Biblioteca › Descargadas, también sin conexión.")
-        Text("Calidad al escuchar sin descargar").font(.headline)
-        Picker("Calidad", selection: $quality) {
-            Text("Máxima").tag("max")
-            Text("Ahorro de datos").tag("low")
+        header(L("Descargas"), L("Descarga una canción con su flecha, o una playlist o un álbum entero con «Descargar todo». Se guardan en este iPhone a la máxima calidad y las tienes en Biblioteca › Descargadas, también sin conexión."))
+        Text(L("Calidad al escuchar sin descargar")).font(.headline)
+        Picker(L("Calidad"), selection: $quality) {
+            Text(L("Máxima")).tag("max")
+            Text(L("Ahorro de datos")).tag("low")
         }
         .pickerStyle(.segmented)
         .padding(.top, 10)
-        Text(quality == "low" ? "Gasta menos datos móviles (48 kbps)." : "Mejor sonido (AAC 128 kbps).")
+        Text(quality == "low" ? L("Gasta menos datos móviles (48 kbps).") : L("Mejor sonido (AAC 128 kbps)."))
             .font(.footnote).foregroundStyle(.secondary).padding(.top, 8)
+    }
+}
+
+/// Casilla de consentimiento de la guía: grande, sin marcar por defecto y con su enlace. Igual que `ConsentBox` en
+/// Android.
+private struct ConsentBox: View {
+    @Binding var checked: Bool
+    let title: String
+    let text: String
+    let link: (String, URL)
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 14) {
+            Image(systemName: checked ? "checkmark.square.fill" : "square")
+                .font(.title2).foregroundStyle(checked ? AnyShapeStyle(.tint) : AnyShapeStyle(.tertiary))
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title).font(.headline)
+                Text(text).font(.subheadline).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                Link(link.0, destination: link.1).font(.subheadline.weight(.semibold)).padding(.top, 3)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(16)
+        .background(RoundedRectangle(cornerRadius: 16, style: .continuous).fill(.regularMaterial))
+        .contentShape(Rectangle())
+        .onTapGesture { checked.toggle() }
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityValue(checked ? L("Marcada") : L("Sin marcar"))
     }
 }

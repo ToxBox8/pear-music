@@ -347,7 +347,7 @@ struct ReelsView: View {
 
     private var header: some View {
         HStack(alignment: .center) {
-            Text("Descubrir").displayTitle(30)
+            Text(L("Descubrir")).displayTitle(30)
             Spacer()
             Button {
                 Task { await feed.reload(seeds: seeds, exclude: exclude) }
@@ -358,7 +358,7 @@ struct ReelsView: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(TactileButtonStyle())
-            .accessibilityLabel("Mezclar otra vez")
+            .accessibilityLabel(L("Mezclar otra vez"))
             .disabled(feed.loading)
         }
         .foregroundStyle(.white)
@@ -370,11 +370,11 @@ struct ReelsView: View {
         VStack(spacing: 14) {
             if feed.loading || !feed.failed {
                 ProgressView().controlSize(.large).tint(.white)
-                Text("Buscando música para ti…").font(.headline)
+                Text(L("Buscando música para ti…")).font(.headline)
             } else {
                 Image(systemName: "wifi.exclamationmark").font(.system(size: 34, weight: .semibold))
-                Text("No hay fragmentos ahora mismo").font(.headline)
-                Text("Revisa la conexión y vuelve a intentarlo.")
+                Text(L("No hay fragmentos ahora mismo")).font(.headline)
+                Text(L("Revisa la conexión y vuelve a intentarlo."))
                     .font(.subheadline).foregroundStyle(.white.opacity(0.72))
                 Button { Task { await feed.reload(seeds: seeds, exclude: exclude) } } label: {
                     Label("Reintentar", systemImage: "arrow.clockwise")
@@ -465,8 +465,8 @@ private struct ReelPage: View {
         }
         .foregroundStyle(.white)
         .accessibilityElement(children: .contain)
-        .accessibilityAction(named: "Me gusta") { like() }
-        .accessibilityAction(named: playing ? "Pausar" : "Reproducir") { togglePlayback() }
+        .accessibilityAction(named: L("Me gusta")) { like() }
+        .accessibilityAction(named: playing ? L("Pausar") : L("Reproducir")) { togglePlayback() }
     }
 
     private func info(theme: AppTheme, broken: Bool) -> some View {
@@ -503,37 +503,37 @@ private struct ReelPage: View {
         let fav = library.isFavorite(song)
         return VStack(spacing: 18) {
             Button { library.toggleFavorite(song) } label: {
-                ReelActionLabel(symbol: fav ? "heart.fill" : "heart", text: "Me gusta", tint: fav ? theme.reelAccent : .white)
+                ReelActionLabel(symbol: fav ? "heart.fill" : "heart", text: L("Me gusta"), tint: fav ? theme.reelAccent : .white)
             }
             .buttonStyle(TactileButtonStyle())
-            .accessibilityLabel(fav ? "Quitar de favoritos" : "Añadir a favoritos")
+            .accessibilityLabel(fav ? L("Quitar de favoritos") : L("Añadir a favoritos"))
 
             Menu {
                 if jam.isActive {
-                    Button { jam.add(song) } label: { Label("Añadir al Jam", systemImage: "person.2.wave.2") }
+                    Button { jam.add(song) } label: { Label("Añadir al Jam", systemImage: "person.3") }
                         .disabled(jam.contains(song))
                 }
                 ForEach(library.userPlaylists) { p in
                     Button(p.name) { library.add(song, to: p) }
                 }
                 if library.userPlaylists.isEmpty && !jam.isActive {
-                    Text("Crea una playlist en Biblioteca")
+                    Text(L("Crea una playlist en Biblioteca"))
                 }
             } label: {
-                ReelActionLabel(symbol: "plus.circle", text: "Añadir")
+                ReelActionLabel(symbol: "plus.circle", text: L("Añadir"))
             }
-            .accessibilityLabel("Añadir a una playlist")
+            .accessibilityLabel(L("Añadir a una playlist"))
 
             if let url = URL(string: "https://music.youtube.com/watch?v=\(song.id)") {
                 ShareLink(item: url, subject: Text(song.title), message: Text("\(song.title) — \(song.artist)")) {
-                    ReelActionLabel(symbol: "paperplane", text: "Compartir")
+                    ReelActionLabel(symbol: "paperplane", text: L("Compartir"))
                 }
             }
 
             Menu { SongMenuItems(song: song) } label: {
-                ReelActionLabel(symbol: "ellipsis", text: "Más")
+                ReelActionLabel(symbol: "ellipsis", text: L("Más"))
             }
-            .accessibilityLabel("Más opciones")
+            .accessibilityLabel(L("Más opciones"))
         }
         .shadow(color: .black.opacity(0.55), radius: 8, y: 1)
     }

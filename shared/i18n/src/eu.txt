@@ -1,0 +1,971 @@
+1	\n\nAltStore edo SideStore-rekin gainetik eguneratzen da: ez duzu liburutegia ez deskargatutako abestiak galtzen.
+2	\n\nGainetik eguneratzen da: ez duzu liburutegia ez deskargatutako abestiak galtzen.
+3	 (#{0} txartela). Abisuetan erantzungo dizugu.
+4	 Ezarpenak goian dago Hasieran eta ez da ordenan sartzen (Itxuran aldatzen da).
+5	 Falta diren {0} abestiak zerrendan geratzen dira, «Gehitu gabe» atalean, berriro bilatzeko.
+6	 · Bilatu 
+7	 · {0} koloreak
+8	 · litekeena
+9	 · #{0} txartela
+10	 · efektudun izenburuak
+11	 · {0} konexiorik gabe
+12	. Eskerrik asko!
+13	Abesti 1
+14	Hurrengoa
+15	Eskuz
+16	Eskuz…
+17	Aa
+18	Ireki Aurkitu {0} aplikazioan
+19	Ireki Jam-a (hiru pertsonen ikonoa)
+20	Ireki Ezarpenak
+21	Ireki Aurkitu
+22	Ireki Jam-a
+23	Ireki esteka
+24	Ireki erreproduzigailua
+25	Sarbide azkarrak
+26	Onartu baldintzak jarraitzeko
+27	Erabilera-baldintzak onartzen ditut
+28	Honi buruz
+29	Aktibatuta
+30	Eguneratu gordetako zerrenda
+31	Aktibatu Ezarpenetan edo idatzi kodea eskuz.
+32	Administrazioa
+33	Pear Music erabiltzen duten guztiei eragiten die, aplikazioa irekitzen duten unetik.
+34	Orain ez, jarraitu
+35	Orain jotzen
+36	Orain jotzen handia
+37	Datu-aurrezpena
+38	Air
+39	AirPods Max
+40	AirPods Pro
+41	Doikuntza fina
+42	Ezarpenak
+43	Ezarpenak barrako beste fitxa bat da; bere lekua Fitxetan aukeratzen da.
+44	Ezarpenak goian dago Hasieran, Jam-aren ondoan, eta ez du lekurik hartzen barran.
+45	Abestia amaitzean
+46	Abestia aldatzean, izenburua ordenatzen diren ikurren artean agertzen da
+47	Spotify edo Apple Music-etik inportatzean, abesti baten iraupena zenbat alda daitekeen ona dela jotzeko
+48	Abesti bat jotzean, aplikazioak eta menuek azalaren antzeko koloreak hartzen dituzte, Aurkitu-n bezala.
+49	Ausazkoa
+50	Argazkiren bat ezin izan da gehitu
+51	Argazkiren bat ezin izan da gehitu.
+52	Bozgorailuak, HomePod eta Apple TV
+53	Bozgorailuak, entzungailuak eta telebistak Bluetooth edo Chromecast bidez
+54	Bozgorailu txikia
+55	Aurrekoa
+56	Ezabatu aurretik berrespena eskatzen da.
+57	Hasi aurretik
+58	Itzalita
+59	Errenkada gisa agertzen dira «Zure musika» atalean, Abestien gainean.
+60	Azal handiarekin agertzen dira Zerrenden karruselean.
+61	Helegitea
+62	Helegitea bidali da. Posta elektronikoz erantzungo dizugu.
+63	Helegitea jarri
+64	Apple Music edo Spotify: ireki zerrenda → Partekatu → Kopiatu esteka. Publikoa izan behar du. Spotify-tik 100 abesti inguru iristen dira gehienez; zerrenda luzeagoetarako, erabili Exportify-ren CSVa.
+65	Enfokatu Jam-aren QRa
+66	Pear Music-en library.json fitxategia (Androidekoa ere bai). Ez daukazuna gehitzen da, ezer ezabatu gabe.
+67	Pear Music-en library.json fitxategia (iOSekoa ere bai). Ez daukazuna gehitzen da, ezer ezabatu gabe.
+68	Arrastatu karpetak ordena aldatzeko.
+69	Arrastatu zerrendak, Deskargatuak eta Gogokoak nahi duzun lekuan jartzeko.
+70	Arrastatu ordena aldatzeko
+71	Arrastatu karruselaren ordena aldatzeko. Zerbait mugitzean, Zerrendak «Eskuz» ordenatzen da.
+72	Arrastatu ≡ karruselaren ordena aldatzeko. Zerbait mugitzean, Zerrendak «Eskuz» ordenatzen da.
+73	Arrastatu ≡ ordena aldatzeko.
+74	Arrastatu ≡ ordena aldatzeko; alboetara irristatzeak ordena bera jarraitzen du. Irristatu Aurkitu ezkerrera ezkutatzeko (eta eskuinera berriro jartzeko). Aplikazioa erabili zenuen azken fitxan irekitzen da.
+75	Goian Hasieran
+76	Arrastatu beste ildo batera posizioa aldatzeko
+77	Artista
+78	{0} artista
+79	Artistak
+80	Itxura
+81	Widgeten itxura
+82	Horrela ikusiko zaituzte besteek
+83	Atzera
+84	Entzungailuak
+85	Automatikoa
+86	Aurreratua
+87	Abisua
+88	Abisuak
+89	Webgunean argitaratutako Pear Music-en abisuak
+90	Abisu garrantzitsuak
+91	Abisuak, {0} irakurri gabe
+92	Laguntza eta euskarria
+93	Pear Music hobetzen laguntzen duzu
+94	Zerrendara gehitua
+95	Duela gutxi gehituak
+96	Gehitu
+97	Gehitu Zure albumetara
+98	Gehitu gogokoetara
+99	Gehitu ilarara
+100	Gehitu zerrenda batera
+101	Gehitu zerrenda batera
+102	Gehitu Jam-era
+103	Gehitu pantaila-argazkiak
+104	Gehitu zerrenda
+105	Gehitu {0} hasierako pantailara
+106	Gehitu {0} Jam-era
+107	Oraindik ez duzu ezer gorde
+108	Oraindik ez duzu gogokorik markatu hemen.
+109	Oraindik ez dago abestirik. Gehitu lehena eta denen mugikorrean agertuko da.
+110	Oraindik ez dago entzunaldirik aldi honetan. Gutxienez 30 segundoz jotzen den abesti bakoitza zenbatzen da.
+111	Oraindik ez dago gogokorik
+112	Oraindik ez dago ezer deskargatuta
+113	Oraindik kopiarik ez
+114	Baxuak eta bonboak gorputz gehiagorekin
+115	Barra goian Hasieran
+116	Beheko barra
+117	Atzean dagoena errefraktatzen duten kristalezko barrak, botoiak eta menuak, iOS 26 bezala
+118	Liburutegia
+119	Liburutegia esportatu da.
+120	Liburutegia gorde da
+121	Liburutegia hodeian gorde da
+122	Blokeoa
+123	Blokeo osoa
+124	Bluetootha
+125	Liburutegia, deskargak, estatistikak eta ezarpenak ezabatzen ditu, eta aplikazioa ixten du. Ezin da desegin.
+126	Zirriborroak
+127	Ezabatu
+128	Ezabatu kontua
+129	Kontua ezabatzeak berehala kentzen ditu zure posta eta hodeiko kopia. Mugikor honetako liburutegia geratu egiten da.
+130	Ezabatu dena
+131	Ezabatu nire datu guztiak
+132	Abestiaren koloreko botoiak eta ukitu bat atzealdeetan eta menuetan
+133	Larrialdi-botoia
+134	Besoa
+135	Gabon
+136	Arratsalde on
+137	Egun on
+138	Bilatu abestiak, albumak edo artistak
+139	Bilatu musika {0} aplikazioan
+140	Bilatu album bat edo sartu artista batean eta sakatu «Gehitu Zure albumetara» edo «Deskargatu dena».
+141	Bilatu abesti bat gehitzeko
+142	Jam-a bilatzen
+143	YouTube Music-en bilatzen… {0}/{1}
+144	Zuretzako musika bilatzen…
+145	Bilatu
+146	Bilatu artistak
+147	Bilatu Ezarpenetan
+148	Bilatu zerrendetan
+149	Bilatu zure albumetan
+150	Bilatu hemen: {0}
+151	Bilatu musika
+152	Bilatu berriro
+153	Bilatu-k bere fitxa du beheko barran, Hasieraren ondoren.
+154	Bilatu-k bere fitxa du beheko barran.
+155	Iradokizunen postontzia
+156	Exportify-ren CSVa (Spotify)
+157	Cachea hustu da
+158	Abesti bakoitza bere bolumenean hasi eta amaitzen da.
+159	Kalitatea
+160	Entzuteko kalitatea
+161	Deskargatu gabe entzuteko kalitatea
+162	Deskargaren kalitatea
+163	Deskargaren kalitatea, inportatzeko tolerantzia eta cachea
+164	Kalitate gorena
+165	Aplikazio osoaren atzealdea, txartelak, kolorea eta letra aldatzen ditu. Nahi duzunean alda dezakezu Ezarpenak › Itxura atalean.
+166	Ez errepikatu, errepikatu zerrenda eta errepikatu abestia artean aldatzen du
+167	Aldatu posta
+168	Aldatu argazkia
+169	Aldatu erreproduzigailua
+170	Kanala
+171	Kanala, erregistroa eta larrialdi-botoia
+172	Utzi
+173	Utzi zain dagoen blokeoa
+174	Utzi deskarga; deskargatutakoa geratu egiten da
+175	Abestiak
+176	Deskargatutako abestiak
+177	Gehien entzundako abestiak
+178	Gustuko dituzun abestiak (SimpMusic)
+179	Abestiak, artistak…
+180	Abestiak, albumak, artistak…
+181	Jotzen ari den abestia
+182	Identifikatzailerik gabeko abestia
+183	Pantaila-argazkiak
+184	Karpeta
+185	{0}(r)en azala
+186	Azal handia eta kontrolak (4×2).
+187	Azala, izenburua eta kontrolak errenkada batean (4×1).
+188	Kasetea
+189	Hatzarekin biratzen dituzun bobinadun kasetea, «scratch» egin daitekeen biniloa edo Air zilarkara. Luze sakatu mini erreproduzigailua aldatzeko.
+190	Kasetea: biratu bobina bat edo arrastatu zinta aurrera edo atzera egiteko. Biniloa: biratu diskoa hatzarekin edo mugitu besoa. iPhonea horizontalean jarrita, kaseteak edo biniloak pantaila osoa hartzen dute. Mini erreproduzigailua luze sakatuta ere alda dezakezu.
+191	Kasetea: biratu bobina bat edo arrastatu zinta aurrera edo atzera egiteko. Biniloa: biratu diskoa hatzarekin edo mugitu besoa. Mugikorra horizontalean jarrita, kaseteak edo biniloak pantaila osoa hartzen dute. Mini erreproduzigailua luze sakatuta ere alda dezakezu.
+192	Cast
+193	Erorketak eta bertsio urgenteak
+194	Erorketak, bertsio berriak eta Pear Music-en berritasunak
+195	Itxi
+196	Itxi abisua
+197	Itxi istorioak
+198	Itxi erreproduzigailua
+199	Amaitu saioa
+200	Zinta
+201	Argia
+202	Argia edo iluna
+203	Gakoa kopiatu da
+204	Berreskuratze-gakoa
+205	Gako publikoa kopiatu da
+206	YouTube Music-en bezero ez-ofiziala. YouTube-ren API ez-ofizial bat erabiltzen du; beraz, funtzionatzeari utz diezaioke YouTube-k aldatzen badu. Deskargak iPhone honetan gordetzen dira.
+207	YouTube Music-en bezero ez-ofiziala. YouTube-ren API ez-ofizial bat erabiltzen du; beraz, funtzionatzeari utz diezaioke YouTube-k aldatzen badu. Deskargak mugikor honetan gordetzen dira.
+208	Klasikoa
+209	Autoa
+210	Ilara
+211	Kolorea
+212	{0} kolorea
+213	Azalaren koloreak
+214	Azalaren koloreak erreproduzigailuan
+215	Azalaren koloreak aplikazioaren gainerakoan
+216	Partekatu
+217	dqnamo-ren The Kitchen-ek inspiratutako osagaiak
+218	Konpresio hori ez da onartzen.
+219	15 minuturo begiratzen du abisu berririk dagoen. Abisuen zerrenda bakarrik eskatzen da, zure ezer bidali gabe.
+220	Noizean behin begiratzen du abisu berririk dagoen. Abisuen zerrenda bakarrik eskatzen da, zure ezer bidali gabe.
+221	Egiaztatu konexioa eta saiatu berriro.
+222	Hau piztuta eta mugikorra kable bidez konektatuta (adb forward tcp:8765 tcp:8765), webguneko orri ezkutuak 5 minutuko gako bat eskatzen du hemen. Mugikorraren barruan bakarrik entzuten du eta 10 minuturen buruan itzaltzen da bera bakarrik. Gako publikoa behin jartzen da Worker-aren PANEL_PUBLIC_KEY aldagaian.
+223	Berretsi zain dagoen blokeoa
+224	Jarraitu
+225	Pasahitza
+226	Kopia automatikoa
+227	SimpMusic-en kopia
+228	SimpMusic-en kopia (.backup)
+229	Liburutegiaren kopia
+230	Kopia gorde da
+231	Kopiatu
+232	Kopiatu gako publikoa
+233	Kopiatu erregistroa
+234	Posta elektronikoa
+235	Sortu zerrenda bat + botoiarekin edo ekarri zureak Apple Music-etik.
+236	Sortu zerrenda bat Liburutegian
+237	Sortu zerrenda bat edo gorde album bat hura aukeratzeko.
+238	Sortu
+239	Sortu Jam-a
+240	Sortu nire kontua
+241	Sortu zerrenda bat honekin: {0}
+242	Sortu bat
+243	Kristal likidoa
+244	Kristala, Airea, Neoia edo Sistema, eta azaletik ateratako koloreak. Dena Ezarpenak › Itxura atalean.
+245	Kredituak
+246	Zerbait garrantzitsua dagoenean, hemen agertuko da.
+247	Entzuten ari zarena amaitzen denean eta errepikapena itzalita dagoenean, azkenaren antzeko abestiak gehitzen dira.
+248	Kontua
+249	Kontua ezabatu da
+250	Kontua sortu da
+251	Kontatu zer egiten ari zinen eta zer espero zenuen. Zenbat eta zehatzago, hobe (gutxienez {0} karaktere).
+252	Zenbat
+253	Botoiak azalaren kolorearen zenbateraino antza duten
+254	Atzealdeak eta menuak zenbateraino tindatzen diren
+255	Kontaiguzu zerk huts egin duen; pantaila-argazkiak gehi ditzakezu
+256	Kontaiguzu zer nahi zenukeen Pear Music-ek egitea
+257	Fitxak dituen kapsula bat eta Bilatu bereizita, SimpMusic bezala. Arrastatu tanta fitxaz aldatzeko; zerrenda batean behera egitean, mini erreproduzigailuaren ondoan tolesten da.
+258	Jam-aren QR kodea
+259	6 zifrako kodea
+260	Jam-aren kodea, 6 karaktere
+261	Batzeko kodea
+262	Datuak esportatu dira
+263	Inportaziotik datoz. Ukitu berriro bilatzeko.
+264	Gelditu deskarga; deskargatutakoa geratu egiten da
+265	Konexiorik gabe erabilgarri egoteari utziko diote, haiek dituzten beste zerrendetan ere bai.
+266	Konexiorik gabe erabilgarri egoteari utziko diote. Zerrendak eta gogokoak ez dira ukitzen.
+267	Desaktibatuta
+268	Desaktibatuta
+269	Desaktibatu
+270	Desaktibatu tenporizadorea
+271	Deskargatu zerbait konexiorik gabe entzuteko
+272	Deskargatu abestiak errenkada bakoitzeko geziarekin edo zerrenda bateko «Deskargatu dena» botoiarekin.
+273	Deskargatu abestiak, albumak eta zerrendak kalitate gorenean.
+274	Deskargatu abesti bat bere geziarekin, edo zerrenda edo album oso bat «Deskargatu dena» botoiarekin. iPhone honetan gordetzen dira kalitate gorenean, eta Liburutegia › Deskargatuak atalean dituzu, konexiorik gabe ere bai.
+275	Deskargatu abesti bat bere geziarekin, edo zerrenda edo album oso bat «Deskargatu dena» botoiarekin. Mugikor honetan gordetzen dira kalitate gorenean, eta Liburutegia › Deskargatuak atalean dituzu, konexiorik gabe ere bai.
+276	Deskargatuta
+277	Deskargatuak
+278	Deskargatuak eta Gogokoak
+279	Deskargatuta
+280	Deskargatzen
+281	Pear Music {0} deskargatzen…
+282	Deskargatzen: % {0}
+283	Deskargatu
+284	Deskargatu falta diren {0} abestiak
+285	Deskargatu dena
+286	Deskargak
+287	Baztertu
+288	Baztertu {0}
+289	Ezezaguna
+290	Aurkitu
+291	Aurkitu, Hasiera, Liburutegia, Ezarpenak
+292	iPhone honetako Musika aplikaziotik
+293	Fitxategi batetik
+294	Esteka batetik
+295	Irristatu pixka bat Aurkitu atalean
+296	Zabaldu barra ({0})
+297	Diskoa
+298	Konexiorik gabe erabilgarri
+299	Bi gauza, bereizita. Bigarrena nahi duzunean alda dezakezu Ezarpenak › Laguntza eta euskarria › Zure datuak atalean.
+300	Non
+301	Non bilatu
+302	Non dago Bilatu
+303	Ekualizadorea
+304	Editatu
+305	Editatu ilara
+306	Editatu zerrenden ordena
+307	Editatu zerrenda
+308	Editatu zerrendak
+309	Izenburuen efektua
+310	Jam-a beteta dago.
+311	Jam-a guztientzat amaituko da.
+312	Ostalaria
+313	Ostalariak Jam-a amaitu du.
+314	Fitxategia moztuta dago.
+315	Fitxategiak zure liburutegia, estatistikak, letrak, euskarriko zirriborroak eta ezarpenak ditu; ez deskargatutako abestiak.
+316	Fitxategia ez da ZIP baliodun bat.
+317	Fitxategiak ez du abestirik.
+318	Errepikapena (ez errepikatu, errepikatu zerrenda edo abestia) erreproduzigailuan aldatzen da.
+319	Kodeak ez du balio.
+320	Euskarriko zerbitzariak ez du erantzuten ({0}). Saiatu geroago.
+321	Zerbitzariak ez du erantzuten ({0}). Saiatu geroago.
+322	Soinua den bezala
+323	Euskarria etenda dago gertakari bat konpontzen dugun bitartean. Zure txostena Zirriborroetan geratzen da.
+324	Gaiak atzealdea, txartelak, kolorea eta letra aldatzen ditu. Atzealdeek azalaren koloreak hartzen dituzte eta gehiago mugitzen dira musika jotzen den bitartean.
+325	Testuak eta ikonoek beti kontraste irakurgarria dute, azala oso argia edo oso bizia izan arren.
+326	Aukeratuta
+327	Aukeratu karpeta
+328	Aukeratu argazkia
+329	Aukeratu zure gaia
+330	Ezabatu
+331	Ezabatu zirriborroa
+332	Ezabatu deskarga
+333	Ezabatu zerrenda
+334	Ezabatu zerrendak
+335	Zerrenda bat ezabatzeak ez ditu bere abestiak Gogokoetatik edo Deskargetatik kentzen.
+336	Ezabatu {0}
+337	Hasi
+338	Hasi entzuten
+339	Hasi hutsetik
+340	Zerrendetan (azal handia)
+341	Zure albumetan
+342	Zuzenean
+343	Erreproduzigailuan
+344	Aplikazioaren gainerakoan
+345	Barran
+346	Mantentze-lanetan
+347	Zure liburutegian: {0}
+348	«Zure musika» atalean (errenkada)
+349	Piztuta
+350	Spotify edo Apple Music-eko esteka
+351	Sartu
+352	Bidalita ({0} eremu)
+353	Bidali
+354	Bidali orain
+355	Bidali helegitea
+356	Bidali errendimendu-datuak (aukerakoa)
+357	Orekatua
+358	Gako horrek ez du formatu zuzena.
+359	Eskaneatu iPhonearen kamerarekin edo Liburutegia → + → Jam lagunekin atalean.
+360	Eskaneatu mugikorraren kamerarekin edo Liburutegia → + → Jam lagunekin atalean.
+361	Eskaneatu QRa
+362	Idatzi zure berreskuratze-gakoa
+363	Idatzi zure izena Jam bat sortzeko edo batzeko.
+364	Entzun nahi duzuna
+365	Entzun abesti bat
+366	Duela gutxi entzuna
+367	Duela gutxi entzunak
+368	Entzun osorik
+369	Entzun nire deskargak
+370	Erabilitako lekua
+371	Aplikazio hau
+372	Estatistikak
+373	Kontua dutenentzat bakarrik gauzak prestatzen ari gara. Abisuetan jakinaraziko dizugu.
+374	Artista honek ez du abesti edo album erabilgarririk.
+375	Aurten
+376	Zati hau ezin izan da kargatu
+377	Hilabete honetan
+378	Mugikor hau
+379	SimpMusic estiloa
+380	Hauek dira gordetako azken abisuak.
+381	Kolorearen indartzea
+382	Azaldu zergatik den benetako txostena. Pertsona batek irakurriko du eta posta elektronikoz erantzungo dizu.
+383	Esportatu edo ezabatu aplikazioak zutaz gordetzen duen guztia
+384	Esportatu kopia
+385	Esportatu nire datuak
+386	Errorea erreproduzitzean: denbora agortu da
+387	Errorea erreproduzitzean: {0}
+388	Berreskuratze-gakoa falta da.
+389	Gogokoak
+390	Gogokoak
+391	Finkatu album edo zerrenda bat txintxetarekin
+392	Liburutegiaren eta Hasieraren goian finkatuta
+393	Finkatuak
+394	Finkatu goian
+395	Atzealdea azal lausotuarekin eta bere koloreko kontrolak
+396	Argazkia
+397	Gustuko izan ditzakezun abesti-zatiak, pantaila osoan. Irristatu hurrengorako eta ukitu bi aldiz «Gustuko dut» emateko. Erabiltzen ez baduzu, irristatu ezkerrera Ezarpenak › Itxura › Fitxak atalean.
+398	Gustuko izan ditzakezun abesti-zatiak, pantaila osoan. Irristatu hurrengorako eta ukitu bi aldiz «Gustuko dut» emateko. Erabiltzen ez baduzu, irristatu ezkerrera Ezarpenak › Itxura › Fitxak atalean. Ukitu Aurkitu fitxa.
+399	Iraungitzea
+400	Abestien arteko iraungitzea
+401	Datu mugikor gutxiago erabiltzen ditu (48 kbps).
+402	Biratu bobina bat edo arrastatu zinta aurrera edo atzera egiteko
+403	Gorde abestiak haien artistak ikusteko
+404	Gorde gogoko bat bihotzarekin
+405	Liburutegian gordeta «{0}» izenarekin
+406	Zure liburutegian gordeta
+407	Gorde orain hodeian
+408	Gorde zerrenda gisa
+409	Gorde liburutegian
+410	Gorde zerrenda
+411	Gorde eta irten
+412	Gorde zure pasahitz-kudeatzailean edo idatzi. Zure liburutegia zifratzen duena da: hura gabe ezin da 
+413	Gorde zure pasahitz-kudeatzailean edo idatzi. Zure liburutegia zifratzen duena da: hura gabe ezin da hodeiko kopia beste mugikor batean berreskuratu. Pear Music-ek ez du gordetzen eta ezin du berreskuratu.
+414	Hasierako gida
+415	Biratu aurrera edo atzera egiteko
+416	Egin kopia orain
+417	{0} gehienez. Txikitu egiten dira eta kokapena eta argazkiaren gainerako datuak kentzen zaizkie bidali aurretik.
+418	Egin zeurea
+419	Eginda
+420	{0}/{1} istorioa: {2}. {3}
+421	Ikonoa
+422	Berdindu bolumena
+423	Inportatuta: {0} gogoko eta {1} zerrenda berri.
+424	«{0}» inportatzen
+425	Garrantzitsua
+426	Inportatu
+427	Inportatu zerrenda 1
+428	Inportatu kopia
+429	Inportatu Apple Music-etik
+430	Inportatu zerrenda
+431	Inportatu {0} zerrenda
+432	Jakinarazi errore bat
+433	Jakinarazi errore bat · Hasierako gida · {0} bertsioa
+434	Hasiera
+435	Instrumentala
+436	Bizia
+437	Jam
+438	Jam lagunekin
+439	Jam zure lagunekin
+440	Jam zuzenean · {0}
+441	Jam konexiorik gabe
+442	{0} Jam-a, {1} kodea
+443	LRCLIBek erantzun du: {0}
+444	Bilaketa-barra beti dago goian Hasieran eta Bilatu fitxa desagertu egiten da.
+445	Bilaketa-barra beti dago goian Hasieran.
+446	Entzuteko kalitatea «Gorena» izatera itzultzen da, iraungitzea kentzen da eta antzeko abestiekin jarraitzen da berriro.
+447	Entzuteko kalitatea «Gorena» izatera itzultzen da eta ekualizadorea eta iraungitzea kentzen dira; antzeko abestiekin jarraitzen da berriro.
+448	Abestiak bolumena jaisten du azken {0} segundoetan eta hurrengoa leunki sartzen da. Zerrenda nahasietarako erabilgarria; jarraian doazen albumetan, hobe «Ez».
+449	Berreskuratze-gakoa ez da kontu honena.
+450	SimpMusic-en kopia handiegia da.
+451	SimpMusic-en kopia hondatuta dago.
+452	Kopia handiegia da. SimpMusic-en, egin kopia deskargarik gabe.
+453	Kopiak ez du zerrendarik.
+454	Kontua etenda dago gertakari bat konpontzen dugun bitartean.
+455	Deskarga ez dator bat argitaratutakoarekin eta ez da instalatu, segurtasunagatik.
+456	Gorde dut
+457	Letra, erritmoan
+458	Zerrenda hutsik geratu da.
+459	Zerrenda hutsik dago edo ez da publikoa.
+460	Behean aukeratzen duzun zerrenda, ukitu batez jotzeko (2×2).
+461	Liburutegian finkatutako lehena
+462	Kontua sortzean gorde zenuena. 26 letra eta zenbaki; berdin dio maiuskulak edo marratxoak.
+463	«Zerrenda finkatua» widgetean agertzen dena.
+464	Deskargatutako abestiak Deskargatuak atalean geratzen dira.
+465	Abestiak YouTube Music-ekoak dira jada: zehatz iristen dira, bilatu gabe. Ez da ezer deskargatzen.
+466	Entzun dituzun azken lau abestiak (4×2).
+467	Kontuak laster egongo dira erabilgarri
+468	Deskargak iPhone honetan gordetzen dira kalitate gorenean eta Liburutegia › Deskargatuak atalean ikusten dira. Zerrenda edo album oso bat jaisteko, erabili bere orriko «Deskargatu dena».
+469	Deskargak mugikor honetan gordetzen dira kalitate gorenean eta Liburutegia › Deskargatuak atalean ikusten dira. Zerrenda edo album oso bat jaisteko, erabili bere orriko «Deskargatu dena».
+470	Deskargak beti gordetzen dira kalitate gorenean (AAC 128 kbps); horrela, berdin entzuten dira konexiorik gabe.
+471	Deskargak beti gordetzen dira kalitate gorenean (Opus, 160 kbps inguru).
+472	Betiko fitxak, iPhonean bezala.
+473	Betiko fitxak.
+474	Zerrendak berriro ordenatzen dira azkenen arabera, Deskargatuak eta Gogokoak karruselera itzultzen dira eta Bilatu Hasierara. Ez da zerrendarik ezabatzen.
+475	Azken {0} lerroak, memorian bakarrik. Ez dute inoiz datu pertsonalik.
+476	Zure liburutegiko zerrendak irakurtzen ditu («Sinkronizatu liburutegia» aktibatuta behar da Ezarpenak → Musika atalean).
+477	Irakurri baldintzak
+478	Letra
+479	Inter letra-tipoa, Rasmus Anderssonena (OFL)
+480	LRCLIBeko letra
+481	Zerrenda irakurtzen…
+482	Memoria askatzen du; berriro deskargatzen dira ikustean
+483	Eginda
+484	Panelaren gakoa USB bidez
+485	Eraman konexiorik gabe
+486	Zuk sortua · {0}
+487	Aurten atera dutena
+488	Gehien entzuten duzuna
+489	Azken entzundakoa, zuretzat egindako irratiak, zure artisten berritasunak eta goian finkatzen duzuna. Kanpaiak Pear Music-en abisuak dakartza.
+490	Azken entzundakoa, zuretzat egindako irratiak, zure artisten berritasunak eta goian finkatzen duzuna. Kanpaiak Pear Music-en abisuak dakartza. Ukitu Hasiera fitxa.
+491	Logoa
+492	Lerro luzeegia
+493	Aste honetako laburpena orain bidaltzen du markatutako eremuekin (derrigorrezkoak beti doaz: identifikatzailea, plataforma, aldaera, bertsioa eta astea). Asteko laburpena bere kabuz bidaltzen da telemetria aktibatuta badago.
+494	Bidali kode bat
+495	Mantendu Pear Music irekita. Segundo batzuk behar izaten ditu.
+496	Eutsi sakatuta deskargak ezabatzeko
+497	Eutsi sakatuta estatistikak ezabatzeko
+498	Eutsi sakatuta ilara husteko
+499	Luze sakatu abesti bat Bilatu edo Hasiera ataletan gehitzeko.
+500	Eutsi sakatuta berresteko
+501	Markatuta
+502	Gustuko dut
+503	Soinu hobea (AAC 128 kbps).
+504	Soinu hobea (Opus, 160 kbps inguru).
+505	Soinu hobea; datu gehiago erabiltzen ditu
+506	Menua
+507	Nahastu nire gogokoak {0} aplikazioan
+508	Nahastu gogokoak
+509	Nahastu gogokoak edo deskargatuak, Aurkitu eta Bilatu (4×1).
+510	Nahastu deskargatutakoa
+511	Nahastu nire gogokoak
+512	Nahastu berriro
+513	Abesti bat jotzen ari den bitartean, aplikazioak azalaren antzeko koloreak hartzen ditu. Aukeratu zenbat; testua beti ondo irakurtzen da.
+514	Bitartean ezin da ezer bilatu, eguneratu edo bidali. Deskargatutako musika hemen dago oraindik.
+515	Bitartean, dena kontu gabe dabil.
+516	Minutuak saioko
+517	Modeloa eta sistema, bertsioa, irekitzeko behar duen denbora, arintasuna, memoria eta erabilera-minutuak, ausazko identifikatzaile batekin. 
+518	Modeloa eta sistema, bertsioa, irekitzeko behar duen denbora, arintasuna, memoria eta erabilera-minutuak, ausazko identifikatzaile batekin. Laburpen bat astean; ez entzuten edo bilatzen duzunetik ezer. Aplikazioa hobeto ibiltzeko bakarrik da; 90 egunen buruan ezabatzen da.
+519	Modua
+520	Modu segurua
+521	Mosaikoa
+522	Erakutsi Aurkitu
+523	Mugitu
+524	Erakutsi QR kodea
+525	Laster, abantailak
+526	Gehiago
+527	Altu gehiago
+528	Distira eta xehetasun gehiago
+529	Baxu gehiago
+530	Aukera gehiago
+531	{0}: aukera gehiago
+532	Gorena
+533	Musika
+534	Ezerk ez dator bat «{0}»(r)ekin
+535	Android 12 edo berriagoa behar du
+536	Bat ere ez (ez gehitu)
+537	Zerrenda honetako abestirik ez dago deskargatuta.
+538	Ez dago abesti deskargaturik
+539	Maila
+540	Ez
+541	Ez dago entzuteko erabilgarri
+542	Aurkitu gabeak
+543	Ez da SimpMusic-en kopia bat (SimpMusic-en: Ezarpenak › Babeskopia).
+544	Ez dago abisurik
+545	Ez dago zirriborrorik
+546	Une honetan ez dago zatirik
+547	Abesti honek ez du letrarik
+548	Ez dago berrekiteko ezer
+549	Ez dago zerrendarik
+550	iPhone honetako liburutegian ez dago zerrendarik.
+551	Ez dago emaitzarik «{0}» bilaketarako
+552	Ez dago single edo EPrik.
+553	Ez dago albumik.
+554	Ez duzu ezertarako behar: Pear Music berdin dabil hura gabe. Baina bat sortzen baduzu, asko laguntzen diguzu aplikazioa hobetzen, eta zure musika nahi duzun lekura eramango duzu.
+555	Ez dirudi Exportify-ren CSV bat denik («Track URI» zutabea falta da).
+556	Ez da gehitzeko abestirik geratzen
+557	Ez da abestirik aurkitu. Zerrenda publikoa da?
+558	Ez da {0} kodea duen Jam-ik aurkitu. Egiaztatu wifi berean zaudetela.
+559	Ezin izan dira kargatu
+560	Ezin izan dira abestiak kargatu
+561	Ezin izan dira gomendioak kargatu.
+562	Ezin izan dira datuak esportatu
+563	Ezin izan da 8765 ataka ireki
+564	Ezin izan da Jam-a wifian iragarri ({0}).
+565	Ezin izan da wifian bilatu ({0}).
+566	Ezin izan da bilatu. Egiaztatu konexioa.
+567	Ezin izan da artista kargatu. Egiaztatu konexioa.
+568	Ezin izan da letra kargatu
+569	Ezin izan da Jam-arekin konektatu.
+570	Ezin izan da Jam-a sortu sare honetan.
+571	Ezin izan da «{0}» deskargatu: {1}
+572	Ezin izan da deskargatu. Saiatu beste konexio batekin.
+573	Ezin izan da bidali
+574	Ezin izan da liburutegia esportatu.
+575	Ezin izan da kopia gorde
+576	Ezin izan da kopia gorde. Aukeratu berriro karpeta.
+577	Ezin izan da liburutegiko fitxategi hori irakurri.
+578	Ezin izan da kopia irakurri.
+579	Ezin izan da zerrenda irakurri.
+580	Ezin izan da zerrenda irakurri. Saiatu Exportify-ren CSVarekin.
+581	Ezin izan da audioa lortu: {0}
+582	Ezin izan da erreproduzitu: {0}
+583	Ezin izan da karpeta hori erabili
+584	Ezin izan da karpeta hori erabili.
+585	Ezin da aldatu: horrela berdin entzuten dira konexiorik gabe
+586	Ez daukat gakoa: hasi hutsetik
+587	Izena
+588	Izena (A-Z)
+589	Izena (Z-A)
+590	Jam-aren izena
+591	Normala
+592	Jakinarazi mugikorrean
+593	Zure artisten berritasunak
+594	Zerrenda berria
+595	Inoiz ez
+596	Abesti kopurua
+597	Ezkutuan · irristatu eskuinera jartzeko
+598	Ezkutatu
+599	Ezkutatu Aurkitu
+600	Ezkutatu lehen urratsak
+601	Deskargak kentzea eskaintzen du
+602	Opakutasuna
+603	Aukerakoa · doan
+604	Aukerakoa · gorde zure liburutegia zifratuta hodeian
+605	Aukerakoa, adib. Hondartzarako bidaia
+606	Jam-aren aukerak
+607	Fabrikako ordena
+608	Barraren ordena
+609	Ordenatu
+610	Ordenatu A-tik Z-ra
+611	Ordenatu Z-tik A-ra
+612	Ordenatu zerrendak
+613	Ordenatu zerrendak honen arabera
+614	Ordenatu honen arabera
+615	Iluna
+616	Panela
+617	Paketea
+618	Mugikorraren bozgorailurako edo eramangarri baterako
+619	Datu mugikorrekin entzuteko
+620	Mugikorraren hasierako pantailarako
+621	Erantzun ahal izateko. Ez da beste ezertarako erabiltzen. Erantzuna Abisuetan ere iristen zaizu, zuri bakarrik.
+622	Berrikusteko
+623	Zuretzat
+624	Pausa
+625	Zerrendaren deskarga pausatzen du
+626	Pausatu
+627	Pear Dev
+628	Pear Music
+629	Pear Music proiektu pertsonal eta doakoa da, YouTube eta Google-rekin zerikusirik gabea. Beharrezkoa da aplikazioa erabiltzeko.
+630	Pear Music-ek ez du konturik ez zure datuak dituen zerbitzaririk: dena mugikor honetan dago. 
+631	Pear Music-ek ez du konturik ez zure datuak dituen zerbitzaririk: dena mugikor honetan dago. Fitxategiak zure liburutegia, estatistikak, letrak, euskarriko zirriborroak eta ezarpenak ditu; ez deskargatutako abestiak.
+632	Pear Music-ek ez du kamera erabiltzeko baimenik
+633	Pear Music {0}
+634	Eskatu blokeo osoa
+635	Itsatsi Spotify-ko zerrenda baten esteka (Partekatu → Kopiatu esteka).
+636	Itsatsi music.apple.com-eko esteka bat (Partekatu → Kopiatu esteka).
+637	Itsatsi
+638	Baimendu Pear Music-en aplikazioak instalatzea eta sakatu berriro Deskargatu.
+639	Pertsonalizatua
+640	Fitxa bereizia
+641	Fitxak
+642	Eskatu kodea sortu zuenari edo eskaneatu haren QRa.
+643	Apple Music-eko zerrenda
+644	Spotify-ko zerrenda
+645	Zerrenda finkatua
+646	Zerrenda inportatua
+647	Zerrendak
+648	Zure argazki, ikono eta koloredun zerrendak, gogokoak eta deskargak leku bakarrean. Finkatu goian gehien entzuten duzuna eta ireki artista bakoitzaren diskografia osoa.
+649	Zerrendak eta gogokoak minutu batean, iPhone eta Android artean ere bai.
+650	Kodearekin berriro sartu ahal izango zara irekita dagoen bitartean.
+651	Jarri deskargatutakoa {0} aplikazioan
+652	Jarri nire gogokoak {0} aplikazioan
+653	Adibidez: album batean «Deskargatu dena» sakatzean, aplikazioa itxi egiten da.
+654	Adibidez: nire zerrendak artistaren arabera ordenatu ahal izatea.
+655	Zergatik den benetako txostena
+656	Tamainaren arabera
+657	«{0}» entzun duzulako
+658	Lehen urratsak
+659	Aurrerapena
+660	Aurrerapena: {0}/{1}
+661	PCan sinatutako egoeretako bat argitaratzen du. Abisua: bere kabuz iraungitzen den bannerra. Modu segurua: eguneratzeak, bilaketa, euskarria, telemetria eta kontua itzaltzen ditu. Blokeoa: mantentze-lanen pantaila; 10 minuturen buruan berresten da beste kode batekin. Normala: dena berriro dabil.
+662	Argitaratu
+663	Argitaratu maila hau
+664	Aplikazioa itxi dezakezu: itzultzean, inportazioak utzi zuen lekutik jarraitzen du.
+665	Postua
+666	Eraman beste mugikor batera
+667	Kendu
+668	Kendu Zure albumetatik
+669	Kendu gogokoetatik
+670	Kendu argazkia
+671	Kendu {0}
+672	Zer gertatu da
+673	Zer bidaltzen den zehazki
+674	Zer nahi zenukeen Pear Music-ek egitea eta zertarako balioko lizukeen (gutxienez {0} karaktere).
+675	Berrekin · {0}/{1}
+676	Azkenak
+677	Gogorarazi bihar
+678	Ibilbidea: {0}. {1}
+679	Berridatzi
+680	Erregistroa
+681	Erregistroa kopiatu da
+682	Saiatu berriro
+683	Saiatu berriro deskarga
+684	Errepikatu abestia
+685	Errepikatu zerrenda
+686	Errepikatu: ez
+687	Txostena bidali da
+688	Erreprodukzioa
+689	Erreproduzitu
+690	Erreproduzitu hurrengo
+691	Erreproduzigailua
+692	Multimedia-erreproduzigailua
+693	Nortasuna duten erreproduzigailuak
+694	Pear Music-en erantzuna
+695	Zerbitzariaren ustekabeko erantzuna.
+696	Berrezarri
+697	Berrezarri {0}
+698	Berrikusi posta: zerbait falta da (adibidez, @ ikurra edo domeinua).
+699	Berrikusi mezua
+700	Berrikusi konexioa eta saiatu berriro.
+701	Berrikusi konexioa eta saiatu berriro.
+702	KONEXIORIK GABE
+703	Zenbat zareten jakiteak non egin ahalegina esaten digu.
+704	Audio-irteera
+705	Audio-irteera: {0}
+706	Irten Jam-etik
+707	Irten gorde gabe
+708	Saltatu
+709	Saltatu ibilbidea
+710	Saltatu gida
+711	Berehala aplikatzen da, Bluetooth bidez jotzen denari ere bai.
+712	Testua eta haren argazkiak ezabatzen dira. Ezin da desegin.
+713	Zure posta eta hodeiko kopia ezabatzen dira. Ezin da desegin.
+714	Ireki ezin duzun hodeiko kopia ezabatuko da eta gako berri bat sortuko da. Mugikor honetako liburutegia ez da ukitzen.
+715	Zerrenda eta haren azala ezabatuko dira. Ezin da desegin.
+716	Mugikor honetako zure zerrendak, gogokoak, deskargak, estatistikak eta ezarpenak ezabatuko dira, eta aplikazioa itxi egingo da. 
+717	Mugikor honetako zure zerrendak, gogokoak, deskargak, estatistikak eta ezarpenak ezabatuko dira, eta aplikazioa itxi egingo da. Zerbait gorde nahi baduzu, esportatu lehenik zure datuak.
+718	YouTube Music-en bilatzen dira berriro (batzuetan bertsio berriak agertzen dira). Aukeratu ona eta zerrendara gehituko da.
+719	Erdibidean moztu zen; jarraitu utzi zuen lekutik.
+720	Egunean bat gordetzen da eta azken {0} kopiak uzten dira. Berreskuratzeko: Liburutegia › Inportatu › Inportatu kopia.
+721	Mugikor honetan gordetzen dira bidali edo ezabatu arte.
+722	Mugikor honetan bakarrik gordetzen dira eta ez dira liburutegiaren kopian agertzen.
+723	Ostalariarekiko konexioa galdu da.
+724	Abestia amaitzean gelditzen da
+725	{0} minutu barru gelditzen da
+726	{0} segundo barru gelditzen da
+727	Konexioa galdu da
+728	{0}(r)ekiko konexioa galdu da.
+729	Jarraitu
+730	Jarraitu antzeko abestiekin
+731	Segurua
+732	Saioa amaitu da
+733	Argazkia badago, ikonoaren ordez erakusten da.
+734	Aktibatzen baduzu, astean behin errendimendu-laburpen bat bidaltzen da: modeloa eta sistema, bertsioa, irekitzeko 
+735	Aktibatzen baduzu, astean behin errendimendu-laburpen bat bidaltzen da: modeloa eta sistema, bertsioa, irekitzeko behar duen denbora, arintasuna (FPS eta etenak), memoria eta erabilera-minutuak, zure kontukoa ez den ausazko identifikatzaile batekin. Ez entzuten edo bilatzen duzunetik ezer. 90 egunen buruan ezabatzen da; itzaltzean, berehala ezabatzen da.
+736	Zerbait gorde nahi baduzu, esportatu lehenik zure datuak.
+737	Jarraitu falta direnekin
+738	Hurrengoa
+739	Iragarkirik gabe, mugarik gabe eta derrigorrezko konturik gabe.
+740	Gehitu gabe
+741	Gehitu gabe: {0}
+742	Konexiorik gabe
+743	Ez dago konexiorik egoera-zerbitzariarekin.
+744	Ez dago konexiorik. Saiatu internet duzunean.
+745	Deskribapenik gabe
+746	Aukeratu gabe
+747	Ikonorik gabe
+748	Oraindik ez dago lerrorik
+749	Markatu gabe
+750	Ez dago Musika aplikazioa irakurtzeko baimenik. Aktibatu Ezarpenak → Pear Music atalean.
+751	Jarraipenik eta publizitaterik gabe. Zuk erabakitzen duzu zer partekatu.
+752	Emaitzarik ez
+753	Amaitu gabe
+754	Singleak eta EPak
+755	Askatu goitik
+756	Spotify-k ez du zerrenda hori ikusten uzten. Publikoa da?
+757	Spotify: esportatu zerrenda exportify.app webgunean (doan, sartu zure Spotify kontuarekin) eta aukeratu .csv fitxategia; abesti guztiak eta haien ISRCa dakartza, hobeto parekatzen dituena. SimpMusic: Ezarpenak › Babeskopia, eta aukeratu .backup fitxategia; haren abestiak YouTube Music-ekoak dira jada, beraz zehatz iristen dira.
+758	Iradokizuna bidali da
+759	Leuna
+760	Zuretzat bakarrik
+761	Zuk bakarrik duzu gakoa. Guk ere ezin dugu irakurri.
+762	Oraingoz {0} bakarrik
+763	Hasierako pantaila luze sakatu ere egin dezakezu › Widgetak › Pear Music. Tamainaz alda daitezke.
+764	Ongi etorri Pear Music-era
+765	{0} helbidera bidali dizugu. 10 minutu barru iraungitzen da.
+766	Telemetria
+767	Errendimendu-telemetria
+768	Gaia
+769	Gaia, erreproduzigailua (kasetea, biniloa, Air), zure aukerako kontua, zure datuak eta laguntza.
+770	Gaia, erreproduzigailua (kasetea, biniloa, Air), widgetak, zure aukerako kontua, zure datuak eta laguntza.
+771	Lotarako tenporizadorea
+772	Amaitu Jam-a
+773	Amaitu ordenatzen
+774	Amaitu gorde gabe
+775	Mota
+776	Ukitu abesti baten bihotza hemen gordetzeko.
+777	Ukitu ilara eta aukeratu Letra: abestia lerroz lerro jarraitzen du eta konexiorik gabe ikusteko gordetzen da.
+778	Ukitu zalantzazkoak bertsio zuzena aukeratzeko. Aukeratu gabe uzten dituzunak ez dira gehitzen.
+779	Ukitu nabarmendutakoa jarraitzeko
+780	Ukitu aldatzeko
+781	Ukitu jarraitzeko · eutsi pausatzeko
+782	YouTube Music-eko musika guztia, doan eta iragarkirik gabe. Pantaila itzalita, konexiorik gabe eta zure lagunekin entzuteko Jam batekin.
+783	Guztiak
+784	Denak bat datoz YouTube Music-eko bertsioarekin.
+785	Oraindik ez da agertzen. Egiaztatu kodea zuzena dela, wifi berean edo Bluetootha aktibatuta zaudetela eta sortu zuenak Pear Music irekita duela.
+786	Oraindik ez da agertzen. Egiaztatu kodea zuzena dela, wifi berean zaudetela eta sortu zuenak Pear Music irekita duela.
+787	Oraindik ez dago ezer hemen
+788	Oraindik ez dago zerrendarik
+789	Oraindik ez duzu albumik
+790	Tolerantzia
+791	Iraupenaren tolerantzia
+792	Ekarri hodeitik
+793	Ekarri nire liburutegia
+794	{0} gogoko eta {1} zerrenda ekarri dira
+795	Zure liburutegia zure berreskuratze-gakoarekin zifratuta bidaiatzen du: zerbitzariak ezin du irakurri.
+796	Zure liburutegia, zure erara
+797	Zure liburutegia, hodeian zifratuta
+798	Zure berreskuratze-gakoa
+799	Zure posta elektronikoa
+800	Zure Pear Music kontua
+801	Zure ideia
+802	Zure abiarazleak ez du hemendik gehitzen uzten: luze sakatu hasierako pantaila › Widgetak
+803	Zure musika
+804	Zure izena
+805	Zure artistak
+806	Zure datuak
+807	Zure datuak zureak dira
+808	Zure gogokoak
+809	Zure fitxak barran eta Bilatu bereizita, SimpMusic bezala. iOS 26n barra tolestu egiten da zerrenda batean behera egitean.
+810	Zure zerrendak
+811	Zure zerrendak, gogokoak eta deskargak, konexiorik gabe ere bai. Finkatu goian gehien entzuten duzuna txintxetarekin eta ukitu artista bat haren diskografia osoa ikusteko.
+812	Zure zerrendak, gogokoak eta deskargak, konexiorik gabe ere bai. Finkatu goian gehien entzuten duzuna txintxetarekin eta ukitu artista bat haren diskografia osoa ikusteko. Ukitu Liburutegia fitxa.
+813	Zure albumak
+814	Aplikazioak zutaz gordetzen duen guztia duen .zip fitxategi bat
+815	Laburpen bat astean; ez entzuten edo bilatzen duzunetik ezer. Aplikazioa hobeto ibiltzeko bakarrik da; 90 egunen buruan ezabatzen da.
+816	Zure gogoko, zerrenda eta albumen kopia bat egunean, aukeratzen duzun karpetan. Aukeratu sinkronizatzen den bat (Google Drive, Nextcloud…) mugikorrez aldatzean ezer ez galtzeko.
+817	Zure gogoko, zerrenda eta albumen kopia bat egunean, aukeratzen duzun karpetan. Aukeratu sinkronizatzen den bat (iCloud Drive, Google Drive…) mugikorrez aldatzean ezer ez galtzeko.
+818	Denek beren mugikorretik abestiak gehitzen dizkioten zerrenda bat, iPhone edo Android, wifi berean. QRarekin berehala sartzen da.
+819	Zurekin dagoenarekin partekatutako zerrenda bat, Android bat izan arren. Eskaneatu QRa berehala sartzeko, edo idatzi kodea.
+820	Zurekin dagoenarekin partekatutako zerrenda bat, iPhone bat izan arren. Eskaneatu QRa berehala sartzeko, edo idatzi kodea.
+821	Denon artean egiten duzuen zerrenda bat. Inguruan dagoen jendearekin dabil, wifi berean edo Bluetootha aktibatuta.
+822	Denon artean egiten duzuen zerrenda bat. Inguruan dagoen jendearekin dabil, wifi berean.
+823	Kopia mugikor honetakoarekin batzen du, ezer ezabatu gabe
+824	Batu bati
+825	YouTube-k abesti bakoitzaz neurtzen duen ozentasuna erabiltzen du: ozenago dabiltzanak jaitsi egiten dira eta ahulenak pixka bat igo, abesti batetik bestera bolumena ukitu behar ez izateko.
+826	Hustu azalen cachea
+827	Hustu erregistroa
+828	Hutsa edo inportatua
+829	Ados
+830	Abiadura
+831	{0} abiadura
+832	Ikusi azala
+833	Ikusi berreskuratze-gakoa
+834	Ikusi ilara
+835	Ikusi {0}(r)en profila
+836	Ikusi egoera eta auditoria
+837	Ikusi letra
+838	Ikusi guztiak
+839	Ikusi dena
+840	Ikusi guztiak: {0}
+841	Ikusi {0}(r)en zure abestiak
+842	Bertsioa
+843	Sistemaren bertsioa
+844	{0} bertsioa
+845	{0} bertsioa eta kredituak
+846	Biniloa
+847	Azalaren koloreen aurrebista
+848	Ahots argiak
+849	Ahotsak eta podcastak nabarmenago
+850	Itzuli hasierara
+851	Sartu berriro zure kontuan.
+852	Ikusi berriro ongietorria, ibilbidea eta istorioak
+853	Kristala gaia, erreproduzigailu Normala, azalaren koloreak itzalita eta fabrikako fitxen ordena itzultzen dira.
+854	Widgetak
+855	Jam-ean dago jada
+856	Jada ez dago finkatuta
+857	Badut gako bat (beste mugikor batekoa)
+858	oraintxe
+859	barra simpmusic kapsula fitxak tolestu tanta
+860	barra simpmusic tolestu bilatu
+861	bluetooth chromecast bozgorailua airplay
+862	ezabatu kendu
+863	errorea akatsa arazoa euskarria txostena marigorringoa kontaktua
+864	bilatu fitxa hasiera barra
+865	karrusela zure musika
+866	azala kolorea tindua leuna orekatua bizia
+867	kasetea biniloa air normala
+868	argia edo iluna iPhonearen arabera
+869	kolorea atzealdea kristala neoia airea sistema itxura
+870	kopia segurtasuna backup drive nextcloud gorde esportatu
+871	kopia segurtasuna backup icloud drive gorde esportatu
+872	iraungitzea trantsizioa leuna bolumena etenak
+873	kontua posta hodeia sinkronizatu kopia zifratua gakoa berreskuratzea saioa hasi
+874	ostalaria
+875	ez den ausazko identifikatzaile batekin. Ez entzuten edo bilatzen duzunetik ezer. 90 egunen buruan ezabatzen da; itzaltzean, berehala ezabatzen da.
+876	parekatu inportatu spotify segundoak bat etortzea
+877	Hasieran
+878	bere fitxan
+879	lekua konexiorik gabe ezabatu
+880	kristala gardena ios 26
+881	baxuak altuak ahotsak soinua eq bozgorailua
+882	duela {0} egun
+883	duela {0} h
+884	duela {0} min
+885	memoria irudiak azalak
+886	gau modua iluna argia automatikoa
+887	jakinarazpenak kanpaia erorketak berritasunak discord
+888	ezkutatu kendu desaktibatu aurkitu jarioa zatiak reels
+889	ordena a-z azkenak eskuz
+890	ordena barra aurkitu hasiera liburutegia
+891	pribatutasuna dbeo esportatu ezabatu datuak zip
+892	irrati amaigabea erreprodukzio automatikoa ilara amaitu
+893	hodeiko kopia beste mugikor batean berreskuratu. Pear Music-ek ez du gordetzen eta ezin du berreskuratu.
+894	aplikazioaren gainerakoan
+895	audio irteera bozgorailua homepod apple tv bluetooth
+896	streaming datuak aurrezpena gorena kbps
+897	iradokizuna ideia proposamena hobekuntza postontzia
+898	ikurrak animazioa scramble
+899	behar duen denbora, arintasuna (FPS eta etenak), memoria eta erabilera-minutuak, zure kontukoa 
+900	telemetria errendimendua datuak baimena pribatutasuna fps
+901	tutoriala ongietorria hasi
+902	bertsioa kredituak lizentzia
+903	widgetak widgeta pertsonalizazioa hasierako pantaila mahaigaina orain jotzen azkenak sarbide azkarrak zerrenda finkatua gaia
+904	{0}\n\nZirriborroetan gorde dugu geroago bidali dezazun.
+905	{0}\n\nBerridatz dezakezu edo, errore bat dela uste baduzu, helegitea jarri.
+906	% {0}
+907	{0} ondo · {1} berrikusteko · {2} aurkitu gabe
+908	{0} abesti, SimpMusic-en berdinak. Ez da ezer deskargatu.
+909	{0}/{1} abesti. Zure Liburutegian dago jada; ez da ezer deskargatu (erabili «Deskargatu dena» konexiorik gabe nahi baduzu).
+910	{0}/{1} · Pausatu
+911	{0}/{1} · bere kabuz markatzen dira
+912	{0}(e)k Jam-a amaitu du.
+913	{0} zerrenda inportatu dira
+914	{0} · {1}(e)k gehitua
+915	{0} · {1}
+916	{0} · {1} konexiorik gabe
+917	{0}, Jam-ean dago jada
+918	{0}, {1} eta beste {2}
+919	{0}. Eutsi sakatuta berresteko
+920	«Gorena» aukerak AAC erabiltzen du 128 kbps-tan; «Datu-aurrezpena» aukerak, 48 kbps. Hurrengo abestitik aplikatzen da.
+921	«Gorena» aukerak Opus erabiltzen du 160 kbps ingurutan; «Datu-aurrezpena» aukerak, 50 kbps inguru. Hurrengo abestitik aplikatzen da.
+922	«{0}» inportatu da
+923	Zure datu guztiak ezabatu?
+924	Zure kontua ezabatu?
+925	Zirriborroa ezabatu?
+926	«{0}» ezabatu?
+927	Hutsetik hasi?
+928	Txostena bidali?
+929	Iradokizuna bidali?
+930	Zerrenda gorde irten aurretik?
+931	«{0}» Zure albumetatik kendu?
+932	{0} berrezarri?
+933	Albuma
+934	Albumak
+935	Hodeiko azken kopia
+936	Azken kopia: {0}
+937	éxitos del momento
+938	…
+939	❌ Errorea: {0}
+940	argia edo iluna mugikorraren arabera
+942	Aukeratuta
+943	Aukeratu hizkuntza
+944	Espainia
+945	Hizkuntza
+946	Aplikazio osoa berehala aldatzen da. Oraindik itzuli gabe dagoena gaztelaniaz ikusten da.
+947	hizkuntza idioma language español català valencià galego english esperanto
+948	Airea
+949	Zilarra Helvetica beltzarekin eta puntuzko eraztun batekin.
+950	Kristala
+951	Argi barreiatua azalaren koloreekin.
+952	Neoia
+953	Musika jotzen den bitartean aurrera egiten duen synthwave sareta.
+954	Sistema
+955	Efekturik eta atzealde animaturik gabe.
+957	{0} kodea
+958	Pertsonak: {0}
+959	Zerrendak: 
+960	Zure posta, testua eta iPhonearen datuak (modeloa, iOS eta aplikazioaren bertsioa) Pear Music-en euskarriko kanal pribatura bidaliko dira.
+961	Zure posta, testua eta mugikorraren datuak (modeloa, Android eta aplikazioaren bertsioa) Pear Music-en euskarriko kanal pribatura bidaliko dira.
+962	Zure posta, testua, {0} argazki eta iPhonearen datuak (modeloa, iOS eta aplikazioaren bertsioa) Pear Music-en euskarriko kanal pribatura bidaliko dira.
+963	Zure posta, testua, {0} argazki eta mugikorraren datuak (modeloa, Android eta aplikazioaren bertsioa) Pear Music-en euskarriko kanal pribatura bidaliko dira.
+964	Eskerrik asko! #{0} txartela da. Abisuetan (zuri bakarrik) eta jarri duzun postan erantzungo dizugu.
+965	Eskerrik asko! Abisuetan (zuri bakarrik) eta jarri duzun postan erantzungo dizugu.
+966	«{0}» gaiak beti modu argia erabiltzen du.
+967	«{0}» gaiak beti modu iluna erabiltzen du.
+968	«{0}»(r)en deskargak kendu?
+969	Deskargak kendu?
+970	SimpMusic-en beheko barra, maxrave-dev-ena (GPL-3.0)
+971	SimpMusic-en inspiratutako beheko barra, maxrave-dev-ena (GPL-3.0)
+972	atzo
+973	Pear Music {0} deskargatzen… % {1}

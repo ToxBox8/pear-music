@@ -8,10 +8,10 @@ enum DeckStyle: String, CaseIterable, Identifiable {
     var id: String { rawValue }
     var name: String {
         switch self {
-        case .normal: return "Normal"
-        case .cassette: return "Casete"
-        case .vinyl: return "Vinilo"
-        case .air: return "Air"
+        case .normal: return L("Normal")
+        case .cassette: return L("Casete")
+        case .vinyl: return L("Vinilo")
+        case .air: return L("Air")
         }
     }
     var symbol: String {
@@ -166,8 +166,8 @@ struct VinylView: View {
                     .contentShape(Circle())
                     .position(center)
                     .gesture(scratchGesture(center: center))
-                    .accessibilityLabel("Disco")
-                    .accessibilityHint("Gíralo para avanzar o retroceder")
+                    .accessibilityLabel(L("Disco"))
+                    .accessibilityHint(L("Gíralo para avanzar o retroceder"))
 
                 // Velocidad (se ilumina al sonar)
                 VStack(spacing: 2) {
@@ -186,15 +186,15 @@ struct VinylView: View {
                     .position(x: pivot.x, y: pivot.y + (armLength + s * 0.12) / 2 - s * 0.12)
                     .animation(armFraction == nil ? .easeInOut(duration: 0.6) : nil, value: theta)
                     .gesture(armGesture(center: center, pivot: pivot, length: armLength, rOuter: rOuter, rInner: rInner))
-                    .accessibilityLabel("Brazo")
-                    .accessibilityHint("Arrástralo a otro surco para cambiar la posición")
+                    .accessibilityLabel(L("Brazo"))
+                    .accessibilityHint(L("Arrástralo a otro surco para cambiar la posición"))
 
                 // Controles del plinto
                 HStack(spacing: s * 0.03) {
                     Button { player.previous() } label: { DeckKey(icon: "backward.fill", size: s * 0.1) }
-                        .accessibilityLabel("Anterior")
+                        .accessibilityLabel(L("Anterior"))
                     Button { player.next() } label: { DeckKey(icon: "forward.fill", size: s * 0.1) }
-                        .accessibilityLabel("Siguiente")
+                        .accessibilityLabel(L("Siguiente"))
                 }
                 .buttonStyle(TactileButtonStyle())
                 .position(x: s * 0.84, y: s * 0.9)
@@ -212,7 +212,7 @@ struct VinylView: View {
                     .shadow(color: .black.opacity(0.4), radius: 3, y: 2)
                 }
                 .buttonStyle(TactileButtonStyle())
-                .accessibilityLabel(player.isPlaying ? "Pausa" : "Reproducir")
+                .accessibilityLabel(player.isPlaying ? L("Pausa") : L("Reproducir"))
                 .position(x: s * 0.13, y: s * 0.9)
             }
             .frame(width: s, height: s)
@@ -405,13 +405,20 @@ struct ImmersiveDeck: View {
                 case .vinyl:
                     HStack(spacing: 28) {
                         VinylView(song: song, clock: player.clock)
-                        DeckInfo(song: song, clock: player.clock)
-                            .frame(maxWidth: 300)
+                        VStack(alignment: .leading, spacing: 12) {
+                            DeckInfo(song: song, clock: player.clock)
+                            ImmersiveControls()
+                        }
+                        .frame(maxWidth: 300)
                     }
                     .padding(.vertical, 12)
                 case .cassette, .normal, .air:
                     CassetteView(song: song, clock: player.clock)
                         .padding(.vertical, 12)
+                        // El casete ocupa todo el ancho: los controles van en una cápsula abajo, sin tapar las bobinas.
+                        .overlay(alignment: .bottom) {
+                            ImmersiveControls().padding(.horizontal, 10).background(Capsule().fill(.black.opacity(0.45)))
+                        }
                 }
             }
         }
@@ -499,26 +506,46 @@ struct ManagePlaylistsView: View {
                         }
                         .buttonStyle(.borderless)
                         .foregroundStyle(.red)
-                        .accessibilityLabel("Eliminar \(p.name)")
+                        .accessibilityLabel(L("Eliminar {0}", p.name))
                     }
                 }
             } footer: {
-                Text("Eliminar una playlist no borra sus canciones de Favoritos ni de Descargas.")
+                Text(L("Eliminar una playlist no borra sus canciones de Favoritos ni de Descargas."))
             }
             .glassRow()
         }
-        .overlay { if library.userPlaylists.isEmpty { Text("No hay playlists").foregroundStyle(.secondary) } }
+        .overlay { if library.userPlaylists.isEmpty { Text(L("No hay playlists")).foregroundStyle(.secondary) } }
         .themed()
-        .navigationTitle("Eliminar playlists")
+        .navigationTitle(L("Eliminar playlists"))
         .navigationBarTitleDisplayMode(.inline)
-        .alert("¿Eliminar «\(pending?.name ?? "")»?", isPresented: Binding(get: { pending != nil }, set: { if !$0 { pending = nil } })) {
-            Button("Eliminar playlist", role: .destructive) {
+        .alert(L("¿Eliminar «{0}»?", pending?.name ?? ""), isPresented: Binding(get: { pending != nil }, set: { if !$0 { pending = nil } })) {
+            Button(L("Eliminar playlist"), role: .destructive) {
                 if let p = pending { library.deletePlaylist(p.id) }
                 pending = nil
             }
-            Button("Cancelar", role: .cancel) { pending = nil }
+            Button(L("Cancelar"), role: .cancel) { pending = nil }
         } message: {
-            Text("Se borrará la playlist y su portada. No se puede deshacer.")
+            Text(L("Se borrará la playlist y su portada. No se puede deshacer."))
         }
+    }
+}
+
+/// Controles de casete y vinilo a pantalla completa en horizontal (Fase 3.4), como `ImmersiveControls` en Android:
+/// anterior, reproducir, siguiente, bucle y temporizador. El «⋯» con la letra se queda en vertical.
+private struct ImmersiveControls: View {
+    @EnvironmentObject var player: Player
+    var body: some View {
+        HStack(spacing: 6) {
+            Button { player.previous() } label: { Image(systemName: "backward.fill").font(.title3).frame(width: 44, height: 44) }
+                .accessibilityLabel(L("Anterior"))
+            Button { player.toggle() } label: { Image(systemName: player.isPlaying ? "pause.fill" : "play.fill").font(.title).frame(width: 48, height: 48) }
+                .accessibilityLabel(player.isPlaying ? L("Pausa") : L("Reproducir"))
+            Button { player.next() } label: { Image(systemName: "forward.fill").font(.title3).frame(width: 44, height: 44) }
+                .accessibilityLabel(L("Siguiente"))
+            RepeatButton()
+            SleepTimerButton()
+        }
+        .foregroundStyle(.white)
+        .environment(\.colorScheme, .dark)
     }
 }

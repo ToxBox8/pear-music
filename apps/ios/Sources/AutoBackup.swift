@@ -36,7 +36,7 @@ final class AutoBackup: ObservableObject {
     func setFolder(_ url: URL, library: Library) {
         let ok = url.startAccessingSecurityScopedResource()
         defer { if ok { url.stopAccessingSecurityScopedResource() } }
-        guard let data = try? url.bookmarkData() else { error = "No se pudo usar esa carpeta."; return }
+        guard let data = try? url.bookmarkData() else { error = L("No se pudo usar esa carpeta."); return }
         bookmark = data
         folderName = url.lastPathComponent
         UserDefaults.standard.set(data, forKey: "backupBookmark")
@@ -60,7 +60,7 @@ final class AutoBackup: ObservableObject {
         if !force && lastDay == today { return false }
         var stale = false
         guard let folder = try? URL(resolvingBookmarkData: bookmark, bookmarkDataIsStale: &stale) else {
-            error = "No se pudo guardar la copia. Vuelve a elegir la carpeta."
+            error = L("No se pudo guardar la copia. Vuelve a elegir la carpeta.")
             return false
         }
         let ok = folder.startAccessingSecurityScopedResource()
@@ -75,7 +75,7 @@ final class AutoBackup: ObservableObject {
             UserDefaults.standard.set(today, forKey: "backupLast")
             return true
         } catch {
-            self.error = "No se pudo guardar la copia. Vuelve a elegir la carpeta."
+            self.error = L("No se pudo guardar la copia. Vuelve a elegir la carpeta.")
             return false
         }
     }
@@ -93,20 +93,20 @@ struct BackupSection: View {
             if backup.enabled {
                 Button { picking = true } label: {
                     SettingsRow(icon: "folder", palette: 3, title: "Carpeta", value: backup.folderName ?? "Elegida",
-                                subtitle: backup.lastDay.map { "Última copia: \($0)" } ?? "Aún sin copia")
+                                subtitle: backup.lastDay.map { L("Última copia: {0}", $0) } ?? L("Aún sin copia"))
                 }
                 .buttonStyle(.plain)
-                Button { message = backup.backup(library: library, force: true) ? "Copia guardada" : "No se pudo guardar la copia" } label: {
+                Button { message = backup.backup(library: library, force: true) ? L("Copia guardada") : L("No se pudo guardar la copia") } label: {
                     Label("Hacer copia ahora", systemImage: "externaldrive.badge.checkmark")
                 }
                 Button("Desactivar", role: .destructive) { backup.disable() }
             } else {
                 Button { picking = true } label: { Label("Elegir carpeta", systemImage: "folder.badge.plus") }
             }
-        } header: { Text("Copia automática") } footer: {
+        } header: { Text(L("Copia automática")) } footer: {
             Text(backup.error ?? message ?? (backup.enabled
-                ? "Se guarda una al día y se dejan las \(AutoBackup.keep) últimas. Para recuperarla: Biblioteca › Importar › Importar copia."
-                : "Una copia al día de tus favoritos, playlists y álbumes en la carpeta que elijas. Elige una que se sincronice (iCloud Drive, Google Drive…) para no perder nada al cambiar de móvil."))
+                ? L("Se guarda una al día y se dejan las {0} últimas. Para recuperarla: Biblioteca › Importar › Importar copia.", AutoBackup.keep)
+                : L("Una copia al día de tus favoritos, playlists y álbumes en la carpeta que elijas. Elige una que se sincronice (iCloud Drive, Google Drive…) para no perder nada al cambiar de móvil.")))
         }
         .glassRow()
         .fileImporter(isPresented: $picking, allowedContentTypes: [.folder]) { result in
