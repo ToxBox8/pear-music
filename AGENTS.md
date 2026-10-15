@@ -36,20 +36,29 @@ libremusic/
 │  │  ├─ project.yml                       Versión, Info.plist, permisos
 │  │  ├─ scripts/screenshots.sh            Capturas en el simulador del iPhone 16 (CI)
 │  │  ├─ scripts/check-linux.sh            Comprueba la sintaxis de iOS en Linux (Swift de swift.org)
+│  │  ├─ Config/                           Usr/Pref/Dev.xcconfig: bundle id, nombre y canal de cada variante
 │  │  └─ Sources/                          Todo el código Swift (sin subcarpetas)
 │  └─ android/                             App Android (Kotlin + Compose + Media3, API 26+)
 │     ├─ gradle/libs.versions.toml         Versiones de dependencias
 │     ├─ scripts/bench.sh                  Mide arranque, fluidez y Descubrir en un móvil
 │     ├─ scripts/smoke.sh                  Prueba rápida en el móvil: instala, abre pantallas, capturas y cierres
+│     ├─ scripts/variante.sh               Compila usr/pref/dev; pref y dev se instalan por adb (nunca se publican)
 │     └─ app/
 │        ├─ build.gradle.kts               versionName / versionCode
 │        └─ src/main/java/app/libremusic/  Código Kotlin por capas (ver abajo)
 ├─ scripts/prepublicar.sh                  Lista de comprobación antes de publicar (versión, CHANGELOG, secretos, firma)
-├─ services/soporte/                       Worker de Cloudflare: reportes de errores → Discord (README con el despliegue)
+├─ scripts/activar-discord.sh              Activa las apps de Discord de soporte y pánico con ~/.config/pear-music/discord-*.env
+├─ scripts/web-1.0.py                      Lo llama ../lanzar-1.0.sh: pone la 1.0/2.0 en downloads.ts, changelog.ts y altstore.json
+├─ services/soporte/                       Worker de Cloudflare: reportes de errores → Discord, rechazos y apelaciones (README con el despliegue)
+├─ services/api/                           Worker pear-music-api: cuenta opcional, biblioteca cifrada y telemetría (D1; README)
+├─ services/estado/                        Worker pear-music-estado: kill switch firmado y botón de pánico (README, scripts de Discord y secretos)
+├─ tools/estado/estado.mjs                 PC de Toxbox: clave Ed25519, lotes prefirmados y publicar estados
+├─ tools/i18n/                             extraer.py (textos → L("…") y catálogo) y construir.py (<idioma>.json a las dos apps)
+├─ shared/i18n/                            Catálogo de idiomas: es.json (claves), src/orden.txt y src/<idioma>.txt (traducciones)
 ├─ shared/design/                          Diseño común a las dos apps
 │  ├─ tokens.json                          Fuente única de colores, temas, radios y letra
 │  ├─ gen_tokens.py                        Genera Tokens.swift y Tokens.kt
-│  ├─ render_icon.py · AppIcon*.svg        Iconos: AppIcon-Encendido (por defecto) y el violeta (alternativo)
+│  ├─ render_icon.py · AppIcon*.svg        Iconos: AppIcon-Encendido (el de Pear Music) y AppIcon (logo antiguo, sólo historia de la marca)
 │  ├─ compare_shots.py                     Hoja de capturas iOS | Android
 │  └─ Inter-LICENSE.txt                    Licencia de la letra de Android
 ├─ docs/
@@ -59,7 +68,12 @@ libremusic/
 │  ├─ PARIDAD.md                           Comparación iOS ↔ Android y diferencias que quedan
 │  ├─ RENDIMIENTO.md                       Cómo se mide el rendimiento en Android y resultados
 │  ├─ RELEASING.md                         Versionado, firma y publicación
+│  ├─ FLAVORS.md                           Las tres variantes (usr, pref, dev): qué lleva cada una y cómo se compila
+│  ├─ TELEMETRIA.md                        Qué envía la telemetría opcional, para qué y cómo se retira
+│  ├─ adr/                                 Decisiones de arquitectura (0001: cuenta, telemetría y actualizaciones)
 │  ├─ SEGURIDAD.md                         Revisión de seguridad y privacidad: datos, arreglos y lo que queda
+│  ├─ RUNBOOK-INCIDENTES.md                Qué hacer en un incidente: niveles, pánico, comunicar, recuperar, lote y clave
+│  ├─ AVISOS-ALCANCE.md                    Discord frente a FCM/APNs para avisos y kill switch (Fase 4.2)
 │  ├─ contexto.md                          Relevo entre sesiones: dónde estamos, bloqueos y siguiente paso
 │  ├─ plan.md                              Prompt maestro de Toxbox, orden actual y reglas de pruebas
 │  ├─ pendiente-decision.md                Preguntas abiertas del plan con propuestas
@@ -97,6 +111,10 @@ La web de descarga vive en otro repo: `ToxBox8/libremusic-landing`.
 | Carátulas y portadas | `Images.swift` |
 | Ajustes | `AppSettings.swift` (pantalla principal, Aspecto, colores de la portada, pestañas, Reproducción, Descargas, Ayuda, guía inicial, `TabOrder`, Restablecer), `Settings.swift` (tema, reproductor, biblioteca, Acerca de, filas) |
 | Informar de un error (formulario, borradores, envío) | `Support.swift` |
+| Variante (`Channel`), registro (`Logs`), exportar y borrar datos (`UserData`), cifrado local (`SecureBox`); pantallas Tus datos y Administración | `UserData.swift`, `DataViews.swift` |
+| Cuenta opcional y biblioteca cifrada; `AccountPitch` | `Account.swift`, `AccountView.swift` |
+| Bienvenida (en `AppSettings.swift`), recorrido, historias y primeros pasos | `Intro.swift` |
+| Telemetría, aviso de versión nueva, filtro local del soporte | `Telemetry.swift`, `Updates.swift`, `SupportFilter.swift` |
 | Importar de Apple Music; `Matcher` (emparejado con confianza) | `AppleMusic.swift` |
 | Importar de Spotify (enlace y CSV de Exportify) y SimpMusic (`.backup`), emparejado de listas e importaciones a medias | `ExternalImport.swift` |
 | Modo de capturas (`-screenshotScenario`) | `Screenshots.swift` |
@@ -112,6 +130,14 @@ La web de descarga vive en otro repo: `ToxBox8/libremusic-landing`.
 | `ui/Library.kt`, `ui/Songs.kt`, `ui/Stats.kt` | Biblioteca 1.1, filas de canción, editor, importar, estadísticas | `LibraryV11.swift`, `LibraryViews.swift` |
 | `ui/Player.kt`, `ui/LyricsView.kt`, `ui/Decks.kt`, `ui/AirPlayer.kt` | Reproductor, letra, casete, vinilo, Air | `LibreMusicApp.swift`, `Deck.swift`, `Kitchen.swift`, `AirPlayer.swift` |
 | `ui/SettingsScreens.kt`, `ui/Onboarding.kt`, `ui/Support.kt` | Ajustes y formularios; guía inicial; informar de un error | `AppSettings.swift`, `Settings.swift`, `Support.swift` |
+| `I18n.kt`, `ui/LanguagePicker.kt` | Idiomas: `L()`, idioma elegido y selector con banderas | `I18n.swift`, `LanguagePicker.swift` |
+| `ui/DataScreens.kt`, `data/UserData.kt`, `data/Logs.kt`, `data/SecureBox.kt` | Tus datos (exportar .zip, borrar todo, telemetría), Administración (sólo dev), registro sin datos personales, cifrado local | `DataViews.swift`, `UserData.swift` |
+| `data/Account.kt`, `ui/AccountScreens.kt` | Cuenta opcional, biblioteca cifrada y `AccountPitch` | `Account.swift`, `AccountView.swift` |
+| `ui/Onboarding.kt`, `ui/Tour.kt`, `ui/Stories.kt`, `ui/FirstSteps.kt` | Bienvenida, recorrido sobre la app, historias y primeros pasos | `AppSettings.swift` (`OnboardingView`), `Intro.swift` |
+| `data/Discography.kt`, `ui/Search.kt` (`DiscographyScreen`) | Discografía completa (YouTube Music + MusicBrainz) | `Discography.swift`, `SearchViews.swift` (`DiscographyView`) |
+| `playback/Widgets.kt`, `playback/NowPlayingWidget.kt`, `ui/PersonalizationScreen.kt` | Widgets (Ahora suena pequeño y grande, accesos rápidos, playlist fijada, recientes) y Ajustes › Widgets | — (iOS aún sin widgets) |
+| `data/Incident.kt` (`Incident`, `Panic`) | Estado firmado (kill switch, niveles 0–3) y botón de pánico de Pear Dev | `Incident.swift` |
+| `data/Telemetry.kt`, `data/PanelKey.kt`, `data/Updates.kt`, `data/SupportFilter.kt` | Telemetría con consentimiento (resumen semanal; `PanelKey`: llave del panel por USB, sólo dev), aviso de versión nueva (APK verificado), filtro local del soporte | `Telemetry.swift`, `Updates.swift`, `SupportFilter.swift` |
 | `ui/Kitchen.kt` | Componentes comunes | `Kitchen.swift`, `Images.swift` |
 | `avisos/`, `ui/Avisos.kt` | Avisos de Pear Music (canal privado de Discord → `/api/avisos` de la web): `AvisosRepo` (descarga, copia guardada, vistos, regla de 48 h sin repetir), `AvisosWorker` (WorkManager cada 15 min, notificaciones), campana `AvisosBell` en Inicio y pantalla `AvisosScreen` | `Avisos.swift` |
 | `ui/simpbar/` | Barra inferior estilo SimpMusic (opción `barStyle`), copiada de Open Menus: vidrio de Kyant, gota arrastrable, Buscar aparte, plegado 2.2.0 | Barra de pestañas de iOS 26 (`tabBarMinimizeBehavior`) |
@@ -119,7 +145,7 @@ La web de descarga vive en otro repo: `ToxBox8/libremusic-landing`.
 | `ui/theme/` | `Theme.kt` (temas y Prefs), `Backdrops.kt`, `Type.kt` (Inter), `SfIcons.kt`, `Tokens.kt` (**generado**) | `Theme.swift`, `Backdrops.swift` |
 | `ui/*ViewModel.kt` | Estado de reproductor, biblioteca e inicio | objetos `@EnvironmentObject` |
 | `playback/` | `PlaybackService` (Media3), `Tracks.kt` (resuelve el audio), `BrowseTree` (Android Auto), `SleepTimer` (temporizador para dormir), `Fade.kt` (fundido entre canciones y `VolumeMix`), `Eq.kt` (ecualizador, sólo Android), `AutoRadio` (radio infinita), `AudioTuning.kt` (búfer de audio, `Prefetch` de las siguientes URLs, `Normalizer`: igualar el volumen), `PlayCounter` (cuenta escuchas), `NowPlayingWidget` (widget de la pantalla de inicio), `LastQueue` (última cola para retomar con la app cerrada) | `Player.swift` |
-| `data/` | `YTClient`, `Song`, `Library` (library.json), `AppleMusic.kt` (y `Matcher`), `ExternalImport.kt` (Spotify, Exportify, SimpMusic, `ImportMatcher`, `ImportJob`), `TabOrder`, `Support` (borradores y envío), `AppIcon` (icono de la app), `Lyrics` (letras de LRCLIB), `PlayStats` (estadísticas, `stats.json`), `AutoBackup` (copia diaria a una carpeta), `Releases` (novedades de tus artistas), `PendingImports` («Sin añadir» de las importaciones), `AppShortcuts` (atajos del icono) | `Client.swift`, `Store.swift`, `AppleMusic.swift` |
+| `data/` | `YTClient`, `Song`, `Library` (library.json), `AppleMusic.kt` (y `Matcher`), `ExternalImport.kt` (Spotify, Exportify, SimpMusic, `ImportMatcher`, `ImportJob`), `TabOrder`, `Support` (borradores y envío), `AppIcon` (migra el antiguo icono violeta), `Lyrics` (letras de LRCLIB), `PlayStats` (estadísticas, `stats.json`), `AutoBackup` (copia diaria a una carpeta), `Releases` (novedades de tus artistas), `PendingImports` («Sin añadir» de las importaciones), `AppShortcuts` (atajos del icono) | `Client.swift`, `Store.swift`, `AppleMusic.swift` |
 | `download/` | Descargas con Media3 DownloadManager | `DownloadStore` en `Store.swift` |
 | `reels/`, `jam/` | Descubrir y Jam | `Reels.swift`, `Jam*.swift` |
 
@@ -130,17 +156,20 @@ Tests en `app/src/test`: lógica (YTClient, `Matcher`, descargas, Jam, bibliotec
 - **Compilar:** no hace falta Mac. Cada push que toca `apps/android` lanza su workflow; el de iOS en macOS sólo se lanza solo en `master`/`monorepo` (los minutos de macOS cuentan ×10), en las versiones o a mano, y en las demás ramas `ios-sintaxis.yml` comprueba la sintaxis en Linux. El .ipa y el APK salen como artefactos.
 - **Errores de Android:** la CI los publica como anotaciones: `gh api repos/ToxBox8/libremusic/check-runs/<job>/annotations`.
 - **Capturas:** `ScreenshotTest` (Android) dibuja 26 pantallas con el tamaño y los márgenes seguros del iPhone 16 y la CI las sube a la rama `screenshots`; `ios.yml` hace en el simulador (`-screenshotScenario`) las 15 primeras y las sube a `screenshots-ios` (de la 16 a la 22 —Tus álbumes, Aspecto, colores, pestañas, guía, informar de un error, icono— aún no tienen escenario en iOS). `python3 shared/design/compare_shots.py --out /tmp/paridad` genera la hoja iOS | Android. Antes de integrar un cambio de interfaz, compara y deja `docs/PARIDAD.md` al día.
-- **Android en local (opcional):** con Gradle 9.4.0, JDK 21 y el SDK de Android, `gradle testDebugUnitTest --tests '*ScreenshotTest'` deja las capturas en `app/build/shots/` en un par de minutos.
-- **Probar en un móvil Android:** `gradle assembleDebug` instala `app.libremusic.debug` al lado de la app normal; los cierres se leen con `adb logcat -b crash -d`. Para medir fluidez, la variante `perf` y `scripts/bench.sh` (ver `docs/RENDIMIENTO.md`); compara con la tabla antes de integrar cambios que afecten a la fluidez.
+- **Android en local (opcional):** con Gradle 9.4.0, JDK 21 y el SDK de Android, `gradle testUsrDebugUnitTest --tests '*ScreenshotTest'` deja las capturas en `app/build/shots/` en un par de minutos.
+- **Probar en un móvil Android:** `gradle assembleUsrDebug` instala `app.libremusic.debug` (o `scripts/variante.sh dev|pref`) al lado de la app normal; los cierres se leen con `adb logcat -b crash -d`. Para medir fluidez, la variante `perf` y `scripts/bench.sh` (ver `docs/RENDIMIENTO.md`); compara con la tabla antes de integrar cambios que afecten a la fluidez.
 - **Compilar iOS sin gastar cuota:** el repo privado se queda sin minutos de macOS; el público `ToxBox8/pear-music` los tiene gratis. Rama `ios-compila` con sólo `apps/ios` (commit con `ToxBox8@users.noreply.github.com`, nunca el historial de este repo) y `gh workflow run ios.yml -R ToxBox8/pear-music --ref ios-compila`; pasos en `docs/contexto.md`.
 - **Errores de iOS:** también salen como anotaciones (los dos `xcodebuild` de `ios.yml`). Sin Mac ni CI, `apps/ios/scripts/check-linux.sh` comprueba al menos la sintaxis con Swift para Linux (los tipos de SwiftUI no, porque sólo existen en Apple).
 - **Diseño:** nunca escribas colores, radios o tamaños de marca a mano. Cámbialos en `shared/design/tokens.json` y ejecuta `python3 shared/design/gen_tokens.py`. La CI falla si `Tokens.swift` o `Tokens.kt` no están al día.
-- **Icono:** el de por defecto es `AppIcon-Encendido.svg` (en Android, `drawable/ic_launcher_power.xml`); el violeta alternativo lo dibuja `render_icon.py` (y su SVG). Ejecuta `render_icon.py` tras cambiar cualquiera de los dos. Para añadir otro icono: un `activity-alias` en el manifiesto + `AppIcon.kt`, y un `.appiconset` + `ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES` en `project.yml`.
+- **Icono:** uno solo, `AppIcon-Encendido.svg` (en Android, vector `drawable/ic_launcher_power.xml`; en iOS, `AppIcon.appiconset`). `render_icon.py` copia su PNG a iOS y al logo de Acerca de, y dibuja el logo antiguo (`AppIcon.svg`, violeta) sólo para la historia de la marca del README y la web. No se vuelven a añadir iconos alternativos en las apps.
+- **Variantes:** usr (pública), pref y dev (sólo el móvil de Toxbox, por adb; nunca se publican). Todo en `docs/FLAVORS.md`; las diferencias van por banderas (`BuildConfig.CHANNEL`/`ADMIN_TOOLS`/`VERBOSE_LOGS`, `Channel` en iOS), nunca con código duplicado. Registra con `Logs`, nunca con `Log`/`print`, y sin datos personales.
 - **Ramas:** `monorepo` es la rama de trabajo; usa ramas propias para cambios grandes y no integres sin la CI en verde.
 - **Versiones:** sube la versión y anota el cambio en `CHANGELOG.md` en el mismo commit (ver `docs/RELEASING.md`).
 - **Decisiones:** cuando se tome una decisión de producto o de diseño, añádela con fecha a `DECISIONS.md`.
 
 ## Convenciones
+
+- **Idiomas:** todo texto visible va dentro de `L("…")` (Kotlin y Swift; `{0}` para datos, nunca concatenar frases). Tras añadir textos: `python3 tools/i18n/extraer.py`, traducir las líneas nuevas del final de `shared/i18n/src/orden.txt` en cada `<idioma>.txt` y `python3 tools/i18n/construir.py`. No uses `L()` para claves, nombres de recursos, cabeceras HTTP ni atajos de Siri (App Intents exige literales).
 
 - Textos de la interfaz, comentarios y mensajes de commit **en español**.
 - Mismos nombres de ajustes en las dos apps (`theme`, `appearance`, `deck`, `searchPlacement`, `playlistSort`, `playlistOrder`, `smartPlacement`, `artworkColorsPlayer`, `artworkColorsApp`, `artworkIntensity`, `artworkOpacity`, `tabOrder`, `lastTab`, `onboarded`, `repeatMode`, `matchTolerance`, `crossfade`, `autoplay`, `scramble`, `quality`; `barStyle`, `settingsTop.classic`, `settingsTop.simpmusic`; `liquidGlass`, `equalizer` y, por ahora, `normalize` sólo en Android), mismo `library.json` y mismo protocolo del Jam.

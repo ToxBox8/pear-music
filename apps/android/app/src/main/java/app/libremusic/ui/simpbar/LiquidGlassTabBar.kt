@@ -7,6 +7,7 @@
  */
 package app.libremusic.ui.simpbar
 
+import app.libremusic.ui.tourTarget
 import android.os.SystemClock
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.spring
@@ -172,7 +173,11 @@ fun LiquidGlassTabBar(
         }
 
     // Resaltada: la más cercana a la gota mientras se desliza el contenido; si no, la elegida.
-    val highlighted by remember { derivedStateOf { follow()?.roundToInt() ?: currentIndex } }
+    // Pear: si la pestaña actual no está en la barra (Ajustes arriba, Buscar), no se marca ninguna y la gota se
+    // esconde. Antes se quedaba en la primera (Descubrir) estando en Ajustes (lo vio Toxbox).
+    val outside by rememberUpdatedState(selectedTab < 0)
+    val highlighted by remember { derivedStateOf { follow()?.roundToInt() ?: if (outside) -1 else currentIndex } }
+    val blobAlpha by androidx.compose.animation.core.animateFloatAsState(if (outside) 0f else 1f, label = "gota")
 
     // La selección también puede cambiar desde fuera (botón Atrás).
     LaunchedEffect(selectedTab) {
@@ -242,6 +247,7 @@ fun LiquidGlassTabBar(
                             translationX =
                                 (if (isLtr) dampedDrag.value else (tabsCount - 1) - dampedDrag.value) * tabWidthPx +
                                 BarInset.toPx()
+                            alpha = if (follow() != null) 1f else blobAlpha
                         }.then(
                             if (glass) {
                                 Modifier.glassBlob(backdrop, luminance, dampedDrag)
@@ -269,6 +275,7 @@ fun LiquidGlassTabBar(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     tabs.forEachIndexed { position, tab ->
+                        androidx.compose.foundation.layout.Box(androidx.compose.ui.Modifier.tourTarget("tab:${tab.key}")) {
                         TabItem(tab = tab, selected = highlighted == position, width = tabWidth) {
                             if (position == currentIndex) {
                                 onTabSelected(position)
@@ -278,6 +285,7 @@ fun LiquidGlassTabBar(
                                 currentIndex = position
                                 onTabSelected(position)
                             }
+                        }
                         }
                     }
                 }

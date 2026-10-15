@@ -1,5 +1,7 @@
 package app.libremusic.ui
 
+
+import app.libremusic.L
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -67,15 +69,15 @@ fun LyricsView(song: Song, modifier: Modifier = Modifier) {
         when (val l = load) {
             LyricsLoad.Loading -> Spinner()
             LyricsLoad.Failed -> Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("No se pudo cargar la letra", style = Typo.headline, color = c.label)
-                Text("Revisa la conexión e inténtalo otra vez.", style = Typo.subheadline, color = c.secondaryLabel)
-                PillButton("Reintentar", Icons.Rounded.Refresh, prominent = false) { attempt++ }
+                Text(L("No se pudo cargar la letra"), style = Typo.headline, color = c.label)
+                Text(L("Revisa la conexión e inténtalo otra vez."), style = Typo.subheadline, color = c.secondaryLabel)
+                PillButton(L("Reintentar"), Icons.Rounded.Refresh, prominent = false) { attempt++ }
             }
             is LyricsLoad.Ready -> {
                 val lyrics = l.lyrics
                 when {
-                    lyrics == null -> LyricsNote("No hay letra para esta canción")
-                    lyrics.instrumental -> LyricsNote("Instrumental")
+                    lyrics == null -> LyricsNote(L("No hay letra para esta canción"))
+                    lyrics.instrumental -> LyricsNote(L("Instrumental"))
                     lyrics.synced -> SyncedLyrics(lyrics)
                     else -> Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 24.dp, vertical = 16.dp)) {
                         Text(lyrics.plain.orEmpty(), style = Typo.title3.copy(fontWeight = FontWeight.SemiBold), color = c.label)
@@ -143,7 +145,7 @@ private fun LyricsNote(text: String) {
 @Composable
 private fun LyricsCredit() {
     Text(
-        "Letra de LRCLIB", style = Typo.caption, color = Libre.colors.tertiaryLabel,
+        L("Letra de LRCLIB"), style = Typo.caption, color = Libre.colors.tertiaryLabel,
         modifier = Modifier.padding(horizontal = 24.dp, vertical = 20.dp),
     )
 }

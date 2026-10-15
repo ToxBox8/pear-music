@@ -1,5 +1,7 @@
 package app.libremusic.ui.theme
 
+
+import app.libremusic.L
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.toArgb
 import android.content.Context
@@ -26,8 +28,8 @@ enum class AppTheme(val key: String) {
     Glass("glass"), Air("air"), Neon("neon"), Plain("plain");
 
     val spec: Tokens.ThemeSpec get() = Tokens.Themes.getValue(key)
-    val title: String get() = spec.name
-    val blurb: String get() = spec.blurb
+    val title: String get() = app.libremusic.L(spec.name)
+    val blurb: String get() = app.libremusic.L(spec.blurb)
     val accent: Color get() = spec.accent
     val onAccent: Color get() = spec.onAccent
     /** Modo impuesto por el tema (null = el que elija el usuario). */
@@ -42,8 +44,9 @@ enum class AppTheme(val key: String) {
     }
 }
 
-enum class DeckStyle(val key: String, val title: String) {
-    Normal("normal", "Normal"), Cassette("cassette", "Casete"), Vinyl("vinyl", "Vinilo"), Air("air", "Air");
+enum class DeckStyle(val key: String, private val titleEs: String) {
+    Normal("normal", L("Normal")), Cassette("cassette", L("Casete")), Vinyl("vinyl", L("Vinilo")), Air("air", L("Air"));
+    val title: String get() = L(titleEs)
 
     /** Objeto físico que llena la pantalla en horizontal. */
     val isObject: Boolean get() = this == Cassette || this == Vinyl
@@ -125,6 +128,19 @@ object Prefs {
     /** La guía inicial (tema, colores y descargas) ya se ha visto. */
     private val _onboarded = MutableStateFlow(true)
     val onboarded: StateFlow<Boolean> = _onboarded.asStateFlow()
+    /** Aceptó las condiciones de uso (pantalla de privacidad de la guía, desde la 1.0). */
+    private val _termsAccepted = MutableStateFlow(true)
+    val termsAccepted: StateFlow<Boolean> = _termsAccepted.asStateFlow()
+    /** Lo que queda de la bienvenida tras la guía: "tour" → "stories" → "" (y la lista de primeros pasos en Inicio). */
+    private val _introStage = MutableStateFlow("")
+    val introStage: StateFlow<String> = _introStage.asStateFlow()
+    /** Al acabar la bienvenida, abrir Ajustes › Cuenta (eligió «Crear mi cuenta»). */
+    var openAccountAfterIntro: Boolean
+        get() = sp.getBoolean("openAccountAfterIntro", false)
+        set(v) = sp.edit().putBoolean("openAccountAfterIntro", v).apply()
+    /** Primeros pasos completados (claves) y si la tarjeta se ha ocultado. */
+    private val _firstSteps = MutableStateFlow(emptySet<String>())
+    val firstSteps: StateFlow<Set<String>> = _firstSteps.asStateFlow()
 
     fun init(context: Context) {
         sp = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
@@ -154,8 +170,13 @@ object Prefs {
         _playlistOrder.value = sp.getString("playlistOrder", "").orEmpty().split("\n").filter { it.isNotEmpty() }
         _smartPlacement.value = sp.getString("smartPlacement", "playlists") ?: "playlists"
         _tabOrder.value = app.libremusic.data.TabOrder.decode(sp.getString("tabOrder", null))
+        _musicOrder.value = decodeMusicOrder(sp.getString("musicOrder", null))
         lastTab = sp.getString("lastTab", null)
         _onboarded.value = sp.getBoolean("onboarded", !fresh)
+        _termsAccepted.value = sp.getLong("termsAcceptedAt", 0) > 0
+        _showDiscover.value = sp.getBoolean("showDiscover", true)
+        _introStage.value = sp.getString("introStage", "") ?: ""
+        _firstSteps.value = sp.getStringSet("firstSteps", null)?.toSet() ?: if (fresh) emptySet() else setOf("hidden")
         setMatchTolerance(sp.getInt("matchTolerance", 4), save = false)
         setCrossfade(sp.getInt("crossfade", 0), save = false)
         setAutoplay(sp.getBoolean("autoplay", true), save = false)
@@ -207,6 +228,38 @@ object Prefs {
     fun setTabOrder(v: List<String>) { _tabOrder.value = v; sp.edit().putString("tabOrder", app.libremusic.data.TabOrder.encode(v)).apply() }
     fun setLastTab(v: String) { if (v != lastTab) { lastTab = v; sp.edit().putString("lastTab", v).apply() } }
     fun setOnboarded(v: Boolean) { _onboarded.value = v; sp.edit().putBoolean("onboarded", v).apply() }
+    /** Pestaña Descubrir visible (Ajustes › Aspecto › Pestañas, Fase 3.3). */
+    private val _showDiscover = MutableStateFlow(true)
+    val showDiscover: StateFlow<Boolean> = _showDiscover.asStateFlow()
+    fun setShowDiscover(v: Boolean) { _showDiscover.value = v; sp.edit().putBoolean("showDiscover", v).apply() }
+
+    /** Orden de las carpetas de «Tu música» (lo pidió Toxbox: mantener pulsado y moverlas). Igual en iOS. */
+    val MUSIC_DEFAULT = listOf("downloads", "favorites", "albums", "songs", "artists", "recents", "stats")
+    private val _musicOrder = MutableStateFlow(MUSIC_DEFAULT)
+    val musicOrder: StateFlow<List<String>> = _musicOrder.asStateFlow()
+    fun setMusicOrder(v: List<String>) { _musicOrder.value = v; sp.edit().putString("musicOrder", v.joinToString(",")).apply() }
+    /** Lo guardado más lo que falte (si una versión nueva añade carpetas), sin repetir ni desconocidos. */
+    fun decodeMusicOrder(raw: String?): List<String> {
+        val saved = raw.orEmpty().split(",").filter { it in MUSIC_DEFAULT }.distinct()
+        return saved + MUSIC_DEFAULT.filter { it !in saved }
+    }
+    /** «Tu música › Artistas» de la Z a la A (Fase 3.1). */
+    var artistsDescending: Boolean
+        get() = sp.getString("artistsSort", "az") == "za"
+        set(v) = sp.edit().putString("artistsSort", if (v) "za" else "az").apply()
+    fun acceptTerms() { _termsAccepted.value = true; sp.edit().putLong("termsAcceptedAt", System.currentTimeMillis()).apply() }
+    /** Sólo para los tests de capturas (y para volver a ver la privacidad). */
+    fun setTermsAccepted(v: Boolean) { if (v) acceptTerms() else { _termsAccepted.value = false; sp.edit().remove("termsAcceptedAt").apply() } }
+    fun resetFirstSteps(hidden: Boolean) {
+        _firstSteps.value = if (hidden) setOf("hidden") else emptySet()
+        sp.edit().putStringSet("firstSteps", _firstSteps.value).apply()
+    }
+    fun setIntroStage(v: String) { _introStage.value = v; sp.edit().putString("introStage", v).apply() }
+    fun markFirstStep(key: String) {
+        if (key in _firstSteps.value) return
+        _firstSteps.value = _firstSteps.value + key
+        sp.edit().putStringSet("firstSteps", _firstSteps.value).apply()
+    }
 
     fun setTheme(t: AppTheme) { _theme.value = t; sp.edit().putString("theme", t.key).apply() }
     fun setAppearance(v: String) { _appearance.value = v; sp.edit().putString("appearance", v).apply() }
@@ -308,8 +361,8 @@ data class ArtworkLevel(val intensity: Float, val opacity: Float) {
 
     /** «Sutil», «Equilibrado», «Intenso», «Desactivado» o «Personalizado» (barras movidas a mano). */
     val title: String get() = when {
-        !enabled -> "Desactivado"
-        else -> presets.firstOrNull { (_, l) -> l.near(this) }?.first ?: "Personalizado"
+        !enabled -> L("Desactivado")
+        else -> presets.firstOrNull { (_, l) -> l.near(this) }?.first ?: L("Personalizado")
     }
 
     private fun near(o: ArtworkLevel) = kotlin.math.abs(intensity - o.intensity) < 0.02f && kotlin.math.abs(opacity - o.opacity) < 0.02f
@@ -320,7 +373,7 @@ data class ArtworkLevel(val intensity: Float, val opacity: Float) {
         /** Equilibrado = cómo se veía antes de las barras (acento de la portada y fondos con un 8–13 %). */
         val Balanced = ArtworkLevel(0.5f, 0.45f)
         val Intense = ArtworkLevel(1f, 1f)
-        val presets = listOf("Sutil" to Subtle, "Equilibrado" to Balanced, "Intenso" to Intense)
+        val presets get() = listOf(L("Sutil") to Subtle, L("Equilibrado") to Balanced, L("Intenso") to Intense)
     }
 }
 

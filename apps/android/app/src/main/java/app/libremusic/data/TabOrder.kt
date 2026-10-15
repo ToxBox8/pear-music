@@ -23,9 +23,13 @@ object TabOrder {
 
     fun encode(order: List<String>): String = order.joinToString(",")
 
-    /** Las pestañas que se ven, con Buscar detrás de Inicio si va aparte. */
-    fun visible(order: List<String>, searchTab: Boolean): List<String> =
-        if (!searchTab) order else order.flatMap { if (it == HOME) listOf(HOME, SEARCH) else listOf(it) }
+    /**
+     * Las pestañas que se ven, con Buscar detrás de Inicio si va aparte. [discover] = false la quita (Ajustes ›
+     * Aspecto › Pestañas › Descubrir, Fase 3.3).
+     */
+    fun visible(order: List<String>, searchTab: Boolean, discover: Boolean = true): List<String> =
+        (if (!searchTab) order else order.flatMap { if (it == HOME) listOf(HOME, SEARCH) else listOf(it) })
+            .filter { discover || it != DISCOVER }
 
     /**
      * Pestaña al abrir: la última usada, si sigue visible. La primera vez, Inicio: abrir en Descubrir pondría

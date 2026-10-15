@@ -138,6 +138,7 @@ class LibraryViewModel(app: Application) : AndroidViewModel(app) {
         if (name.isBlank()) null else library.createPlaylist(name, listOfNotNull(firstSong))
 
     fun deletePlaylist(id: String) = library.deletePlaylist(id)
+    fun setPinned(id: String, pinned: Boolean) = library.setPinned(id, pinned)
     fun addToPlaylist(playlistId: String, song: Song) = library.addToPlaylist(playlistId, song)
     fun removeFromPlaylist(playlistId: String, songId: String) = library.removeFromPlaylist(playlistId, songId)
 

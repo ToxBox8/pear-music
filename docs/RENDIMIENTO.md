@@ -5,7 +5,7 @@ para esto: la versión debug de Compose es varias veces más lenta que la public
 
 ## Cómo se mide
 
-1. `gradle assemblePerf` → `app/build/outputs/apk/perf/app-perf.apk`: igual que la release (R8, sin
+1. `gradle assembleUsrPerf` → `app/build/outputs/apk/usr/perf/app-usr-perf.apk`: igual que la release (R8, sin
    depuración) pero con la clave de depuración y el id `app.libremusic.perf`, así que se instala al
    lado de la app normal sin tocarla.
 2. `apps/android/scripts/bench.sh "<etiqueta>" [all|nav]` con el móvil por USB y sin tocarlo:

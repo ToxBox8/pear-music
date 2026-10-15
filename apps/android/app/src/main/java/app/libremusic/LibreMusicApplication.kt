@@ -13,7 +13,12 @@ class LibreMusicApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        app.libremusic.data.Telemetry.processStart = android.os.SystemClock.elapsedRealtime()
         Prefs.init(this)
+        I18n.init(this)
+        app.libremusic.data.Account.init(this)
+        app.libremusic.data.Incident.load(this)
+        app.libremusic.data.AppIcon.migrateLegacy(this)
         YTClient.init(this)
         library = Library(this)
         app.libremusic.data.PlayStats.init(this)

@@ -1,5 +1,7 @@
 package app.libremusic.data
 
+
+import app.libremusic.L
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.net.Uri
@@ -40,17 +42,17 @@ object SpotifyImporter {
      * más largas, el CSV de Exportify.
      */
     suspend fun fetchPublic(link: String): AMPlaylist = withContext(Dispatchers.IO) {
-        val id = playlistId(link) ?: throw ImportException("Pega el enlace de una playlist de Spotify (Compartir → Copiar enlace).")
+        val id = playlistId(link) ?: throw ImportException(L("Pega el enlace de una playlist de Spotify (Compartir → Copiar enlace)."))
         val html = YTClient.http.newCall(Request.Builder().url("https://open.spotify.com/embed/playlist/$id").header("User-Agent", UA).build())
-            .execute().use { if (it.isSuccessful) it.body?.string().orEmpty() else throw ImportException("Spotify no deja ver esa playlist. ¿Es pública?") }
+            .execute().use { if (it.isSuccessful) it.body?.string().orEmpty() else throw ImportException(L("Spotify no deja ver esa playlist. ¿Es pública?")) }
         parseEmbed(html)
     }
 
     fun parseEmbed(html: String): AMPlaylist {
         val json = Regex("<script id=\"__NEXT_DATA__\"[^>]*>(.*?)</script>", RegexOption.DOT_MATCHES_ALL).find(html)?.groupValues?.get(1)
-            ?: throw ImportException("No se pudo leer la playlist. Prueba con el CSV de Exportify.")
+            ?: throw ImportException(L("No se pudo leer la playlist. Prueba con el CSV de Exportify."))
         val entity = JSONObject(json).optJSONObject("props")?.optJSONObject("pageProps")?.optJSONObject("state")
-            ?.optJSONObject("data")?.optJSONObject("entity") ?: throw ImportException("No se pudo leer la playlist. Prueba con el CSV de Exportify.")
+            ?.optJSONObject("data")?.optJSONObject("entity") ?: throw ImportException(L("No se pudo leer la playlist. Prueba con el CSV de Exportify."))
         val list = entity.optJSONArray("trackList") ?: JSONArray()
         val tracks = (0 until list.length()).mapNotNull { i ->
             val t = list.optJSONObject(i) ?: return@mapNotNull null
@@ -60,9 +62,9 @@ object SpotifyImporter {
                 duration = t.optDouble("duration", 0.0) / 1000, explicit = t.optBoolean("isExplicit"),
             )
         }
-        if (tracks.isEmpty()) throw ImportException("La playlist está vacía o no es pública.")
+        if (tracks.isEmpty()) throw ImportException(L("La playlist está vacía o no es pública."))
         val cover = entity.optJSONObject("coverArt")?.optJSONArray("sources")?.optJSONObject(0)?.optString("url")?.ifEmpty { null }
-        return AMPlaylist(entity.optString("name").ifEmpty { "Playlist de Spotify" }, tracks, cover)
+        return AMPlaylist(entity.optString("name").ifEmpty { L("Playlist de Spotify") }, tracks, cover)
     }
 }
 
@@ -79,11 +81,11 @@ object ExportifyCsv {
 
     fun parse(name: String, text: String): AMPlaylist {
         val rows = rows(text.removePrefix("﻿"))
-        if (rows.size < 2) throw ImportException("El archivo no tiene canciones.")
+        if (rows.size < 2) throw ImportException(L("El archivo no tiene canciones."))
         val header = rows.first()
         // La columna de «Track URI» es la que tiene spotify:track:… en la primera fila de datos.
         val start = rows[1].indexOfFirst { it.startsWith("spotify:track:") || it.startsWith("spotify:local:") }
-        if (start < 0) throw ImportException("No parece un CSV de Exportify (falta la columna «Track URI»).")
+        if (start < 0) throw ImportException(L("No parece un CSV de Exportify (falta la columna «Track URI»)."))
         val isrcCol = header.indexOfFirst { it.trim().equals("ISRC", ignoreCase = true) }.takeIf { it >= 0 } ?: (start + ISRC)
         val tracks = rows.drop(1).mapNotNull { r ->
             fun col(i: Int) = r.getOrNull(i)?.trim().orEmpty()
@@ -97,8 +99,8 @@ object ExportifyCsv {
                 col(start + EXPLICIT).lowercase().let { if (it == "true") true else if (it == "false") false else null },
             )
         }
-        if (tracks.isEmpty()) throw ImportException("El archivo no tiene canciones.")
-        return AMPlaylist(name.substringBeforeLast('.').replace('_', ' ').ifBlank { "Playlist de Spotify" }, tracks, null)
+        if (tracks.isEmpty()) throw ImportException(L("El archivo no tiene canciones."))
+        return AMPlaylist(name.substringBeforeLast('.').replace('_', ' ').ifBlank { L("Playlist de Spotify") }, tracks, null)
     }
 
     /** CSV con comillas dobles (RFC 4180): comas y saltos de línea dentro de comillas, "" = comilla. */
@@ -161,7 +163,7 @@ object SimpMusicBackup {
                                     val n = zip.read(buf)
                                     if (n < 0) break
                                     total += n
-                                    if (total > MAX_DB_BYTES) throw ImportException("La copia de SimpMusic es demasiado grande.")
+                                    if (total > MAX_DB_BYTES) throw ImportException(L("La copia de SimpMusic es demasiado grande."))
                                     out.write(buf, 0, n)
                                 }
                             }
@@ -170,7 +172,7 @@ object SimpMusicBackup {
                     }
                 }
             }
-            if (!found) throw ImportException("No es una copia de SimpMusic (en SimpMusic: Ajustes › Copia de seguridad).")
+            if (!found) throw ImportException(L("No es una copia de SimpMusic (en SimpMusic: Ajustes › Copia de seguridad)."))
             readDatabase(tmp)
         } finally {
             tmp.delete()
@@ -180,7 +182,7 @@ object SimpMusicBackup {
 
     fun readDatabase(file: File): List<SimpPlaylist> {
         val db = runCatching { SQLiteDatabase.openDatabase(file.path, null, SQLiteDatabase.OPEN_READONLY) }
-            .getOrElse { throw ImportException("La copia de SimpMusic está dañada.") }
+            .getOrElse { throw ImportException(L("La copia de SimpMusic está dañada.")) }
         return db.use {
             val out = mutableListOf<SimpPlaylist>()
             it.rawQuery("SELECT id, title, thumbnail FROM local_playlist ORDER BY id", null).use { c ->
@@ -195,7 +197,7 @@ object SimpMusicBackup {
                 }
             }
             val liked = songs(it, "SELECT videoId, title, artistName, thumbnails FROM song WHERE liked = 1 ORDER BY favoriteAt DESC", null)
-            if (liked.isNotEmpty()) out.add(0, SimpPlaylist("Canciones que te gustan (SimpMusic)", liked, null))
+            if (liked.isNotEmpty()) out.add(0, SimpPlaylist(L("Canciones que te gustan (SimpMusic)"), liked, null))
             out
         }
     }

@@ -1,5 +1,7 @@
 package app.libremusic.jam
 
+
+import app.libremusic.L
 import app.libremusic.data.Song
 import org.json.JSONArray
 import org.json.JSONObject
@@ -114,7 +116,7 @@ object JamRules {
             val c = reader.read()
             if (c == -1) return if (sb.isEmpty()) null else sb.toString()
             if (c == '\n'.code) return sb.toString()
-            if (sb.length >= max) throw java.io.IOException("Línea demasiado larga")
+            if (sb.length >= max) throw java.io.IOException(L("Línea demasiado larga"))
             sb.append(c.toChar())
         }
     }

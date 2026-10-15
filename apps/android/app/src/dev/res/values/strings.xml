@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Nombre bajo el icono de la variante dev (sólo en el móvil de Toxbox), para no confundirla con la pública. -->
+<resources>
+    <string name="app_name" translatable="false">Pear Dev</string>
+</resources>

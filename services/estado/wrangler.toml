@@ -1,0 +1,17 @@
+# pear-music-estado (Fase 4): estado firmado de las apps y botón de pánico. Separado de la web y del repo.
+# Despliegue y secretos: README.md. Desplegado el 15-10-2026.
+name = "pear-music-estado"
+main = "src/worker.js"
+compatibility_date = "2026-09-01"
+workers_dev = true
+preview_urls = false
+
+[vars]
+# Clave pública Ed25519 (base64) de `node tools/estado/estado.mjs clave`. La privada nunca sale del PC.
+PUBLIC_KEY = "XBII1upMDF2PUHjTFrJwYEyHbbiUM3TT2O+9kHuTlgI="
+DISCORD_ADMIN_ROLE = ""
+DISCORD_ADMIN_CHANNEL = ""
+
+[[kv_namespaces]]
+binding = "ESTADO"
+id = "013da6ec7fd64adfad5282a9e33a9420"

@@ -1,5 +1,7 @@
 package app.libremusic.reels
 
+
+import app.libremusic.L
 import android.content.Intent
 import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
@@ -141,7 +143,7 @@ fun ReelsScreen(reelsVm: ReelsViewModel, playerVm: PlayerViewModel, libraryVm: L
             Row(Modifier.fillMaxWidth().statusBarsPadding().padding(start = 20.dp, end = 20.dp, top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                 Text("Descubrir", style = Typo.display(Tokens.TypeSize.DisplayScreen, Libre.colors.theme), color = Color.White, modifier = Modifier.weight(1f))
                 Box(
-                    Modifier.size(44.dp).tactile(enabled = !state.loading, label = "Mezclar otra vez") { reelsVm.load(seeds, exclude, force = true) },
+                    Modifier.size(44.dp).tactile(enabled = !state.loading, label = L("Mezclar otra vez")) { reelsVm.load(seeds, exclude, force = true) },
                     contentAlignment = Alignment.Center,
                 ) { Icon(Icons.Rounded.Autorenew, null, tint = Color.White, modifier = Modifier.size(22.dp)) }
             }
@@ -155,13 +157,13 @@ private fun EmptyState(loading: Boolean, onRetry: () -> Unit) {
         if (loading) {
             Spinner(36.dp, Color.White)
             Spacer(Modifier.height(14.dp))
-            Text("Buscando música para ti…", style = Typo.headline, color = Color.White)
+            Text(L("Buscando música para ti…"), style = Typo.headline, color = Color.White)
         } else {
             Icon(Icons.Rounded.WifiOff, null, tint = Color.White, modifier = Modifier.size(34.dp))
             Spacer(Modifier.height(14.dp))
-            Text("No hay fragmentos ahora mismo", style = Typo.headline, color = Color.White)
+            Text(L("No hay fragmentos ahora mismo"), style = Typo.headline, color = Color.White)
             Spacer(Modifier.height(6.dp))
-            Text("Revisa la conexión y vuelve a intentarlo.", style = Typo.subheadline, color = Color.White.copy(0.72f), textAlign = TextAlign.Center)
+            Text(L("Revisa la conexión y vuelve a intentarlo."), style = Typo.subheadline, color = Color.White.copy(0.72f), textAlign = TextAlign.Center)
             Spacer(Modifier.height(20.dp))
             PillButton("Reintentar", Icons.Rounded.Refresh, prominent = true, modifier = Modifier.widthIn(max = 220.dp), onClick = onRetry)
         }
@@ -260,17 +262,17 @@ private fun ReelPage(song: Song, isCurrent: Boolean, state: ReelsState, reelsVm:
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Rounded.Warning, null, tint = Color.White.copy(0.85f), modifier = Modifier.size(15.dp))
                             Spacer(Modifier.size(6.dp))
-                            Text("Este fragmento no se pudo cargar", style = Typo.footnote.semibold, color = Color.White.copy(0.85f))
+                            Text(L("Este fragmento no se pudo cargar"), style = Typo.footnote.semibold, color = Color.White.copy(0.85f))
                         }
                     }
                     Spacer(Modifier.height(10.dp))
                     Row(
-                        Modifier.height(40.dp).background(theme.reelAccent(), CircleShape).tactile(label = "Escuchar completa", onClick = onListenFull).padding(horizontal = 16.dp),
+                        Modifier.height(40.dp).background(theme.reelAccent(), CircleShape).tactile(label = L("Escuchar completa"), onClick = onListenFull).padding(horizontal = 16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(Icons.Rounded.PlayArrow, null, tint = theme.reelOnAccent(), modifier = Modifier.size(18.dp))
                         Spacer(Modifier.size(6.dp))
-                        Text("Escuchar completa", style = Typo.subheadline.bold, color = theme.reelOnAccent())
+                        Text(L("Escuchar completa"), style = Typo.subheadline.bold, color = theme.reelOnAccent())
                     }
                 }
                 Actions(song, theme)
@@ -292,15 +294,15 @@ private fun Actions(song: Song, theme: AppTheme) {
     var moreMenu by remember { mutableStateOf(false) }
     val jamActive = jam.phase == JamPhase.Hosting || jam.phase == JamPhase.Joined
     Column(verticalArrangement = Arrangement.spacedBy(18.dp)) {
-        ActionLabel(if (fav) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder, "Me gusta", if (fav) theme.reelAccent() else Color.White) {
+        ActionLabel(if (fav) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder, L("Me gusta"), if (fav) theme.reelAccent() else Color.White) {
             env.library.toggleFavorite(song)
         }
         Box {
-            ActionLabel(Icons.Outlined.AddCircleOutline, "Añadir") { addMenu = true }
+            ActionLabel(Icons.Outlined.AddCircleOutline, L("Añadir")) { addMenu = true }
             ContextMenu(addMenu, { addMenu = false }, buildList {
-                if (jamActive) add(MenuEntry.Action("Añadir al Jam", app.libremusic.ui.theme.JamIcon(), enabled = jam.jam?.entries?.none { it.song.id == song.id } != false) { JamService.add(song) })
+                if (jamActive) add(MenuEntry.Action(L("Añadir al Jam"), app.libremusic.ui.theme.JamIcon(), enabled = jam.jam?.entries?.none { it.song.id == song.id } != false) { JamService.add(song) })
                 data.userPlaylists.forEach { p -> add(MenuEntry.Action(p.name) { env.library.addToPlaylist(p.id, song) }) }
-                if (data.userPlaylists.isEmpty() && !jamActive) add(MenuEntry.Note("Crea una playlist en Biblioteca"))
+                if (data.userPlaylists.isEmpty() && !jamActive) add(MenuEntry.Note(L("Crea una playlist en Biblioteca")))
             })
         }
         ActionLabel(Icons.AutoMirrored.Rounded.Send, "Compartir") {
@@ -311,7 +313,7 @@ private fun Actions(song: Song, theme: AppTheme) {
             context.startActivity(Intent.createChooser(send, null))
         }
         Box {
-            ActionLabel(Icons.Rounded.MoreHoriz, "Más") { moreMenu = true }
+            ActionLabel(Icons.Rounded.MoreHoriz, L("Más")) { moreMenu = true }
             ContextMenu(moreMenu, { moreMenu = false }, songMenu(song))
         }
     }

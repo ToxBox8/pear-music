@@ -1,0 +1,973 @@
+\n\nSe actualiza encima con AltStore o SideStore: no pierdes tu biblioteca ni tus canciones descargadas.
+\n\nSe actualiza encima: no pierdes tu biblioteca ni tus canciones descargadas.
+ (ticket #{0}). Te contestaremos en Avisos.
+ Ajustes está arriba en Inicio y no entra en el orden (se cambia en Aspecto).
+ Las {0} que faltan quedan en la playlist, en «Sin añadir», para buscarlas otra vez.
+ · Buscar 
+ · Colores {0}
+ · más probable
+ · ticket #{0}
+ · títulos con efecto
+ · {0} sin conexión
+. ¡Gracias!
+1 canción
+A continuación
+A mano
+A mano…
+Aa
+Abre Descubrir en {0}
+Abre el Jam (el icono de las tres personas)
+Abrir Ajustes
+Abrir Descubrir
+Abrir el Jam
+Abrir enlace
+Abrir reproductor
+Accesos rápidos
+Acepta las condiciones para seguir
+Acepto las condiciones de uso
+Acerca de
+Activada
+Actualizar playlist guardada
+Actívalo en Ajustes o escribe el código a mano.
+Administración
+Afecta a todas las personas que usan Pear Music en cuanto abran la app.
+Ahora no, seguir
+Ahora suena
+Ahora suena grande
+Ahorro de datos
+Air
+AirPods Max
+AirPods Pro
+Ajuste fino
+Ajustes
+Ajustes es una pestaña más de la barra; su sitio se elige en Pestañas.
+Ajustes está arriba en Inicio, junto al Jam, y no ocupa sitio en la barra.
+Al acabar la canción
+Al cambiar de canción, el título aparece entre símbolos que se ordenan
+Al importar de Spotify o Apple Music, cuánto puede durar distinta una canción para darla por buena
+Al sonar una canción, la app y los menús toman colores parecidos a los de su portada, como Descubrir.
+Aleatorio
+Alguna foto no se pudo añadir
+Alguna foto no se pudo añadir.
+Altavoces, HomePod y Apple TV
+Altavoces, auriculares y televisores con Bluetooth o Chromecast
+Altavoz pequeño
+Anterior
+Antes de borrar se pide confirmación.
+Antes de empezar
+Apagada
+Aparecen como filas en «Tu música», encima de Canciones.
+Aparecen con su portada grande en el carrusel de Playlists.
+Apelación
+Apelación enviada. Te contestaremos al correo.
+Apelar
+Apple Music o Spotify: abre la playlist → Compartir → Copiar enlace. Tiene que ser pública. De Spotify llegan hasta unas 100 canciones; para listas más largas, usa el CSV de Exportify.
+Apunta al QR del Jam
+Archivo library.json de Pear Music (también el de Android). Se añade lo que no tengas, sin borrar nada.
+Archivo library.json de Pear Music (también el de iOS). Se añade lo que no tengas, sin borrar nada.
+Arrastra las carpetas para cambiar el orden.
+Arrastra las playlists, Descargadas y Favoritos para colocarlas donde quieras.
+Arrastra para cambiar el orden
+Arrastra para cambiar el orden del carrusel. Al mover algo, Playlists se ordena «A mano».
+Arrastra ≡ para cambiar el orden del carrusel. Al mover algo, Playlists se ordena «A mano».
+Arrastra ≡ para cambiar el orden.
+Arrastra ≡ para cambiar el orden; deslizar a los lados sigue el mismo orden. Desliza Descubrir a la izquierda para ocultarla (y a la derecha para volver a ponerla). La app se abre en la última pestaña que usaste.
+Arriba en Inicio
+Arrástralo a otro surco para cambiar la posición
+Artista
+Artista {0}
+Artistas
+Aspecto
+Aspecto de los widgets
+Así te verán los demás
+Atrás
+Auriculares
+Automático
+Avanzado
+Aviso
+Avisos
+Avisos de Pear Music publicados en la web
+Avisos importantes
+Avisos, {0} sin leer
+Ayuda y soporte
+Ayudas a mejorar Pear Music
+Añadida a la playlist
+Añadidas recientemente
+Añadir
+Añadir a Tus álbumes
+Añadir a favoritos
+Añadir a la cola
+Añadir a playlist
+Añadir a una playlist
+Añadir al Jam
+Añadir capturas
+Añadir playlist
+Añadir {0} a la pantalla de inicio
+Añadir {0} al Jam
+Aún no has guardado nada
+Aún no has marcado favoritas aquí.
+Aún no hay canciones. Añade la primera y aparecerá en el móvil de todos.
+Aún no hay escuchas en este periodo. Cuenta cada canción que suena al menos 30 segundos.
+Aún no hay favoritas
+Aún no hay nada descargado
+Aún sin copia
+Bajos y bombos con más cuerpo
+Barra arriba en Inicio
+Barra inferior
+Barras, botones y menús de cristal que refractan lo de detrás, como iOS 26
+Biblioteca
+Biblioteca exportada.
+Biblioteca guardada
+Biblioteca guardada en la nube
+Bloqueo
+Bloqueo total
+Bluetooth
+Borra la biblioteca, las descargas, las estadísticas y los ajustes, y cierra la app. No se puede deshacer.
+Borradores
+Borrar
+Borrar la cuenta
+Borrar la cuenta elimina al momento tu correo y la copia de la nube. La biblioteca de este móvil se queda.
+Borrar todo
+Borrar todos mis datos
+Botones del color de la canción y fondos y menús con un toque
+Botón de pánico
+Brazo
+Buenas noches
+Buenas tardes
+Buenos días
+Busca canciones, álbumes o artistas
+Busca música en {0}
+Busca un álbum o entra en un artista y pulsa «Añadir a Tus álbumes» o «Descargar todo».
+Busca una canción para añadirla
+Buscando el Jam
+Buscando en YouTube Music… {0} de {1}
+Buscando música para ti…
+Buscar
+Buscar artistas
+Buscar en Ajustes
+Buscar en playlists
+Buscar en tus álbumes
+Buscar en {0}
+Buscar música
+Buscar otra vez
+Buscar tiene su propia pestaña en la barra de abajo, justo después de Inicio.
+Buscar tiene su propia pestaña en la barra de abajo.
+Buzón de sugerencias
+CSV de Exportify (Spotify)
+Caché vaciada
+Cada canción empieza y acaba a su volumen.
+Calidad
+Calidad al escuchar
+Calidad al escuchar sin descargar
+Calidad de descarga
+Calidad de descarga, tolerancia al importar y caché
+Calidad máxima
+Cambia el fondo, las tarjetas, el color y la letra de toda la app. Puedes cambiarlo cuando quieras en Ajustes › Aspecto.
+Cambia entre no repetir, repetir lista y repetir canción
+Cambiar el correo
+Cambiar foto
+Cambiar reproductor
+Canal
+Canal, registro y botón de pánico
+Cancelar
+Cancelar bloqueo pendiente
+Cancelar la descarga; lo ya descargado se queda
+Canciones
+Canciones descargadas
+Canciones más escuchadas
+Canciones que te gustan (SimpMusic)
+Canciones, artistas…
+Canciones, álbumes, artistas…
+Canción que suena
+Canción sin identificador
+Capturas
+Carpeta
+Carátula de {0}
+Carátula grande y controles (4×2).
+Carátula, título y controles en una fila (4×1).
+Casete
+Casete con bobinas que giras con el dedo, vinilo que se puede «scratchear» o el Air plateado. Mantén pulsado el mini reproductor para cambiar.
+Casete: gira una bobina o arrastra la cinta para avanzar o rebobinar. Vinilo: gira el disco con el dedo o mueve el brazo. Con el iPhone en horizontal, el casete o el vinilo ocupan toda la pantalla. También puedes cambiarlo manteniendo pulsado el mini reproductor.
+Casete: gira una bobina o arrastra la cinta para avanzar o rebobinar. Vinilo: gira el disco con el dedo o mueve el brazo. Con el móvil en horizontal, el casete o el vinilo ocupan toda la pantalla. También puedes cambiarlo manteniendo pulsado el mini reproductor.
+Cast
+Caídas y versiones urgentes
+Caídas, versiones nuevas y novedades de Pear Music
+Cerrar
+Cerrar el aviso
+Cerrar las historias
+Cerrar reproductor
+Cerrar sesión
+Cinta
+Claro
+Claro u oscuro
+Clave copiada
+Clave de recuperación
+Clave pública copiada
+Cliente no oficial de YouTube Music. Usa una API no oficial de YouTube, así que puede dejar de funcionar si YouTube la cambia. Las descargas se guardan en este iPhone.
+Cliente no oficial de YouTube Music. Usa una API no oficial de YouTube, así que puede dejar de funcionar si YouTube la cambia. Las descargas se guardan en este móvil.
+Clásica
+Coche
+Cola
+Color
+Color {0}
+Colores de la portada
+Colores de la portada en el reproductor
+Colores de la portada en el resto de la app
+Compartir
+Componentes inspirados en The Kitchen de dqnamo
+Compresión no admitida.
+Comprueba cada 15 minutos si hay avisos nuevos. Sólo se pide la lista de avisos, sin enviar nada tuyo.
+Comprueba de vez en cuando si hay avisos nuevos. Sólo se pide la lista de avisos, sin enviar nada tuyo.
+Comprueba la conexión y vuelve a intentarlo.
+Con esto encendido y el móvil por cable (adb forward tcp:8765 tcp:8765), la página escondida de la web pide aquí una llave de 5 minutos. Sólo escucha dentro del móvil y se apaga sola a los 10 minutos. La clave pública va una vez en PANEL_PUBLIC_KEY del Worker.
+Confirmar bloqueo pendiente
+Continuar
+Contraseña
+Copia automática
+Copia de SimpMusic
+Copia de SimpMusic (.backup)
+Copia de la biblioteca
+Copia guardada
+Copiar
+Copiar clave pública
+Copiar registro
+Correo
+Crea una playlist con + o tráete las tuyas desde Apple Music.
+Crea una playlist en Biblioteca
+Crea una playlist o guarda un álbum para elegirlo.
+Crear
+Crear Jam
+Crear mi cuenta
+Crear playlist con {0}
+Crear uno
+Cristal líquido
+Cristal, Aire, Neón o Sistema, y colores que salen de la portada. Todo en Ajustes › Aspecto.
+Créditos
+Cuando haya algo importante saldrá aquí.
+Cuando se acaba lo que estás escuchando y el bucle está apagado, se añaden canciones parecidas a la última.
+Cuenta
+Cuenta borrada
+Cuenta creada
+Cuenta qué hacías y qué esperabas que pasara. Cuanto más concreto, mejor (mínimo {0} caracteres).
+Cuánto
+Cuánto se parecen los botones al color de la portada
+Cuánto se tiñen los fondos y los menús
+Cuéntanos qué ha fallado; puedes añadir capturas
+Cuéntanos qué te gustaría que hiciera Pear Music
+Cápsula con tus pestañas y Buscar aparte, como SimpMusic. Arrastra la gota para cambiar de pestaña; al bajar por una lista se pliega junto al mini reproductor.
+Código QR del Jam
+Código de 6 cifras
+Código del Jam, 6 caracteres
+Código para unirse
+Datos exportados
+De la importación. Toca para buscarlas otra vez.
+Deja de descargar; lo ya descargado se queda
+Dejarán de estar disponibles sin conexión, también en otras listas que las tengan.
+Dejarán de estar disponibles sin conexión. Las playlists y los favoritos no se tocan.
+Desactivada
+Desactivado
+Desactivar
+Desactivar temporizador
+Descarga algo para escucharlo sin conexión
+Descarga canciones con la flecha de cada fila o con «Descargar todo» en una playlist.
+Descarga canciones, álbumes y playlists a máxima calidad.
+Descarga una canción con su flecha, o una playlist o un álbum entero con «Descargar todo». Se guardan en este iPhone a la máxima calidad y las tienes en Biblioteca › Descargadas, también sin conexión.
+Descarga una canción con su flecha, o una playlist o un álbum entero con «Descargar todo». Se guardan en este móvil a la máxima calidad y las tienes en Biblioteca › Descargadas, también sin conexión.
+Descargada
+Descargadas
+Descargadas y Favoritos
+Descargado
+Descargando
+Descargando Pear Music {0}…
+Descargando {0} %
+Descargar
+Descargar las {0} que faltan
+Descargar todo
+Descargas
+Descartar
+Descartar {0}
+Desconocido
+Descubrir
+Descubrir, Inicio, Biblioteca, Ajustes
+Desde la app Música de este iPhone
+Desde un archivo
+Desde un enlace
+Desliza un rato en Descubrir
+Desplegar barra ({0})
+Disco
+Disponible sin conexión
+Dos cosas, por separado. Puedes cambiar la segunda cuando quieras en Ajustes › Ayuda y soporte › Tus datos.
+Dónde
+Dónde buscar
+Dónde está Buscar
+Ecualizador
+Editar
+Editar cola
+Editar el orden de las playlists
+Editar playlist
+Editar playlists
+Efecto en los títulos
+El Jam está lleno.
+El Jam se terminará para todos.
+El anfitrión
+El anfitrión ha terminado el Jam.
+El archivo está cortado.
+El archivo lleva tu biblioteca, estadísticas, letras, borradores de soporte y ajustes; no las canciones descargadas.
+El archivo no es un ZIP válido.
+El archivo no tiene canciones.
+El bucle (no repetir, repetir lista o canción) se cambia en el reproductor.
+El código no es válido.
+El servidor de soporte no responde ({0}). Prueba más tarde.
+El servidor no responde ({0}). Prueba más tarde.
+El sonido tal cual
+El soporte está en pausa mientras resolvemos un incidente. Tu reporte se queda en Borradores.
+El tema cambia el fondo, las tarjetas, el color y la letra. Los fondos toman los colores de la carátula y se animan más mientras suena música.
+El texto y los iconos mantienen siempre un contraste legible, aunque la portada sea muy clara o muy viva.
+Elegida
+Elegir carpeta
+Elegir foto
+Elige tu tema
+Eliminar
+Eliminar borrador
+Eliminar descarga
+Eliminar playlist
+Eliminar playlists
+Eliminar una playlist no borra sus canciones de Favoritos ni de Descargas.
+Eliminar {0}
+Empezar
+Empezar a escuchar
+Empezar de cero
+En Playlists (portada grande)
+En Tus álbumes
+En directo
+En el reproductor
+En el resto de la app
+En la barra
+En mantenimiento
+En tu biblioteca: {0}
+En «Tu música» (fila)
+Encendida
+Enlace de Spotify o Apple Music
+Entrar
+Enviado ({0} campos)
+Enviar
+Enviar ahora
+Enviar apelación
+Enviar datos de rendimiento (opcional)
+Equilibrado
+Esa clave no tiene el formato correcto.
+Escanead con la cámara del iPhone o desde Biblioteca → + → Jam con amigos.
+Escanead con la cámara del móvil o desde Biblioteca → + → Jam con amigos.
+Escanear QR
+Escribe tu clave de recuperación
+Escribe tu nombre para crear un Jam o unirte.
+Escucha lo que quieras
+Escucha una canción
+Escuchado hace poco
+Escuchado recientemente
+Escuchar completa
+Escuchar mis descargas
+Espacio usado
+Esta app
+Estadísticas
+Estamos preparando cosas solo para quien tenga cuenta. Te avisaremos en Avisos.
+Este artista no tiene canciones ni álbumes disponibles.
+Este año
+Este fragmento no se pudo cargar
+Este mes
+Este móvil
+Estilo SimpMusic
+Estos son los últimos avisos guardados.
+Exageración del color
+Explica por qué es un reporte de verdad. Lo leerá una persona y te contestará al correo.
+Exporta o borra todo lo que la app guarda de ti
+Exportar copia
+Exportar mis datos
+Fallo al reproducir: tiempo de espera agotado
+Fallo al reproducir: {0}
+Falta la clave de recuperación.
+Favoritas
+Favoritos
+Fija un álbum o una playlist con la chincheta
+Fijado arriba en Biblioteca e Inicio
+Fijados
+Fijar arriba
+Fondo con la carátula desenfocada y controles de su color
+Foto
+Fragmentos de canciones que te pueden gustar, a pantalla completa. Desliza para la siguiente y toca dos veces para «Me gusta». Si no lo usas, deslízalo a la izquierda en Ajustes › Aspecto › Pestañas.
+Fragmentos de canciones que te pueden gustar, a pantalla completa. Desliza para la siguiente y toca dos veces para «Me gusta». Si no lo usas, deslízalo a la izquierda en Ajustes › Aspecto › Pestañas. Toca la pestaña Descubrir.
+Fundido
+Fundido entre canciones
+Gasta menos datos móviles (48 kbps).
+Gira una bobina o arrastra la cinta para avanzar o rebobinar
+Guarda canciones para ver sus artistas
+Guarda una favorita con el corazón
+Guardada en Biblioteca como «{0}»
+Guardada en tu biblioteca
+Guardar ahora en la nube
+Guardar como playlist
+Guardar en biblioteca
+Guardar lista
+Guardar y salir
+Guárdala en tu gestor de contraseñas o apúntala. Es lo que cifra tu biblioteca: sin ella no se puede 
+Guárdala en tu gestor de contraseñas o apúntala. Es lo que cifra tu biblioteca: sin ella no se puede recuperar la copia de la nube en otro móvil. Pear Music no la guarda y no la puede recuperar.
+Guía inicial
+Gíralo para avanzar o retroceder
+Hacer copia ahora
+Hasta {0}. Se reducen y se les quitan la ubicación y los demás datos de la foto antes de enviarlas.
+Hazla tuya
+Hecho
+Historia {0} de {1}: {2}. {3}
+Icono
+Igualar el volumen
+Importado: {0} favoritas y {1} playlists nuevas.
+Importando «{0}»
+Importante
+Importar
+Importar 1 playlist
+Importar copia
+Importar de Apple Music
+Importar playlist
+Importar {0} playlists
+Informar de un error
+Informar de un error · Guía inicial · Versión {0}
+Inicio
+Instrumental
+Intenso
+Jam
+Jam con amigos
+Jam con tus amigos
+Jam en directo · {0}
+Jam sin conexión
+Jam {0}, código {1}
+LRCLIB respondió {0}
+La barra de búsqueda está siempre arriba en Inicio y la pestaña Buscar desaparece.
+La barra de búsqueda está siempre arriba en Inicio.
+La calidad al escuchar vuelve a «Máxima» se quita el fundido y se vuelve a seguir con canciones parecidas.
+La calidad al escuchar vuelve a «Máxima» y se quitan el ecualizador y el fundido; se vuelve a seguir con canciones parecidas.
+La canción baja de volumen en sus últimos {0} s y la siguiente entra suavemente. Útil para listas variadas; en álbumes que van seguidos, mejor «No».
+La clave de recuperación no es la de esta cuenta.
+La copia de SimpMusic es demasiado grande.
+La copia de SimpMusic está dañada.
+La copia es demasiado grande. En SimpMusic, haz la copia sin las descargas.
+La copia no tiene playlists.
+La cuenta está en pausa mientras resolvemos un incidente.
+La descarga no coincide con la publicada y no se ha instalado, por seguridad.
+La he guardado
+La letra, al compás
+La lista quedó vacía.
+La playlist está vacía o no es pública.
+La playlist que elijas abajo, para ponerla a sonar de un toque (2×2).
+La primera fijada en Biblioteca
+La que guardaste al crear la cuenta. 26 letras y números; da igual mayúsculas o guiones.
+La que sale en el widget «Playlist fijada».
+Las canciones descargadas se quedan en Descargadas.
+Las canciones ya son de YouTube Music: llegan exactas, sin buscar. No se descarga nada.
+Las cuatro últimas canciones que escuchaste (4×2).
+Las cuentas estarán disponibles muy pronto
+Las descargas se guardan en este iPhone a la máxima calidad y se ven en Biblioteca › Descargadas. Para bajar una lista o un álbum entero, usa «Descargar todo» en su página.
+Las descargas se guardan en este móvil a la máxima calidad y se ven en Biblioteca › Descargadas. Para bajar una lista o un álbum entero, usa «Descargar todo» en su página.
+Las descargas se guardan siempre a la máxima calidad (AAC 128 kbps), así suenan igual sin conexión.
+Las descargas se guardan siempre a la máxima calidad (Opus, unos 160 kbps).
+Las pestañas de siempre, como en el iPhone.
+Las pestañas de siempre.
+Las playlists vuelven a ordenarse por recientes, Descargadas y Favoritos al carrusel y Buscar a Inicio. No se borra ninguna playlist.
+Las últimas {0} líneas, sólo en memoria. Nunca llevan datos personales.
+Lee las playlists de tu biblioteca (necesita «Sincronizar biblioteca» activado en Ajustes → Música).
+Leer las condiciones
+Letra
+Letra Inter, de Rasmus Andersson (OFL)
+Letra de LRCLIB
+Leyendo la playlist…
+Libera memoria; se vuelven a descargar al verlas
+Listo
+Llave del panel por USB
+Llévatela sin conexión
+Lo has creado tú · {0}
+Lo que han sacado este año
+Lo que más escuchas
+Lo último que has escuchado, radios hechas para ti, lo nuevo de tus artistas y lo que fijes arriba. La campana trae los avisos de Pear Music.
+Lo último que has escuchado, radios hechas para ti, lo nuevo de tus artistas y lo que fijes arriba. La campana trae los avisos de Pear Music. Toca la pestaña Inicio.
+Logo
+Línea demasiado larga
+Manda ya el resumen de esta semana con los campos marcados (los obligatorios siempre van: identificador, plataforma, variante, versión y semana). El resumen semanal sigue saliendo solo si la telemetría está activada.
+Mandarme un código
+Mantén Pear Music abierta. Suele tardar unos segundos.
+Mantén para borrar las descargas
+Mantén para borrar las estadísticas
+Mantén para vaciar la cola
+Mantén pulsada una canción en Buscar o Inicio para añadirla.
+Mantén pulsado para confirmar
+Marcada
+Me gusta
+Mejor sonido (AAC 128 kbps).
+Mejor sonido (Opus, unos 160 kbps).
+Mejor sonido; gasta más datos
+Menú
+Mezcla mis favoritas en {0}
+Mezclar favoritas
+Mezclar favoritas o descargadas, Descubrir y Buscar (4×1).
+Mezclar lo descargado
+Mezclar mis favoritas
+Mezclar otra vez
+Mientras suena una canción, la app toma colores parecidos a los de su portada. Elige cuánto; el texto siempre se lee bien.
+Mientras tanto no se puede buscar, actualizar ni enviar nada. Tu música descargada sigue aquí.
+Mientras tanto, todo funciona sin cuenta.
+Minutos por sesión
+Modelo y sistema, versión, cuánto tarda en abrir, fluidez, memoria y minutos de uso, con un identificador aleatorio. 
+Modelo y sistema, versión, cuánto tarda en abrir, fluidez, memoria y minutos de uso, con un identificador aleatorio. Un resumen a la semana; nada de lo que escuchas ni buscas. Sirve sólo para que la app vaya mejor; se borra a los 90 días.
+Modo
+Modo seguro
+Mosaico
+Mostrar Descubrir
+Mover
+Muestra el código QR
+Muy pronto, ventajas
+Más
+Más agudos
+Más brillo y detalle
+Más graves
+Más opciones
+Más opciones de {0}
+Máxima
+Música
+Nada coincide con «{0}»
+Necesita Android 12 o posterior
+Ninguna (no añadir)
+Ninguna canción de esta lista está descargada.
+Ninguna canción descargada
+Nivel
+No
+No disponible para escuchar
+No encontradas
+No es una copia de SimpMusic (en SimpMusic: Ajustes › Copia de seguridad).
+No hay avisos
+No hay borradores
+No hay fragmentos ahora mismo
+No hay letra para esta canción
+No hay nada que retomar
+No hay playlists
+No hay playlists en la biblioteca de este iPhone.
+No hay resultados para «{0}»
+No hay singles ni EP.
+No hay álbumes.
+No la necesitas para nada: Pear Music funciona igual sin ella. Pero si te la creas nos ayudas muchísimo a mejorar la app, y tú te llevas tu música allá donde vayas.
+No parece un CSV de Exportify (falta la columna «Track URI»).
+No queda ninguna canción por añadir
+No se encontraron canciones. ¿La playlist es pública?
+No se encontró ningún Jam con el código {0}. Comprobad que estáis en la misma Wi-Fi.
+No se han podido cargar
+No se pudieron cargar las canciones
+No se pudieron cargar las recomendaciones.
+No se pudieron exportar los datos
+No se pudo abrir el puerto 8765
+No se pudo anunciar el Jam en la Wi-Fi ({0}).
+No se pudo buscar en la Wi-Fi ({0}).
+No se pudo buscar. Revisa tu conexión.
+No se pudo cargar el artista. Revisa tu conexión.
+No se pudo cargar la letra
+No se pudo conectar con el Jam.
+No se pudo crear el Jam en esta red.
+No se pudo descargar «{0}»: {1}
+No se pudo descargar. Prueba con otra conexión.
+No se pudo enviar
+No se pudo exportar la biblioteca.
+No se pudo guardar la copia
+No se pudo guardar la copia. Vuelve a elegir la carpeta.
+No se pudo leer ese archivo de biblioteca.
+No se pudo leer la copia.
+No se pudo leer la playlist.
+No se pudo leer la playlist. Prueba con el CSV de Exportify.
+No se pudo obtener el audio: {0}
+No se pudo reproducir: {0}
+No se pudo usar esa carpeta
+No se pudo usar esa carpeta.
+No se puede cambiar: así suenan igual sin conexión
+No tengo la clave: empezar de cero
+Nombre
+Nombre (A-Z)
+Nombre (Z-A)
+Nombre del Jam
+Normal
+Notificar en el móvil
+Novedades de tus artistas
+Nueva playlist
+Nunca
+Nº de canciones
+Oculta · desliza a la derecha para ponerla
+Ocultar
+Ocultar Descubrir
+Ocultar primeros pasos
+Ofrece quitar las descargas
+Opacidad
+Opcional · gratis
+Opcional · guarda tu biblioteca cifrada en la nube
+Opcional, p. ej. Viaje a la playa
+Opciones del Jam
+Orden de fábrica
+Orden de la barra
+Ordenar
+Ordenar de la A a la Z
+Ordenar de la Z a la A
+Ordenar playlists
+Ordenar playlists por
+Ordenar por
+Oscuro
+Panel
+Paquete
+Para el altavoz del móvil o uno portátil
+Para escuchar con datos móviles
+Para la pantalla de inicio del móvil
+Para poder contestarte. No se usa para nada más. La respuesta también te llega a Avisos, sólo a ti.
+Para revisar
+Para ti
+Pausa
+Pausa la descarga de la lista
+Pausar
+Pear Dev
+Pear Music
+Pear Music es un proyecto personal y gratuito, sin relación con YouTube ni Google. Es necesario para usar la app.
+Pear Music no tiene cuentas ni servidor con tus datos: todo está en este móvil. 
+Pear Music no tiene cuentas ni servidor con tus datos: todo está en este móvil. El archivo lleva tu biblioteca, estadísticas, letras, borradores de soporte y ajustes; no las canciones descargadas.
+Pear Music no tiene permiso para usar la cámara
+Pear Music {0}
+Pedir bloqueo total
+Pega el enlace de una playlist de Spotify (Compartir → Copiar enlace).
+Pega un enlace de music.apple.com (Compartir → Copiar enlace).
+Pegar
+Permite instalar apps de Pear Music y vuelve a pulsar Descargar.
+Personalizado
+Pestaña aparte
+Pestañas
+Pide el código a quien lo creó o escanea su QR.
+Playlist de Apple Music
+Playlist de Spotify
+Playlist fijada
+Playlist importada
+Playlists
+Playlists con tu foto, icono y color, favoritos y descargas en un sitio. Fija arriba lo que más escuchas y abre la discografía completa de cada artista.
+Playlists y favoritos en un minuto, también entre iPhone y Android.
+Podrás volver a entrar con el código mientras siga abierto.
+Pon lo descargado en {0}
+Pon mis favoritas en {0}
+Por ejemplo: al pulsar «Descargar todo» en un álbum, la app se cierra.
+Por ejemplo: poder ordenar mis playlists por artista.
+Por qué es un reporte de verdad
+Por tamaño
+Porque escuchaste «{0}»
+Primeros pasos
+Progreso
+Progreso: {0} de {1}
+Publica uno de los estados firmados en el PC. Aviso: banner que caduca solo. Modo seguro: apaga actualizaciones, búsqueda, soporte, telemetría y cuenta. Bloqueo: pantalla de mantenimiento; se confirma a los 10 min con otro código. Normal: todo vuelve a funcionar.
+Publicar
+Publicar este nivel
+Puedes cerrar la app: al volver, la importación sigue donde se quedó.
+Puesto
+Pásala a otro móvil
+Quitar
+Quitar de Tus álbumes
+Quitar de favoritos
+Quitar foto
+Quitar {0}
+Qué ha pasado
+Qué se envía exactamente
+Qué te gustaría que hiciera Pear Music y para qué te serviría (mínimo {0} caracteres).
+Reanudar · {0} de {1}
+Recientes
+Recordarme mañana
+Recorrido: {0}. {1}
+Reformular
+Registro
+Registro copiado
+Reintentar
+Reintentar descarga
+Repetir canción
+Repetir lista
+Repetir: no
+Reporte enviado
+Reproducción
+Reproducir
+Reproducir a continuación
+Reproductor
+Reproductor multimedia
+Reproductores con personalidad
+Respuesta de Pear Music
+Respuesta inesperada del servidor.
+Restablecer
+Restablecer {0}
+Revisa el correo: falta algo (por ejemplo, la @ o el dominio).
+Revisa el mensaje
+Revisa la conexión e inténtalo otra vez.
+Revisa la conexión y vuelve a intentarlo.
+SIN CONEXIÓN
+Saber cuántos sois nos dice dónde poner el esfuerzo.
+Salida de audio
+Salida de audio: {0}
+Salir del Jam
+Salir sin guardar
+Saltar
+Saltar el recorrido
+Saltar la guía
+Se aplica al momento, también a lo que suena por Bluetooth.
+Se borran el texto y sus fotos. No se puede deshacer.
+Se borran tu correo y la copia de la nube. No se puede deshacer.
+Se borrará la copia de la nube que no puedes abrir y se creará una clave nueva. La biblioteca de este móvil no se toca.
+Se borrará la playlist y su portada. No se puede deshacer.
+Se borrarán tus playlists, favoritos, descargas, estadísticas y ajustes de este móvil, y la app se cerrará. 
+Se borrarán tus playlists, favoritos, descargas, estadísticas y ajustes de este móvil, y la app se cerrará. Si quieres conservar algo, exporta antes tus datos.
+Se buscan otra vez en YouTube Music (a veces aparecen versiones nuevas). Elige la buena y se añade a la playlist.
+Se cortó a medias; sigue donde se quedó.
+Se guarda una al día y se dejan las {0} últimas. Para recuperarla: Biblioteca › Importar › Importar copia.
+Se guardan en este móvil hasta que los envías o los eliminas.
+Se guardan sólo en este móvil y no salen en la copia de la biblioteca.
+Se ha perdido la conexión con el anfitrión.
+Se para al acabar la canción
+Se para en {0} min
+Se para en {0} s
+Se perdió la conexión
+Se perdió la conexión con {0}.
+Seguir
+Seguir con canciones parecidas
+Seguro
+Sesión cerrada
+Si hay foto se muestra en lugar del icono.
+Si la activas, una vez a la semana se envía un resumen de rendimiento: modelo y sistema, versión, cuánto 
+Si la activas, una vez a la semana se envía un resumen de rendimiento: modelo y sistema, versión, cuánto tarda en abrir, fluidez (FPS y tirones), memoria y minutos de uso, con un identificador aleatorio que no es el de tu cuenta. Nada de lo que escuchas ni buscas. Se borra a los 90 días; al apagarla se borra al momento.
+Si quieres conservar algo, exporta antes tus datos.
+Sigue con las que faltan
+Siguiente
+Sin anuncios, sin límites y sin cuenta obligatoria.
+Sin añadir
+Sin añadir: {0}
+Sin conexión
+Sin conexión con el servidor de estado.
+Sin conexión. Inténtalo cuando tengas internet.
+Sin descripción
+Sin elegir
+Sin icono
+Sin líneas todavía
+Sin marcar
+Sin permiso para leer la app Música. Actívalo en Ajustes → Pear Music.
+Sin rastreo ni publicidad. Tú decides qué compartes.
+Sin resultados
+Sin terminar
+Singles y EP
+Soltar de arriba
+Spotify no deja ver esa playlist. ¿Es pública?
+Spotify: exporta la playlist en exportify.app (gratis, entra con tu cuenta de Spotify) y elige el .csv; trae todas las canciones y su ISRC, que empareja mejor. SimpMusic: Ajustes › Copia de seguridad, y elige el archivo .backup; sus canciones ya son de YouTube Music, así que llegan exactas.
+Sugerencia enviada
+Sutil
+Sólo para ti
+Sólo tú tienes la clave. Ni siquiera nosotros podemos leerla.
+Sólo {0} por ahora
+También puedes mantener pulsada la pantalla de inicio › Widgets › Pear Music. Se pueden cambiar de tamaño.
+Te damos la bienvenida a Pear Music
+Te lo hemos mandado a {0}. Caduca en 10 minutos.
+Telemetría
+Telemetría de rendimiento
+Tema
+Tema, reproductor (casete, vinilo, Air), tu cuenta opcional, tus datos y ayuda.
+Tema, reproductor (casete, vinilo, Air), widgets, tu cuenta opcional, tus datos y ayuda.
+Temporizador para dormir
+Terminar Jam
+Terminar de ordenar
+Terminar sin guardar
+Tipo
+Toca el corazón de una canción para guardarla aquí.
+Toca la cola y elige Letra: sigue la canción línea a línea y se guarda para verla sin conexión.
+Toca las dudosas para elegir la versión correcta. Las que dejes sin elegir no se añaden.
+Toca lo resaltado para seguir
+Toca para cambiarla
+Toca para seguir · mantén para pausar
+Toda la música de YouTube Music, gratis y sin anuncios. Con la pantalla apagada, sin conexión y con un Jam para escuchar con tus amigos.
+Todas
+Todas encajan con su versión en YouTube Music.
+Todavía no aparece. Comprobad que el código es correcto, que estáis en la misma WiFi o con el Bluetooth activado y que quien lo creó tiene Pear Music abierta.
+Todavía no aparece. Comprobad que el código es correcto, que estáis en la misma WiFi y que quien lo creó tiene Pear Music abierta.
+Todavía no hay nada aquí
+Todavía no hay playlists
+Todavía no tienes álbumes
+Tolerancia
+Tolerancia de duración
+Traer de la nube
+Traer mi biblioteca
+Traídas {0} favoritas y {1} playlists
+Tu biblioteca viaja cifrada con tu clave de recuperación: el servidor no puede leerla.
+Tu biblioteca, a tu manera
+Tu biblioteca, cifrada en la nube
+Tu clave de recuperación
+Tu correo
+Tu cuenta de Pear Music
+Tu idea
+Tu lanzador no deja añadirlo desde aquí: mantén pulsada la pantalla de inicio › Widgets
+Tu música
+Tu nombre
+Tus artistas
+Tus datos
+Tus datos son tuyos
+Tus favoritos
+Tus pestañas en la barra y Buscar aparte, como SimpMusic. En iOS 26 la barra se pliega al bajar por una lista.
+Tus playlists
+Tus playlists, favoritos y descargas, también sin conexión. Fija arriba lo que más escuches con la chincheta y toca un artista para ver toda su discografía.
+Tus playlists, favoritos y descargas, también sin conexión. Fija arriba lo que más escuches con la chincheta y toca un artista para ver toda su discografía. Toca la pestaña Biblioteca.
+Tus álbumes
+Un archivo .zip con todo lo que la app guarda de ti
+Un resumen a la semana; nada de lo que escuchas ni buscas. Sirve sólo para que la app vaya mejor; se borra a los 90 días.
+Una copia al día de tus favoritos, playlists y álbumes en la carpeta que elijas. Elige una que se sincronice (Google Drive, Nextcloud…) para no perder nada al cambiar de móvil.
+Una copia al día de tus favoritos, playlists y álbumes en la carpeta que elijas. Elige una que se sincronice (iCloud Drive, Google Drive…) para no perder nada al cambiar de móvil.
+Una playlist a la que todos añaden canciones desde su móvil, iPhone o Android, en la misma Wi-Fi. Con el QR se entra al momento.
+Una playlist compartida con quien esté contigo, aunque tenga un Android. Escanea el QR para entrar al momento, o escribe el código.
+Una playlist compartida con quien esté contigo, aunque tenga un iPhone. Escanea el QR para entrar al momento, o escribe el código.
+Una playlist que hacéis entre todos. Funciona con gente que está cerca, en la misma WiFi o con el Bluetooth activado.
+Una playlist que hacéis entre todos. Funciona con gente que está cerca, en la misma WiFi.
+Une la copia con lo de este móvil, sin borrar nada
+Unirme a uno
+Usa la sonoridad que YouTube mide de cada canción: las que suenan más fuerte bajan y las más flojas suben un poco, para no tocar el volumen entre canción y canción.
+Vaciar caché de carátulas
+Vaciar registro
+Vacía o importada
+Vale
+Velocidad
+Velocidad {0}
+Ver carátula
+Ver clave de recuperación
+Ver cola
+Ver el perfil de {0}
+Ver estado y auditoría
+Ver letra
+Ver todas
+Ver todo
+Ver todos: {0}
+Ver tus canciones de {0}
+Versión
+Versión del sistema
+Versión {0}
+Versión {0} y créditos
+Vinilo
+Vista previa de los colores de la portada
+Voces claras
+Voces y pódcast más presentes
+Volver al inicio
+Vuelve a entrar en tu cuenta.
+Vuelve a ver la bienvenida, el recorrido y las historias
+Vuelven el tema Cristal, el reproductor Normal, los colores de la portada apagados y el orden de pestañas de fábrica.
+Widgets
+Ya está en el Jam
+Ya no está fijado
+Ya tengo una clave (de otro móvil)
+ahora mismo
+barra simpmusic cápsula pestañas plegar gota
+barra simpmusic plegar buscar
+bluetooth chromecast altavoz airplay
+borrar quitar
+bug fallo problema soporte reporte escarabajo contacto
+buscar pestaña inicio barra
+carrusel tu música
+carátula color tinte sutil equilibrado intenso
+casete vinilo air normal
+claro u oscuro según el iPhone
+color fondo cristal neón aire sistema apariencia
+copia seguridad backup drive nextcloud guardar exportar
+copia seguridad backup icloud drive guardar exportar
+crossfade transición suave volumen cortes
+cuenta correo nube sincronizar copia cifrada clave recuperación iniciar sesión
+el anfitrión
+el de tu cuenta. Nada de lo que escuchas ni buscas. Se borra a los 90 días; al apagarla se borra al momento.
+emparejar importar spotify segundos coincidencia
+en Inicio
+en su pestaña
+espacio offline sin conexión borrar
+glass transparente ios 26
+graves agudos voces bajos sonido eq altavoz
+hace {0} días
+hace {0} h
+hace {0} min
+memoria imágenes portadas
+modo noche oscuro claro automático
+notificaciones campana caídas novedades discord
+ocultar quitar desactivar descubrir feed fragmentos reels
+orden a-z recientes a mano
+orden barra descubrir inicio biblioteca
+privacidad rgpd exportar borrar datos eliminar zip
+radio infinita autoplay automático cola acabar
+recuperar la copia de la nube en otro móvil. Pear Music no la guarda y no la puede recuperar.
+resto de la app
+salida audio altavoz homepod apple tv bluetooth
+streaming datos ahorro máxima kbps
+sugerencia idea propuesta mejora buzón
+símbolos animación scramble
+tarda en abrir, fluidez (FPS y tirones), memoria y minutos de uso, con un identificador aleatorio que no es 
+telemetría rendimiento datos consentimiento privacidad fps
+tutorial bienvenida empezar
+versión créditos licencia
+widgets widget personalización pantalla de inicio escritorio ahora suena recientes accesos rápidos playlist fijada tema
+{0}\n\nLo hemos guardado en Borradores para que lo envíes más tarde.
+{0}\n\nPuedes reformularlo o, si crees que es un error, apelar.
+{0} %
+{0} bien · {1} para revisar · {2} no encontradas
+{0} canciones, iguales que en SimpMusic. No se ha descargado nada.
+{0} de {1} canciones. Ya está en tu Biblioteca; no se ha descargado nada (usa «Descargar todo» si la quieres sin conexión).
+{0} de {1} · Pausar
+{0} de {1} · se marcan solos
+{0} ha terminado el Jam.
+{0} playlists importadas
+{0} · añadida por {1}
+{0} · {1}
+{0} · {1} sin conexión
+{0}, ya está en el Jam
+{0}, {1} y {2} más
+{0}. Mantén pulsado para confirmar
+«Máxima» usa AAC a 128 kbps; «Ahorro de datos», 48 kbps. Se aplica desde la siguiente canción.
+«Máxima» usa Opus a unos 160 kbps; «Ahorro de datos», unos 50 kbps. Se aplica desde la siguiente canción.
+«{0}» importada
+¿Borrar todos tus datos?
+¿Borrar tu cuenta?
+¿Eliminar el borrador?
+¿Eliminar «{0}»?
+¿Empezar de cero?
+¿Enviar el reporte?
+¿Enviar la sugerencia?
+¿Guardar la lista antes de salir?
+¿Quitar «{0}» de Tus álbumes?
+¿Restablecer {0}?
+Álbum
+Álbumes
+Última copia en la nube
+Última copia: {0}
+éxitos del momento
+…
+❌ Error {0}
+claro u oscuro según el móvil
+Choose your language · Tria la llengua · Escolle o idioma · Aukeratu hizkuntza · Elektu vian lingvon
+Elegido
+Elige tu idioma
+España
+Idioma
+Toda la app cambia al momento. Lo que aún no está traducido se ve en español.
+idioma lengua language català valencià galego euskara english esperanto
+Aire
+Plata con Helvetica negra y un anillo de puntos.
+Cristal
+Luz difusa con los colores de la carátula.
+Neón
+Rejilla synthwave que avanza mientras suena.
+Sistema
+Sin efectos ni fondos animados.
+Español
+Código {0}
+Personas: {0}
+Playlists: 
+Se enviarán tu correo, el texto y datos del iPhone (modelo, versión de iOS y de la app) al canal privado de soporte de Pear Music.
+Se enviarán tu correo, el texto y datos del móvil (modelo, versión de Android y de la app) al canal privado de soporte de Pear Music.
+Se enviarán tu correo, el texto, {0} foto(s) y datos del iPhone (modelo, versión de iOS y de la app) al canal privado de soporte de Pear Music.
+Se enviarán tu correo, el texto, {0} foto(s) y datos del móvil (modelo, versión de Android y de la app) al canal privado de soporte de Pear Music.
+¡Gracias! Es el ticket #{0}. Te contestaremos en Avisos (sólo a ti) y al correo que has puesto.
+¡Gracias! Te contestaremos en Avisos (sólo a ti) y al correo que has puesto.
+«{0}» usa siempre el modo claro.
+«{0}» usa siempre el modo oscuro.
+¿Quitar las descargas de «{0}»?
+¿Quitar las descargas?
+Barra inferior de SimpMusic, de maxrave-dev (GPL-3.0)
+Barra inferior inspirada en SimpMusic, de maxrave-dev (GPL-3.0)
+ayer
+Descargando Pear Music {0}… {1} %

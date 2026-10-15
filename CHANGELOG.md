@@ -4,6 +4,31 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). C
 
 ## iOS
 
+### [2.0.0] — 2026-10-15 (build 12)
+- Pear Music tiene un solo icono, el de encendido: desaparece «Icono de la app» de Ajustes › Aspecto y quien tuviera el violeta vuelve al de encendido (iOS avisa una vez del cambio).
+- La copia de la biblioteca se exporta como `pear-music-library.json`.
+- Ajustes › Ayuda y soporte › **Tus datos**: exporta todo lo que la app guarda de ti en un .zip o bórralo todo.
+- Por dentro: la app se puede compilar en tres variantes (Pear Music, y Pear Pref y Pear Dev sólo para pruebas).
+- Bienvenida nueva: privacidad clara (condiciones y datos de rendimiento por separado), recorrido por la app tocando cada sección, historias con lo que puedes hacer y «Primeros pasos» en Inicio.
+- Cuenta opcional (Ajustes › Cuenta): guarda tu biblioteca en la nube cifrada con una clave que sólo tienes tú y pásala a otro móvil. Pronto, ventajas para quien tenga cuenta.
+- Aviso cuando hay versión nueva, con sus novedades: «Descargar» abre AltStore o SideStore, o «Recordarme mañana».
+- Informar de un error: si el mensaje no se entiende o tiene insultos te lo decimos antes de enviarlo, y si se rechaza puedes apelar.
+- Tus datos: telemetría de rendimiento opcional (apagada por defecto). Los borradores de soporte se guardan cifrados.
+- Artistas: al entrar en un artista, toda su discografía (álbumes, EP y sencillos), y lo que no se puede escuchar aparece marcado. Desde un álbum, toca el artista para ir a su perfil. En Tu música › Artistas, orden A-Z / Z-A y cada artista abre su perfil.
+- La copia de la biblioteca ya conserva las fotos de tus playlists y su orden.
+- Jam: con el QR se entra al momento, y encontrarlo por código es más fiable.
+- Ajustes › Aspecto › Pestañas: desliza Descubrir a la izquierda para quitarla de la barra (se queda difuminada; a la derecha, vuelve).
+- Fija álbumes y playlists con la chincheta: salen arriba en Biblioteca e Inicio.
+- Reproductor Air con bucle, temporizador y «⋯» (con la letra); casete y vinilo en horizontal con controles.
+- Si algún día hay un problema serio, la app puede enseñarte un aviso, pasar a un modo seguro (tu música descargada sigue sonando) o ponerse en mantenimiento. Sólo con instrucciones firmadas por Pear Music; si no puede comprobarlo, sigue funcionando normal.
+- Telemetría (si la activas): un solo resumen de rendimiento a la semana.
+- La guía inicial enseña lo nuevo: fijar con la chincheta, la discografía de los artistas, el Jam con QR, la campana de avisos y quitar Descubrir; «Primeros pasos» suma «Fija un álbum o una playlist».
+- **Idiomas**: español, català, valencià, galego, euskara, English y Esperanto. Elígelo al empezar (con banderas) o en Ajustes › Idioma; cambia al momento.
+- **Buzón de sugerencias** (Ayuda y soporte, y la carta junto al escarabajo). Tus reportes y sugerencias tienen número de ticket y la respuesta te llega sólo a ti en la campana de Avisos.
+- Tu música: mantén pulsada una carpeta para ordenarlas a tu gusto. Playlists › Ver todas tiene un lápiz para ordenarlas.
+- Pestañas: desliza Descubrir a la izquierda para quitarla de la barra.
+- Inicio: el saludo ya no se monta sobre el Jam al bajar, y el Jam tiene un icono nuevo.
+
 ### [1.4.1] — 2026-10-14 (build 7)
 - **Avisos**: se bajan cada vez que vuelves a la app. Una campana en Inicio, junto al Jam, con los avisos de Pear Music (caídas, versiones nuevas, novedades) y un número con los que no has leído. Si dejas activado «Notificar en el móvil», los nuevos llegan también como notificación cuando iOS deja comprobarlo en segundo plano. También en Ajustes › Ayuda y soporte › Avisos.
 - Nueva opción «Barra estilo SimpMusic» (Ajustes › Aspecto › Barra inferior): Buscar aparte en la barra (Inicio ya no lleva buscador con esta barra). En iOS 26 la barra se pliega al bajar y el mini reproductor se pone a su lado.
@@ -82,6 +107,34 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). C
 - Primera versión distribuida desde la web (compilación «air-plata»): biblioteca Nueva 1.1, tema Aire en plata, reproductor Air, Descubrir (reels), Jam con amigos, Buscar en Inicio.
 
 ## Android
+
+### [1.0.0] — 2026-10-15 (versionCode 19)
+- Pear Music tiene un solo icono, el de encendido: desaparece «Icono de la app» de Ajustes › Aspecto y quien tuviera el violeta vuelve al de encendido al abrir la app (según el lanzador, puede que haya que volver a poner el acceso directo).
+- La copia de la biblioteca se exporta como `pear-music-library.json`.
+- Ajustes › Ayuda y soporte › **Tus datos**: exporta todo lo que la app guarda de ti en un .zip o bórralo todo.
+- Más privacidad: sólo conexiones seguras (HTTPS) también en Android 8 y 9, y la copia de seguridad de Google ya no se lleva tus borradores de soporte.
+- Por dentro: la app se puede compilar en tres variantes (Pear Music, y Pear Pref y Pear Dev sólo para pruebas).
+- Bienvenida nueva: privacidad clara (condiciones y datos de rendimiento por separado), recorrido por la app tocando cada sección, historias con lo que puedes hacer y «Primeros pasos» en Inicio.
+- Cuenta opcional (Ajustes › Cuenta): guarda tu biblioteca en la nube cifrada con una clave que sólo tienes tú y pásala a otro móvil. Pronto, ventajas para quien tenga cuenta.
+- Aviso cuando hay versión nueva, con sus novedades: «Descargar» baja la versión, comprueba que es la oficial y la instala encima sin perder nada, o «Recordarme mañana».
+- Informar de un error: si el mensaje no se entiende o tiene insultos te lo decimos antes de enviarlo, y si se rechaza puedes apelar.
+- Tus datos: telemetría de rendimiento opcional (apagada por defecto). Los borradores de soporte se guardan cifrados.
+- Artistas: al entrar en un artista, toda su discografía (álbumes, EP y sencillos), y lo que no se puede escuchar aparece marcado. Desde un álbum, toca el artista para ir a su perfil. En Tu música › Artistas, orden A-Z / Z-A y cada artista abre su perfil.
+- La copia de la biblioteca ya conserva las fotos de tus playlists y su orden.
+- Jam: con el QR se entra al momento, y encontrarlo por código es más fiable.
+- Ajustes › Aspecto › Pestañas: desliza Descubrir a la izquierda para quitarla de la barra (se queda difuminada; a la derecha, vuelve).
+- Fija álbumes y playlists con la chincheta: salen arriba en Biblioteca e Inicio.
+- Reproductor Air con bucle, temporizador y «⋯» (con la letra); casete y vinilo en horizontal con controles.
+- Widgets nuevos (Ahora suena grande, Accesos rápidos, Playlist fijada y Recientes) y la sección Ajustes › Widgets para añadirlos y elegir su tema.
+- Barra estilo SimpMusic: estando en Ajustes ya no se marca Descubrir.
+- Si algún día hay un problema serio, la app puede enseñarte un aviso, pasar a un modo seguro (tu música descargada sigue sonando) o ponerse en mantenimiento. Sólo con instrucciones firmadas por Pear Music; si no puede comprobarlo, sigue funcionando normal.
+- Telemetría (si la activas): un solo resumen de rendimiento a la semana.
+- La guía inicial enseña lo nuevo: fijar con la chincheta, la discografía de los artistas, el Jam con QR, la campana de avisos y quitar Descubrir; «Primeros pasos» suma «Fija un álbum o una playlist».
+- **Idiomas**: español, català, valencià, galego, euskara, English y Esperanto. Elígelo al empezar (con banderas) o en Ajustes › Idioma; cambia al momento.
+- **Buzón de sugerencias** (Ayuda y soporte, y la carta junto al escarabajo). Tus reportes y sugerencias tienen número de ticket y la respuesta te llega sólo a ti en la campana de Avisos.
+- Tu música: mantén pulsada una carpeta para ordenarlas a tu gusto. Playlists › Ver todas tiene un lápiz para ordenarlas.
+- Pestañas: desliza Descubrir a la izquierda para quitarla de la barra.
+- Inicio: el saludo ya no se monta sobre el Jam al bajar, y el Jam tiene un icono nuevo.
 
 ### [0.9.5] — 2026-10-14 (versionCode 14)
 - **Avisos al día al abrir la app**: la campana de Inicio baja los avisos cada vez que vuelves a Pear Music, sin esperar a la comprobación de fondo (antes podían tardar hasta un cuarto de hora o más en salir). Lo que ya ves en la campana no te llega después como notificación.

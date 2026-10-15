@@ -1,5 +1,7 @@
 package app.libremusic.ui
 
+
+import app.libremusic.L
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -300,9 +302,9 @@ fun CassetteView(song: Song) {
             val smallKey = (cw * 0.14f).coerceIn(26.dp, 50.dp)
             val bigKey = (cw * 0.18f).coerceIn(32.dp, 64.dp)
             Row(horizontalArrangement = Arrangement.spacedBy(cw * 0.05f), verticalAlignment = Alignment.CenterVertically) {
-                CassetteKey(Icons.Rounded.Replay, smallKey, false, "Volver al inicio", enabled = st.progress > 0) { restart() }
-                CassetteKey(if (st.isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow, bigKey, true, if (st.isPlaying) "Pausa" else "Reproducir") { env.player.togglePlay() }
-                CassetteKey(Icons.Rounded.FastForward, smallKey, false, "Siguiente") { env.player.next() }
+                CassetteKey(Icons.Rounded.Replay, smallKey, false, L("Volver al inicio"), enabled = st.progress > 0) { restart() }
+                CassetteKey(if (st.isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow, bigKey, true, if (st.isPlaying) L("Pausa") else L("Reproducir")) { env.player.togglePlay() }
+                CassetteKey(Icons.Rounded.FastForward, smallKey, false, L("Siguiente")) { env.player.next() }
             }
         }
     }
@@ -549,7 +551,7 @@ fun VinylView(song: Song) {
                             },
                         )
                     }
-                    .semanticsButton("Disco") {},
+                    .semanticsButton(L("Disco")) {},
             ) {
                 Record(
                     song.thumb(600),
@@ -618,8 +620,8 @@ fun VinylView(song: Song) {
             ) { Tonearm(sd, lifted) }
             // Controles del plinto
             Row(Modifier.offset(x = sd * 0.84f - 44.dp, y = sd * 0.9f - 22.dp), horizontalArrangement = Arrangement.spacedBy(sd * 0.03f)) {
-                DeckKey(Icons.Rounded.FastRewind, sd * 0.1f, "Anterior") { env.player.previous() }
-                DeckKey(Icons.Rounded.FastForward, sd * 0.1f, "Siguiente") { env.player.next() }
+                DeckKey(Icons.Rounded.FastRewind, sd * 0.1f, L("Anterior")) { env.player.previous() }
+                DeckKey(Icons.Rounded.FastForward, sd * 0.1f, L("Siguiente")) { env.player.next() }
             }
             Box(
                 Modifier.offset(x = sd * 0.13f - max(56f, sd.value * 0.17f).dp / 2, y = sd * 0.9f - max(44f, sd.value * 0.1f).dp / 2)
@@ -627,7 +629,7 @@ fun VinylView(song: Song) {
                     .shadow(3.dp, RoundedCornerShape(6.dp), ambientColor = Color.Black.copy(0.4f), spotColor = Color.Black.copy(0.4f))
                     .background(hex(0x3B3A3F), RoundedCornerShape(6.dp))
                     .border(1.dp, Color.White.copy(0.15f), RoundedCornerShape(6.dp))
-                    .tactile(label = if (st.isPlaying) "Pausa" else "Reproducir") { env.player.togglePlay() },
+                    .tactile(label = if (st.isPlaying) L("Pausa") else L("Reproducir")) { env.player.togglePlay() },
                 contentAlignment = Alignment.Center,
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {

@@ -91,4 +91,14 @@
     <string name="widget_prev">Anterior</string>
     <string name="widget_play">Reproducir o pausar</string>
     <string name="widget_next">Siguiente</string>
+    <string name="widget_large_label">Ahora suena (grande)</string>
+    <string name="widget_large_description">Lo que suena con la carátula grande y los controles.</string>
+    <string name="widget_quick_label">Accesos rápidos</string>
+    <string name="widget_quick_description">Mezclar favoritas o descargadas, Descubrir y Buscar de un toque.</string>
+    <string name="widget_playlist_label">Playlist fijada</string>
+    <string name="widget_playlist_description">Tu playlist favorita, para ponerla a sonar de un toque. Se elige en Ajustes › Widgets.</string>
+    <string name="widget_playlist_empty">Elige la playlist en Ajustes › Widgets</string>
+    <string name="widget_recents_label">Recientes</string>
+    <string name="widget_recents_description">Las cuatro últimas canciones que escuchaste.</string>
+    <string name="widget_recents_empty">Aún no has escuchado nada</string>
 </resources>

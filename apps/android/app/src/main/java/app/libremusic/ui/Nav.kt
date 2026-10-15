@@ -1,5 +1,7 @@
 package app.libremusic.ui
 
+
+import app.libremusic.L
 import androidx.activity.compose.PredictiveBackHandler
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.CubicBezierEasing
@@ -68,15 +70,16 @@ import app.libremusic.ui.theme.semibold
 // Navegación con pestañas y una pila por pestaña, como TabView + NavigationStack en iOS.
 
 /** [key]: la clave de `TabOrder` (igual que en iOS). */
-enum class Tab(val title: String, val key: String) {
-    Home("Inicio", "home"), Discover("Descubrir", "discover"), Search("Buscar", "search"), Library("Biblioteca", "library"), Settings("Ajustes", "settings");
+enum class Tab(private val titleEs: String, val key: String) {
+    Home(L("Inicio"), "home"), Discover(L("Descubrir"), "discover"), Search(L("Buscar"), "search"), Library(L("Biblioteca"), "library"), Settings(L("Ajustes"), "settings");
+    val title: String get() = L(titleEs)
 
     companion object {
         fun of(key: String): Tab = entries.firstOrNull { it.key == key } ?: Home
     }
 }
 
-enum class SmartList(val title: String) { Downloads("Descargadas"), Favorites("Favoritos") }
+enum class SmartList(private val titleEs: String) { Downloads(L("Descargadas")), Favorites(L("Favoritos")); val title: String get() = L(titleEs) }
 
 /** Pantallas que se apilan dentro de una pestaña. */
 sealed interface Route {
@@ -91,15 +94,35 @@ sealed interface Route {
     data object Artists : Route
     data class Artist(val name: String) : Route
     data class RemoteArtistR(val artist: app.libremusic.data.RemoteArtist) : Route
+    /** Discografía completa de un artista: «albums» o «singles». */
+    data class Discography(
+        val artist: String,
+        val kind: String,
+        val albums: List<app.libremusic.data.RemoteCollection>,
+        val singles: List<app.libremusic.data.RemoteCollection>,
+        val albumsRef: app.libremusic.data.BrowseRef?,
+        val singlesRef: app.libremusic.data.BrowseRef?,
+    ) : Route
     data object Playlists : Route
+    /** Ajustes › Idioma (Cierre 1.0). */
+    data object Language : Route
     data object Albums : Route
     data object ArtworkColors : Route
     data object TabOrderR : Route
     data object DownloadsSettings : Route
     data object Help : Route
-    data object AppIconR : Route
+    /** Ajustes › Ayuda y soporte › Tus datos (exportar y borrar). */
+    data object MyData : Route
+    /** Ajustes › Cuenta (opcional). */
+    data object AccountR : Route
+    /** Ajustes › Widgets: widgets (Fase 3.4). */
+    data object Personalization : Route
+    /** Administración: sólo en la variante dev. */
+    data object Admin : Route
     /** «Informar de un error»: un reporte nuevo (null) o un borrador. */
     data class Support(val draftId: String?) : Route
+    /** Ayuda y soporte › Buzón de sugerencias (Cierre 1.0): el mismo formulario, como sugerencia. */
+    data class Suggest(val draftId: String?) : Route
     data object SupportDrafts : Route
     data object Appearance : Route
     data object ThemePicker : Route
@@ -325,10 +348,10 @@ fun NavBar(title: String?, onBack: (() -> Unit)?, trailing: @Composable () -> Un
                     .size(44.dp)
                     .then(
                         if (LocalGlass.current != null) {
-                            Modifier.glassInteractive(press, "Atrás", grow = 0.12f, onClick = onBack)
+                            Modifier.glassInteractive(press, L("Atrás"), grow = 0.12f, onClick = onBack)
                                 .liquidGlass(CircleShape, c.dark, GlassStyle.Button, press = press, fallback = material(c.dark))
                         } else {
-                            Modifier.background(material(c.dark, thick = true), CircleShape).tactile(label = "Atrás", onClick = onBack)
+                            Modifier.background(material(c.dark, thick = true), CircleShape).tactile(label = L("Atrás"), onClick = onBack)
                         },
                     ),
                 contentAlignment = Alignment.Center,

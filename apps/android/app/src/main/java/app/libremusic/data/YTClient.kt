@@ -120,6 +120,8 @@ object YTClient {
      * `searchAll` en iOS. Sólo falla si fallan las tres; si una falla, su sección sale vacía.
      */
     fun searchAll(query: String): SearchResults {
+        // Modo seguro (Fase 4): sin búsqueda remota; la música guardada y descargada sigue funcionando.
+        if (Incident.restricted) throw java.io.IOException("La búsqueda está en pausa mientras resolvemos un incidente.")
         val pool = java.util.concurrent.Executors.newFixedThreadPool(3)
         try {
             val songs = pool.submit<List<Song>?> { runCatching { search(query) }.getOrNull() }
@@ -176,6 +178,7 @@ object YTClient {
         var songs = emptyList<Song>()
         collect(json, "musicShelfRenderer") { shelf -> if (songs.isEmpty()) songs = parseSongs(shelf) }
         val carousels = mutableListOf<List<RemoteCollection>>()
+        val more = mutableListOf<BrowseRef?>()
         collect(json, "musicCarouselShelfRenderer") { shelf ->
             val items = mutableListOf<RemoteCollection>()
             collect(shelf, "musicTwoRowItemRenderer") { item ->
@@ -186,7 +189,14 @@ object YTClient {
                 val year = parts.last()
                 items += c.copy(subtitle = listOf(kind, name, year).filter { it.isNotEmpty() }.joinToString(" • "))
             }
-            if (items.isNotEmpty()) carousels += items
+            if (items.isNotEmpty()) {
+                carousels += items
+                // «Ver todo» de la sección: la página de discografía completa (lo que hace SimpMusic).
+                val end = shelf.optJSONObject("header")?.optJSONObject("musicCarouselShelfBasicHeaderRenderer")
+                    ?.optJSONObject("moreContentButton")?.optJSONObject("buttonRenderer")
+                    ?.optJSONObject("navigationEndpoint")?.optJSONObject("browseEndpoint")
+                more += end?.optString("browseId")?.ifEmpty { null }?.let { BrowseRef(it, end.optString("params").ifEmpty { null }) }
+            }
         }
         return ArtistPage(
             name = name,
@@ -194,7 +204,36 @@ object YTClient {
             songs = songs.map { if (it.artist.isEmpty()) it.copy(artist = name) else it },
             albums = carousels.getOrNull(0).orEmpty(),
             singles = carousels.getOrNull(1).orEmpty(),
+            albumsMore = more.getOrNull(0),
+            singlesMore = more.getOrNull(1),
         )
+    }
+
+    /**
+     * Discografía completa de una sección del artista («Ver todo»): YouTube Music la devuelve entera en una
+     * cuadrícula. Mismo formato de subtítulo que [artist] («Single • Artista • 2024»).
+     */
+    fun discography(ref: BrowseRef, artistName: String): List<RemoteCollection> {
+        val body = JSONObject().put("browseId", ref.browseId)
+        ref.params?.let { body.put("params", it) }
+        val json = browse(body)
+        val out = mutableListOf<RemoteCollection>()
+        val seen = HashSet<String>()
+        collect(json, "musicTwoRowItemRenderer") { item ->
+            val c = (parseTwoRow(item) as? HomeItem.CollectionItem)?.collection ?: return@collect
+            if (!c.id.startsWith("MPREb") || !seen.add(c.id)) return@collect
+            val parts = c.subtitle.split(" • ")
+            val kind = if (parts.size > 1) parts[0] else "Álbum"
+            out += c.copy(subtitle = listOf(kind, artistName, parts.last()).filter { it.isNotEmpty() }.joinToString(" • "))
+        }
+        return out
+    }
+
+    /** El artista con ese nombre exacto (sin tildes ni mayúsculas), para abrir su perfil desde un álbum o una canción. */
+    fun findArtist(name: String): RemoteArtist? {
+        val key = Discography.normalize(name)
+        val artists = searchAll(name).artists
+        return artists.firstOrNull { Discography.normalize(it.name) == key } ?: artists.firstOrNull()?.takeIf { key.isNotEmpty() && Discography.normalize(it.name).startsWith(key) }
     }
 
     fun suggestions(query: String): List<String> {

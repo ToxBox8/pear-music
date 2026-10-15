@@ -1,5 +1,7 @@
 package app.libremusic.jam
 
+
+import app.libremusic.L
 import android.content.Context
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
@@ -34,6 +36,8 @@ data class JamUiState(
     val joiningCode: String? = null,
     /** Motivo cuando phase == Lost (texto para el usuario). */
     val reason: String? = null,
+    /** Anfitrión: su dirección en la Wi-Fi («IP:puerto») para el QR, que así entra al momento (Fase 3.2). */
+    val direct: String? = null,
 )
 
 /**
@@ -65,6 +69,20 @@ object JamService {
     private var hostWriter: BufferedWriter? = null
     private var discovery: NsdManager.DiscoveryListener? = null
     private var searchTimeout: Job? = null
+    /** Direcciones directas vistas en enlaces o QR, por código (Fase 3.2). */
+    private val directHints = java.util.concurrent.ConcurrentHashMap<String, Pair<String, Int>>()
+    /** Gana el primer camino que conecta (directo o búsqueda en la Wi-Fi). */
+    private val connecting = java.util.concurrent.atomic.AtomicBoolean(false)
+    /** Android resuelve un anuncio a la vez: cola en vez de reintentos que podían perder el bueno. */
+    private val resolveQueue = ArrayDeque<NsdServiceInfo>()
+    private var resolving = false
+    private var joinStartedAt = 0L
+
+    /** Recuerda la dirección directa de un enlace o QR (`libremusic://jam/CÓDIGO?h=IP:puerto`). */
+    fun rememberLink(text: String?) {
+        val code = JamLink.codeFrom(text) ?: return
+        JamLink.directFrom(text)?.let { directHints[code] = it }
+    }
 
     fun init(context: Context) {
         appContext = context.applicationContext
@@ -85,6 +103,7 @@ object JamService {
                 val socket = ServerSocket(0)
                 server = socket
                 register(name, code, myName, socket.localPort)
+                localIpv4()?.let { ip -> _state.value = _state.value.copy(direct = "$ip:${socket.localPort}") }
                 while (!socket.isClosed) {
                     val client = socket.accept()
                     // Tope de conexiones: más que el máximo del Jam sólo puede ser alguien abusando de la red.
@@ -92,14 +111,15 @@ object JamService {
                     scope.launch { servePeer(client) }
                 }
             } catch (e: Exception) {
-                if (server != null && _state.value.phase == JamPhase.Hosting) lose("No se pudo crear el Jam en esta red.")
+                if (server != null && _state.value.phase == JamPhase.Hosting) lose(L("No se pudo crear el Jam en esta red."))
             }
         }
     }
 
     private fun register(name: String, code: String, host: String, port: Int) {
         val info = NsdServiceInfo().apply {
-            serviceName = name
+            // El código en el nombre: los invitados resuelven primero el que coincide (Fase 3.2).
+            serviceName = "${name.take(48)} · $code"
             serviceType = SERVICE_TYPE
             this.port = port
             setAttribute("v", JAM_PROTOCOL_VERSION.toString())
@@ -109,7 +129,7 @@ object JamService {
         val listener = object : NsdManager.RegistrationListener {
             override fun onServiceRegistered(serviceInfo: NsdServiceInfo) = Unit
             override fun onRegistrationFailed(serviceInfo: NsdServiceInfo, errorCode: Int) =
-                lose("No se pudo anunciar el Jam en la Wi-Fi ($errorCode).")
+                lose(L("No se pudo anunciar el Jam en la Wi-Fi ({0}).", errorCode))
             override fun onServiceUnregistered(serviceInfo: NsdServiceInfo) = Unit
             override fun onUnregistrationFailed(serviceInfo: NsdServiceInfo, errorCode: Int) = Unit
         }
@@ -191,55 +211,89 @@ object JamService {
         if (code.length != JamLink.CODE_LENGTH) return
         leave()
         _state.value = JamUiState(JamPhase.Searching, myName = myName, joiningCode = code)
+        joinStartedAt = android.os.SystemClock.elapsedRealtime()
+        connecting.set(false)
+        synchronized(resolveQueue) { resolveQueue.clear(); resolving = false }
         acquireMulticast()
         val listener = object : NsdManager.DiscoveryListener {
             override fun onDiscoveryStarted(serviceType: String) = Unit
             override fun onDiscoveryStopped(serviceType: String) = Unit
             override fun onStartDiscoveryFailed(serviceType: String, errorCode: Int) =
-                lose("No se pudo buscar en la Wi-Fi ($errorCode).")
+                lose(L("No se pudo buscar en la Wi-Fi ({0}).", errorCode))
             override fun onStopDiscoveryFailed(serviceType: String, errorCode: Int) = Unit
             override fun onServiceLost(serviceInfo: NsdServiceInfo) = Unit
             override fun onServiceFound(serviceInfo: NsdServiceInfo) {
-                if (_state.value.phase == JamPhase.Searching) resolve(serviceInfo, code, myName, attempt = 0)
+                if (_state.value.phase != JamPhase.Searching) return
+                synchronized(resolveQueue) {
+                    // El que lleva el código en el nombre, delante.
+                    if (serviceInfo.serviceName.endsWith(" · $code")) resolveQueue.addFirst(serviceInfo) else resolveQueue.addLast(serviceInfo)
+                }
+                resolveNext(code, myName)
             }
         }
         discovery = listener
         nsd.discoverServices(SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, listener)
+        // Atajo del QR: conexión directa a la vez que la búsqueda en la Wi-Fi; gana el primero.
+        directHints[code]?.let { (ip, port) -> scope.launch { connect(ip, port, code, myName, direct = true) } }
         searchTimeout = scope.launch {
             delay(30_000)
             if (_state.value.phase == JamPhase.Searching) {
-                lose("No se encontró ningún Jam con el código $code. Comprobad que estáis en la misma Wi-Fi.")
+                lose(L("No se encontró ningún Jam con el código {0}. Comprobad que estáis en la misma Wi-Fi.", code))
             }
         }
     }
 
+    /** Resuelve el siguiente anuncio de la cola (uno a la vez, como exige Android). */
     @Suppress("DEPRECATION") // resolveService sigue siendo la vía compatible con Android 8+
-    private fun resolve(info: NsdServiceInfo, code: String, myName: String, attempt: Int) {
+    private fun resolveNext(code: String, myName: String) {
+        val info = synchronized(resolveQueue) {
+            if (resolving || _state.value.phase != JamPhase.Searching) return
+            resolveQueue.removeFirstOrNull()?.also { resolving = true } ?: return
+        }
         nsd.resolveService(info, object : NsdManager.ResolveListener {
             override fun onResolveFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
-                // Android solo resuelve uno a la vez: reintento breve.
-                if (errorCode == NsdManager.FAILURE_ALREADY_ACTIVE && attempt < 5) {
-                    scope.launch {
-                        delay(300L * (attempt + 1))
-                        if (_state.value.phase == JamPhase.Searching) resolve(info, code, myName, attempt + 1)
-                    }
+                synchronized(resolveQueue) {
+                    resolving = false
+                    // Otro resolve seguía activo (de otra app): se vuelve a poner a la cola, al final.
+                    if (errorCode == NsdManager.FAILURE_ALREADY_ACTIVE) resolveQueue.addLast(info)
                 }
+                scope.launch { delay(150); resolveNext(code, myName) }
             }
 
             override fun onServiceResolved(serviceInfo: NsdServiceInfo) {
+                synchronized(resolveQueue) { resolving = false }
                 val txtCode = serviceInfo.attributes["code"]?.let { String(it, Charsets.UTF_8) }
-                val host = serviceInfo.host ?: return
-                if (txtCode != code || _state.value.phase != JamPhase.Searching) return
-                stopDiscovery()
-                scope.launch { connect(host.hostAddress ?: return@launch, serviceInfo.port, code, myName) }
+                val host = serviceInfo.host?.hostAddress
+                if (txtCode != code || host == null || _state.value.phase != JamPhase.Searching) {
+                    resolveNext(code, myName)
+                    return
+                }
+                scope.launch { connect(host, serviceInfo.port, code, myName) }
             }
         })
     }
 
-    private fun connect(address: String, port: Int, code: String, myName: String) {
+    /** La IPv4 privada de este móvil en la Wi-Fi (para el QR), o null. */
+    private fun localIpv4(): String? = runCatching {
+        java.net.NetworkInterface.getNetworkInterfaces().toList()
+            .filter { it.isUp && !it.isLoopback }
+            .sortedByDescending { it.name.startsWith("wlan") }
+            .flatMap { it.inetAddresses.toList() }
+            .firstOrNull { it is java.net.Inet4Address && it.isSiteLocalAddress }?.hostAddress
+    }.getOrNull()
+
+    private fun connect(address: String, port: Int, code: String, myName: String, direct: Boolean = false) {
+        if (connecting.get()) return
+        var owned = false
         try {
             val socket = Socket()
-            socket.connect(InetSocketAddress(address, port), 10_000)
+            // Directo (QR) con poco margen: si la IP ya no vale, la búsqueda en la Wi-Fi sigue por su lado.
+            socket.connect(InetSocketAddress(address, port), if (direct) 2_000 else 10_000)
+            // Gana el primero que conecta; el otro se cierra sin ruido.
+            if (!connecting.compareAndSet(false, true)) { runCatching { socket.close() }; return }
+            owned = true
+            stopDiscovery()
+            app.libremusic.data.Logs.i("LMJam", "join_ms=${android.os.SystemClock.elapsedRealtime() - joinStartedAt} via=${if (direct) "directo" else "wifi"}")
             hostSocket = socket
             val writer = BufferedWriter(OutputStreamWriter(socket.getOutputStream(), Charsets.UTF_8))
             hostWriter = writer
@@ -255,24 +309,29 @@ object JamService {
                         myName = msg.state.members.lastOrNull { it == myName || it.startsWith("$myName (") } ?: myName,
                     )
                     JamMessage.Ended -> {
-                        lose("El anfitrión ha terminado el Jam.")
+                        lose(L("El anfitrión ha terminado el Jam."))
                         return
                     }
                     is JamMessage.Error -> {
-                        lose(if (msg.reason == "full") "El Jam está lleno." else "El código no es válido.")
+                        lose(if (msg.reason == "full") L("El Jam está lleno.") else L("El código no es válido."))
                         return
                     }
                     else -> Unit
                 }
             }
-            if (_state.value.phase == JamPhase.Joined) lose("Se ha perdido la conexión con el anfitrión.")
+            if (_state.value.phase == JamPhase.Joined) lose(L("Se ha perdido la conexión con el anfitrión."))
         } catch (_: Exception) {
+            // Si falló el atajo directo antes de conectar, la búsqueda en la Wi-Fi sigue; no es un error todavía.
+            if (direct && !connecting.get()) return
             val phase = _state.value.phase
-            if (phase == JamPhase.Joined || phase == JamPhase.Searching) lose("No se pudo conectar con el Jam.")
+            if (phase == JamPhase.Joined || phase == JamPhase.Searching) lose(L("No se pudo conectar con el Jam."))
         } finally {
-            runCatching { hostSocket?.close() }
-            hostSocket = null
-            hostWriter = null
+            // Sólo limpia quien ganó: un intento perdedor no puede cerrar la conexión buena.
+            if (owned) {
+                runCatching { hostSocket?.close() }
+                hostSocket = null
+                hostWriter = null
+            }
         }
     }
 

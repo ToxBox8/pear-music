@@ -1,5 +1,7 @@
 package app.libremusic.data
 
+
+import app.libremusic.L
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -42,7 +44,7 @@ object AppleMusicImporter {
         val urlString = trimmed.split(Regex("\\s+")).firstOrNull { "music.apple.com" in it } ?: trimmed
         val host = runCatching { java.net.URI(urlString).host }.getOrNull()
         if (host == null || !host.endsWith("music.apple.com")) {
-            throw AppleMusicException("Pega un enlace de music.apple.com (Compartir → Copiar enlace).")
+            throw AppleMusicException(L("Pega un enlace de music.apple.com (Compartir → Copiar enlace)."))
         }
         val html = YTClient.http.newCall(Request.Builder().url(urlString).header("User-Agent", SAFARI_UA).build())
             .execute().use { it.body?.string().orEmpty() }
@@ -58,7 +60,7 @@ object AppleMusicImporter {
                 }
             } }
         }
-        var name = "Playlist de Apple Music"
+        var name = L("Playlist de Apple Music")
         script(html, "type=\"application/ld+json\"")?.let { ld ->
             runCatching {
                 val obj = JSONObject(ld)
@@ -68,7 +70,7 @@ object AppleMusicImporter {
                 }
             }
         }
-        if (tracks.isEmpty()) throw AppleMusicException("No se encontraron canciones. ¿La playlist es pública?")
+        if (tracks.isEmpty()) throw AppleMusicException(L("No se encontraron canciones. ¿La playlist es pública?"))
         val artwork = meta(html, "og:image")?.replace(Regex("/\\d+x\\d+[^/?]*\\.jpg(\\?.*)?$"), "/600x600bb.jpg")
         AMPlaylist(name, tracks, artwork)
     }

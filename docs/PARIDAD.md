@@ -22,8 +22,10 @@ bloques de texto largos miden un poco más o menos.
 | Barras de pestañas, «Cerrar», hojas | El cristal líquido de iOS 26 refracta el fondo; Android usa un velo translúcido con la misma forma, o su propio cristal líquido si se activa en Aspecto (los botones de dentro de una pantalla no refractan) | Efecto del sistema |
 | Deslizar entre pestañas | iOS cambia al soltar; Android enseña la pestaña vecina mientras se arrastra | `TabView` de SwiftUI no deja dibujar la vecina |
 | Colores de la portada | Mismos presets, barras y contraste mínimo; el tinte de Android se calcula con HSV y el de iOS con HSB | Cada sistema tiene su espacio de color |
-| Icono de la app | Android cambia de `activity-alias` (el lanzador tarda unos segundos y puede quitar el acceso directo); iOS usa iconos alternativos y enseña un aviso del sistema | APIs de cada sistema |
 | Ajustes › Aspecto | «Cristal líquido» sólo en Android | El cristal de iOS 26 lo da el sistema |
+| Recorrido de la bienvenida | Android pone el foco en cada pestaña; iOS resalta la barra entera (el Jam y Ajustes arriba, con foco exacto) | La barra de pestañas de iOS es del sistema y no deja medir cada botón |
+| Aviso de versión nueva | Android descarga, verifica e instala el APK; iOS abre AltStore/SideStore | iOS no deja que una app se instale sola |
+| Widgets y Ajustes › Personalización | Sólo Android por ahora | iOS necesita una extensión de WidgetKit; se hará cuando se pueda compilar iOS (CI) |
 | 07 Ajustes | «AirPlay» con su selector (iOS) / «Salida de audio» con chevron (Android); versión de la app | AirPlay sólo existe en Apple |
 | 09–13 Reproductores | Icono de AirPlay / icono de Cast | AirPlay → salida de audio del sistema |
 | 12 Air | Casilla «iPhone» / «Este móvil» | Nombre de la salida de audio de cada sistema |
@@ -57,7 +59,7 @@ Lo nuevo se hizo igual en las dos apps (mismos textos, ajustes y formatos). Andr
 | Pestañas | Orden fijo | Ordenables, Descubrir primero, abre en la última usada |
 | Soporte | No existía | Escarabajo en Ajustes, formulario con borradores |
 | Importar | Apple Music y copia | También Spotify (enlace, CSV) y SimpMusic, con revisión |
-| Icono | Violeta | Encendido original por defecto; el violeta, elegible |
+| Icono | Violeta | Encendido (logo de Pear Music); el violeta ya no está |
 | Menú de canción con música (Android) | Fallaba la mitad de las veces | Sale siempre (el gesto ya no se reinicia al redibujar) |
 | Casete y vinilo en horizontal (Android) | Barra de estado encima | Sin barras del sistema, como iOS |
 

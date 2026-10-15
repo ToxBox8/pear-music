@@ -58,3 +58,15 @@ Transporte abierto que ambas plataformas implementan con APIs nativas:
 1. Android implementa v2 desde el principio. **Hecho en Android 0.5.0** (`apps/android/.../jam/`, con tests del formato).
 2. iOS añade v2 junto a v1: el anfitrión anuncia los dos y el invitado busca en los dos y se queda con el primero que encuentre el código. **Hecho en iOS 1.2.0** (pendiente de prueba en dispositivos). Retirar v1 más adelante.
 3. Probar pronto con dispositivos reales iPhone ↔ Android en la misma Wi-Fi, incluidas redes con aislamiento de clientes.
+
+## Entrar más rápido (Android 1.0 / iOS 2.0)
+
+- **Enlace y QR con la dirección del anfitrión:** `libremusic://jam/CÓDIGO?h=IP:PUERTO` (IPv4 privada de la Wi-Fi y
+  puerto TCP del Jam). Quien lo escanea abre la conexión directa **a la vez** que la búsqueda en la red y gana la
+  primera que conecte; el intento directo se abandona a los 2 s. Sólo se aceptan IPs privadas (10/8, 172.16/12,
+  192.168/16) y puertos 1024–65535. Las versiones anteriores leen sólo la ruta e ignoran `?h=`.
+- **Código en el nombre del anuncio:** `«Nombre del Jam» · CÓDIGO`. Android sólo puede resolver un anuncio a la vez:
+  los invitados ponen delante de la cola el que acaba en su código. El código sigue en el TXT, que es lo que vale.
+- **Cola de resolución en Android** en lugar de reintentos con espera: antes, con varios Jams en la red, el bueno
+  podía descartarse tras 5 reintentos.
+- Tiempo de entrada en el registro: `LMJam join_ms=… via=directo|wifi` (`adb logcat -s LMJam`).

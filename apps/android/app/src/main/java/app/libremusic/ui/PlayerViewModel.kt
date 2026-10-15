@@ -1,5 +1,7 @@
 package app.libremusic.ui
 
+
+import app.libremusic.L
 import android.app.Application
 import android.content.ComponentName
 import androidx.lifecycle.AndroidViewModel
@@ -55,7 +57,7 @@ class PlayerViewModel(app: Application) : AndroidViewModel(app) {
         override fun onEvents(player: Player, events: Player.Events) = sync()
         override fun onPlayerError(error: PlaybackException) {
             _state.value = _state.value.copy(
-                error = "No se pudo reproducir: ${error.cause?.message ?: error.errorCodeName}",
+                error = L("No se pudo reproducir: {0}", error.cause?.message ?: error.errorCodeName),
             )
         }
     }

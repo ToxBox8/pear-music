@@ -1,5 +1,7 @@
 package app.libremusic.data
 
+
+import app.libremusic.L
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -14,6 +16,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
@@ -44,11 +47,13 @@ data class SupportDraft(
     val text: String = "",
     val photos: List<String> = emptyList(),
     val updated: Long = System.currentTimeMillis(),
+    /** «error» (Informar de un error) o «sugerencia» (Buzón de sugerencias). */
+    val kind: String = "error",
 ) {
     val isEmpty get() = email.isBlank() && text.isBlank() && photos.isEmpty()
 
     fun toJson(): JSONObject = JSONObject().put("id", id).put("email", email).put("text", text)
-        .put("photos", JSONArray(photos)).put("updated", updated)
+        .put("photos", JSONArray(photos)).put("updated", updated).put("kind", kind)
 
     companion object {
         fun fromJson(o: JSONObject) = SupportDraft(
@@ -57,25 +62,37 @@ data class SupportDraft(
             text = o.optString("text"),
             photos = o.optJSONArray("photos")?.let { a -> (0 until a.length()).map { a.getString(it) } }.orEmpty(),
             updated = o.optLong("updated"),
+            kind = if (o.optString("kind") == "sugerencia") "sugerencia" else "error",
         )
     }
 }
 
-/** Borradores guardados en el móvil (`filesDir/support/drafts.json`), el más reciente primero. */
-class SupportStore(private val dir: File) {
+/** Borradores guardados en el móvil (`filesDir/support/drafts.json`, cifrado), el más reciente primero. */
+class SupportStore(private val dir: File, private val box: Box = SecureBox) {
     private val file = File(dir, "drafts.json")
     private val _drafts = MutableStateFlow(load())
     val drafts: StateFlow<List<SupportDraft>> = _drafts.asStateFlow()
 
     private fun load(): List<SupportDraft> = runCatching {
-        val a = JSONArray(file.readText())
-        (0 until a.length()).map { SupportDraft.fromJson(a.getJSONObject(it)) }
+        val bytes = file.readBytes()
+        // Hasta la 0.9.5 se guardaba en claro (empieza por «[»): se lee y se vuelve a guardar cifrado.
+        val legacy = bytes.isNotEmpty() && bytes[0] == '['.code.toByte()
+        val a = JSONArray(String(if (legacy) bytes else box.open(bytes)))
+        (0 until a.length()).map { SupportDraft.fromJson(a.getJSONObject(it)) }.also { if (legacy) write(it) }
     }.getOrDefault(emptyList()).sortedByDescending { it.updated }
 
     private fun persist(list: List<SupportDraft>) {
         _drafts.value = list.sortedByDescending { it.updated }
-        dir.mkdirs()
-        file.writeText(JSONArray().apply { _drafts.value.forEach { put(it.toJson()) } }.toString())
+        write(_drafts.value)
+    }
+
+    /** El correo y el texto van cifrados con [SecureBox] (ver docs/SEGURIDAD.md). */
+    private fun write(list: List<SupportDraft>) {
+        val json = JSONArray().apply { list.forEach { put(it.toJson()) } }.toString()
+        // Si el Keystore falla (raro, pero pasa en algún móvil), el borrador se queda sólo en memoria: nunca en claro
+        // en el disco, y nunca un cierre de la app al salir del formulario.
+        runCatching { dir.mkdirs(); file.writeBytes(box.seal(json.toByteArray())) }
+            .onFailure { Logs.w("Support", "No se pudo guardar el borrador cifrado: ${it.javaClass.simpleName}") }
     }
 
     /** Guarda (o quita, si está vacío) el borrador. */
@@ -141,12 +158,27 @@ object SupportClient {
         }.getOrNull()
     }
 
-    /** Envía el reporte. Devuelve null si ha llegado, o el motivo para enseñárselo al usuario. */
-    suspend fun send(context: Context, d: SupportDraft, appVersion: String): String? = withContext(Dispatchers.IO) {
+    /** Resultado de enviar: `error` null si ha llegado; si el servidor lo rechazó por el contenido, `denialId`
+     *  permite apelar (`appeal`). */
+    data class Result(val error: String?, val denialId: String? = null, val ticket: Int? = null)
+
+    /** El id anónimo con el que se piden las respuestas del soporte, sólo si ya se envió algo desde aquí. */
+    fun sentDeviceId(context: Context): String? {
         val sp = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
-        val deviceId = sp.getString("supportDeviceId", null) ?: UUID.randomUUID().toString().also {
+        return if (sp.getBoolean("supportSent", false)) sp.getString("supportDeviceId", null) else null
+    }
+
+    private fun deviceId(context: Context): String {
+        val sp = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
+        return sp.getString("supportDeviceId", null) ?: UUID.randomUUID().toString().also {
             sp.edit().putString("supportDeviceId", it).apply()
         }
+    }
+
+    /** Envía el reporte. */
+    suspend fun send(context: Context, d: SupportDraft, appVersion: String): Result = withContext(Dispatchers.IO) {
+        if (Incident.restricted) return@withContext Result(L("El soporte está en pausa mientras resolvemos un incidente. Tu reporte se queda en Borradores."))
+        val deviceId = deviceId(context)
         val body = MultipartBody.Builder().setType(MultipartBody.FORM)
             .addFormDataPart("email", d.email.trim())
             .addFormDataPart("text", d.text.trim())
@@ -155,6 +187,7 @@ object SupportClient {
             .addFormDataPart("os", "Android ${android.os.Build.VERSION.RELEASE}")
             .addFormDataPart("model", "${android.os.Build.MANUFACTURER} ${android.os.Build.MODEL}")
             .addFormDataPart("deviceId", deviceId)
+            .addFormDataPart("kind", d.kind)
             .apply {
                 d.photos.map(::File).filter { it.exists() }.forEachIndexed { i, f ->
                     addFormDataPart("photo$i", "foto-${i + 1}.jpg", f.asRequestBody("image/jpeg".toMediaType()))
@@ -163,12 +196,34 @@ object SupportClient {
             .build()
         try {
             YTClient.http.newCall(Request.Builder().url(ENDPOINT).post(body).build()).execute().use { res ->
-                if (res.isSuccessful) null
-                else runCatching { JSONObject(res.body?.string().orEmpty()).optString("error") }.getOrNull()?.ifEmpty { null }
-                    ?: "El servidor de soporte no responde (${res.code}). Prueba más tarde."
+                val json = runCatching { JSONObject(res.body?.string().orEmpty()) }.getOrNull()
+                if (res.isSuccessful) {
+                    // Desde ahora la campana pregunta por las respuestas a sus tickets.
+                    context.getSharedPreferences("settings", Context.MODE_PRIVATE).edit().putBoolean("supportSent", true).apply()
+                    return@use Result(null, ticket = json?.optInt("ticket")?.takeIf { it > 0 })
+                }
+                Result(
+                    json?.optString("error")?.ifEmpty { null } ?: L("El servidor de soporte no responde ({0}). Prueba más tarde.", res.code),
+                    json?.optString("denialId")?.ifEmpty { null },
+                )
             }
         } catch (e: java.io.IOException) {
-            "Sin conexión. Inténtalo cuando tengas internet."
+            Result(L("Sin conexión. Inténtalo cuando tengas internet."))
+        }
+    }
+
+    /** Apela un rechazo (sólo desde el móvil que lo envió). Devuelve null si ha llegado, o el motivo. */
+    suspend fun appeal(context: Context, denialId: String, email: String, text: String): String? = withContext(Dispatchers.IO) {
+        val body = JSONObject().put("denialId", denialId).put("deviceId", deviceId(context)).put("email", email.trim()).put("text", text.trim())
+            .toString().toRequestBody("application/json".toMediaType())
+        try {
+            YTClient.http.newCall(Request.Builder().url(ENDPOINT.replace("/report", "/appeal")).post(body).build()).execute().use { res ->
+                if (res.isSuccessful) null
+                else runCatching { JSONObject(res.body?.string().orEmpty()).optString("error") }.getOrNull()?.ifEmpty { null }
+                    ?: L("El servidor de soporte no responde ({0}). Prueba más tarde.", res.code)
+            }
+        } catch (e: java.io.IOException) {
+            L("Sin conexión. Inténtalo cuando tengas internet.")
         }
     }
 }

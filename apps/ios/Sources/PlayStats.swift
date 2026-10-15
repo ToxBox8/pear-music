@@ -13,8 +13,8 @@ final class PlayStats: ObservableObject {
         var id: String { rawValue }
         var title: String {
             switch self {
-            case .month: return "Este mes"
-            case .year: return "Este año"
+            case .month: return L("Este mes")
+            case .year: return L("Este año")
             case .all: return "Siempre"
             }
         }
@@ -118,7 +118,7 @@ struct StatsView: View {
                 .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
             }
             if s.plays == 0 {
-                Text("Aún no hay escuchas en este periodo. Cuenta cada canción que suena al menos 30 segundos.")
+                Text(L("Aún no hay escuchas en este periodo. Cuenta cada canción que suena al menos 30 segundos."))
                     .font(.headline).foregroundStyle(.secondary).multilineTextAlignment(.center)
                     .frame(maxWidth: .infinity).padding(.top, 40)
                     .listRowBackground(Color.clear)
@@ -145,7 +145,7 @@ struct StatsView: View {
                     VStack(alignment: .leading, spacing: 14) {
                         Text("\(times(s.plays, "escucha", "escuchas")) de \(songCount(s.songs)) y \(times(s.artists, "artista", "artistas"))")
                             .font(.subheadline).foregroundStyle(.secondary).textCase(nil)
-                        Text("Lo que más escuchas").font(.title3.bold()).foregroundStyle(.primary).textCase(nil)
+                        Text(L("Lo que más escuchas")).font(.title3.bold()).foregroundStyle(.primary).textCase(nil)
                     }
                 }
                 Section {
@@ -166,19 +166,19 @@ struct StatsView: View {
                     }
                     .glassRow()
                 } header: {
-                    Text("Tus artistas").font(.title3.bold()).foregroundStyle(.primary).textCase(nil)
+                    Text(L("Tus artistas")).font(.title3.bold()).foregroundStyle(.primary).textCase(nil)
                 }
             }
             if !stats.plays.isEmpty {
                 Section {
-                    HoldToConfirmButton(title: "Mantén para borrar las estadísticas") { stats.clear() }
+                    HoldToConfirmButton(title: L("Mantén para borrar las estadísticas")) { stats.clear() }
                         .listRowBackground(Color.clear)
                 } footer: {
-                    Text("Se guardan sólo en este móvil y no salen en la copia de la biblioteca.")
+                    Text(L("Se guardan sólo en este móvil y no salen en la copia de la biblioteca."))
                 }
             }
         }
-        .navigationTitle("Estadísticas")
+        .navigationTitle(L("Estadísticas"))
         .themed()
     }
 

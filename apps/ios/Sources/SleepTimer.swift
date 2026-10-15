@@ -60,10 +60,10 @@ final class SleepTimer: ObservableObject {
     func label(_ s: State? = nil) -> String? {
         switch s ?? state {
         case .off: return nil
-        case .endOfSong: return "Se para al acabar la canción"
+        case .endOfSong: return L("Se para al acabar la canción")
         case .at:
             let secs = Int((remaining(s) ?? 0).rounded(.up))
-            return secs >= 60 ? "Se para en \((secs + 59) / 60) min" : "Se para en \(secs) s"
+            return secs >= 60 ? L("Se para en {0} min", (secs + 59) / 60) : L("Se para en {0} s", secs)
         }
     }
 
@@ -109,7 +109,7 @@ struct SleepTimerButton: View {
                 }
             }
             Button { timer.endOfSong() } label: {
-                Label("Al acabar la canción", systemImage: timer.state == .endOfSong ? "checkmark" : "music.note")
+                Label(L("Al acabar la canción"), systemImage: timer.state == .endOfSong ? "checkmark" : "music.note")
             }
             if timer.state != .off {
                 Divider()
@@ -122,7 +122,7 @@ struct SleepTimerButton: View {
                 .frame(width: 44, height: 44)
                 .contentShape(Rectangle())
         }
-        .accessibilityLabel(timer.label().map { "Temporizador: \($0)" } ?? "Temporizador para dormir")
+        .accessibilityLabel(timer.label().map { "Temporizador: \($0)" } ?? L("Temporizador para dormir"))
     }
 }
 

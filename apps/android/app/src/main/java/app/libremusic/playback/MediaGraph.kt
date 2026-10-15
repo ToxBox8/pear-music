@@ -69,7 +69,7 @@ object MediaGraph {
         } catch (e: androidx.media3.datasource.HttpDataSource.InvalidResponseCodeException) {
             val id = dataSpec.uri.takeIf { it.scheme == "libremusic" }?.lastPathSegment
             if (e.responseCode != 403 || id == null) throw e
-            android.util.Log.w("LMStream", "403 en $id: identificador y URL nuevos")
+            app.libremusic.data.Logs.w("LMStream", "403 en $id: identificador y URL nuevos")
             runCatching { inner.close() }
             onForbidden(id)
             inner.open(dataSpec)

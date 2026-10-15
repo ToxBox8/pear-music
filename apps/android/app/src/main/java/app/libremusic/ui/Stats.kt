@@ -1,5 +1,7 @@
 package app.libremusic.ui
 
+
+import app.libremusic.L
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -49,14 +51,14 @@ fun StatsScreen() {
         ThemeBackdrop(player.isPlaying, player.current)
         LazyColumn(Modifier.fillMaxSize()) {
             item { NavBar(null, onBack = { env.app.pop() }) }
-            item { LargeTitle("Estadísticas", Modifier.padding(bottom = 8.dp)) }
+            item { LargeTitle(L("Estadísticas"), Modifier.padding(bottom = 8.dp)) }
             item {
                 Box(Modifier.padding(horizontal = 16.dp, vertical = 4.dp)) {
                     Segmented(PlayStats.Period.entries.map { it.key to it.title }, periodKey) { periodKey = it }
                 }
             }
             if (summary.plays == 0) {
-                item { CenterNote("Aún no hay escuchas en este periodo. Cuenta cada canción que suena al menos 30 segundos.", 48.dp) }
+                item { CenterNote(L("Aún no hay escuchas en este periodo. Cuenta cada canción que suena al menos 30 segundos."), 48.dp) }
             } else {
                 item {
                     Text(
@@ -65,7 +67,7 @@ fun StatsScreen() {
                         modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 14.dp, bottom = 6.dp),
                     )
                 }
-                item { StatsHeader("Lo que más escuchas") }
+                item { StatsHeader(L("Lo que más escuchas")) }
                 val top = summary.topSongs.map { it.first }
                 itemsIndexed(summary.topSongs, key = { _, it -> "s" + it.first.id }) { i, (song, n) ->
                     GlassRowItem({ env.player.play(top, i) }) {
@@ -81,7 +83,7 @@ fun StatsScreen() {
                         Text(times(n, "vez", "veces"), style = tnum, color = c.secondaryLabel)
                     }
                 }
-                item { StatsHeader("Tus artistas") }
+                item { StatsHeader(L("Tus artistas")) }
                 itemsIndexed(summary.topArtists, key = { _, it -> "a" + it.first }) { i, (name, n) ->
                     val cover = summary.topSongs.firstOrNull { primaryArtist(it.first.artist) == name }?.first
                         ?: data.songs.values.firstOrNull { primaryArtist(it.artist) == name }
@@ -99,9 +101,9 @@ fun StatsScreen() {
             if (data.plays.isNotEmpty()) {
                 item {
                     Column(Modifier.padding(start = 16.dp, end = 16.dp, top = 28.dp)) {
-                        HoldToConfirmButton("Mantén para borrar las estadísticas") { PlayStats.clear() }
+                        HoldToConfirmButton(L("Mantén para borrar las estadísticas")) { PlayStats.clear() }
                         Text(
-                            "Se guardan sólo en este móvil y no salen en la copia de la biblioteca.",
+                            L("Se guardan sólo en este móvil y no salen en la copia de la biblioteca."),
                             style = Typo.footnote, color = c.secondaryLabel, modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                         )
                     }

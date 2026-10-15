@@ -110,20 +110,20 @@ struct SearchSettings: View {
     var body: some View {
         Form {
             Section {
-                Picker("Buscar", selection: $searchPlacement) {
+                Picker(L("Buscar"), selection: $searchPlacement) {
                     Label("Barra arriba en Inicio", systemImage: "house").tag("home")
                     Label("Pestaña aparte", systemImage: "magnifyingglass").tag("tab")
                 }
                 .pickerStyle(.inline)
                 .labelsHidden()
-            } header: { Text("Dónde buscar") } footer: {
+            } header: { Text(L("Dónde buscar")) } footer: {
                 Text(searchPlacement == "tab"
-                     ? "Buscar tiene su propia pestaña en la barra de abajo."
-                     : "La barra de búsqueda está siempre arriba en Inicio y la pestaña Buscar desaparece.")
+                     ? L("Buscar tiene su propia pestaña en la barra de abajo.")
+                     : L("La barra de búsqueda está siempre arriba en Inicio y la pestaña Buscar desaparece."))
             }
             .glassRow()
         }
-        .navigationTitle("Buscar")
+        .navigationTitle(L("Buscar"))
         .navigationBarTitleDisplayMode(.inline)
         .themed()
     }
@@ -152,26 +152,26 @@ struct AppearanceSettings: View {
                 .padding(.vertical, 6)
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
-            } header: { Text("Tema") } footer: {
-                Text("El tema cambia el fondo, las tarjetas, el color y la letra. Los fondos toman los colores de la carátula y se animan más mientras suena música.")
+            } header: { Text(L("Tema")) } footer: {
+                Text(L("El tema cambia el fondo, las tarjetas, el color y la letra. Los fondos toman los colores de la carátula y se animan más mientras suena música."))
             }
 
             Section {
-                Picker("Modo", selection: $appearance) {
-                    Text("Automático").tag("system")
-                    Text("Claro").tag("light")
-                    Text("Oscuro").tag("dark")
+                Picker(L("Modo"), selection: $appearance) {
+                    Text(L("Automático")).tag("system")
+                    Text(L("Claro")).tag("light")
+                    Text(L("Oscuro")).tag("dark")
                 }
                 .pickerStyle(.segmented)
                 .disabled(theme.scheme != nil)
-            } header: { Text("Claro u oscuro") } footer: {
+            } header: { Text(L("Claro u oscuro")) } footer: {
                 if let forced = theme.scheme {
-                    Text("«\(theme.name)» usa siempre el modo \(forced == .dark ? "oscuro" : "claro").")
+                    Text(forced == .dark ? L("«{0}» usa siempre el modo oscuro.", theme.name) : L("«{0}» usa siempre el modo claro.", theme.name))
                 }
             }
             .glassRow()
         }
-        .navigationTitle("Tema")
+        .navigationTitle(L("Tema"))
         .navigationBarTitleDisplayMode(.inline)
         .themed()
     }
@@ -189,7 +189,7 @@ struct ThemeCard: View {
                 BackdropPreview(theme: theme)
                 HStack(spacing: 6) {
                     Circle().fill(theme.accent).frame(width: 8, height: 8)
-                    Text("Aa").font(.system(.subheadline, design: theme.fontDesign).weight(.semibold))
+                    Text(L("Aa")).font(.system(.subheadline, design: theme.fontDesign).weight(.semibold))
                 }
                 .padding(.horizontal, 10).padding(.vertical, 6)
                 .background(ThemeSurface(radius: 10, theme: theme))
@@ -228,22 +228,22 @@ struct PlayerSettings: View {
                 DeckPicker()
                     .listRowBackground(Color.clear)
                     .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
-            } header: { Text("Reproductor multimedia") } footer: {
-                Text("Casete: gira una bobina o arrastra la cinta para avanzar o rebobinar. Vinilo: gira el disco con el dedo o mueve el brazo. Con el iPhone en horizontal, el casete o el vinilo ocupan toda la pantalla. También puedes cambiarlo manteniendo pulsado el mini reproductor.")
+            } header: { Text(L("Reproductor multimedia")) } footer: {
+                Text(L("Casete: gira una bobina o arrastra la cinta para avanzar o rebobinar. Vinilo: gira el disco con el dedo o mueve el brazo. Con el iPhone en horizontal, el casete o el vinilo ocupan toda la pantalla. También puedes cambiarlo manteniendo pulsado el mini reproductor."))
             }
 
             Section {
                 Toggle(isOn: $scramble) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Efecto en los títulos")
-                        Text("Al cambiar de canción, el título aparece entre símbolos que se ordenan")
+                        Text(L("Efecto en los títulos"))
+                        Text(L("Al cambiar de canción, el título aparece entre símbolos que se ordenan"))
                             .font(.footnote).foregroundStyle(.secondary)
                     }
                 }
             }
             .glassRow()
         }
-        .navigationTitle("Reproductor")
+        .navigationTitle(L("Reproductor"))
         .navigationBarTitleDisplayMode(.inline)
         .themed()
     }
@@ -258,13 +258,13 @@ struct LibrarySettings: View {
 
     var body: some View {
         Form {
-            Section("Ordenar playlists por") {
-                Picker("Ordenar", selection: $sort) {
-                    Text("Añadidas recientemente").tag("recent")
-                    Text("Nombre (A-Z)").tag("name")
-                    Text("Nombre (Z-A)").tag("nameDesc")
-                    Text("Nº de canciones").tag("count")
-                    Text("A mano").tag("custom")
+            Section(L("Ordenar playlists por")) {
+                Picker(L("Ordenar"), selection: $sort) {
+                    Text(L("Añadidas recientemente")).tag("recent")
+                    Text(L("Nombre (A-Z)")).tag("name")
+                    Text(L("Nombre (Z-A)")).tag("nameDesc")
+                    Text(L("Nº de canciones")).tag("count")
+                    Text(L("A mano")).tag("custom")
                 }
                 .pickerStyle(.inline)
                 .labelsHidden()
@@ -274,33 +274,33 @@ struct LibrarySettings: View {
             Section {
                 Button { showReorder = true } label: { Label("Ordenar a mano", systemImage: "line.3.horizontal") }
             } footer: {
-                Text("Arrastra las playlists, Descargadas y Favoritos para colocarlas donde quieras.")
+                Text(L("Arrastra las playlists, Descargadas y Favoritos para colocarlas donde quieras."))
             }
             .glassRow()
 
             Section {
-                Picker("Descargadas y Favoritos", selection: $placement) {
-                    Text("En Playlists (portada grande)").tag("playlists")
-                    Text("En «Tu música» (fila)").tag("music")
+                Picker(L("Descargadas y Favoritos"), selection: $placement) {
+                    Text(L("En Playlists (portada grande)")).tag("playlists")
+                    Text(L("En «Tu música» (fila)")).tag("music")
                 }
                 .pickerStyle(.inline)
                 .labelsHidden()
-            } header: { Text("Descargadas y Favoritos") } footer: {
-                Text(placement == "music" ? "Aparecen como filas en «Tu música», encima de Canciones." : "Aparecen con su portada grande en el carrusel de Playlists.")
+            } header: { Text(L("Descargadas y Favoritos")) } footer: {
+                Text(placement == "music" ? L("Aparecen como filas en «Tu música», encima de Canciones.") : L("Aparecen con su portada grande en el carrusel de Playlists."))
             }
             .glassRow()
 
             Section {
-                Picker("Buscar", selection: $searchPlacement) {
-                    Text("Barra arriba en Inicio").tag("home")
-                    Text("Pestaña aparte").tag("tab")
+                Picker(L("Buscar"), selection: $searchPlacement) {
+                    Text(L("Barra arriba en Inicio")).tag("home")
+                    Text(L("Pestaña aparte")).tag("tab")
                 }
                 .pickerStyle(.inline)
                 .labelsHidden()
-            } header: { Text("Dónde está Buscar") } footer: {
+            } header: { Text(L("Dónde está Buscar")) } footer: {
                 Text(searchPlacement == "tab"
-                     ? "Buscar tiene su propia pestaña en la barra de abajo, justo después de Inicio."
-                     : "La barra de búsqueda está siempre arriba en Inicio.")
+                     ? L("Buscar tiene su propia pestaña en la barra de abajo, justo después de Inicio.")
+                     : L("La barra de búsqueda está siempre arriba en Inicio."))
             }
             .glassRow()
 
@@ -312,15 +312,15 @@ struct LibrarySettings: View {
                     Label("Eliminar playlists", systemImage: "trash").foregroundStyle(.red)
                 }
             } footer: {
-                Text("Antes de borrar se pide confirmación.")
+                Text(L("Antes de borrar se pide confirmación."))
             }
             .glassRow()
 
-            ResetSection(section: "Biblioteca", what: "Las playlists vuelven a ordenarse por recientes, Descargadas y Favoritos al carrusel y Buscar a Inicio. No se borra ninguna playlist.") {
+            ResetSection(section: L("Biblioteca"), what: L("Las playlists vuelven a ordenarse por recientes, Descargadas y Favoritos al carrusel y Buscar a Inicio. No se borra ninguna playlist.")) {
                 SettingsReset.library()
             }
         }
-        .navigationTitle("Biblioteca")
+        .navigationTitle(L("Biblioteca"))
         .navigationBarTitleDisplayMode(.inline)
         .themed()
         .sheet(isPresented: $showReorder) { ReorderPlaylistsView() }
@@ -343,8 +343,8 @@ struct AboutView: View {
                         .frame(width: 96, height: 96)
                         .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
                         .shadow(color: .black.opacity(0.2), radius: 10, y: 5)
-                    Text("Pear Music").font(.title2.bold())
-                    Text("Versión \(Self.version)").font(.subheadline).foregroundStyle(.secondary)
+                    Text(L("Pear Music")).font(.title2.bold())
+                    Text(L("Versión {0}", Self.version)).font(.subheadline).foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity)
                 .padding(.vertical, 8)
@@ -352,19 +352,23 @@ struct AboutView: View {
             }
 
             Section {
-                Text("Cliente no oficial de YouTube Music. Usa una API no oficial de YouTube, así que puede dejar de funcionar si YouTube la cambia. Las descargas se guardan en este iPhone.")
+                Text(L("Cliente no oficial de YouTube Music. Usa una API no oficial de YouTube, así que puede dejar de funcionar si YouTube la cambia. Las descargas se guardan en este iPhone."))
                     .font(.subheadline)
             }
             .glassRow()
 
-            Section("Créditos") {
+            Section(L("Créditos")) {
                 Link(destination: URL(string: "https://www.dqnamo.com/kitchen")!) {
-                    Label("Componentes inspirados en The Kitchen de dqnamo", systemImage: "fork.knife")
+                    Label(L("Componentes inspirados en The Kitchen de dqnamo"), systemImage: "fork.knife")
+                }
+                // SimpMusic (GPL-3.0): la barra estilo SimpMusic sale de su diseño. Lo pidió Toxbox.
+                Link(destination: URL(string: "https://github.com/maxrave-dev/SimpMusic")!) {
+                    Label(L("Barra inferior inspirada en SimpMusic, de maxrave-dev (GPL-3.0)"), systemImage: "music.note.house")
                 }
             }
             .glassRow()
         }
-        .navigationTitle("Acerca de")
+        .navigationTitle(L("Acerca de"))
         .navigationBarTitleDisplayMode(.inline)
         .themed()
     }

@@ -1,0 +1,971 @@
+1	\n\nIt updates in place with AltStore or SideStore: you keep your library and downloaded songs.
+2	\n\nIt updates in place: you keep your library and downloaded songs.
+3	 (ticket #{0}). We'll reply in Notices.
+4	 Settings is at the top of Home and isn't part of the order (change it in Appearance).
+5	 The {0} missing ones stay in the playlist under "Not added" so you can search for them again.
+6	 · Search 
+7	 · Colours {0}
+8	 · most likely
+9	 · ticket #{0}
+10	 · animated titles
+11	 · {0} offline
+12	. Thank you!
+13	1 song
+14	Up next
+15	Custom
+16	Custom…
+17	Aa
+18	Open Discover in {0}
+19	Open the Jam (the three-people icon)
+20	Open Settings
+21	Open Discover
+22	Open the Jam
+23	Open link
+24	Open player
+25	Quick actions
+26	Accept the terms to continue
+27	I accept the terms of use
+28	About
+29	On
+30	Update saved playlist
+31	Turn it on in Settings or type the code by hand.
+32	Administration
+33	It affects everyone who uses Pear Music as soon as they open the app.
+34	Not now, continue
+35	Now playing
+36	Now playing (large)
+37	Data saver
+38	Air
+39	AirPods Max
+40	AirPods Pro
+41	Fine tuning
+42	Settings
+43	Settings is one more tab in the bar; choose its place in Tabs.
+44	Settings is at the top of Home, next to the Jam, and takes no space in the bar.
+45	When the song ends
+46	When the song changes, the title appears among symbols that fall into place
+47	When importing from Spotify or Apple Music, how much a song's length may differ and still count as a match
+48	While a song plays, the app and its menus take on colours like its cover, as in Discover.
+49	Shuffle
+50	Some photos couldn't be added
+51	Some photos couldn't be added.
+52	Speakers, HomePod and Apple TV
+53	Speakers, headphones and TVs with Bluetooth or Chromecast
+54	Small speaker
+55	Previous
+56	You'll be asked to confirm before deleting.
+57	Before you start
+58	Off
+59	They appear as rows in "Your music", above Songs.
+60	They appear with their large cover in the Playlists carousel.
+61	Appeal
+62	Appeal sent. We'll reply by email.
+63	Appeal
+64	Apple Music or Spotify: open the playlist → Share → Copy link. It must be public. Up to about 100 songs come from Spotify; for longer lists, use the Exportify CSV.
+65	Point at the Jam's QR code
+66	Pear Music library.json file (the Android one works too). Whatever you don't have is added, nothing is deleted.
+67	Pear Music library.json file (the iOS one works too). Whatever you don't have is added, nothing is deleted.
+68	Drag the folders to change the order.
+69	Drag playlists, Downloaded and Favourites to place them wherever you like.
+70	Drag to change the order
+71	Drag to change the carousel order. Once you move something, Playlists is sorted "Custom".
+72	Drag ≡ to change the carousel order. Once you move something, Playlists is sorted "Custom".
+73	Drag ≡ to change the order.
+74	Drag ≡ to change the order; swiping sideways follows the same order. Swipe Discover to the left to hide it (and to the right to bring it back). The app opens on the last tab you used.
+75	At the top of Home
+76	Drag it to another groove to change the position
+77	Artist
+78	Artist {0}
+79	Artists
+80	Appearance
+81	Widget appearance
+82	This is how others will see you
+83	Back
+84	Headphones
+85	Automatic
+86	Advanced
+87	Notice
+88	Notices
+89	Pear Music notices published on the website
+90	Important notices
+91	Notices, {0} unread
+92	Help and support
+93	You help improve Pear Music
+94	Added to the playlist
+95	Recently added
+96	Add
+97	Add to Your albums
+98	Add to favourites
+99	Add to queue
+100	Add to playlist
+101	Add to a playlist
+102	Add to the Jam
+103	Add screenshots
+104	Add playlist
+105	Add {0} to the home screen
+106	Add {0} to the Jam
+107	You haven't saved anything yet
+108	You haven't marked any favourites here yet.
+109	No songs yet. Add the first one and it will show up on everyone's phone.
+110	No plays in this period yet. Every song that plays for at least 30 seconds counts.
+111	No favourites yet
+112	Nothing downloaded yet
+113	No backup yet
+114	Fuller bass and kick drums
+115	Bar at the top of Home
+116	Bottom bar
+117	Glass bars, buttons and menus that refract what's behind them, like iOS 26
+118	Library
+119	Library exported.
+120	Library saved
+121	Library saved to the cloud
+122	Lockdown
+123	Full lockdown
+124	Bluetooth
+125	Deletes your library, downloads, statistics and settings, and closes the app. This can't be undone.
+126	Drafts
+127	Delete
+128	Delete account
+129	Deleting your account removes your email and the cloud backup right away. The library on this phone stays.
+130	Delete everything
+131	Delete all my data
+132	Buttons in the song's colour, with a tint in backgrounds and menus
+133	Panic button
+134	Tonearm
+135	Good evening
+136	Good afternoon
+137	Good morning
+138	Search for songs, albums or artists
+139	Search for music in {0}
+140	Search for an album or open an artist and tap "Add to Your albums" or "Download all".
+141	Search for a song to add it
+142	Looking for the Jam
+143	Searching YouTube Music… {0} of {1}
+144	Finding music for you…
+145	Search
+146	Search artists
+147	Search Settings
+148	Search playlists
+149	Search your albums
+150	Search {0}
+151	Search music
+152	Search again
+153	Search has its own tab in the bottom bar, right after Home.
+154	Search has its own tab in the bottom bar.
+155	Suggestion box
+156	Exportify CSV (Spotify)
+157	Cache cleared
+158	Each song starts and ends at its own volume.
+159	Quality
+160	Streaming quality
+161	Streaming quality when not downloaded
+162	Download quality
+163	Download quality, import tolerance and cache
+164	Maximum quality
+165	Changes the background, cards, colour and font of the whole app. You can change it any time in Settings › Appearance.
+166	Switches between no repeat, repeat list and repeat song
+167	Change email
+168	Change photo
+169	Change player
+170	Channel
+171	Channel, log and panic button
+172	Cancel
+173	Cancel pending lockdown
+174	Cancel the download; what's already downloaded stays
+175	Songs
+176	Downloaded songs
+177	Most played songs
+178	Songs you like (SimpMusic)
+179	Songs, artists…
+180	Songs, albums, artists…
+181	Song playing
+182	Song without an identifier
+183	Screenshots
+184	Folder
+185	Cover of {0}
+186	Large cover and controls (4×2).
+187	Cover, title and controls in one row (4×1).
+188	Cassette
+189	A cassette with reels you turn with your finger, a vinyl you can scratch or the silver Air. Long-press the mini player to switch.
+190	Cassette: turn a reel or drag the tape to fast-forward or rewind. Vinyl: spin the record with your finger or move the tonearm. With the iPhone in landscape, the cassette or vinyl fills the screen. You can also switch by long-pressing the mini player.
+191	Cassette: turn a reel or drag the tape to fast-forward or rewind. Vinyl: spin the record with your finger or move the tonearm. With the phone in landscape, the cassette or vinyl fills the screen. You can also switch by long-pressing the mini player.
+192	Cast
+193	Outages and urgent versions
+194	Outages, new versions and Pear Music news
+195	Close
+196	Close the notice
+197	Close the stories
+198	Close player
+199	Sign out
+200	Tape
+201	Light
+202	Light or dark
+203	Key copied
+204	Recovery key
+205	Public key copied
+206	Unofficial YouTube Music client. It uses an unofficial YouTube API, so it may stop working if YouTube changes it. Downloads are stored on this iPhone.
+207	Unofficial YouTube Music client. It uses an unofficial YouTube API, so it may stop working if YouTube changes it. Downloads are stored on this phone.
+208	Classic
+209	Car
+210	Queue
+211	Colour
+212	Colour {0}
+213	Cover colours
+214	Cover colours in the player
+215	Cover colours in the rest of the app
+216	Share
+217	Components inspired by The Kitchen by dqnamo
+218	Unsupported compression.
+219	Checks every 15 minutes for new notices. Only the list of notices is requested; nothing of yours is sent.
+220	Checks from time to time for new notices. Only the list of notices is requested; nothing of yours is sent.
+221	Check your connection and try again.
+222	With this on and the phone connected by cable (adb forward tcp:8765 tcp:8765), the website's hidden page asks here for a 5-minute key. It only listens inside the phone and turns itself off after 10 minutes. The public key goes once into the Worker's PANEL_PUBLIC_KEY.
+223	Confirm pending lockdown
+224	Continue
+225	Password
+226	Automatic backup
+227	SimpMusic backup
+228	SimpMusic backup (.backup)
+229	Library backup
+230	Backup saved
+231	Copy
+232	Copy public key
+233	Copy log
+234	Email
+235	Create a playlist with + or bring yours over from Apple Music.
+236	Create a playlist in Library
+237	Create a playlist or save an album to choose it.
+238	Create
+239	Create Jam
+240	Create my account
+241	Create a playlist with {0}
+242	Create one
+243	Liquid glass
+244	Glass, Air, Neon or System, and colours taken from the cover. All in Settings › Appearance.
+245	Credits
+246	When there's something important, it'll show up here.
+247	When what you're listening to ends and repeat is off, similar songs are added after the last one.
+248	Account
+249	Account deleted
+250	Account created
+251	Tell us what you were doing and what you expected to happen. The more specific, the better (at least {0} characters).
+252	How much
+253	How closely the buttons match the cover colour
+254	How much backgrounds and menus are tinted
+255	Tell us what went wrong; you can add screenshots
+256	Tell us what you'd like Pear Music to do
+257	A capsule with your tabs and Search apart, like SimpMusic. Drag the drop to switch tabs; scrolling down a list folds it next to the mini player.
+258	Jam QR code
+259	6-digit code
+260	Jam code, 6 characters
+261	Code to join
+262	Data exported
+263	From the import. Tap to search for them again.
+264	Stop downloading; what's already downloaded stays
+265	They will no longer be available offline, also in other lists that include them.
+266	They will no longer be available offline. Playlists and favourites aren't touched.
+267	Off
+268	Off
+269	Turn off
+270	Turn off timer
+271	Download something to listen offline
+272	Download songs with the arrow on each row or with "Download all" in a playlist.
+273	Download songs, albums and playlists at maximum quality.
+274	Download a song with its arrow, or a whole playlist or album with "Download all". They're stored on this iPhone at maximum quality and you'll find them in Library › Downloaded, also offline.
+275	Download a song with its arrow, or a whole playlist or album with "Download all". They're stored on this phone at maximum quality and you'll find them in Library › Downloaded, also offline.
+276	Downloaded
+277	Downloaded
+278	Downloaded and Favourites
+279	Downloaded
+280	Downloading
+281	Downloading Pear Music {0}…
+282	Downloading {0} %
+283	Download
+284	Download the {0} missing
+285	Download all
+286	Downloads
+287	Dismiss
+288	Dismiss {0}
+289	Unknown
+290	Discover
+291	Discover, Home, Library, Settings
+292	From the Music app on this iPhone
+293	From a file
+294	From a link
+295	Scroll through Discover for a while
+296	Expand bar ({0})
+297	Record
+298	Available offline
+299	Two separate things. You can change the second one any time in Settings › Help and support › Your data.
+300	Where
+301	Where to search
+302	Where Search goes
+303	Equaliser
+304	Edit
+305	Edit queue
+306	Edit the playlist order
+307	Edit playlist
+308	Edit playlists
+309	Title effect
+310	The Jam is full.
+311	The Jam will end for everyone.
+312	The host
+313	The host has ended the Jam.
+314	The file is cut off.
+315	The file contains your library, statistics, lyrics, support drafts and settings; not the downloaded songs.
+316	The file isn't a valid ZIP.
+317	The file has no songs.
+318	Repeat (off, repeat list or song) is changed in the player.
+319	The code isn't valid.
+320	The support server isn't responding ({0}). Try again later.
+321	The server isn't responding ({0}). Try again later.
+322	The sound as it is
+323	Support is paused while we fix an incident. Your report stays in Drafts.
+324	The theme changes the background, cards, colour and font. Backgrounds take the cover's colours and move more while music plays.
+325	Text and icons always keep readable contrast, even if the cover is very light or very vivid.
+326	Chosen
+327	Choose folder
+328	Choose photo
+329	Choose your theme
+330	Delete
+331	Delete draft
+332	Remove download
+333	Delete playlist
+334	Delete playlists
+335	Deleting a playlist doesn't remove its songs from Favourites or Downloads.
+336	Delete {0}
+337	Start
+338	Start listening
+339	Start from scratch
+340	In Playlists (large cover)
+341	In Your albums
+342	Live
+343	In the player
+344	In the rest of the app
+345	In the bar
+346	Under maintenance
+347	In your library: {0}
+348	In "Your music" (row)
+349	On
+350	Spotify or Apple Music link
+351	Sign in
+352	Sent ({0} fields)
+353	Send
+354	Send now
+355	Send appeal
+356	Send performance data (optional)
+357	Balanced
+358	That key isn't in the right format.
+359	Scan with the iPhone camera or from Library → + → Jam with friends.
+360	Scan with the phone camera or from Library → + → Jam with friends.
+361	Scan QR
+362	Enter your recovery key
+363	Type your name to create or join a Jam.
+364	Listen to whatever you want
+365	Play a song
+366	Recently played
+367	Recently played
+368	Play full song
+369	Play my downloads
+370	Space used
+371	This app
+372	Statistics
+373	We're preparing things just for account holders. We'll let you know in Notices.
+374	This artist has no songs or albums available.
+375	This year
+376	This snippet couldn't be loaded
+377	This month
+378	This phone
+379	SimpMusic style
+380	These are the last saved notices.
+381	Colour boost
+382	Explain why this is a genuine report. A person will read it and reply by email.
+383	Export or delete everything the app stores about you
+384	Export backup
+385	Export my data
+386	Playback failed: timed out
+387	Playback failed: {0}
+388	The recovery key is missing.
+389	Favourites
+390	Favourites
+391	Pin an album or playlist with the pin
+392	Pinned to the top of Library and Home
+393	Pinned
+394	Pin to top
+395	Background with the blurred cover and controls in its colour
+396	Photo
+397	Song snippets you might like, full screen. Swipe for the next one and double-tap to "Like". If you don't use it, swipe it to the left in Settings › Appearance › Tabs.
+398	Song snippets you might like, full screen. Swipe for the next one and double-tap to "Like". If you don't use it, swipe it to the left in Settings › Appearance › Tabs. Tap the Discover tab.
+399	Crossfade
+400	Crossfade between songs
+401	Uses less mobile data (48 kbps).
+402	Turn a reel or drag the tape to fast-forward or rewind
+403	Save songs to see their artists
+404	Save a favourite with the heart
+405	Saved in Library as "{0}"
+406	Saved in your library
+407	Save to the cloud now
+408	Save as playlist
+409	Save to library
+410	Save list
+411	Save and leave
+412	Keep it in your password manager or write it down. It's what encrypts your library: without it, you can't 
+413	Keep it in your password manager or write it down. It's what encrypts your library: without it, you can't restore the cloud backup on another phone. Pear Music doesn't store it and can't recover it.
+414	Welcome guide
+415	Turn it to go forward or back
+416	Back up now
+417	Up to {0}. They're resized and stripped of location and other photo data before sending.
+418	Make it yours
+419	Done
+420	Story {0} of {1}: {2}. {3}
+421	Icon
+422	Even out the volume
+423	Imported: {0} favourites and {1} new playlists.
+424	Importing "{0}"
+425	Important
+426	Import
+427	Import 1 playlist
+428	Import backup
+429	Import from Apple Music
+430	Import playlist
+431	Import {0} playlists
+432	Report a problem
+433	Report a problem · Welcome guide · Version {0}
+434	Home
+435	Instrumental
+436	Intense
+437	Jam
+438	Jam with friends
+439	Jam with your friends
+440	Live Jam · {0}
+441	Jam offline
+442	Jam {0}, code {1}
+443	LRCLIB responded {0}
+444	The search bar is always at the top of Home and the Search tab disappears.
+445	The search bar is always at the top of Home.
+446	Streaming quality goes back to "Maximum", crossfade is removed and similar songs play again when a list ends.
+447	Streaming quality goes back to "Maximum", the equaliser and crossfade are removed, and similar songs play again when a list ends.
+448	The song fades out over its last {0} s and the next one comes in smoothly. Useful for mixed lists; for albums that flow together, better "No".
+449	The recovery key doesn't belong to this account.
+450	The SimpMusic backup is too large.
+451	The SimpMusic backup is damaged.
+452	The backup is too large. In SimpMusic, back up without downloads.
+453	The backup has no playlists.
+454	Your account is paused while we fix an incident.
+455	The download doesn't match the published one and wasn't installed, for safety.
+456	I've saved it
+457	Lyrics, in time
+458	The list is now empty.
+459	The playlist is empty or not public.
+460	The playlist you choose below, to play it with one tap (2×2).
+461	The first pinned in Library
+462	The one you saved when creating the account. 26 letters and numbers; case and dashes don't matter.
+463	The one shown in the "Pinned playlist" widget.
+464	Downloaded songs stay in Downloaded.
+465	The songs are already from YouTube Music: they arrive exactly, without searching. Nothing is downloaded.
+466	The last four songs you listened to (4×2).
+467	Accounts will be available very soon
+468	Downloads are stored on this iPhone at maximum quality and appear in Library › Downloaded. To get a whole list or album, use "Download all" on its page.
+469	Downloads are stored on this phone at maximum quality and appear in Library › Downloaded. To get a whole list or album, use "Download all" on its page.
+470	Downloads are always stored at maximum quality (AAC 128 kbps), so they sound the same offline.
+471	Downloads are always stored at maximum quality (Opus, about 160 kbps).
+472	The usual tabs, like on the iPhone.
+473	The usual tabs.
+474	Playlists are sorted by recent again, Downloaded and Favourites go back to the carousel and Search back to Home. No playlist is deleted.
+475	The last {0} lines, in memory only. They never contain personal data.
+476	Reads the playlists in your library (needs "Sync Library" turned on in Settings → Music).
+477	Read the terms
+478	Lyrics
+479	Inter font, by Rasmus Andersson (OFL)
+480	Lyrics from LRCLIB
+481	Reading the playlist…
+482	Frees memory; they're downloaded again when you see them
+483	Done
+484	Panel key over USB
+485	Take it offline
+486	Created by you · {0}
+487	What they released this year
+488	What you play most
+489	What you played last, radios made for you, what's new from your artists and whatever you pin to the top. The bell brings Pear Music notices.
+490	What you played last, radios made for you, what's new from your artists and whatever you pin to the top. The bell brings Pear Music notices. Tap the Home tab.
+491	Logo
+492	Line too long
+493	Sends this week's summary now with the ticked fields (the required ones always go: identifier, platform, variant, version and week). The weekly summary still goes out on its own if telemetry is on.
+494	Email me a code
+495	Keep Pear Music open. It usually takes a few seconds.
+496	Hold to delete downloads
+497	Hold to delete statistics
+498	Hold to clear the queue
+499	Long-press a song in Search or Home to add it.
+500	Hold to confirm
+501	Ticked
+502	Like
+503	Better sound (AAC 128 kbps).
+504	Better sound (Opus, about 160 kbps).
+505	Better sound; uses more data
+506	Menu
+507	Shuffle my favourites in {0}
+508	Shuffle favourites
+509	Shuffle favourites or downloads, Discover and Search (4×1).
+510	Shuffle downloads
+511	Shuffle my favourites
+512	Shuffle again
+513	While a song plays, the app takes on colours like its cover. Choose how much; text is always readable.
+514	Meanwhile you can't search, update or send anything. Your downloaded music is still here.
+515	Meanwhile, everything works without an account.
+516	Minutes per session
+517	Model and system, version, how long it takes to open, smoothness, memory and minutes of use, with a random identifier. 
+518	Model and system, version, how long it takes to open, smoothness, memory and minutes of use, with a random identifier. One summary a week; nothing of what you play or search. It's only to make the app better; it's deleted after 90 days.
+519	Mode
+520	Safe mode
+521	Mosaic
+522	Show Discover
+523	Move
+524	Show the QR code
+525	Perks coming very soon
+526	More
+527	More treble
+528	More brightness and detail
+529	More bass
+530	More options
+531	More options for {0}
+532	Maximum
+533	Music
+534	Nothing matches "{0}"
+535	Needs Android 12 or later
+536	None (don't add)
+537	No song in this list is downloaded.
+538	No downloaded songs
+539	Level
+540	No
+541	Not available to play
+542	Not found
+543	This isn't a SimpMusic backup (in SimpMusic: Settings › Backup).
+544	No notices
+545	No drafts
+546	No snippets right now
+547	No lyrics for this song
+548	Nothing to resume
+549	No playlists
+550	There are no playlists in this iPhone's library.
+551	No results for "{0}"
+552	No singles or EPs.
+553	No albums.
+554	You don't need it at all: Pear Music works just the same without it. But if you create one, you help us a lot to improve the app, and you take your music wherever you go.
+555	This doesn't look like an Exportify CSV (the "Track URI" column is missing).
+556	No songs left to add
+557	No songs were found. Is the playlist public?
+558	No Jam was found with the code {0}. Check that you're on the same Wi-Fi.
+559	Couldn't be loaded
+560	The songs couldn't be loaded
+561	Recommendations couldn't be loaded.
+562	The data couldn't be exported
+563	Port 8765 couldn't be opened
+564	The Jam couldn't be announced on the Wi-Fi ({0}).
+565	Couldn't search on the Wi-Fi ({0}).
+566	Couldn't search. Check your connection.
+567	The artist couldn't be loaded. Check your connection.
+568	The lyrics couldn't be loaded
+569	Couldn't connect to the Jam.
+570	The Jam couldn't be created on this network.
+571	"{0}" couldn't be downloaded: {1}
+572	Couldn't download. Try another connection.
+573	Couldn't send
+574	The library couldn't be exported.
+575	The backup couldn't be saved
+576	The backup couldn't be saved. Choose the folder again.
+577	That library file couldn't be read.
+578	The backup couldn't be read.
+579	The playlist couldn't be read.
+580	The playlist couldn't be read. Try the Exportify CSV.
+581	The audio couldn't be fetched: {0}
+582	Couldn't play: {0}
+583	That folder couldn't be used
+584	That folder couldn't be used.
+585	Can't be changed: this way they sound the same offline
+586	I don't have the key: start from scratch
+587	Name
+588	Name (A-Z)
+589	Name (Z-A)
+590	Jam name
+591	Normal
+592	Notify on the phone
+593	New from your artists
+594	New playlist
+595	Never
+596	Number of songs
+597	Hidden · swipe right to bring it back
+598	Hide
+599	Hide Discover
+600	Hide first steps
+601	Offers to remove downloads
+602	Opacity
+603	Optional · free
+604	Optional · keep your library encrypted in the cloud
+605	Optional, e.g. Beach trip
+606	Jam options
+607	Default order
+608	Bar order
+609	Sort
+610	Sort A to Z
+611	Sort Z to A
+612	Sort playlists
+613	Sort playlists by
+614	Sort by
+615	Dark
+616	Panel
+617	Package
+618	For the phone speaker or a portable one
+619	For listening on mobile data
+620	For the phone's home screen
+621	So we can reply. It's not used for anything else. The reply also reaches you in Notices, only you.
+622	To review
+623	For you
+624	Pause
+625	Pauses the list download
+626	Pause
+627	Pear Dev
+628	Pear Music
+629	Pear Music is a free personal project, not related to YouTube or Google. Required to use the app.
+630	Pear Music has no accounts or server with your data: everything is on this phone. 
+631	Pear Music has no accounts or server with your data: everything is on this phone. The file contains your library, statistics, lyrics, support drafts and settings; not the downloaded songs.
+632	Pear Music isn't allowed to use the camera
+633	Pear Music {0}
+634	Request full lockdown
+635	Paste a Spotify playlist link (Share → Copy link).
+636	Paste a music.apple.com link (Share → Copy link).
+637	Paste
+638	Allow installing apps from Pear Music and tap Download again.
+639	Custom
+640	Separate tab
+641	Tabs
+642	Ask whoever created it for the code or scan their QR.
+643	Apple Music playlist
+644	Spotify playlist
+645	Pinned playlist
+646	Imported playlist
+647	Playlists
+648	Playlists with your photo, icon and colour, favourites and downloads in one place. Pin what you play most to the top and open each artist's full discography.
+649	Playlists and favourites in a minute, also between iPhone and Android.
+650	You can rejoin with the code while it's still open.
+651	Play my downloads in {0}
+652	Play my favourites in {0}
+653	For example: when I tap "Download all" on an album, the app closes.
+654	For example: being able to sort my playlists by artist.
+655	Why it's a genuine report
+656	By size
+657	Because you listened to "{0}"
+658	First steps
+659	Progress
+660	Progress: {0} of {1}
+661	Publishes one of the states signed on the PC. Notice: banner that expires on its own. Safe mode: turns off updates, search, support, telemetry and account. Lockdown: maintenance screen; confirmed after 10 min with another code. Normal: everything works again.
+662	Publish
+663	Publish this level
+664	You can close the app: when you come back, the import continues where it left off.
+665	Position
+666	Move it to another phone
+667	Remove
+668	Remove from Your albums
+669	Remove from favourites
+670	Remove photo
+671	Remove {0}
+672	What happened
+673	What exactly is sent
+674	What you'd like Pear Music to do and how it would help you (at least {0} characters).
+675	Resume · {0} of {1}
+676	Recent
+677	Remind me tomorrow
+678	Tour: {0}. {1}
+679	Rephrase
+680	Log
+681	Log copied
+682	Retry
+683	Retry download
+684	Repeat song
+685	Repeat list
+686	Repeat: off
+687	Report sent
+688	Playback
+689	Play
+690	Play next
+691	Player
+692	Media player
+693	Players with personality
+694	Reply from Pear Music
+695	Unexpected server response.
+696	Reset
+697	Reset {0}
+698	Check the email: something's missing (for example, the @ or the domain).
+699	Check the message
+700	Check your connection and try again.
+701	Check your connection and try again.
+702	OFFLINE
+703	Knowing how many of you there are tells us where to put the effort.
+704	Audio output
+705	Audio output: {0}
+706	Leave the Jam
+707	Leave without saving
+708	Skip
+709	Skip the tour
+710	Skip the guide
+711	Applied instantly, also to what plays over Bluetooth.
+712	The text and its photos are deleted. This can't be undone.
+713	Your email and the cloud backup are deleted. This can't be undone.
+714	The cloud backup you can't open will be deleted and a new key will be created. The library on this phone isn't touched.
+715	The playlist and its cover will be deleted. This can't be undone.
+716	Your playlists, favourites, downloads, statistics and settings on this phone will be deleted, and the app will close. 
+717	Your playlists, favourites, downloads, statistics and settings on this phone will be deleted, and the app will close. If you want to keep anything, export your data first.
+718	They're searched again on YouTube Music (new versions sometimes appear). Choose the right one and it's added to the playlist.
+719	It was cut off halfway; continue where it left off.
+720	One is saved each day and the last {0} are kept. To restore it: Library › Import › Import backup.
+721	They're kept on this phone until you send or delete them.
+722	They're kept only on this phone and aren't included in the library backup.
+723	The connection to the host was lost.
+724	Stops when the song ends
+725	Stops in {0} min
+726	Stops in {0} s
+727	Connection lost
+728	The connection to {0} was lost.
+729	Continue
+730	Keep playing similar songs
+731	Safe
+732	Signed out
+733	If there's a photo, it's shown instead of the icon.
+734	If you turn it on, a performance summary is sent once a week: model and system, version, how long it 
+735	If you turn it on, a performance summary is sent once a week: model and system, version, how long it takes to open, smoothness (FPS and stutter), memory and minutes of use, with a random identifier that isn't your account's. Nothing of what you play or search. It's deleted after 90 days; turning it off deletes it right away.
+736	If you want to keep anything, export your data first.
+737	Continue with the remaining ones
+738	Next
+739	No ads, no limits and no account required.
+740	Not added
+741	Not added: {0}
+742	Offline
+743	No connection to the status server.
+744	No connection. Try again when you're online.
+745	No description
+746	Not chosen
+747	No icon
+748	No lines yet
+749	Not ticked
+750	No permission to read the Music app. Turn it on in Settings → Pear Music.
+751	No tracking or advertising. You decide what you share.
+752	No results
+753	Unfinished
+754	Singles and EPs
+755	Unpin
+756	Spotify won't show that playlist. Is it public?
+757	Spotify: export the playlist at exportify.app (free, sign in with your Spotify account) and choose the .csv; it brings every song and its ISRC, which matches better. SimpMusic: Settings › Backup, and choose the .backup file; its songs are already from YouTube Music, so they arrive exactly.
+758	Suggestion sent
+759	Subtle
+760	Just for you
+761	Only you have the key. Not even we can read it.
+762	Only {0} for now
+763	You can also long-press the home screen › Widgets › Pear Music. They can be resized.
+764	Welcome to Pear Music
+765	We've sent it to {0}. It expires in 10 minutes.
+766	Telemetry
+767	Performance telemetry
+768	Theme
+769	Theme, player (cassette, vinyl, Air), your optional account, your data and help.
+770	Theme, player (cassette, vinyl, Air), widgets, your optional account, your data and help.
+771	Sleep timer
+772	End Jam
+773	Finish reordering
+774	End without saving
+775	Type
+776	Tap a song's heart to save it here.
+777	Tap the queue and choose Lyrics: it follows the song line by line and is saved to view offline.
+778	Tap the doubtful ones to choose the right version. The ones you leave unchosen aren't added.
+779	Tap the highlighted item to continue
+780	Tap to change it
+781	Tap to continue · hold to pause
+782	All of YouTube Music, free and ad-free. With the screen off, offline and with a Jam to listen with your friends.
+783	All
+784	They all match their YouTube Music version.
+785	It doesn't show up yet. Check that the code is right, that you're on the same Wi-Fi or have Bluetooth on, and that whoever created it has Pear Music open.
+786	It doesn't show up yet. Check that the code is right, that you're on the same Wi-Fi and that whoever created it has Pear Music open.
+787	Nothing here yet
+788	No playlists yet
+789	You don't have any albums yet
+790	Tolerance
+791	Length tolerance
+792	Bring from the cloud
+793	Bring my library
+794	Brought {0} favourites and {1} playlists
+795	Your library travels encrypted with your recovery key: the server can't read it.
+796	Your library, your way
+797	Your library, encrypted in the cloud
+798	Your recovery key
+799	Your email
+800	Your Pear Music account
+801	Your idea
+802	Your launcher doesn't allow adding it from here: long-press the home screen › Widgets
+803	Your music
+804	Your name
+805	Your artists
+806	Your data
+807	Your data is yours
+808	Your favourites
+809	Your tabs in the bar and Search apart, like SimpMusic. On iOS 26 the bar folds as you scroll down a list.
+810	Your playlists
+811	Your playlists, favourites and downloads, also offline. Pin what you play most to the top and tap an artist to see their whole discography.
+812	Your playlists, favourites and downloads, also offline. Pin what you play most to the top and tap an artist to see their whole discography. Tap the Library tab.
+813	Your albums
+814	A .zip file with everything the app stores about you
+815	One summary a week; nothing of what you play or search. It's only to make the app better; it's deleted after 90 days.
+816	A daily backup of your favourites, playlists and albums in the folder you choose. Pick one that syncs (Google Drive, Nextcloud…) so you don't lose anything when you change phones.
+817	A daily backup of your favourites, playlists and albums in the folder you choose. Pick one that syncs (iCloud Drive, Google Drive…) so you don't lose anything when you change phones.
+818	A playlist everyone adds songs to from their phone, iPhone or Android, on the same Wi-Fi. With the QR you're in instantly.
+819	A playlist shared with whoever is with you, even if they have an Android. Scan the QR to join instantly, or type the code.
+820	A playlist shared with whoever is with you, even if they have an iPhone. Scan the QR to join instantly, or type the code.
+821	A playlist you make together. It works with people nearby, on the same Wi-Fi or with Bluetooth on.
+822	A playlist you make together. It works with people nearby, on the same Wi-Fi.
+823	Merges the backup with what's on this phone, without deleting anything
+824	Join one
+825	Uses the loudness YouTube measures for each song: louder songs go down and quieter ones go up a little, so you don't have to touch the volume between songs.
+826	Clear cover cache
+827	Clear log
+828	Empty or imported
+829	OK
+830	Speed
+831	Speed {0}
+832	View cover
+833	View recovery key
+834	View queue
+835	View {0}'s profile
+836	View status and audit
+837	View lyrics
+838	See all
+839	See all
+840	See all: {0}
+841	See your songs by {0}
+842	Version
+843	System version
+844	Version {0}
+845	Version {0} and credits
+846	Vinyl
+847	Preview of the cover colours
+848	Clear vocals
+849	Voices and podcasts more present
+850	Back to the start
+851	Sign in to your account again.
+852	See the welcome, the tour and the stories again
+853	Back to the Glass theme, the Normal player, cover colours off and the default tab order.
+854	Widgets
+855	Already in the Jam
+856	No longer pinned
+857	I already have a key (from another phone)
+858	just now
+859	simpmusic bar capsule tabs fold drop
+860	simpmusic bar fold search
+861	bluetooth chromecast speaker airplay
+862	delete remove
+863	bug failure problem support report ladybug contact
+864	search tab home bar
+865	carousel your music
+866	cover colour tint subtle balanced intense
+867	cassette vinyl air normal
+868	light or dark as on the iPhone
+869	colour background glass neon air system appearance
+870	backup copy drive nextcloud save export
+871	backup copy icloud drive save export
+872	crossfade transition smooth volume gaps
+873	account email cloud sync encrypted backup recovery key sign in
+874	the host
+875	your account's. Nothing of what you play or search. It's deleted after 90 days; turning it off deletes it right away.
+876	match import spotify seconds tolerance
+877	on Home
+878	in its own tab
+879	space offline delete
+880	glass transparent ios 26
+881	bass treble vocals low sound eq speaker
+882	{0} days ago
+883	{0} h ago
+884	{0} min ago
+885	memory images covers
+886	night mode dark light automatic
+887	notifications bell outages news discord
+888	hide remove disable discover feed snippets reels
+889	sort a-z recent custom
+890	bar order discover home library
+891	privacy gdpr export delete data erase zip
+892	endless radio autoplay automatic queue end
+893	restore the cloud backup on another phone. Pear Music doesn't store it and can't recover it.
+894	rest of the app
+895	audio output speaker homepod apple tv bluetooth
+896	streaming data saver maximum kbps
+897	suggestion idea proposal improvement mailbox
+898	symbols animation scramble
+899	takes to open, smoothness (FPS and stutter), memory and minutes of use, with a random identifier that isn't 
+900	telemetry performance data consent privacy fps
+901	tutorial welcome start
+902	version credits licence
+903	widgets widget home screen now playing recent quick actions pinned playlist theme
+904	{0}\n\nWe've saved it in Drafts so you can send it later.
+905	{0}\n\nYou can rephrase it or, if you think it's a mistake, appeal.
+906	{0} %
+907	{0} good · {1} to review · {2} not found
+908	{0} songs, the same as in SimpMusic. Nothing has been downloaded.
+909	{0} of {1} songs. It's already in your Library; nothing has been downloaded (use "Download all" if you want it offline).
+910	{0} of {1} · Pause
+911	{0} of {1} · ticked automatically
+912	{0} has ended the Jam.
+913	{0} playlists imported
+914	{0} · added by {1}
+915	{0} · {1}
+916	{0} · {1} offline
+917	{0}, already in the Jam
+918	{0}, {1} and {2} more
+919	{0}. Hold to confirm
+920	"Maximum" uses AAC at 128 kbps; "Data saver", 48 kbps. Applies from the next song.
+921	"Maximum" uses Opus at about 160 kbps; "Data saver", about 50 kbps. Applies from the next song.
+922	"{0}" imported
+923	Delete all your data?
+924	Delete your account?
+925	Delete the draft?
+926	Delete "{0}"?
+927	Start from scratch?
+928	Send the report?
+929	Send the suggestion?
+930	Save the list before leaving?
+931	Remove "{0}" from Your albums?
+932	Reset {0}?
+933	Album
+934	Albums
+935	Last cloud backup
+936	Last backup: {0}
+937	éxitos del momento
+938	…
+939	❌ Error {0}
+940	light or dark as on the phone
+942	Selected
+943	Choose your language
+944	Spain
+945	Language
+946	The whole app changes instantly. Anything not translated yet appears in Spanish.
+947	language idioma español català valencià galego euskara esperanto
+948	Air
+949	Silver with black Helvetica and a ring of dots.
+950	Glass
+951	Diffused light with the cover's colours.
+952	Neon
+953	Synthwave grid that moves while music plays.
+954	System
+955	No effects or animated backgrounds.
+957	Code {0}
+958	People: {0}
+959	Playlists: 
+960	Your email, the text and iPhone details (model, iOS and app version) will be sent to Pear Music's private support channel.
+961	Your email, the text and phone details (model, Android and app version) will be sent to Pear Music's private support channel.
+962	Your email, the text, {0} photo(s) and iPhone details (model, iOS and app version) will be sent to Pear Music's private support channel.
+963	Your email, the text, {0} photo(s) and phone details (model, Android and app version) will be sent to Pear Music's private support channel.
+964	Thank you! It's ticket #{0}. We'll reply in Notices (only to you) and to the email you entered.
+965	Thank you! We'll reply in Notices (only to you) and to the email you entered.
+966	"{0}" always uses light mode.
+967	"{0}" always uses dark mode.
+968	Remove the downloads of "{0}"?
+969	Remove the downloads?
+970	Bottom bar from SimpMusic, by maxrave-dev (GPL-3.0)
+971	Bottom bar inspired by SimpMusic, by maxrave-dev (GPL-3.0)
+972	yesterday
+973	Downloading Pear Music {0}… {1}%

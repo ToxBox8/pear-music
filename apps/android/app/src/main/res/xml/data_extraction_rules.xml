@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Lo mismo que backup_rules.xml para Android 12+, en la nube y al pasar a un móvil nuevo. -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="file" path="support/" />
+        <exclude domain="file" path="downloads/" />
+        <exclude domain="sharedpref" path="youtube.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="youtube.xml" />
+    </device-transfer>
+</data-extraction-rules>

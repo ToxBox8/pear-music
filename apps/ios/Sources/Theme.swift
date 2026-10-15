@@ -19,8 +19,8 @@ enum AppTheme: String, CaseIterable, Identifiable {
 
     private var spec: Tokens.ThemeSpec { Tokens.themes[rawValue]! }
 
-    var name: String { spec.name }
-    var blurb: String { spec.blurb }
+    var name: String { L(spec.name) }
+    var blurb: String { L(spec.blurb) }
 
     var symbol: String {
         switch self {
@@ -210,14 +210,14 @@ struct ArtworkLevel: Hashable {
         let name: String
         let level: ArtworkLevel
     }
-    static let presets = [Preset(name: "Sutil", level: subtle), Preset(name: "Equilibrado", level: balanced), Preset(name: "Intenso", level: intense)]
+    static var presets: [Preset] { [Preset(name: L("Sutil"), level: subtle), Preset(name: L("Equilibrado"), level: balanced), Preset(name: L("Intenso"), level: intense)] }
 
     var enabled: Bool { intensity > 0.005 || opacity > 0.005 }
 
     /// «Sutil», «Equilibrado», «Intenso», «Desactivado» o «Personalizado».
     var title: String {
-        guard enabled else { return "Desactivado" }
-        return Self.presets.first { abs($0.level.intensity - intensity) < 0.02 && abs($0.level.opacity - opacity) < 0.02 }?.name ?? "Personalizado"
+        guard enabled else { return L("Desactivado") }
+        return Self.presets.first { abs($0.level.intensity - intensity) < 0.02 && abs($0.level.opacity - opacity) < 0.02 }?.name ?? L("Personalizado")
     }
 
     /// Opacidad del tinte de los fondos (0,1 en «Equilibrado», como antes).

@@ -39,7 +39,7 @@ test("sin fotos llega a Discord", async () => {
   assert.equal(sent.length, 1);
   assert.equal(sent[0].url, env.DISCORD_WEBHOOK);
   const payload = JSON.parse(sent[0].body.get("payload_json"));
-  assert.equal(payload.embeds[0].title, "Reporte desde iOS 1.4.0");
+  assert.equal(payload.embeds[0].title, "Reporte #1 desde iOS 1.4.0");
 });
 
 test("con dos fotos las adjunta", async () => {
@@ -85,11 +85,44 @@ test("si Discord falla no cuenta para el límite", async () => {
   globalThis.fetch = async (url) => String(url).startsWith("https://cloudflare-dns.com/")
     ? Response.json({ Status: 0, Answer: [{}] }) : new Response("", { status: 500 });
   assert.equal((await worker.fetch(report(), env)).status, 502);
-  assert.equal(kv.size, 0);
+  // Sólo avanza el contador de tickets; ningún límite cuenta y no queda ticket guardado.
+  assert.deepEqual([...kv.keys()], ["ticket:seq"]);
 });
 
 test("si Discord falla, la app recibe un error (y guarda el borrador)", async () => {
   globalThis.fetch = async (url) => String(url).startsWith("https://cloudflare-dns.com/")
     ? Response.json({ Status: 0, Answer: [{}] }) : new Response("", { status: 500 });
   assert.equal((await worker.fetch(report(), env)).status, 502);
+});
+
+test("insultos: se rechaza con motivo, se registra sin el texto y se puede apelar una vez", async () => {
+  const res = await worker.fetch(report({ text: "eres un gilipollas, la app no va" }), env);
+  assert.equal(res.status, 400);
+  const body = await res.json();
+  assert.match(body.error, /insultos/);
+  assert.equal(body.canAppeal, true);
+  const stored = kv.get(`deny:${body.denialId}`);
+  assert.ok(stored && !stored.includes("gilipollas") && !stored.includes("dev-1"), "el registro no guarda el texto ni el id");
+  const appeal = (extra = {}) => worker.fetch(new Request("https://w.example/appeal", {
+    method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({ denialId: body.denialId, deviceId: "dev-1", email: "ana@gmail.com",
+      text: "Perdón, estaba enfadado: la app se cierra al abrir la cola cada vez.", ...extra }),
+  }), env);
+  assert.equal((await appeal({ deviceId: "otro" })).status, 403);
+  assert.equal((await appeal()).status, 200);
+  assert.match(sent.at(-1).body, /Apelación/);
+  assert.equal((await appeal()).status, 409);
+});
+
+test("una palabrota suelta de frustración no se rechaza", async () => {
+  assert.equal((await worker.fetch(report({ text: "Esto es una mierda, la app se cierra al abrir la cola" }), env)).status, 200);
+});
+
+test("el mismo reporte repetido desde el mismo móvil al día siguiente de la hora se rechaza", async () => {
+  assert.equal((await worker.fetch(report(), env)).status, 200);
+  // Pasada la hora (se vacían los contadores por hora), el mismo texto sigue rechazado durante 24 h.
+  for (const k of [...kv.keys()]) if (k.startsWith("rl:")) kv.delete(k);
+  const res = await worker.fetch(report(), env);
+  assert.equal(res.status, 400);
+  assert.match((await res.json()).error, /mismo reporte/);
 });

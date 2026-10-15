@@ -29,13 +29,26 @@ La web de descarga es `ToxBox8/libremusic-landing`.
 | **Inicio** | Saludo según la hora, buscador arriba (o pestaña aparte), «Escuchado recientemente», «Para ti» (radio de lo último que escuchaste), «Novedades de tus artistas» (lanzamientos de este año de los 8 artistas que más escuchas), tus playlists y las estanterías de YouTube Music. Los álbumes y playlists públicas se abren y se pueden guardar en la biblioteca. |
 | **Descubrir** | Feed vertical a pantalla completa. Cada canción suena 30 s desde la zona del estribillo, en bucle. Desliza para la siguiente, doble toque para «Me gusta», y «Escuchar completa» la pasa al reproductor. Sale de las radios de tus favoritas y recientes. |
 | **Biblioteca** | Carrusel de playlists con Descargadas y Favoritos (o, si se elige, como filas en «Tu música»), ordenado por recientes, nombre A-Z/Z-A, tamaño o a mano; debajo, en «Tu música», Tus álbumes (los guardados o descargados desde su página, en cuadrícula con buscador), Canciones, Artistas, Recientes y Estadísticas (lo más escuchado este mes, este año o siempre, en `stats.json`, sólo en el móvil). Cada lista tiene un anillo de puntos con lo descargado, filtros, «Descargar todo» y un editor (nombre, foto, icono y color). |
-| **Ajustes** | Buscador arriba y cinco secciones con su valor debajo: Aspecto (tema, reproductor, colores de la portada con presets y barras, orden de pestañas y, sólo en Android, cristal líquido), Reproducción (calidad, seguir con canciones parecidas, ecualizador —sólo Android—, fundido entre canciones, AirPlay/salida), Descargas (canciones, espacio, borrar), Biblioteca (orden de playlists, Descargadas/Favoritos, dónde va Buscar, copia automática, eliminar playlists) y Ayuda y soporte (informar de un error, guía inicial, Acerca de); Avanzado plegado. «Restablecer» por sección. El escarabajo de arriba a la derecha abre «Informar de un error»: correo, texto y hasta 4 capturas que llegan a un canal privado de Discord a través de un Worker de Cloudflare (`services/soporte`), con borradores. |
+| **Ajustes** | Buscador arriba y cinco secciones con su valor debajo: Aspecto (tema, reproductor, colores de la portada con presets y barras, orden de pestañas y, sólo en Android, cristal líquido), Reproducción (calidad, seguir con canciones parecidas, ecualizador —sólo Android—, fundido entre canciones, AirPlay/salida), Descargas (canciones, espacio, borrar), Biblioteca (orden de playlists, Descargadas/Favoritos, dónde va Buscar, copia automática, eliminar playlists) y Ayuda y soporte (avisos, informar de un error, guía inicial, Tus datos —exportar todo en un .zip o borrarlo todo— y Acerca de); Avanzado plegado. «Restablecer» por sección. El escarabajo de arriba a la derecha abre «Informar de un error»: correo, texto y hasta 4 capturas que llegan a un canal privado de Discord a través de un Worker de Cloudflare (`services/soporte`), con borradores. |
 
 La barra inferior puede ser la clásica o **estilo SimpMusic** (Ajustes › Aspecto › Barra inferior): cápsula con las pestañas y una gota que se arrastra, Buscar en un círculo aparte (Inicio no lleva buscador) y al bajar por una lista se pliega en un círculo junto al mini reproductor. **Ajustes** puede ir en la barra o arriba en Inicio junto al Jam (Aspecto › Ajustes; por defecto en la barra con la clásica y arriba con la estilo SimpMusic). Deslizar a los lados cambia de pestaña siguiendo al dedo, y la barra se mueve a la vez.
 
 **Avisos:** la campana de Inicio (junto al Jam, con un número de no leídos) abre los avisos de Pear Music, los mismos que la web en `/avisos`. Salen de un canal privado de Discord (el bot del Worker de la web los lee), se bajan cada vez que se abre la app y, con «Notificar en el móvil», llegan como notificación: sólo los de las últimas 48 h y una vez cada uno (Android cada 15 min; iOS cuando el sistema deja). También en Ajustes › Ayuda y soporte › Avisos.
 
-Las pestañas se ordenan en Ajustes › Aspecto › Pestañas (por defecto Descubrir, Inicio, Biblioteca, Ajustes) y la app se abre en la última usada. La primera vez sale una guía de tres pantallas (tema, colores y descargas).
+Las pestañas se ordenan en Ajustes › Aspecto › Pestañas (por defecto Descubrir, Inicio, Biblioteca, Ajustes) y la app se abre en la última usada. La primera vez sale la **bienvenida**: bienvenida, privacidad (condiciones obligatorias y telemetría opcional, por separado y sin marcar; la cuenta, opcional), tema, colores y descargas; después un recorrido sobre la app real (foco sobre cada sección), unas historias a pantalla completa y la tarjeta «Primeros pasos» en Inicio. Quien ya tenía la app sólo ve la privacidad, una vez.
+
+**Fase 3:** la página de un artista tiene «Ver todo» con su discografía completa (YouTube Music y, atenuado, lo que sólo conoce MusicBrainz); tocar un artista en Tu música › Artistas (A-Z/Z-A) o en la cabecera de un álbum abre su perfil. Descubrir se puede quitar (Aspecto › Pestañas). Los álbumes y playlists se pueden **fijar** arriba en Biblioteca e Inicio. En Android hay cinco widgets (Ahora suena pequeño y grande, Accesos rápidos, Playlist fijada y Recientes) que se configuran en **Ajustes › Widgets**.
+
+**Cuenta (opcional):** Ajustes › Cuenta. Entrar con un código al correo; la biblioteca se guarda en la nube cifrada con una clave de recuperación que sólo tiene el usuario (`services/api`, aún sin desplegar). **Versión nueva:** al abrir, como mucho cada 6 h, la app lee `version.json` de la web y ofrece «Descargar» (Android: APK verificado, con el progreso en el aviso, e instalado encima con un toque en el
+instalador del sistema; iOS: AltStore/SideStore) o «Recordarme mañana».
+
+**Incidentes (Fase 4):** al abrirse (y en Android cada 15 min) la app lee un estado firmado con Ed25519 del Worker `pear-music-estado` (`services/estado`): 0 normal, 1 aviso (banner 24 h), 2 modo seguro (sin actualizaciones salvo las marcadas como arreglo, sin búsqueda remota, soporte, telemetría ni cuenta; la música descargada sigue), 3 mantenimiento. Falla en abierto. Se cambia desde Pear Dev o `/panico` en Discord con contraseña + TOTP; la clave privada sólo está en el PC de Toxbox. Qué hacer: `docs/RUNBOOK-INCIDENTES.md`.
+
+**Idiomas (Cierre 1.0):** español, català, valencià, galego, euskara, English y Esperanto (bienvenida y Ajustes › Idioma, con banderas). Los textos van en español dentro de `L("…")` y el catálogo común está en `shared/i18n/` (`tools/i18n/`).
+
+**Tickets y sugerencias:** cada reporte o sugerencia (Ayuda y soporte › Buzón de sugerencias, o la carta de Ajustes) tiene número; Toxbox contesta desde Discord con `/msg` y la respuesta sale sólo a esa persona en la campana (`services/soporte`).
+
+**Telemetría (Fase 4b):** con consentimiento, un resumen por semana a `pear-music-api` (desplegado el 14-10, sin correo). Pear Dev no envía sola: sólo «Enviar ahora», eligiendo campos, y dar una llave por USB para el panel escondido de la web (`/panel-t`), que sin el móvil de Toxbox conectado no existe (`docs/TELEMETRIA.md`).
 
 Sobre las pestañas flota el **mini reproductor**: tocarlo abre el reproductor y mantenerlo pulsado deja elegir el tipo de reproductor.
 
@@ -59,7 +72,11 @@ Cuatro temas, en las dos apps:
 | **Neón** | Rejilla synthwave; siempre oscuro. |
 | **Sistema** | Sin efectos. |
 
-La marca es violeta `#8B5CF6`. El icono por defecto es el original de encendido (lila `#A78BFA` sobre `#07070A`); el violeta con nota y bobina se puede elegir en Aspecto › Icono de la app.
+La marca es violeta `#8B5CF6`. El icono, en las dos apps y en la web, es el de encendido (lila `#A78BFA` sobre `#07070A`). El violeta con nota y bobina es el logo antiguo de LibreMusic: ya no va en las apps, sólo en el README y la web como evolución de la marca.
+
+### Variantes
+
+Del mismo código salen tres apps (`docs/FLAVORS.md`): **Pear Music** (usr, la pública), **Pear Pref** (la de Toxbox) y **Pear Dev** (pruebas, con Ajustes › Ayuda y soporte › Administración: canal, registro y botón de pánico). Pref y Dev sólo se instalan en el móvil de Toxbox y nunca se publican.
 
 ## Cómo funciona
 
@@ -114,7 +131,7 @@ La marca es violeta `#8B5CF6`. El icono por defecto es el original de encendido 
 
 | App | Versión | Estado |
 |---|---|---|
-| iOS | 1.4.1 (preparada; publicada: 1.4.0) | Referencia de diseño. Publicada el 13-10 desde el repo público (`ToxBox8/pear-music`, release `ios-v1.4.0`), en la web y en la fuente de AltStore. Falta probarla en un iPhone. |
+| iOS | 1.4.1 (publicada) | Referencia de diseño. Publicada el 14-10 desde el repo público (`ToxBox8/pear-music`, release `ios-v1.4.1`, compilada por su CI), en la web y en la fuente de AltStore. Falta probarla en un iPhone. |
 | Android | 0.9.5 (publicada) | Misma interfaz que iOS (`docs/PARIDAD.md`). Publicada el 14-10 en GitHub Releases (`android-v0.9.5`; por la tarde, tras la 0.9.4 de la mañana; firmada en local con la clave de siempre) y en la web. Probada en un Nothing Phone (2) con Android 16 (`docs/pruebas/v0.9.0-manual`). |
 
 Pendientes y fases en `docs/ARCHITECTURE.md` y `CHANGELOG.md`.

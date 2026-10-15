@@ -3,6 +3,8 @@ package app.libremusic.ui.theme
 import androidx.compose.ui.unit.dp
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Groups
+import androidx.compose.material.icons.outlined.Groups
 import androidx.compose.material.icons.automirrored.rounded.MenuBook
 import androidx.compose.material.icons.automirrored.rounded.QueueMusic
 import androidx.compose.material.icons.rounded.AutoAwesome
@@ -75,37 +77,11 @@ object SfIcons {
 }
 
 /**
- * El icono del Jam de iOS (`person.2.wave.2`: dos personas con ondas a los lados), dibujado a mano
- * porque SF Symbols no se puede usar fuera de Apple y Material no tiene uno igual. [filled] para
- * el Jam activo (`person.2.wave.2.fill`).
+ * El icono del Jam: un grupo de tres personas, el mismo que usa SimpMusic para escuchar juntos (lo pidió Toxbox).
+ * En iOS, `person.3` / `person.3.fill`. [filled] para el Jam activo.
  */
-private fun jamVector(filled: Boolean): androidx.compose.ui.graphics.vector.ImageVector {
-    val w = if (filled) 2.1f else 1.6f
-    val ink = androidx.compose.ui.graphics.SolidColor(androidx.compose.ui.graphics.Color.Black)
-    return androidx.compose.ui.graphics.vector.ImageVector.Builder(
-        name = if (filled) "JamFill" else "Jam", defaultWidth = 24.dp, defaultHeight = 24.dp, viewportWidth = 24f, viewportHeight = 24f,
-    ).apply {
-        val stroke: androidx.compose.ui.graphics.vector.ImageVector.Builder.(androidx.compose.ui.graphics.vector.PathBuilder.() -> Unit) -> Unit = { block ->
-            addPath(
-                androidx.compose.ui.graphics.vector.PathBuilder().apply(block).nodes,
-                stroke = ink, strokeLineWidth = w,
-                strokeLineCap = androidx.compose.ui.graphics.StrokeCap.Round,
-                strokeLineJoin = androidx.compose.ui.graphics.StrokeJoin.Round,
-            )
-        }
-        // Ondas a la izquierda y a la derecha.
-        stroke { moveTo(5.9f, 7.7f); arcTo(7.5f, 7.5f, 0f, false, false, 5.9f, 16.3f) }
-        stroke { moveTo(3.4f, 6.0f); arcTo(10.5f, 10.5f, 0f, false, false, 3.4f, 18.0f) }
-        stroke { moveTo(18.1f, 7.7f); arcTo(7.5f, 7.5f, 0f, false, true, 18.1f, 16.3f) }
-        stroke { moveTo(20.6f, 6.0f); arcTo(10.5f, 10.5f, 0f, false, true, 20.6f, 18.0f) }
-        // Persona de delante: cabeza y hombros.
-        stroke { moveTo(12.6f, 9.6f); arcTo(2.0f, 2.0f, 0f, true, true, 8.6f, 9.6f); arcTo(2.0f, 2.0f, 0f, true, true, 12.6f, 9.6f); close() }
-        stroke { moveTo(7.4f, 16.4f); arcTo(3.2f, 3.0f, 0f, false, true, 13.8f, 16.4f) }
-        // Persona de detrás, asomando a la derecha.
-        stroke { moveTo(15.8f, 8.7f); arcTo(1.6f, 1.6f, 0f, true, false, 13.4f, 7.4f) }
-        stroke { moveTo(14.7f, 12.3f); arcTo(2.6f, 2.6f, 0f, false, true, 16.7f, 15.2f) }
-    }.build()
-}
+private fun jamVector(filled: Boolean): androidx.compose.ui.graphics.vector.ImageVector =
+    if (filled) Icons.Rounded.Groups else Icons.Outlined.Groups
 
 private val jamOutline by lazy { jamVector(false) }
 private val jamFill by lazy { jamVector(true) }

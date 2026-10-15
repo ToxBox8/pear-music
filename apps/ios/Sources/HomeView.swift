@@ -34,9 +34,9 @@ struct HomeView: View {
 
     private var greeting: String {
         switch Calendar.current.component(.hour, from: Date()) {
-        case 6..<13: return "Buenos días"
-        case 13..<21: return "Buenas tardes"
-        default: return "Buenas noches"
+        case 6..<13: return L("Buenos días")
+        case 13..<21: return L("Buenas tardes")
+        default: return L("Buenas noches")
         }
     }
 
@@ -45,19 +45,21 @@ struct HomeView: View {
             ScrollView {
                 if showingSearch { searchResults } else {
                 LazyVStack(alignment: .leading, spacing: 30) {
+                    FirstStepsCard()
+                    PinnedRow()
                     if !library.recents.isEmpty {
-                        section("Escuchado recientemente") { SongCardsRow(songs: Array(library.recents.prefix(15))) }
+                        section(L("Escuchado recientemente")) { SongCardsRow(songs: Array(library.recents.prefix(15))) }
                     }
                     if !forYou.isEmpty {
-                        section("Para ti", subtitle: seed.map { "Porque escuchaste «\($0.title)»" }) { QuickPicks(songs: forYou) }
+                        section(L("Para ti"), subtitle: seed.map { L("Porque escuchaste «{0}»", $0.title) }) { QuickPicks(songs: forYou) }
                     }
                     if !releases.isEmpty {
-                        section("Novedades de tus artistas", subtitle: "Lo que han sacado este año") {
+                        section(L("Novedades de tus artistas"), subtitle: L("Lo que han sacado este año")) {
                             ShelfContent(items: releases.map { .collection($0) })
                         }
                     }
                     if !library.userPlaylists.isEmpty {
-                        section("Tus playlists") {
+                        section(L("Tus playlists")) {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 LazyHStack(alignment: .top, spacing: 14) {
                                     ForEach(library.userPlaylists) { p in
@@ -84,7 +86,7 @@ struct HomeView: View {
                         ProgressView().frame(maxWidth: .infinity).padding(.top, 40)
                     } else if failed {
                         VStack(spacing: 10) {
-                            Text("No se pudieron cargar las recomendaciones.").foregroundStyle(.secondary)
+                            Text(L("No se pudieron cargar las recomendaciones.")).foregroundStyle(.secondary)
                             Button { Task { await load() } } label: { Label("Reintentar", systemImage: "arrow.clockwise") }
                                 .buttonStyle(PillButtonStyle(prominent: false))
                                 .frame(maxWidth: 220)
@@ -104,17 +106,18 @@ struct HomeView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button { jam.showSheet = true } label: {
-                        Image(systemName: jam.isActive ? "person.2.wave.2.fill" : "person.2.wave.2")
+                        Image(systemName: jam.isActive ? "person.3.fill" : "person.3")
+                            .tourTarget("jam")
                     }
-                    .accessibilityLabel(jam.isActive ? "Abrir el Jam" : "Jam con amigos")
+                    .accessibilityLabel(jam.isActive ? L("Abrir el Jam") : L("Jam con amigos"))
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     AvisosBell { showAvisos = true }
                 }
                 if settingsTop {
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        Button { showSettings = true } label: { Image(systemName: "gearshape") }
-                            .accessibilityLabel("Ajustes")
+                        Button { showSettings = true } label: { Image(systemName: "gearshape").tourTarget("settings") }
+                            .accessibilityLabel(L("Ajustes"))
                     }
                 }
             }
@@ -290,6 +293,7 @@ struct CollectionView: View {
     @State private var loading = true
     @State private var saved = false
     @State private var confirmRemove = false
+    @State private var showArtist = false
 
     /// Un álbum («MPREb_…») va a «Tus álbumes»; una playlist de YouTube Music, a Playlists.
     private var isAlbum: Bool { collection.id.hasPrefix("MPREb") }
@@ -303,24 +307,37 @@ struct CollectionView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
                         .shadow(color: .black.opacity(0.25), radius: 16, y: 8)
                     Text(collection.title).font(.title2.bold()).multilineTextAlignment(.center)
-                    Text(collection.subtitle).font(.subheadline).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                    // «Álbum • Artista • año»: el artista se toca para ir a su perfil (Fase 3.1).
+                    let parts = collection.subtitle.components(separatedBy: " • ")
+                    if isAlbum, parts.count >= 2, !parts[1].isEmpty {
+                        HStack(spacing: 0) {
+                            Text(parts[0] + " · ").foregroundStyle(.secondary)
+                            Button(parts[1]) { showArtist = true }
+                                .buttonStyle(.borderless).fontWeight(.semibold)
+                                .accessibilityLabel(L("Ver el perfil de {0}", parts[1]))
+                            if parts.count >= 3 { Text(" · " + (parts.last ?? "")).foregroundStyle(.secondary) }
+                        }
+                        .font(.subheadline)
+                    } else {
+                        Text(collection.subtitle).font(.subheadline).foregroundStyle(.secondary).multilineTextAlignment(.center)
+                    }
                     PlayShuffleBar(songs: songs)
                         .padding(.top, 4)
                     if isAlbum {
                         Button { if saved { confirmRemove = true } else { Task { await save() } } } label: {
-                            Label(saved ? "En Tus álbumes" : "Añadir a Tus álbumes",
+                            Label(saved ? L("En Tus álbumes") : L("Añadir a Tus álbumes"),
                                   systemImage: saved ? "checkmark" : "plus")
                         }
                         .buttonStyle(PillButtonStyle(prominent: false))
                         .disabled(songs.isEmpty)
-                        .confirmationDialog("¿Quitar «\(collection.title)» de Tus álbumes?", isPresented: $confirmRemove, titleVisibility: .visible) {
-                            Button("Quitar de Tus álbumes", role: .destructive) { removeAlbum() }
+                        .confirmationDialog(L("¿Quitar «{0}» de Tus álbumes?", collection.title), isPresented: $confirmRemove, titleVisibility: .visible) {
+                            Button(L("Quitar de Tus álbumes"), role: .destructive) { removeAlbum() }
                         } message: {
-                            Text("Las canciones descargadas se quedan en Descargadas.")
+                            Text(L("Las canciones descargadas se quedan en Descargadas."))
                         }
                     } else {
                         Button { Task { await save() } } label: {
-                            Label(saved ? "Guardada en tu biblioteca" : "Guardar en biblioteca",
+                            Label(saved ? L("Guardada en tu biblioteca") : L("Guardar en biblioteca"),
                                   systemImage: saved ? "checkmark" : "plus")
                         }
                         .buttonStyle(PillButtonStyle(prominent: false))
@@ -347,7 +364,11 @@ struct CollectionView: View {
         .listStyle(.plain)
         .overlay {
             if loading { ProgressView() }
-            else if songs.isEmpty { Text("No se pudieron cargar las canciones").foregroundStyle(.secondary) }
+            else if songs.isEmpty { Text(L("No se pudieron cargar las canciones")).foregroundStyle(.secondary) }
+        }
+        .navigationDestination(isPresented: $showArtist) {
+            let name = collection.subtitle.components(separatedBy: " • ").dropFirst().first ?? ""
+            ArtistProfileLoader(name: name, songs: library.allSongs().filter { primaryArtist($0.artist).caseInsensitiveCompare(name) == .orderedSame })
         }
         .themed()
         .navigationBarTitleDisplayMode(.inline)
@@ -378,7 +399,7 @@ extension View {
     /// Barra de búsqueda fija bajo el título (sólo si Buscar va en Inicio).
     @ViewBuilder func searchBar(_ enabled: Bool, text: Binding<String>, submit: @escaping () -> Void) -> some View {
         if enabled {
-            searchable(text: text, placement: .navigationBarDrawer(displayMode: .always), prompt: "Canciones, artistas…")
+            searchable(text: text, placement: .navigationBarDrawer(displayMode: .always), prompt: L("Canciones, artistas…"))
                 .onSubmit(of: .search, submit)
         } else {
             self

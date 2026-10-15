@@ -21,7 +21,7 @@ import java.io.File
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [34], qualifiers = "w393dp-h852dp-port-xxhdpi")
+@Config(sdk = [34], qualifiers = "es-rES-w393dp-h852dp-port-xxhdpi")
 class WebShotTest : ShotBase() {
     private fun cover(i: Int): String {
         val url = javaClass.getResource("/web-covers/cover$i.jpg") ?: error("Falta web-covers/cover$i.jpg")

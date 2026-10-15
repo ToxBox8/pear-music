@@ -1,5 +1,7 @@
 package app.libremusic.ui
 
+
+import app.libremusic.L
 import androidx.compose.material.icons.rounded.MoreHoriz
 
 import androidx.compose.animation.core.animateFloatAsState
@@ -89,18 +91,18 @@ fun songMenu(song: Song): List<MenuEntry> {
     val inJam = jam.jam?.entries?.any { it.song.id == song.id } == true
     val coverVersion by env.library.coverVersion.collectAsState()
     return buildList {
-        if (jamActive) add(MenuEntry.Action(if (inJam) "Ya está en el Jam" else "Añadir al Jam", app.libremusic.ui.theme.JamIcon(), enabled = !inJam) { JamService.add(song) })
-        add(MenuEntry.Action("Reproducir a continuación", Icons.Rounded.QueuePlayNext) { env.player.playNext(song) })
-        add(MenuEntry.Action("Añadir a la cola", Icons.AutoMirrored.Rounded.QueueMusic) { env.player.addToQueue(song) })
+        if (jamActive) add(MenuEntry.Action(if (inJam) L("Ya está en el Jam") else L("Añadir al Jam"), app.libremusic.ui.theme.JamIcon(), enabled = !inJam) { JamService.add(song) })
+        add(MenuEntry.Action(L("Reproducir a continuación"), Icons.Rounded.QueuePlayNext) { env.player.playNext(song) })
+        add(MenuEntry.Action(L("Añadir a la cola"), Icons.AutoMirrored.Rounded.QueueMusic) { env.player.addToQueue(song) })
         add(
-            MenuEntry.Action(if (fav) "Quitar de favoritos" else "Añadir a favoritos", if (fav) Icons.Rounded.HeartBroken else Icons.Rounded.FavoriteBorder) {
+            MenuEntry.Action(if (fav) L("Quitar de favoritos") else L("Añadir a favoritos"), if (fav) Icons.Rounded.HeartBroken else Icons.Rounded.FavoriteBorder) {
                 env.library.toggleFavorite(song)
             },
         )
         if (data.userPlaylists.isNotEmpty()) {
             add(
                 MenuEntry.Sub(
-                    "Añadir a playlist", Icons.AutoMirrored.Rounded.PlaylistAdd,
+                    L("Añadir a playlist"), Icons.AutoMirrored.Rounded.PlaylistAdd,
                     // Con la portada de cada playlist, para reconocerlas de un vistazo.
                     data.userPlaylists.map { p ->
                         MenuEntry.Action(
@@ -112,9 +114,9 @@ fun songMenu(song: Song): List<MenuEntry> {
             )
         }
         if (st?.isDone == true) {
-            add(MenuEntry.Action("Eliminar descarga", Icons.Rounded.Delete, destructive = true) { env.library.removeDownload(song) })
+            add(MenuEntry.Action(L("Eliminar descarga"), Icons.Rounded.Delete, destructive = true) { env.library.removeDownload(song) })
         } else {
-            add(MenuEntry.Action("Descargar", Icons.Outlined.ArrowCircleDown, enabled = st?.isActive != true) { env.library.toggleDownload(song) })
+            add(MenuEntry.Action(L("Descargar"), Icons.Outlined.ArrowCircleDown, enabled = st?.isActive != true) { env.library.toggleDownload(song) })
         }
     }
 }
@@ -180,7 +182,7 @@ fun SongRow(
         }
         Spacer(Modifier.width(4.dp))
         FavoriteGlyphButton(song)
-        if (more) IconTap(Icons.Rounded.MoreHoriz, "Más opciones de ${song.title}", tint = c.secondaryLabel) { menu = true }
+        if (more) IconTap(Icons.Rounded.MoreHoriz, L("Más opciones de {0}", song.title), tint = c.secondaryLabel) { menu = true }
         else DownloadGlyphButton(song)
     }
 }
@@ -192,7 +194,7 @@ fun FavoriteGlyphButton(song: Song) {
     val data by env.library.data.collectAsState()
     val fav = data.favorites.any { it.id == song.id }
     val scale by animateFloatAsState(if (fav) 1.08f else 1f, uiEaseOut(200), label = "fav")
-    Box(Modifier.size(44.dp).tactile(label = if (fav) "Quitar de favoritos" else "Añadir a favoritos") { env.library.toggleFavorite(song) }, contentAlignment = Alignment.Center) {
+    Box(Modifier.size(44.dp).tactile(label = if (fav) L("Quitar de favoritos") else L("Añadir a favoritos")) { env.library.toggleFavorite(song) }, contentAlignment = Alignment.Center) {
         Icon(
             if (fav) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder, null,
             tint = if (fav) c.accent else c.secondaryLabel, modifier = Modifier.size(22.dp).scale(scale),
@@ -211,10 +213,10 @@ fun DownloadGlyphButton(song: Song) {
     val busy = st?.isActive == true
     val failed = st?.isFailed == true
     val label = when {
-        done -> "Descargada"
-        busy -> "Descargando"
-        failed -> "Reintentar descarga"
-        else -> "Descargar"
+        done -> L("Descargada")
+        busy -> L("Descargando")
+        failed -> L("Reintentar descarga")
+        else -> L("Descargar")
     }
     Box(
         Modifier.size(44.dp).tactile(enabled = !done && !busy, label = label) { env.library.toggleDownload(song) },

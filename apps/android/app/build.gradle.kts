@@ -16,8 +16,40 @@ android {
         minSdk = 26
         targetSdk = 35
         // Versión de la app (ver docs/RELEASING.md). versionCode siempre sube.
-        versionCode = 14
-        versionName = "0.9.5"
+        versionCode = 19
+        versionName = "1.0.0"
+    }
+
+    // Tres apps con el mismo código (Fase 1 de la 1.0). Lo que cambia entre ellas son estas banderas de
+    // BuildConfig, nunca código duplicado. Ver docs/FLAVORS.md.
+    //  - usr: la pública (web, GitHub). Mismo applicationId de siempre para actualizar encima.
+    //  - pref: la de Toxbox. Estable, sin herramientas de administración.
+    //  - dev: pruebas y administración (panel, botón de pánico, registro detallado).
+    // dev y pref sólo se instalan por adb en el móvil de Toxbox: no se publican nunca.
+    flavorDimensions += "canal"
+    productFlavors {
+        create("usr") {
+            dimension = "canal"
+            buildConfigField("String", "CHANNEL", "\"usr\"")
+            buildConfigField("boolean", "ADMIN_TOOLS", "false")
+            buildConfigField("boolean", "VERBOSE_LOGS", "false")
+        }
+        create("pref") {
+            dimension = "canal"
+            applicationIdSuffix = ".pref"
+            versionNameSuffix = "-pref"
+            buildConfigField("String", "CHANNEL", "\"pref\"")
+            buildConfigField("boolean", "ADMIN_TOOLS", "false")
+            buildConfigField("boolean", "VERBOSE_LOGS", "false")
+        }
+        create("dev") {
+            dimension = "canal"
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
+            buildConfigField("String", "CHANNEL", "\"dev\"")
+            buildConfigField("boolean", "ADMIN_TOOLS", "true")
+            buildConfigField("boolean", "VERBOSE_LOGS", "true")
+        }
     }
 
     signingConfigs {
@@ -111,6 +143,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout.compose)
 
     implementation(libs.okhttp)
+    implementation(libs.bouncycastle)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.coil.compose)
 

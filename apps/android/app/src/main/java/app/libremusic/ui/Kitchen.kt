@@ -1,5 +1,7 @@
 package app.libremusic.ui
 
+
+import app.libremusic.L
 import androidx.compose.ui.semantics.selected
 
 import androidx.compose.ui.semantics.toggleableState
@@ -143,7 +145,7 @@ val UiEaseOut = CubicBezierEasing(Tokens.Motion.EaseOut[0], Tokens.Motion.EaseOu
 fun <T> uiEaseOut(ms: Int = 180) = tween<T>(ms, easing = UiEaseOut)
 
 /** «1 canción», «12 canciones». */
-fun songCount(n: Int): String = if (n == 1) "1 canción" else "$n canciones"
+fun songCount(n: Int): String = if (n == 1) L("1 canción") else "$n canciones"
 
 /** "3:08" a partir de segundos. */
 fun timeString(seconds: Double): String {
@@ -420,10 +422,10 @@ fun CapsuleButton(text: String, icon: ImageVector?, prominent: Boolean, modifier
 @Composable
 fun PlayShuffleBar(songs: List<app.libremusic.data.Song>, onPlay: (List<app.libremusic.data.Song>, Int) -> Unit) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-        PillButton("Reproducir", Icons.Rounded.PlayArrow, prominent = true, modifier = Modifier.weight(1f), enabled = songs.isNotEmpty()) {
+        PillButton(L("Reproducir"), Icons.Rounded.PlayArrow, prominent = true, modifier = Modifier.weight(1f), enabled = songs.isNotEmpty()) {
             onPlay(songs, 0)
         }
-        PillButton("Aleatorio", Icons.Rounded.Shuffle, prominent = false, modifier = Modifier.weight(1f), enabled = songs.isNotEmpty()) {
+        PillButton(L("Aleatorio"), Icons.Rounded.Shuffle, prominent = false, modifier = Modifier.weight(1f), enabled = songs.isNotEmpty()) {
             onPlay(songs.shuffled(), 0)
         }
     }
@@ -441,7 +443,7 @@ fun HoldToConfirmButton(title: String, icon: ImageVector = Icons.Rounded.Delete,
     val scope = rememberCoroutineScope()
     val haptics = rememberHaptics()
     val shape = RoundedCornerShape(12.dp)
-    val label = if (confirmed) "Hecho" else title
+    val label = if (confirmed) L("Hecho") else title
     Box(
         Modifier
             .fillMaxWidth()
@@ -449,7 +451,7 @@ fun HoldToConfirmButton(title: String, icon: ImageVector = Icons.Rounded.Delete,
             .clip(shape)
             .background(red.copy(alpha = 0.14f))
             .border(1.dp, red.copy(alpha = 0.7f), shape)
-            .semantics { contentDescription = "$title. Mantén pulsado para confirmar"; this.onClick(label = null, action = { action(); true }) }
+            .semantics { contentDescription = L("{0}. Mantén pulsado para confirmar", title); this.onClick(label = null, action = { action(); true }) }
             .pointerInput(Unit) {
                 awaitEachGesture {
                     awaitFirstDown()
@@ -582,7 +584,7 @@ fun SearchField(
     onQuery: (String) -> Unit,
     onSubmit: () -> Unit,
     modifier: Modifier = Modifier,
-    placeholder: String = "Canciones, artistas…",
+    placeholder: String = L("Canciones, artistas…"),
     focusRequester: FocusRequester? = null,
 ) {
     val c = Libre.colors
@@ -611,8 +613,8 @@ fun SearchField(
         }
         if (query.isNotEmpty()) {
             Icon(
-                Icons.Rounded.Cancel, "Borrar", tint = c.tertiaryLabel,
-                modifier = Modifier.size(18.dp).tactile(label = "Borrar") { onQuery("") },
+                Icons.Rounded.Cancel, L("Borrar"), tint = c.tertiaryLabel,
+                modifier = Modifier.size(18.dp).tactile(label = L("Borrar")) { onQuery("") },
             )
         }
     }
@@ -856,7 +858,7 @@ fun DotRing(lit: Double, diameter: Dp, tint: Color, dots: Int = 72) {
 
 /** Acción al deslizar la fila hacia la izquierda («Quitar» en rojo), como swipeActions sin deslizamiento completo. */
 @Composable
-fun SwipeToRemove(label: String = "Quitar", onRemove: () -> Unit, content: @Composable () -> Unit) {
+fun SwipeToRemove(label: String = L("Quitar"), onRemove: () -> Unit, content: @Composable () -> Unit) {
     val c = Libre.colors
     val density = androidx.compose.ui.platform.LocalDensity.current
     val action = with(density) { 84.dp.toPx() }

@@ -12,9 +12,16 @@ export const LIMITS = {
   perDevicePerHour: 1,
   perEmailPerHour: 1,
   perIpPerHour: 3,
+  // El mismo texto desde el mismo móvil se rechaza durante un día.
+  repeatWindowSeconds: 86_400,
+  // Denegaciones: se guardan 30 días (sin el texto) y se puede apelar una vez cada una, 3 al día por móvil.
+  denialTtlSeconds: 30 * 86_400,
+  appealsPerDevicePerDay: 3,
+  minAppealText: 20,
+  maxAppealText: 1500,
 };
 
-import { emailProblem, textProblem } from "./spam.js";
+import { abuseProblem, emailProblem, textProblem } from "./spam.js";
 
 export function validEmail(email) {
   return emailProblem(email) === null;
@@ -35,7 +42,7 @@ export function checkReport(r) {
   const text = (r.text ?? "").trim();
   if (text.length < LIMITS.minText) return "Cuenta un poco más qué ha pasado.";
   if (text.length > LIMITS.maxText) return `El texto es demasiado largo (máximo ${LIMITS.maxText} caracteres).`;
-  const badText = textProblem(text);
+  const badText = textProblem(text) ?? abuseProblem(text);
   if (badText) return badText;
   if (!["ios", "android"].includes(r.platform)) return "Plataforma desconocida.";
   if (!r.deviceId || r.deviceId.length > 64) return "Falta el identificador del dispositivo.";
@@ -64,14 +71,15 @@ export function discordPayload(r) {
     allowed_mentions: { parse: [] },
     embeds: [
       {
-        title: `Reporte desde ${r.platform === "ios" ? "iOS" : "Android"} ${r.appVersion ?? ""}`.trim(),
+        title: `${r.kind === "sugerencia" ? "💡 Sugerencia" : "Reporte"}${r.ticket ? ` #${r.ticket}` : ""} desde ${r.platform === "ios" ? "iOS" : "Android"} ${r.appVersion ?? ""}`.trim(),
         description: r.text.trim().slice(0, 4000),
-        color: 0x8b5cf6,
+        color: r.kind === "sugerencia" ? 0x34c759 : 0x8b5cf6,
         fields: [
           field("Correo", r.email.trim()),
           field("Sistema", r.os),
           field("Modelo", r.model),
           field("Dispositivo", r.deviceId.slice(0, 8)),
+          ...(r.ticket ? [field("Ticket", `#${r.ticket} · contesta con /msg, abre con /rp ${r.ticket} o`)] : []),
         ],
         timestamp: new Date().toISOString(),
       },

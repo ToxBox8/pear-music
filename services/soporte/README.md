@@ -43,3 +43,32 @@ Desplegado el 13-10-2026 en la cuenta de la web. KV `RATE` = `fa1cbcea…`. Los 
 ## Probar sin desplegar
 
 `npm test` (Node 20+): valida los límites y ejecuta el Worker entero con un KV y un Discord falsos.
+
+## Tickets y buzón de sugerencias (Cierre 1.0)
+
+Cada reporte o sugerencia (`kind=sugerencia`, desde Ayuda y soporte › Buzón de sugerencias) abre un ticket
+numerado: la app recibe `{ok, ticket}` y el embed de Discord lleva «#n». Las sugerencias van a
+`DISCORD_WEBHOOK_SUGERENCIAS` si existe (si no, al canal de soporte).
+
+Desde Discord (aplicación propia «Pear Music · soporte»; la del pánico es otra, porque cada aplicación tiene una sola
+URL de interacciones):
+
+- `/msg ticket:<autocompleta los abiertos> texto:<…> [tipo]`: le llega **sólo a esa persona** como aviso en la
+  campana. Tipos: 💬 mensaje (por defecto), 🎉 `fiesta` (solucionado, gracias; también si el texto empieza por
+  «fiesta») y `>_` `en-ello` (o si empieza por «estamos en ello»).
+- `/rp ticket:<n> accion:o` abre el ticket: hilo propio en `DISCORD_TICKETS_CHANNEL` y aviso «Abrimos tu
+  incidencia» con un check. `accion:c` lo cierra (archiva el hilo y ya no admite mensajes).
+
+La app pide sus avisos con `GET /mensajes?device=<id anónimo>` sólo si ya envió algo desde ese móvil. Aquí se guarda
+el resumen SHA-256 del id, nunca el id ni el correo (6 meses).
+
+Activarlo (Toxbox, una vez):
+1. Portal de desarrolladores de Discord › nueva aplicación «Pear Music · soporte» › *Public Key* →
+   `npx wrangler secret put DISCORD_PUBLIC_KEY`; *Bot* › token → `npx wrangler secret put DISCORD_BOT_TOKEN`.
+2. *Interactions Endpoint URL*: `https://libremusic-soporte.8toxbox8-69a.workers.dev/discord`.
+3. Invitar el bot al servidor de soporte con `applications.commands` y permiso de crear hilos y escribir.
+4. En `wrangler.toml` (`[vars]`): `DISCORD_ADMIN_ROLE` (id del rol) y `DISCORD_TICKETS_CHANNEL` (id del canal).
+   Opcional: `npx wrangler secret put DISCORD_WEBHOOK_SUGERENCIAS` (webhook del canal de sugerencias).
+5. `npx wrangler deploy` y `DISCORD_APP_ID=… DISCORD_GUILD_ID=… DISCORD_BOT_TOKEN=… node scripts/registrar-discord.mjs`.
+
+Desplegado el 15-10-2026 (tickets y `/mensajes` ya funcionan; los comandos esperan a los pasos 1–5).

@@ -272,7 +272,7 @@ final class Player: ObservableObject {
                         guard let self, self.current?.id == song.id else { return }
                         if retryDirect { self.load(preferHLS: false, renewed: renewed); return }
                         if retryRenewed { YTClient.resetVisitorData(); self.load(preferHLS: true, renewed: true); return }
-                        self.error = "Fallo al reproducir: \(Player.describe(item.error))"
+                        self.error = L("Fallo al reproducir: {0}", Player.describe(item.error))
                         self.isPlaying = false
                     }
                 }
@@ -293,12 +293,12 @@ final class Player: ObservableObject {
                     guard !Task.isCancelled, let self, self.current?.id == song.id,
                           item.status == .unknown else { return }
                     if retryDirect { self.load(preferHLS: false, renewed: renewed); return }
-                    self.error = "Fallo al reproducir: tiempo de espera agotado"
+                    self.error = L("Fallo al reproducir: tiempo de espera agotado")
                     self.isPlaying = false
                 }
             } catch {
                 if !Task.isCancelled {
-                    self.error = "No se pudo obtener el audio: \(error.localizedDescription)"
+                    self.error = L("No se pudo obtener el audio: {0}", error.localizedDescription)
                     isPlaying = false
                 }
             }
@@ -372,7 +372,7 @@ enum RepeatMode: String, CaseIterable {
     }
     var symbol: String { self == .one ? "repeat.1" : "repeat" }
     var label: String {
-        switch self { case .off: return "Repetir: no"; case .all: return "Repetir lista"; case .one: return "Repetir canción" }
+        switch self { case .off: return L("Repetir: no"); case .all: return L("Repetir lista"); case .one: return L("Repetir canción") }
     }
     var remote: MPRepeatType {
         switch self { case .off: return .off; case .all: return .all; case .one: return .one }

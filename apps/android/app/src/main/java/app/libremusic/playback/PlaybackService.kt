@@ -2,6 +2,8 @@
 
 package app.libremusic.playback
 
+
+import app.libremusic.L
 import android.app.PendingIntent
 import android.content.Intent
 import android.net.Uri
@@ -222,7 +224,7 @@ class PlaybackService : MediaLibraryService() {
             controller: MediaSession.ControllerInfo,
         ): ListenableFuture<MediaSession.MediaItemsWithStartPosition> {
             val saved = LastQueue.load(this@PlaybackService)
-                ?: return Futures.immediateFailedFuture(UnsupportedOperationException("No hay nada que retomar"))
+                ?: return Futures.immediateFailedFuture(UnsupportedOperationException(L("No hay nada que retomar")))
             return Futures.immediateFuture(
                 MediaSession.MediaItemsWithStartPosition(LastQueue.mediaItems(saved), saved.index, saved.positionMs),
             )

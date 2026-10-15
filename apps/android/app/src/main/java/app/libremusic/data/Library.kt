@@ -1,5 +1,7 @@
 package app.libremusic.data
 
+
+import app.libremusic.L
 import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +20,8 @@ data class Playlist(
     val tint: Int? = null,
     /** Si es un álbum guardado («Tus álbumes»): no sale en Playlists. docs/LIBRARY_FORMAT.md */
     val album: AlbumInfo? = null,
+    /** Fijado arriba en Biblioteca e Inicio para abrirlo de un toque (Fase 3.3). */
+    val pinned: Boolean = false,
 ) {
     val isAlbum: Boolean get() = album != null
 
@@ -29,6 +33,7 @@ data class Playlist(
             icon?.let { put("icon", it) }
             tint?.let { put("tint", it) }
             album?.let { put("album", it.toJson()) }
+            if (pinned) put("pinned", true)
         }
 
     companion object {
@@ -39,6 +44,7 @@ data class Playlist(
             icon = if (o.has("icon") && !o.isNull("icon")) o.optString("icon") else null,
             tint = if (o.has("tint") && !o.isNull("tint")) o.optInt("tint") else null,
             album = o.optJSONObject("album")?.let(AlbumInfo::fromJson),
+            pinned = o.optBoolean("pinned", false),
         )
     }
 }
@@ -63,7 +69,7 @@ data class AlbumInfo(val browseId: String, val artist: String? = null, val year:
         /** Del subtítulo de YouTube Music: «Álbum • Artista • 2024» o «Artista • 2024». */
         fun from(browseId: String, subtitle: String): AlbumInfo {
             val parts = subtitle.split(" • ").map { it.trim() }
-                .filter { it.isNotEmpty() && it !in setOf("Álbum", "Album", "Single", "EP") }
+                .filter { it.isNotEmpty() && it !in setOf(L("Álbum"), "Album", "Single", "EP") }
             val last = parts.lastOrNull()
             return if (last != null && last.length == 4 && last.all { it.isDigit() }) {
                 AlbumInfo(browseId, parts.dropLast(1).firstOrNull(), last)
@@ -188,6 +194,9 @@ class Library(context: Context) {
 
     fun coverFile(id: String): File = File(coversDir, "$id.jpg")
 
+    /** Fijar o soltar un álbum (o playlist) arriba en Biblioteca e Inicio. */
+    fun setPinned(id: String, pinned: Boolean) = updatePlaylist(id) { it.copy(pinned = pinned) }
+
     /** Guarda la foto reducida a 700 px (JPEG), como iOS; null la quita. */
     fun setCover(id: String, jpegOrImage: ByteArray?) {
         val f = coverFile(id)
@@ -234,14 +243,62 @@ class Library(context: Context) {
 
     // region Exportar / importar
 
-    fun exportJson(): String = _data.value.toJson().toString(2)
+    /**
+     * La copia (docs/LIBRARY_FORMAT.md). Desde 1.0 lleva también las **portadas propias** (`covers`, JPEG en
+     * base64) y el **orden manual** de las playlists (`playlistOrder`, `playlistSort`), que antes se perdían.
+     * [covers] = false para la nube cuando no caben (límite de 2 MB).
+     */
+    fun exportJson(covers: Boolean = true): String {
+        val o = _data.value.toJson()
+        if (covers) {
+            val map = JSONObject()
+            _data.value.playlists.forEach { p ->
+                val f = coverFile(p.id)
+                if (f.exists()) map.put(p.id, java.util.Base64.getEncoder().encodeToString(f.readBytes()))
+            }
+            if (map.length() > 0) o.put("covers", map)
+        }
+        val order = app.libremusic.ui.theme.Prefs.playlistOrder.value
+        if (order.isNotEmpty()) o.put("playlistOrder", JSONArray(order))
+        o.put("playlistSort", app.libremusic.ui.theme.Prefs.playlistSort.value)
+        // Orden de las carpetas de «Tu música» (Cierre 1.0), sólo si no es el de fábrica.
+        app.libremusic.ui.theme.Prefs.musicOrder.value.takeIf { it != app.libremusic.ui.theme.Prefs.MUSIC_DEFAULT }?.let { o.put("musicOrder", JSONArray(it)) }
+        return o.toString(2)
+    }
 
-    /** Añade lo que no estuviera ya. Devuelve cuántas canciones favoritas y playlists se han añadido. */
+    /**
+     * Añade lo que no estuviera ya (nunca borra). Devuelve cuántas canciones favoritas y playlists se han añadido.
+     * Las portadas se ponen donde no haya una propia, y el orden se une: el tuyo se respeta y lo nuevo va detrás
+     * en el orden de la copia; si este móvil no tenía orden propio, se adopta el de la copia.
+     */
     fun importJson(text: String): Pair<Int, Int> {
-        val incoming = LibraryData.fromJson(JSONObject(text))
+        val json = JSONObject(text)
+        val incoming = LibraryData.fromJson(json)
         val before = _data.value
         update { it.merge(incoming) }
         val after = _data.value
+        json.optJSONObject("covers")?.let { covers ->
+            var changed = false
+            after.playlists.forEach { p ->
+                val b64 = covers.optString(p.id).ifEmpty { null } ?: return@forEach
+                val f = coverFile(p.id)
+                if (!f.exists()) runCatching { f.writeBytes(java.util.Base64.getDecoder().decode(b64)); changed = true }
+            }
+            if (changed) _coverVersion.value++
+        }
+        json.optJSONArray("playlistOrder")?.let { arr ->
+            val prefs = app.libremusic.ui.theme.Prefs
+            val incomingOrder = (0 until arr.length()).map { arr.getString(it) }
+            val local = prefs.playlistOrder.value
+            prefs.setPlaylistOrder(mergeOrder(local, incomingOrder))
+            val sort = json.optString("playlistSort")
+            if (local.isEmpty() && sort.isNotEmpty()) prefs.setPlaylistSort(sort)
+        }
+        json.optJSONArray("musicOrder")?.let { arr ->
+            val prefs = app.libremusic.ui.theme.Prefs
+            // Como el orden de las playlists: si este móvil no tenía uno propio, se adopta el de la copia.
+            if (prefs.musicOrder.value == prefs.MUSIC_DEFAULT) prefs.setMusicOrder(prefs.decodeMusicOrder((0 until arr.length()).joinToString(",") { arr.getString(it) }))
+        }
         return (after.favorites.size - before.favorites.size) to (after.playlists.size - before.playlists.size)
     }
 
@@ -254,3 +311,7 @@ class Library(context: Context) {
             .getOrDefault(LibraryData())
     }
 }
+
+/** El orden de este móvil, y detrás lo que traiga la copia que no estuviera (en su orden). */
+fun mergeOrder(local: List<String>, incoming: List<String>): List<String> =
+    if (local.isEmpty()) incoming else local + incoming.filter { it !in local }

@@ -1,5 +1,7 @@
 package app.libremusic.playback
 
+
+import app.libremusic.L
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
@@ -79,10 +81,10 @@ object SleepTimer {
     /** «Se para en 12 min», «Se para en 45 s», «Al acabar la canción». */
     fun label(state: State = _state.value): String? = when (state) {
         State.Off -> null
-        State.EndOfSong -> "Se para al acabar la canción"
+        State.EndOfSong -> L("Se para al acabar la canción")
         is State.At -> {
             val s = ((remainingMs(state) ?: 0) + 999) / 1000
-            if (s >= 60) "Se para en ${(s + 59) / 60} min" else "Se para en $s s"
+            if (s >= 60) L("Se para en {0} min", (s + 59) / 60) else L("Se para en {0} s", s)
         }
     }
 

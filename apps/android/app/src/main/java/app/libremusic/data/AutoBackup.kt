@@ -1,5 +1,7 @@
 package app.libremusic.data
 
+
+import app.libremusic.L
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -93,7 +95,7 @@ object AutoBackup {
             sp(context).edit().putString("backupLast", today.toString()).apply()
             _state.value = st.copy(lastDay = today.toString(), error = null)
         } else {
-            _state.value = st.copy(error = "No se pudo guardar la copia. Vuelve a elegir la carpeta.")
+            _state.value = st.copy(error = L("No se pudo guardar la copia. Vuelve a elegir la carpeta."))
         }
         ok.isSuccess
     }

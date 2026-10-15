@@ -9,6 +9,7 @@ import android.graphics.Color
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.collectAsState
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.getValue
@@ -30,13 +31,16 @@ class AppActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        app.libremusic.jam.JamService.rememberLink(intent?.dataString)
         jamCode = JamLink.codeFrom(intent?.dataString)
         app.libremusic.data.AppShortcuts.handle(intent)
         app.libremusic.data.AppShortcuts.publish(this)
         abrirAvisosSi(intent)
         askForNotifications()
         setContent {
-            LibreMusicTheme {
+            // Al cambiar de idioma se vuelve a dibujar todo con los textos nuevos (Cierre 1.0).
+            val lang by I18n.lang.collectAsState()
+            androidx.compose.runtime.key(lang) { LibreMusicTheme {
                 LibreMusicApp(
                     jamCode = jamCode,
                     onDismissJam = { jamCode = null },
@@ -46,12 +50,13 @@ class AppActivity : ComponentActivity() {
                         enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
                     },
                 )
-            }
+            } }
         }
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        app.libremusic.jam.JamService.rememberLink(intent.dataString)
         JamLink.codeFrom(intent.dataString)?.let { jamCode = it }
         app.libremusic.data.AppShortcuts.handle(intent)
         abrirAvisosSi(intent)

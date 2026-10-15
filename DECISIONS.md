@@ -6,6 +6,89 @@ Las entradas anteriores al 2026-10-12 se han reconstruido a partir del historial
 
 ---
 
+## 2026-10-15 (13) — Revisión de las actualizaciones antes de publicar la 1.0
+
+- **Modo seguro y actualizaciones** (Toxbox aceptó la propuesta): con el kill switch en nivel 2 o más las apps sólo
+  ofrecen una versión marcada como arreglo (`"fix": true` en `version.json`, desde `changelog.ts` de la web). Antes
+  no ofrecían ninguna, y así no llegaba justo la versión que arregla el incidente.
+- **Enlace del APK con `?v=<versión>`** en `version.json`: si una caché servía el APK anterior con el hash nuevo, la
+  app decía «no coincide». Se descartó renombrar el archivo para no romper los enlaces a `LibreMusic.apk`.
+- **Android:** el aviso enseña el progreso de la descarga (de 10 en 10 %) y, si falta el permiso de instalar, al
+  volver a pulsar «Descargar» reutiliza el APK ya verificado en vez de bajarlo otra vez.
+- **iOS:** el botón «Descargar» del aviso no estaba traducido.
+- **Telemetría:** `PANEL_PUBLIC_KEY` pasa a la clave de Pear Dev release, la instalación nueva de Toxbox. Lo decidió
+  Toxbox: en la pública el resumen semanal es automático; **Pear Dev sólo manual** (mide siempre, envía sólo con
+  «Enviar ahora»). Se sigue pidiendo el consentimiento en la pública (RGPD: un identificador en el móvil lo exige).
+- **Test del flujo completo de «Descargar»** (`UpdatesFlowTest`): servidor HTTP local, SHA-256, reutilizar el APK,
+  instalador del sistema o ajustes del permiso.
+- **Quien tiene la 0.9.x no tiene este aviso** (llegó en la Fase 2): el paso a la 1.0 se anuncia por la campana
+  (`avisar.sh`) y `#novedades`. A partir de la 1.0 ya es automático.
+
+## 2026-10-15 (12) — Cierre 1.0: últimos fixes de Toxbox, tickets y buzón, idiomas y repo público
+
+- **Fuentes públicas** (lo decidió Toxbox: «Mantener las fuentes públicas»): la barra estilo SimpMusic es código GPL-3.0 adaptado, así que el código tiene que acompañar a los APK. El repo público se personaliza como el de SimpMusic (banner, logo, insignias, botones de descarga, capturas, créditos con SimpMusic) con `docs/publicar/README-publico.md` y `docs/readme/`. La compilación de iOS no se toca.
+- **Idiomas** (lo pidió Toxbox): español, català, valencià, galego, euskara, English (bandera del Reino Unido) y Esperanto. Se eligen en la bienvenida (primer paso) y en Ajustes › Idioma, con banderas dibujadas; España se despliega en sus cinco idiomas. Enfoque gettext: el texto en español es la clave (`L("…")`, `{0}` para datos), un catálogo común en `shared/i18n/` para las dos apps y `tools/i18n/` para extraerlo y montarlo. Cambia al momento, sin reiniciar. El valenciano sigue la norma de l'AVL (este/esta, seua, eixir, guardar, afig, mantín). Quedan en español: el panel de administración de Pear Dev, los textos de los widgets y atajos de Android (recursos del sistema) y algún texto con datos complejos.
+- **Tickets de soporte y buzón de sugerencias**: cada reporte o sugerencia abre un ticket numerado; desde Discord, `/msg` (autocompleta los abiertos) contesta SÓLO a esa persona con un aviso en la campana (check al abrirse, bocadillo, confeti si se solucionó, línea de comandos si «estamos en ello») y `/rp n o|c` abre un hilo propio o lo cierra. La app pide sus avisos con el id anónimo del soporte y sólo si ya envió algo. Es una aplicación de Discord aparte de la del pánico (una URL de interacciones por aplicación). Buzón: Ayuda y soporte › Buzón de sugerencias y una carta junto al escarabajo.
+- **Interfaz**: «Personalización» pasa a «Widgets»; Descubrir se oculta deslizándola a la izquierda en el orden de la barra (difuminada) en vez de con un interruptor; las carpetas de «Tu música» se ordenan manteniéndolas pulsadas (temblor suave, bordes redondeados; `musicOrder`, también en la copia); lápiz en Playlists › Ver todas para «Editar playlists»; el saludo pequeño de Inicio ya no pisa el Jam (con Ajustes arriba va a la izquierda) y su barra es opaca; icono del Jam = grupo de personas (el de SimpMusic; iOS `person.3`); la barra estilo SimpMusic no marca ninguna pestaña si la actual no está en la barra (antes marcaba Descubrir estando en Ajustes).
+- **La animación de la barra en Pear Dev** se veía peor porque era una compilación debug (1,8 % de tirones frente a 0,15 % en la pública, medido con `gfxinfo`); el código es el mismo. Las compilaciones finales de dev y pref son release.
+- **AltStore**: la fuente y el `.ipa` 1.4.1 cuadran (identificador, versión, tamaño, permisos, sin entitlements); falta el mensaje exacto de error de Toxbox o su `idevicesyslog` para seguir.
+
+## 2026-10-15 (11) — Fase 4b: telemetría semanal, «Enviar ahora» y panel sólo con el móvil de Toxbox por USB
+
+- **Un informe por semana** (lo pidió Toxbox): cada sesión se apunta sólo en el móvil y al empezar la semana ISO siguiente se envía el resumen (medianas y número de sesiones), al salir de la app o en la comprobación de fondo (AvisosWorker / `BGAppRefreshTask`). Campos nuevos `week`, `kind` y `sessions` en la lista cerrada; sin consentimiento no se apunta nada.
+- **Pear Dev › Administración › Telemetría**: «Enviar ahora» con interruptores para elegir los campos (`kind: "manual"`). Los obligatorios (identificador aleatorio, plataforma, variante, versión y semana) van siempre.
+- **Panel en la web sólo con el móvil de Toxbox conectado por USB** (lo eligió Toxbox: «llave en Pear Dev por cable», y después: «que sólo aparezca la opción de telemetría si la web detecta mi móvil conectado por USB»). Pear Dev tiene un par Ed25519 propio (privada cifrada con `SecureBox`); con «Llave del panel por USB» escucha sólo en `127.0.0.1:8765` del móvil, sólo responde a la web y se apaga a los 10 min. Con `adb forward tcp:8765 tcp:8765`, la web pregunta `/hola` y pide llaves de 5 min; la API (`PANEL_PUBLIC_KEY`) sólo enseña el resumen con una llave válida. Sin el móvil, `/panel-t` es un 404 y el menú no tiene «Telemetría».
+- **El menú sólo prueba 127.0.0.1 en el navegador donde ya se abrió el panel** (marca en `localStorage`): así ningún otro visitante hace peticiones a su red local ni ve avisos del navegador por ello. La web quita `upgrade-insecure-requests` (convertiría esa llamada en https); todo lo demás ya era https.
+- **`pear-music-api` desplegado sin correo** (D1 `pear-music` en weur): la telemetría ya funciona de verdad; las cuentas siguen «muy pronto» hasta tener dominio. *Diferencia aceptada:* la llave por USB sólo en Android (el móvil de Toxbox); iOS tiene «Enviar ahora».
+
+## 2026-10-14 (10) — Fase 4: kill switch firmado y botón de pánico remoto
+
+- **Estado firmado con Ed25519 y la clave privada sólo en el PC de Toxbox** (`~/.config/pear-music/estado-ed25519.pem`). Toxbox preguntó si era mejor guardarla en Cloudflare; se le explicó que en el PC es más segura (quien entre en Cloudflare no puede firmar nada) y lo aceptó («mejor claude», «si»). Las apps sólo llevan la pública.
+- **Estados prefirmados**: el PC firma un lote de 20 cambios × 4 niveles válido 30 días y lo sube; el Worker `pear-music-estado` (aparte de la web y del repo) sólo publica el siguiente sobre del lote. Así el botón funciona desde el móvil sin que la clave salga del PC. Contadores crecientes: las apps rechazan uno menor (anti-rollback).
+- **Niveles 0 normal · 1 aviso (caduca a las 24 h) · 2 modo seguro (apaga actualizaciones, búsqueda remota, soporte, telemetría y cuenta) · 3 bloqueo total.** Falla en abierto: sin red, sin estado, con firma mala o caducado, la app sigue normal. La música descargada sigue en los niveles 0–2.
+- **Activación desde Pear Dev (Administración) o `/panico` en Discord**, con contraseña (PBKDF2) + TOTP; 5 min entre cambios; 5 fallos por hora bloquean; auditoría y alerta al canal de administración. **Nivel 3 en dos pasos** (confirmar a los 10 min con otro código) en vez de pedir una segunda persona: Toxbox trabaja solo. La app de Discord la crea Toxbox; Claude no maneja tokens (`scripts/registrar-discord.mjs` lo ejecuta él).
+- **El panel de pánico de Pear Dev sustituye al «borrar datos y cerrar» local** de la Fase 1, que no protegía a nadie más que al móvil de pruebas.
+- **4.2, alcance de los avisos (`docs/AVISOS-ALCANCE.md`): el kill switch no va por push.** FCM/APNs no llega a todos (APNs probablemente imposible con Apple ID gratuito; FCM añade un tercero). Discord queda para administración y comunidad. Datos sin verificar marcados.
+- **Runbook en `docs/RUNBOOK-INCIDENTES.md`**: cuándo usar cada nivel, comunicar en `#avisos-pear-music`, recuperar, renovar el lote y rotar la clave (rotar exige versión nueva de las apps).
+
+## 2026-10-14 (9) — Fase 3: discografía, Artistas, copia completa, Jam más rápido, Descubrir opcional, fijados, reproductores y widgets
+
+- **Discografía completa: YouTube Music («Ver todo», lo que se puede escuchar) + MusicBrainz** (lo eligió Toxbox: «las dos»). MusicBrainz es API pública y documentada (1 petición/s, User-Agent con contacto); sólo se completa si el nombre del artista coincide exactamente (mejor no completar que mezclar artistas). Lo que no está en YouTube Music sale atenuado como «No disponible para escuchar». La forma de leer el «Ver todo» se aprendió leyendo SimpMusic (GPL-3.0), sin copiar código.
+- **Tocar un artista (Tu música › Artistas o la cabecera de un álbum) abre su perfil** de YouTube Music, buscado por nombre exacto; sin red o sin coincidencia, sus canciones guardadas. El perfil enlaza «En tu biblioteca». A-Z/Z-A arriba a la derecha (`artistsSort`).
+- **La copia de la biblioteca lleva portadas y orden** (`covers`, `playlistOrder`, `playlistSort`): antes se perdían. Al importar, portadas donde falten y orden unido (el del móvil manda). La nube sólo con portadas si caben en 2 MB.
+- **Jam: lo lento era encontrarlo y unirse** (lo dijo Toxbox). QR con la dirección del anfitrión (`?h=IP:puerto`, sólo IPs privadas) para conectar directo a la vez que se busca; cola de resolución NSD en Android (los reintentos podían perder el Jam bueno) y el código en el nombre del anuncio. Compatible con versiones anteriores. Medición antes/después pendiente del móvil.
+- **Descubrir se puede quitar de la barra** (`showDiscover`). **Fijar** álbumes y playlists arriba en Biblioteca e Inicio (`pinned` en `library.json`; lo eligió Toxbox).
+- **Carátulas = reproductores** (lo aclaró Toxbox): Air recibe bucle, temporizador y «⋯» con la letra; casete y vinilo a pantalla completa, controles. En vertical ya los tenían.
+- **Widgets (Android):** «Ahora suena» grande, accesos rápidos, playlist fijada y recientes, configurables en la nueva sección **Ajustes › Personalización** (tema oscuro/claro y playlist del widget). Lo eligió Toxbox (los cuatro). **iOS sin widgets por ahora**: una extensión de WidgetKit sin poder compilar iOS podría romper el `.ipa`; se hará con la CI.
+
+## 2026-10-14 (8) — Fase 2: bienvenida, cuenta opcional cifrada, telemetría, actualizaciones y soporte
+
+- **Cuenta opcional en Cloudflare (Worker `pear-music-api` + D1) con código al correo y biblioteca cifrada en el móvil** (lo eligió Toxbox: «que esté cifrado por seguridad de los usuarios»). La clave de cifrado es una clave de recuperación de 26 caracteres que sólo tiene el usuario; el servidor guarda un blob que no puede leer y el correo cifrado. ADR completo en `docs/adr/0001-cuenta-telemetria-actualizaciones.md`. Sin desplegar: el correo necesita un dominio propio (`services/api/README.md`).
+- **La cuenta se presenta como opcional, que ayuda a mejorar la app y que pronto tendrá ventajas** (lo pidió Toxbox: «ponlo más bonito y currado»): `AccountPitch` en Ajustes › Cuenta y en la guía. No se prometen ventajas concretas que aún no existen.
+- **Telemetría** sólo con consentimiento, apagada por defecto, separada de la cuenta y de las condiciones; lista cerrada de campos en `docs/TELEMETRIA.md`, 90 días, retirar = borrar en el servidor.
+- **Bienvenida: bienvenida → privacidad → tema → tutorial** (lo eligió Toxbox). El tutorial son tres piezas en este orden, también elegido por Toxbox: **recorrido sobre la app real** (foco sobre cada sección; se toca para avanzar), **historias a pantalla completa** con capturas reales y la tarjeta **«Primeros pasos»** en Inicio. Quien ya tenía la app sólo ve la pantalla de privacidad una vez. *Diferencia aceptada:* en iOS la barra de pestañas es del sistema y el recorrido resalta la barra entera en vez de cada pestaña.
+- **Aviso de versión nueva**: Android baja el APK, comprueba el SHA-256 de `version.json` y abre el instalador (mismo paquete y firma: se conservan biblioteca y descargas); iOS abre AltStore/SideStore (lo eligió Toxbox). Sólo la variante usr.
+- **Soporte:** las apps validan con las mismas reglas que el Worker antes de enviar; el Worker añade insultos, repetición en 24 h, registro de rechazos sin el texto y apelación (una por rechazo). Una palabrota suelta de frustración no se rechaza, para no perder reportes buenos.
+- **Borradores de soporte cifrados** (`SecureBox`: Android Keystore / Keychain + AES-256-GCM), el hallazgo bajo que quedaba abierto en la Fase 1. Lo pidió Toxbox.
+- **Botón de pánico:** se hace en la Fase 4 con el diseño de `tareas/FASE 4` (estado firmado Ed25519, niveles, TOTP), no aquí.
+
+## 2026-10-14 (7) — Fase 1: tres variantes y auditoría de datos
+
+- **Tres apps, un solo código: usr, pref y dev** (Android `productFlavors`, iOS configuraciones + schemes con `Config/*.xcconfig`). Lo pidió Toxbox. *Nombres:* el flavor de pruebas se llama `dev`, no `debug`, porque Gradle no deja que un flavor se llame como un tipo de compilación que ya existe. *Identificadores:* usr conserva `app.libremusic` / `com.example.libremusic` (las instalaciones de siempre se actualizan encima); pref y dev llevan sufijo y se llaman «Pear Pref» y «Pear Dev». *Distribución:* pref y dev **sólo en el móvil de Toxbox**, instaladas por adb con la depuración USB; nunca se publican (lo decidió Toxbox). En iOS el scheme `LibreMusic` sigue siendo usr para no tocar la CI ni las releases.
+- **Botón de pánico (dev) = borrar todos los datos de la variante y cerrarla.** Toxbox no lo concretó; se eligió lo más útil y seguro para un panel de pruebas. Reutiliza `UserData.eraseAll`.
+- **Tus datos (las tres variantes):** exportar todo en un .zip (sin el audio descargado) y borrar todo (Android `clearApplicationUserData`; iOS vacía archivos, ajustes, llavero y datos web y sale). Es el derecho de acceso, portabilidad y supresión del RGPD; no hay «borrar cuenta» porque no hay cuentas. Toxbox avisó de que **más adelante habrá telemetría**: tendrá que engancharse aquí con consentimiento separado y retirable.
+- **Sin certificate pinning** (YouTube, LRCLIB y Cloudflare rotan certificados) y **sin `EncryptedSharedPreferences`** (obsoleta desde 2025): sólo HTTPS con las CA del sistema y, si hace falta cifrar algo, Keystore/Keychain directamente. Informe completo en `docs/SEGURIDAD.md`.
+- **Pre-releases por fase** (lo decidió Toxbox): `preN` = fase N. Android `1.0.0-preN`; iOS `2.0.0` con el build subiendo, porque iOS sólo admite números en la versión. Sólo en el repo privado, como pre-release, con etiquetas `android-1.0.0-preN` / `ios-2.0.0-preN` (sin la `v`, para que no se lance `release.yml`).
+
+## 2026-10-14 (6) — Fase 0 del renombrado: un solo logo y «LibreMusic» sólo como historia de la marca
+
+- **Las apps sólo llevan el logo de Pear Music, el de encendido** (el que usa la web). Se quita «Icono de la app» de Ajustes › Aspecto y el icono violeta con nota y bobina, que pasa a ser el **logo antiguo**: sólo vive en el README (sección «Evolución de la marca») y en la web, como LibreMusic → Pear Music. Lo decidió Toxbox («deja el que es más reciente en los repos, el que se utiliza en la web»). *Migración:* en Android el alias `.MainActivityViolet` se queda en el manifiesto con el icono de encendido (si se borrara, a quien lo tenía activo se le quedaría la app sin icono) y `AppIcon.migrateLegacy` lo apaga al arrancar; en iOS, si había icono alternativo, se vuelve al principal (`setAlternateIconName(nil)`, con el aviso del sistema una vez). `render_icon.py` ya sólo dibuja el logo antiguo para la historia de la marca.
+- **Nombres internos visibles:** sólo cambia el nombre propuesto al exportar la copia (`pear-music-library.json`; importar acepta cualquier nombre). Los archivos `LibreMusic.apk` / `LibreMusic-ios-*.ipa`, los artefactos de la CI y la URL `libremusic-landing…workers.dev` se quedan: los usan Obtainium, AltStore y los enlaces ya compartidos. Lo decidió Toxbox.
+
+## 2026-10-14 (6) — cada versión también va a los avisos
+
+- Al publicar iOS 1.4.1 y Android 0.9.5, Toxbox no recibió en la app ninguna notificación de la actualización: el anuncio sólo fue a `#novedades`, y las apps sólo leen `#avisos-pear-music`. Desde ahora cada versión se anuncia en los dos canales (paso 6 de `docs/RELEASING.md`). No se hace que la app lea `#novedades`: es un canal público de charla de versiones y los avisos tienen que poder ser también caídas o urgencias, separados.
+
 ## 2026-10-14 (5) — avisos al abrir la app (Android 0.9.5)
 
 - Con el bot ya leyendo el canal (`/api/avisos` en «ok»), Toxbox vio que los avisos **llegaban a Open Menus pero no a Pear 0.9.4**. Al portar el código se quedó fuera la descarga al abrir: Pear sólo pintaba la copia guardada y bajaba avisos al entrar en la pantalla Avisos o en el trabajo de fondo (cada 15 min, o más si el sistema lo retrasa). Ahora se bajan cada vez que la app pasa a primer plano (Android `LifecycleEventEffect(ON_START)`, iOS `scenePhase == .active`), como Open Menus. Lo recibido así se apunta como notificado: ya se ve en la campana y no tiene sentido notificarlo después.

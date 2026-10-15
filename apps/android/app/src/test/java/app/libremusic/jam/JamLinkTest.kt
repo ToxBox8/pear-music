@@ -35,4 +35,18 @@ class JamLinkTest {
     @Test
     fun buildsLink() =
         assertEquals("libremusic://jam/ABC234", JamLink.link("ABC234"))
+
+    /** Fase 3.2: el QR lleva la dirección del anfitrión para entrar sin esperar a la búsqueda en la Wi-Fi. */
+    @Test fun enlaceDirecto() {
+        val link = JamLink.link("ABC234", "192.168.1.20:41234")
+        org.junit.Assert.assertEquals("libremusic://jam/ABC234?h=192.168.1.20:41234", link)
+        org.junit.Assert.assertEquals("ABC234", JamLink.codeFrom(link))
+        org.junit.Assert.assertEquals("192.168.1.20" to 41234, JamLink.directFrom(link))
+        // Sólo redes locales y puertos válidos: nunca se conecta a una IP pública por un QR.
+        org.junit.Assert.assertNull(JamLink.directFrom("libremusic://jam/ABC234?h=8.8.8.8:41234"))
+        org.junit.Assert.assertNull(JamLink.directFrom("libremusic://jam/ABC234?h=10.0.0.5:80"))
+        org.junit.Assert.assertNull(JamLink.directFrom("libremusic://jam/ABC234?h=300.1.1.1:41234"))
+        org.junit.Assert.assertNull(JamLink.directFrom("libremusic://jam/ABC234"))
+        org.junit.Assert.assertEquals("10.0.0.5" to 50000, JamLink.directFrom("libremusic://jam/ABC234?h=10.0.0.5:50000"))
+    }
 }

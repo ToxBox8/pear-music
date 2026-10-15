@@ -20,6 +20,8 @@ struct Playlist: Identifiable, Codable {
     var tint: Int?          // índice en PlaylistStyle.palettes
     /// Si es un álbum guardado («Tus álbumes»): no sale en Playlists. docs/LIBRARY_FORMAT.md
     var album: AlbumInfo?
+    /// Fijado arriba en Biblioteca e Inicio para abrirlo de un toque (Fase 3.3). nil = no.
+    var pinned: Bool?
 }
 
 /// Datos de un álbum de YouTube Music guardado como lista. Mismo formato que `AlbumInfo` en Android.
@@ -32,7 +34,7 @@ struct AlbumInfo: Codable, Hashable {
     init(browseId: String, subtitle: String) {
         self.browseId = browseId
         let parts = subtitle.components(separatedBy: " • ").map { $0.trimmingCharacters(in: .whitespaces) }
-            .filter { !$0.isEmpty && !["Álbum", "Album", "Single", "EP"].contains($0) }
+            .filter { !$0.isEmpty && ![L("Álbum"), "Album", "Single", "EP"].contains($0) }
         if let last = parts.last, last.count == 4, Int(last) != nil {
             year = last
             artist = parts.dropLast().first
@@ -170,10 +172,28 @@ final class Library: ObservableObject {
     }
     // MARK: Copia de la biblioteca (library.json, docs/LIBRARY_FORMAT.md)
     /// La biblioteca en el formato común con Android.
-    func exportData() -> Data {
+    /// Desde 2.0 lleva también las **portadas propias** (`covers`, JPEG en base64) y el **orden manual** de las
+    /// playlists (`playlistOrder`, `playlistSort`), que antes se perdían. `covers: false` para la nube si no caben.
+    func exportData(covers: Bool = true) -> Data {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        return (try? encoder.encode(Saved(favorites: favorites, playlists: playlists, recents: recents))) ?? Data()
+        let base = (try? encoder.encode(Saved(favorites: favorites, playlists: playlists, recents: recents))) ?? Data()
+        guard var dict = (try? JSONSerialization.jsonObject(with: base)) as? [String: Any] else { return base }
+        if covers {
+            var map: [String: String] = [:]
+            for p in playlists where PlaylistArt.exists(p.id) {
+                if let data = try? Data(contentsOf: PlaylistArt.url(p.id)) { map[p.id.uuidString] = data.base64EncodedString() }
+            }
+            if !map.isEmpty { dict["covers"] = map }
+        }
+        let d = UserDefaults.standard
+        let order = LibraryOrder.decode(d.string(forKey: "playlistOrder") ?? "")
+        if !order.isEmpty { dict["playlistOrder"] = order }
+        dict["playlistSort"] = d.string(forKey: "playlistSort") ?? "recent"
+        // Orden de las carpetas de «Tu música» (Cierre 1.0), sólo si no es el de fábrica.
+        let music = MusicOrder.decode(d.string(forKey: "musicOrder"))
+        if music != MusicOrder.defaults { dict["musicOrder"] = music }
+        return (try? JSONSerialization.data(withJSONObject: dict, options: [.prettyPrinted, .sortedKeys])) ?? base
     }
 
     /// Une una copia sin borrar nada: favoritas y recientes por id de canción, playlists por id.
@@ -190,6 +210,32 @@ final class Library: ObservableObject {
         favorites += newFavorites
         playlists += newPlaylists
         recents = Array((recents + newRecents).prefix(40))
+        // Portadas donde no haya una propia, y el orden unido: el tuyo se respeta y lo nuevo va detrás; si este
+        // iPhone no tenía orden propio, se adopta el de la copia. Igual que Library.importJson en Android.
+        if let extra = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] {
+            if let covers = extra["covers"] as? [String: String] {
+                for p in playlists where !PlaylistArt.exists(p.id) {
+                    if let b64 = covers[p.id.uuidString], let jpeg = Data(base64Encoded: b64) {
+                        try? FileManager.default.createDirectory(at: PlaylistArt.url(p.id).deletingLastPathComponent(), withIntermediateDirectories: true)
+                        try? jpeg.write(to: PlaylistArt.url(p.id), options: .atomic)
+                    }
+                }
+                objectWillChange.send()
+            }
+            if let incoming = extra["playlistOrder"] as? [String] {
+                let d = UserDefaults.standard
+                let local = LibraryOrder.decode(d.string(forKey: "playlistOrder") ?? "")
+                let merged = local.isEmpty ? incoming : local + incoming.filter { !local.contains($0) }
+                d.set(merged.joined(separator: "\n"), forKey: "playlistOrder")
+                if local.isEmpty, let sort = extra["playlistSort"] as? String { d.set(sort, forKey: "playlistSort") }
+            }
+            if let music = extra["musicOrder"] as? [String] {
+                let d = UserDefaults.standard
+                if MusicOrder.decode(d.string(forKey: "musicOrder")) == MusicOrder.defaults {
+                    d.set(MusicOrder.decode(music.joined(separator: ",")).joined(separator: ","), forKey: "musicOrder")
+                }
+            }
+        }
         return (newFavorites.count, newPlaylists.count)
     }
 
@@ -270,7 +316,7 @@ final class DownloadStore: ObservableObject {
             // Cancelada desde «Detener»: no es un fallo y no se marca para reintentar.
             if Task.isCancelled || error is CancellationError || (error as? URLError)?.code == .cancelled { return }
             failed.insert(song.id)
-            lastError = "No se pudo descargar «\(song.title)»: \(error.localizedDescription)"
+            lastError = L("No se pudo descargar «{0}»: {1}", song.title, error.localizedDescription)
         }
     }
 
@@ -406,5 +452,16 @@ final class DownloadStore: ObservableObject {
         downloadedIDs.remove(song.id)
         failed.remove(song.id)
         writeJSON(songs, to: indexFile)
+    }
+}
+
+/// Orden de las carpetas de «Tu música» (`musicOrder`, separadas por comas). Igual que `Prefs.musicOrder` en Android.
+enum MusicOrder {
+    static let defaults = ["downloads", "favorites", "albums", "songs", "artists", "recents", "stats"]
+    /// Lo guardado más lo que falte, sin repetir ni desconocidos.
+    static func decode(_ raw: String?) -> [String] {
+        var seen = Set<String>()
+        let saved = (raw ?? "").split(separator: ",").map(String.init).filter { defaults.contains($0) && seen.insert($0).inserted }
+        return saved + defaults.filter { !saved.contains($0) }
     }
 }

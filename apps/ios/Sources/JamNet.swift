@@ -20,6 +20,31 @@ struct JamWire: Codable {
 
 enum JamV2 {
     static let serviceType = "_lm-jam2._tcp"
+
+    /// La IPv4 privada del iPhone en la Wi-Fi (en0), o nil.
+    static func localIPv4() -> String? {
+        var ifaddr: UnsafeMutablePointer<ifaddrs>?
+        guard getifaddrs(&ifaddr) == 0, let first = ifaddr else { return nil }
+        defer { freeifaddrs(ifaddr) }
+        var fallback: String?
+        for ptr in sequence(first: first, next: { $0.pointee.ifa_next }) {
+            let ifa = ptr.pointee
+            guard let addr = ifa.ifa_addr, addr.pointee.sa_family == UInt8(AF_INET) else { continue }
+            var host = [CChar](repeating: 0, count: Int(NI_MAXHOST))
+            getnameinfo(addr, socklen_t(addr.pointee.sa_len), &host, socklen_t(host.count), nil, 0, NI_NUMERICHOST)
+            let ip = String(cString: host)
+            let name = String(cString: ifa.ifa_name)
+            guard ip.hasPrefix("10.") || ip.hasPrefix("192.168.") || isPrivate172(ip) else { continue }
+            if name == "en0" { return ip }
+            fallback = fallback ?? ip
+        }
+        return fallback
+    }
+
+    private static func isPrivate172(_ ip: String) -> Bool {
+        let p = ip.split(separator: ".").compactMap { Int($0) }
+        return p.count == 4 && p[0] == 172 && (16...31).contains(p[1])
+    }
     static let maxPeople = 16
     /// Topes contra abusos desde la red local (mismos que `JamRules` en Android).
     static let maxConnections = 24
@@ -106,11 +131,19 @@ final class JamHostV2 {
     var onMessage: ((UUID, JamWire) -> Void)?
     var onClose: ((UUID) -> Void)?
 
+    /// Dirección del anfitrión en la Wi-Fi («IP:puerto») para el QR, cuando el puerto está listo (Fase 3.2).
+    var onDirect: ((String) -> Void)?
+
     init?(name: String, code: String, host: String) {
         guard let listener = try? NWListener(using: .tcp) else { return nil }
         let txt = NWTXTRecord(["v": "2", "code": code, "host": String(host.prefix(40))])
-        listener.service = NWListener.Service(name: String(name.prefix(60)), type: JamV2.serviceType, domain: nil, txtRecord: txt)
+        // El código en el nombre: los invitados Android resuelven primero el que coincide (Fase 3.2).
+        listener.service = NWListener.Service(name: "\(name.prefix(48)) · \(code)", type: JamV2.serviceType, domain: nil, txtRecord: txt)
         listener.newConnectionHandler = { [weak self] connection in self?.accept(connection) }
+        listener.stateUpdateHandler = { [weak self, weak listener] state in
+            guard case .ready = state, let port = listener?.port?.rawValue, let ip = JamV2.localIPv4() else { return }
+            self?.onDirect?("\(ip):\(port)")
+        }
         self.listener = listener
         listener.start(queue: queue)
     }
@@ -170,7 +203,26 @@ final class JamGuestV2 {
     var onMessage: ((JamWire) -> Void)?
     var onClose: (() -> Void)?
 
-    init(code: String, name: String) {
+    private var started = Date()
+    private var direct: JamLine?
+    /// Conexiones de la búsqueda aún sin decidir (retenidas hasta que una gana).
+    private var pending: [JamLine] = []
+
+    /// `direct` («IP», puerto) del QR: se prueba a la vez que la búsqueda Bonjour y gana el primero (Fase 3.2).
+    init(code: String, name: String, direct: (String, UInt16)? = nil) {
+        if let (ip, port) = direct, let p = NWEndpoint.Port(rawValue: port) {
+            let quick = JamLine(NWConnection(host: NWEndpoint.Host(ip), port: p, using: .tcp))
+            self.direct = quick
+            quick.onReady = { [weak self, weak quick] in
+                guard let self, let quick, self.line == nil else { quick?.close(); return }
+                self.adopt(quick, code: code, name: name, via: "directo")
+            }
+            quick.start(queue: queue)
+            // Si en 2 s no ha conectado, se abandona: la búsqueda sigue por su lado.
+            queue.asyncAfter(deadline: .now() + 2) { [weak self] in
+                if let self, self.line == nil { self.direct?.close(); self.direct = nil }
+            }
+        }
         let browser = NWBrowser(for: .bonjourWithTXTRecord(type: JamV2.serviceType, domain: nil), using: .tcp)
         browser.browseResultsChangedHandler = { [weak self] results, _ in
             guard let self, self.line == nil else { return }
@@ -186,14 +238,28 @@ final class JamGuestV2 {
     }
 
     private func connect(to endpoint: NWEndpoint, code: String, name: String) {
+        let found = JamLine(NWConnection(to: endpoint, using: .tcp))
+        pending.append(found)
+        found.onReady = { [weak self, weak found] in
+            guard let self, let found, self.line == nil else { found?.close(); return }
+            self.adopt(found, code: code, name: name, via: "wifi")
+        }
+        found.start(queue: queue)
+    }
+
+    /// El primer camino que conecta se queda la conexión; se paran la búsqueda y el otro intento.
+    private func adopt(_ winner: JamLine, code: String, name: String, via: String) {
+        line = winner
         browser?.cancel()
         browser = nil
-        let line = JamLine(NWConnection(to: endpoint, using: .tcp))
-        self.line = line
-        line.onReady = { [weak line] in line?.send(JamWire(type: "hello", name: name, code: code)) }
-        line.onMessage = { [weak self] msg in self?.onMessage?(msg) }
-        line.onClose = { [weak self] in self?.onClose?() }
-        line.start(queue: queue)
+        if direct !== winner { direct?.close() }
+        direct = nil
+        pending.filter { $0 !== winner }.forEach { $0.close() }
+        pending = []
+        Logs.d("LMJam", "join_ms=\(Int(Date().timeIntervalSince(started) * 1000)) via=\(via)")
+        winner.onMessage = { [weak self] msg in self?.onMessage?(msg) }
+        winner.onClose = { [weak self] in self?.onClose?() }
+        winner.send(JamWire(type: "hello", name: name, code: code))
     }
 
     func send(_ msg: JamWire) {

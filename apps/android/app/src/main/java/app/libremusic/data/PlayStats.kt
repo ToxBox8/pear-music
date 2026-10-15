@@ -1,5 +1,7 @@
 package app.libremusic.data
 
+
+import app.libremusic.L
 import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,7 +19,9 @@ import java.util.concurrent.Executors
  * `{"version":1,"songs":{"<videoId>":{"title","artist","thumbnail"}},"plays":[["<videoId>",<segundos epoch>],…]}`.
  */
 object PlayStats {
-    enum class Period(val key: String, val title: String) { Month("month", "Este mes"), Year("year", "Este año"), All("all", "Siempre") }
+    enum class Period(val key: String, private val titleEs: String) { Month("month", L("Este mes")), Year("year", L("Este año")), All("all", "Siempre") ;
+    val title: String get() = L(titleEs)
+}
 
     data class Play(val id: String, val at: Long)
     data class Data(val songs: Map<String, Song> = emptyMap(), val plays: List<Play> = emptyList())

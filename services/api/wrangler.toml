@@ -1,0 +1,30 @@
+# pear-music-api (ADR 0001): cuenta opcional, biblioteca cifrada en el móvil y telemetría con consentimiento.
+# Despliegue y secretos: README.md. Desplegado el 14-10-2026 sin correo (falta un dominio): telemetría sí, cuentas aún no.
+name = "pear-music-api"
+main = "src/worker.js"
+compatibility_date = "2026-09-01"
+workers_dev = true
+preview_urls = false
+
+[vars]
+# Remitente del código de acceso: tiene que ser de un dominio dado de alta en Cloudflare Email Service.
+MAIL_FROM = ""
+# Panel de telemetría (Fase 4b): clave pública de Pear Dev (Administración › Copiar clave pública) y la web.
+PANEL_PUBLIC_KEY = "nN1ybcOUBiQ3nmCDTYU8GSEQMEbVH1iAE6bdYqdFOuU="
+PANEL_ORIGIN = "https://libremusic-landing.8toxbox8-69a.workers.dev"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "pear-music"
+database_id = "76962086-71be-4f09-838d-1be94107a963"
+
+[[kv_namespaces]]
+binding = "RATE"
+id = "7fda8c1d0b7a4ef3a063dcf12ca0849d"
+
+[[send_email]]
+name = "EMAIL"
+
+# Limpieza diaria: telemetría de más de 90 días y códigos caducados.
+[triggers]
+crons = ["17 3 * * *"]

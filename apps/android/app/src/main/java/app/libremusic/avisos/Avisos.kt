@@ -1,5 +1,7 @@
 package app.libremusic.avisos
 
+
+import app.libremusic.L
 import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +25,12 @@ data class Aviso(
     val texto: String,
     val enlace: String?,
     val fecha: Instant,
+    /**
+     * Respuesta del soporte SÓLO para esta instalación (tickets, Cierre 1.0): «abierto» (check), «mensaje»
+     * (bocadillo), «fiesta» (confeti, solucionado) o «en-ello» (línea de comandos). null = aviso para todos.
+     */
+    val personal: String? = null,
+    val ticket: Int? = null,
 )
 
 sealed interface EstadoAvisos {
@@ -49,6 +57,8 @@ object AvisosRepo {
     private const val CLAVE_JSON = "ultima_respuesta"
     private const val CLAVE_VISTOS = "vistos"
     private const val CLAVE_NOTIFICADOS = "notificados"
+    private const val CLAVE_PERSONALES = "personales"
+    const val URL_MENSAJES = "https://libremusic-soporte.8toxbox8-69a.workers.dev/mensajes"
     const val CLAVE_NOTIFICAR = "notificar_en_movil"
 
     private val _estado = MutableStateFlow<EstadoAvisos>(EstadoAvisos.Cargando)
@@ -65,7 +75,8 @@ object AvisosRepo {
     /** Pinta la copia guardada al instante; luego llama a [refrescar]. */
     fun cargarCopia(context: Context) {
         val guardado = prefs(context).getString(CLAVE_JSON, null) ?: return
-        runCatching { parsear(guardado) }.onSuccess { avisos ->
+        runCatching { parsear(guardado) }.onSuccess { generales ->
+            val avisos = juntar(generales, prefs(context).getString(CLAVE_PERSONALES, null)?.let { runCatching { parsearPersonales(it) }.getOrNull() }.orEmpty())
             _estado.value = EstadoAvisos.Listo(avisos, sinConexion = false)
             recalcularSinLeer(context, avisos)
         }
@@ -74,7 +85,8 @@ object AvisosRepo {
     /** Descarga los avisos. Devuelve la lista nueva, o null si no se pudo. */
     suspend fun refrescar(context: Context): List<Aviso>? {
         val json = withContext(Dispatchers.IO) { runCatching { descargar(url(context)) }.getOrNull() }
-        val avisos = json?.let { runCatching { parsear(it) }.getOrNull() }
+        val generales = json?.let { runCatching { parsear(it) }.getOrNull() }
+        val avisos = generales?.let { juntar(it, personales(context)) }
         if (avisos == null) {
             _estado.value =
                 when (val actual = _estado.value) {
@@ -87,6 +99,40 @@ object AvisosRepo {
         _estado.value = EstadoAvisos.Listo(avisos, sinConexion = false)
         recalcularSinLeer(context, avisos)
         return avisos
+    }
+
+    /** Avisos generales y respuestas del soporte para esta instalación, de más nuevo a más viejo. */
+    private fun juntar(generales: List<Aviso>, personales: List<Aviso>) = (generales + personales).sortedByDescending { it.fecha }
+
+    /**
+     * Las respuestas del soporte a los tickets de esta instalación. Sólo se piden si desde aquí se ha enviado algún
+     * reporte o sugerencia (así nadie más manda su identificador). Sin red, la copia guardada.
+     */
+    private suspend fun personales(context: Context): List<Aviso> = withContext(Dispatchers.IO) {
+        val device = app.libremusic.data.SupportClient.sentDeviceId(context) ?: return@withContext emptyList()
+        val guardado = prefs(context).getString(CLAVE_PERSONALES, null)
+        val json = runCatching { descargar("$URL_MENSAJES?device=${java.net.URLEncoder.encode(device, "UTF-8")}") }.getOrNull()
+        val lista = json?.let { runCatching { parsearPersonales(it) }.getOrNull() }
+        if (lista != null) prefs(context).edit().putString(CLAVE_PERSONALES, json).apply()
+        lista ?: guardado?.let { runCatching { parsearPersonales(it) }.getOrNull() }.orEmpty()
+    }
+
+    fun parsearPersonales(json: String): List<Aviso> {
+        val lista = JSONObject(json).getJSONArray("mensajes")
+        return (0 until lista.length()).map { i ->
+            val m = lista.getJSONObject(i)
+            val n = m.optInt("ticket")
+            Aviso(
+                id = "ticket-" + m.getString("id"),
+                importante = false,
+                titulo = m.optString("title").ifEmpty { L("Respuesta de Pear Music") },
+                texto = m.optString("text"),
+                enlace = null,
+                fecha = Instant.parse(m.getString("at")),
+                personal = m.optString("tipo").takeIf { it in setOf("abierto", "mensaje", "fiesta", "en-ello") } ?: "mensaje",
+                ticket = n.takeIf { it > 0 },
+            )
+        }
     }
 
     /**

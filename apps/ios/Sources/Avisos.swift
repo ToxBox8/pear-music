@@ -15,6 +15,10 @@ struct Aviso: Identifiable, Equatable {
     let texto: String
     let enlace: URL?
     let fecha: Date
+    /// Respuesta del soporte SÓLO para este iPhone (tickets, Cierre 1.0): «abierto», «mensaje», «fiesta» o
+    /// «en-ello». nil = aviso para todos. Igual que Android.
+    var personal: String? = nil
+    var ticket: Int? = nil
 }
 
 enum EstadoAvisos: Equatable {
@@ -45,6 +49,7 @@ final class AvisosStore: ObservableObject {
         static let vistos = "avisos.vistos"
         static let notificados = "avisos.notificados"
         static let notificar = "avisos.notificar"
+        static let personales = "avisos.personales"
     }
 
     var notificar: Bool {
@@ -57,7 +62,8 @@ final class AvisosStore: ObservableObject {
 
     /// Pinta la copia guardada al instante; luego hay que llamar a `refrescar()`.
     func cargarCopia() {
-        guard let data = d.data(forKey: Clave.json), let avisos = try? Self.parsear(data) else { return }
+        guard let data = d.data(forKey: Clave.json), let generales = try? Self.parsear(data) else { return }
+        let avisos = Self.juntar(generales, d.data(forKey: Clave.personales).flatMap { try? Self.parsearPersonales($0) } ?? [])
         estado = .listo(avisos, sinConexion: false)
         recalcularSinLeer(avisos)
     }
@@ -69,10 +75,11 @@ final class AvisosStore: ObservableObject {
         req.setValue("application/json", forHTTPHeaderField: "Accept")
         guard let (data, resp) = try? await URLSession.shared.data(for: req),
               (resp as? HTTPURLResponse)?.statusCode == 200, data.count <= 256 * 1024,
-              let avisos = try? Self.parsear(data) else {
+              let generales = try? Self.parsear(data) else {
             if case .listo(let l, _) = estado { estado = .listo(l, sinConexion: true) } else { estado = .error }
             return nil
         }
+        let avisos = Self.juntar(generales, await personales())
         d.set(data, forKey: Clave.json)
         estado = .listo(avisos, sinConexion: false)
         recalcularSinLeer(avisos)
@@ -113,6 +120,37 @@ final class AvisosStore: ObservableObject {
     enum Fallo: Error { case formato, version, estado }
 
     /// Falla si no es la versión 1 o el estado no es «ok» ni «sin_configurar» (que es una lista vacía).
+    nonisolated static func juntar(_ generales: [Aviso], _ personales: [Aviso]) -> [Aviso] {
+        (generales + personales).sorted { $0.fecha > $1.fecha }
+    }
+
+    /// Las respuestas del soporte a los tickets de este iPhone; sólo si ya se envió algo desde aquí.
+    private func personales() async -> [Aviso] {
+        let guardado = d.data(forKey: Clave.personales).flatMap { try? Self.parsearPersonales($0) } ?? []
+        guard let device = SupportClient.sentDeviceID,
+              var url = URLComponents(string: "https://libremusic-soporte.8toxbox8-69a.workers.dev/mensajes") else { return guardado }
+        url.queryItems = [URLQueryItem(name: "device", value: device)]
+        guard let u = url.url, let (data, resp) = try? await URLSession.shared.data(from: u),
+              (resp as? HTTPURLResponse)?.statusCode == 200, let lista = try? Self.parsearPersonales(data) else { return guardado }
+        d.set(data, forKey: Clave.personales)
+        return lista
+    }
+
+    nonisolated static func parsearPersonales(_ data: Data) throws -> [Aviso] {
+        guard let raiz = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let lista = raiz["mensajes"] as? [[String: Any]] else { throw Fallo.formato }
+        let iso = ISO8601DateFormatter()
+        iso.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let tipos: Set<String> = ["abierto", "mensaje", "fiesta", "en-ello"]
+        return lista.compactMap { m in
+            guard let id = m["id"] as? String, let at = m["at"] as? String, let fecha = iso.date(from: at) ?? ISO8601DateFormatter().date(from: at) else { return nil }
+            let tipo = m["tipo"] as? String ?? "mensaje"
+            return Aviso(id: "ticket-" + id, importante: false, titulo: m["title"] as? String ?? L("Respuesta de Pear Music"),
+                         texto: m["text"] as? String ?? "", enlace: nil, fecha: fecha,
+                         personal: tipos.contains(tipo) ? tipo : "mensaje", ticket: m["ticket"] as? Int)
+        }
+    }
+
     nonisolated static func parsear(_ data: Data) throws -> [Aviso] {
         guard let raiz = try JSONSerialization.jsonObject(with: data) as? [String: Any] else { throw Fallo.formato }
         guard raiz["version"] as? Int == 1 else { throw Fallo.version }
@@ -138,6 +176,9 @@ final class AvisosStore: ObservableObject {
         BGTaskScheduler.shared.register(forTaskWithIdentifier: tareaFondo, using: nil) { tarea in
             programarFondo()
             let trabajo = Task { @MainActor in
+                // Estado de incidencias (Fase 4) y resumen semanal de telemetría (Fase 4b), igual que el AvisosWorker de Android.
+                await Incident.shared.refresh()
+                await Telemetry.shared.flushIfDue()
                 let store = AvisosStore.shared
                 if let avisos = await store.refrescar(), store.notificar {
                     for aviso in store.pendientesDeNotificar(avisos) { await notificar(aviso) }
@@ -197,13 +238,13 @@ final class AvisosNotificationDelegate: NSObject, UNUserNotificationCenterDelega
 /// Igual que la web y Android: «ahora mismo», «hace 5 min», «hace 3 h», «ayer», «hace 3 días» o la fecha.
 func haceCuanto(_ fecha: Date, ahora: Date = Date()) -> String {
     let seg = max(0, ahora.timeIntervalSince(fecha))
-    if seg < 60 { return "ahora mismo" }
+    if seg < 60 { return L("ahora mismo") }
     let min = (seg / 60).rounded()
-    if min < 60 { return "hace \(Int(min)) min" }
+    if min < 60 { return L("hace {0} min", Int(min)) }
     let h = (min / 60).rounded()
-    if h < 24 { return "hace \(Int(h)) h" }
+    if h < 24 { return L("hace {0} h", Int(h)) }
     let d = (h / 24).rounded()
-    if d < 7 { return d == 1 ? "ayer" : "hace \(Int(d)) días" }
+    if d < 7 { return d == 1 ? "ayer" : L("hace {0} días", Int(d)) }
     let f = DateFormatter()
     f.locale = Locale(identifier: "es_ES")
     f.dateFormat = "d MMM yyyy"
@@ -232,7 +273,7 @@ struct AvisosBell: View {
                     }
                 }
         }
-        .accessibilityLabel(store.sinLeer > 0 ? "Avisos, \(store.sinLeer) sin leer" : "Avisos")
+        .accessibilityLabel(store.sinLeer > 0 ? L("Avisos, {0} sin leer", store.sinLeer) : L("Avisos"))
     }
 }
 
@@ -244,14 +285,14 @@ struct AvisosView: View {
         Form {
             Section {
                 Toggle(isOn: $notificar) {
-                    SettingsRow(icon: "bell.badge.fill", palette: 4, title: "Notificar en el móvil", value: nil)
+                    SettingsRow(icon: "bell.badge.fill", palette: 4, title: L("Notificar en el móvil"), value: nil)
                 }
                 .onChange(of: notificar) { nuevo in
                     store.notificar = nuevo
                     if nuevo { Task { await store.pedirPermiso(); notificar = store.notificar } }
                 }
             } footer: {
-                Text("Comprueba de vez en cuando si hay avisos nuevos. Sólo se pide la lista de avisos, sin enviar nada tuyo.")
+                Text(L("Comprueba de vez en cuando si hay avisos nuevos. Sólo se pide la lista de avisos, sin enviar nada tuyo."))
             }
             .glassRow()
             switch store.estado {
@@ -261,9 +302,9 @@ struct AvisosView: View {
                 Section {
                     VStack(spacing: 8) {
                         Image(systemName: "icloud.slash").font(.largeTitle).foregroundStyle(.tertiary)
-                        Text("No se han podido cargar").font(.headline)
-                        Text("Comprueba la conexión y vuelve a intentarlo.").font(.subheadline).foregroundStyle(.secondary)
-                        Button("Reintentar") { Task { await store.refrescar() } }.buttonStyle(.bordered)
+                        Text(L("No se han podido cargar")).font(.headline)
+                        Text(L("Comprueba la conexión y vuelve a intentarlo.")).font(.subheadline).foregroundStyle(.secondary)
+                        Button(L("Reintentar")) { Task { await store.refrescar() } }.buttonStyle(.bordered)
                     }
                     .frame(maxWidth: .infinity).padding(.vertical, 24).multilineTextAlignment(.center)
                 }
@@ -272,8 +313,8 @@ struct AvisosView: View {
                     Section {
                         VStack(spacing: 8) {
                             Image(systemName: "bell.slash").font(.largeTitle).foregroundStyle(.tertiary)
-                            Text("No hay avisos").font(.headline)
-                            Text("Cuando haya algo importante saldrá aquí.").font(.subheadline).foregroundStyle(.secondary)
+                            Text(L("No hay avisos")).font(.headline)
+                            Text(L("Cuando haya algo importante saldrá aquí.")).font(.subheadline).foregroundStyle(.secondary)
                         }
                         .frame(maxWidth: .infinity).padding(.vertical, 24).multilineTextAlignment(.center)
                     }
@@ -281,15 +322,15 @@ struct AvisosView: View {
                     Section {
                         ForEach(avisos) { AvisoRow(aviso: $0) }
                     } header: {
-                        if sinConexion { Text("Sin conexión") }
+                        if sinConexion { Text(L("Sin conexión")) }
                     } footer: {
-                        if sinConexion { Text("Estos son los últimos avisos guardados.") }
+                        if sinConexion { Text(L("Estos son los últimos avisos guardados.")) }
                     }
                     .glassRow()
                 }
             }
         }
-        .navigationTitle("Avisos")
+        .navigationTitle(L("Avisos"))
         .navigationBarTitleDisplayMode(.inline)
         .refreshable { await store.refrescar() }
         .task {
@@ -307,18 +348,35 @@ private struct AvisoRow: View {
     let aviso: Aviso
     @Environment(\.openURL) private var openURL
 
+    // Respuestas del soporte sólo para ti: check (abierta), bocadillo, confeti (solucionado) y línea de comandos.
+    private var symbol: String {
+        switch aviso.personal {
+        case "abierto": return "checkmark.circle.fill"
+        case "mensaje": return "bubble.left.fill"
+        case "fiesta": return "party.popper.fill"
+        case "en-ello": return "apple.terminal.fill"
+        default: return aviso.importante ? "exclamationmark.bubble.fill" : "megaphone.fill"
+        }
+    }
+    private var highlighted: Bool { aviso.importante || aviso.personal != nil }
+    private var tint: Color { aviso.personal == "fiesta" ? .green : highlighted ? .accentColor : .secondary }
+    private var label: String {
+        if aviso.personal != nil { return L("Sólo para ti") + (aviso.ticket.map { L(" · ticket #{0}", $0) } ?? "") }
+        return aviso.importante ? L("Importante") : L("Aviso")
+    }
+
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            Image(systemName: aviso.importante ? "exclamationmark.bubble.fill" : "megaphone.fill")
+            Image(systemName: symbol)
                 .font(.system(size: 17, weight: .semibold))
-                .foregroundStyle(aviso.importante ? Color.accentColor : .secondary)
+                .foregroundStyle(tint)
                 .frame(width: 40, height: 40)
-                .background(Circle().fill((aviso.importante ? Color.accentColor : Color.secondary).opacity(aviso.importante ? 0.16 : 0.12)))
+                .background(Circle().fill(tint.opacity(highlighted ? 0.16 : 0.12)))
             VStack(alignment: .leading, spacing: 3) {
                 HStack {
-                    Text(aviso.importante ? "Importante" : "Aviso")
+                    Text(label)
                         .font(.footnote.weight(.semibold))
-                        .foregroundStyle(aviso.importante ? Color.accentColor : .secondary)
+                        .foregroundStyle(tint)
                     Spacer()
                     Text(haceCuanto(aviso.fecha)).font(.footnote).foregroundStyle(.secondary)
                 }

@@ -1,7 +1,6 @@
 package app.libremusic.playback
 
 import android.media.audiofx.LoudnessEnhancer
-import android.util.Log
 import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
@@ -104,7 +103,7 @@ object Normalizer {
                 null
             } else {
                 runCatching { LoudnessEnhancer(sessionId) }
-                    .onFailure { Log.w("Normalizer", "Sin LoudnessEnhancer: ${it.message}") }
+                    .onFailure { app.libremusic.data.Logs.w("Normalizer", "Sin LoudnessEnhancer: ${it.message}") }
                     .getOrNull()
             }
     }

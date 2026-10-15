@@ -1,7 +1,8 @@
 package app.libremusic.playback
 
+
+import app.libremusic.L
 import android.media.audiofx.Equalizer
-import android.util.Log
 import kotlin.math.log2
 
 /**
@@ -10,13 +11,15 @@ import kotlin.math.log2
  * tenga el móvil (suelen ser 5). Sólo Android: iOS reproduce HLS con AVPlayer, que no deja procesar el audio.
  */
 object Eq {
-    enum class Preset(val key: String, val title: String, val subtitle: String) {
-        Off("off", "No", "El sonido tal cual"),
-        Bass("bass", "Más graves", "Bajos y bombos con más cuerpo"),
-        Vocal("vocal", "Voces claras", "Voces y pódcast más presentes"),
-        Treble("treble", "Más agudos", "Más brillo y detalle"),
-        Small("small", "Altavoz pequeño", "Para el altavoz del móvil o uno portátil"),
+    enum class Preset(val key: String, private val titleEs: String, private val subtitleEs: String) {
+        Off("off", "No", L("El sonido tal cual")),
+        Bass("bass", L("Más graves"), L("Bajos y bombos con más cuerpo")),
+        Vocal("vocal", L("Voces claras"), L("Voces y pódcast más presentes")),
+        Treble("treble", L("Más agudos"), L("Más brillo y detalle")),
+        Small("small", L("Altavoz pequeño"), L("Para el altavoz del móvil o uno portátil")),
         ;
+    val title: String get() = L(titleEs)
+    val subtitle: String get() = L(subtitleEs)
 
         companion object {
             fun of(key: String?) = entries.firstOrNull { it.key == key } ?: Off
@@ -45,7 +48,7 @@ object Eq {
     fun attach(audioSessionId: Int) {
         release()
         if (audioSessionId == 0) return
-        eq = runCatching { Equalizer(0, audioSessionId) }.onFailure { Log.w("Eq", "Sin ecualizador: ${it.message}") }.getOrNull()
+        eq = runCatching { Equalizer(0, audioSessionId) }.onFailure { app.libremusic.data.Logs.w("Eq", "Sin ecualizador: ${it.message}") }.getOrNull()
         apply()
     }
 
@@ -64,6 +67,6 @@ object Eq {
                 e.setBandLevel(b.toShort(), mb.toShort())
             }
             e.enabled = preset != Preset.Off
-        }.onFailure { Log.w("Eq", "No se pudo aplicar: ${it.message}") }
+        }.onFailure { app.libremusic.data.Logs.w("Eq", "No se pudo aplicar: ${it.message}") }
     }
 }

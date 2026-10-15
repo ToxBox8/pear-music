@@ -2,6 +2,8 @@
 
 package app.libremusic.playback
 
+
+import app.libremusic.L
 import android.os.Bundle
 import androidx.media3.common.Player
 import androidx.media3.session.CommandButton
@@ -34,9 +36,9 @@ object Repeat {
     }
 
     fun label(mode: Int): String = when (mode) {
-        Player.REPEAT_MODE_ALL -> "Repetir lista"
-        Player.REPEAT_MODE_ONE -> "Repetir canción"
-        else -> "Repetir: no"
+        Player.REPEAT_MODE_ALL -> L("Repetir lista")
+        Player.REPEAT_MODE_ONE -> L("Repetir canción")
+        else -> L("Repetir: no")
     }
 
     /** Botón de la notificación y la pantalla de bloqueo, con el icono del estado actual. */

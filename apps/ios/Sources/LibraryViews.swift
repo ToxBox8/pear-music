@@ -27,7 +27,7 @@ extension Library {
 func primaryArtist(_ s: String) -> String {
     let name = s.replacingOccurrences(of: #"\s*(,| y | & | x | feat\.? | ft\.? | · ).*$"#, with: "",
                                       options: [.regularExpression, .caseInsensitive])
-    return name.isEmpty ? "Desconocido" : name
+    return name.isEmpty ? L("Desconocido") : name
 }
 
 struct RowHighlightStyle: ButtonStyle {
@@ -64,7 +64,7 @@ struct NoMatchesView: View {
     var body: some View {
         VStack(spacing: 6) {
             Image(systemName: "magnifyingglass").font(.title2).foregroundStyle(.secondary)
-            Text("Nada coincide con «\(query.trimmingCharacters(in: .whitespaces))»").foregroundStyle(.secondary)
+            Text(L("Nada coincide con «{0}»", query.trimmingCharacters(in: .whitespaces))).foregroundStyle(.secondary)
         }
         .multilineTextAlignment(.center).padding(.horizontal, 32)
     }
@@ -75,6 +75,7 @@ struct PlaylistsListView: View {
     @AppStorage("playlistSort") private var sort = "recent"
     @AppStorage("playlistOrder") private var orderRaw = ""
     @State private var query = ""
+    @State private var editing = false
 
     /// En el mismo orden que el carrusel.
     private var ordered: [Playlist] {
@@ -99,13 +100,21 @@ struct PlaylistsListView: View {
             .glassRow()
         }
         .overlay {
-            if library.userPlaylists.isEmpty { Text("Todavía no hay playlists").foregroundStyle(.secondary) }
+            if library.userPlaylists.isEmpty { Text(L("Todavía no hay playlists")).foregroundStyle(.secondary) }
             else if shown.isEmpty { NoMatchesView(query: query) }
         }
-        .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Buscar en playlists")
+        .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: L("Buscar en playlists"))
         .scrollDismissesKeyboard(.interactively)
         .themed()
-        .navigationTitle("Playlists")
+        .navigationTitle(L("Playlists"))
+        // Lápiz (lo pidió Toxbox): editar el orden aquí mismo, sin ir a Ajustes.
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button { editing = true } label: { Image(systemName: "pencil") }
+                    .accessibilityLabel(L("Editar el orden de las playlists"))
+            }
+        }
+        .sheet(isPresented: $editing) { ReorderPlaylistsView() }
         .miniPlayer()
     }
 }
@@ -143,10 +152,10 @@ struct AlbumsListView: View {
             if albums.isEmpty { AlbumsEmptyView() }
             else if shown.isEmpty { NoMatchesView(query: query) }
         }
-        .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Buscar en tus álbumes")
+        .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: L("Buscar en tus álbumes"))
         .scrollDismissesKeyboard(.interactively)
         .themed()
-        .navigationTitle("Tus álbumes")
+        .navigationTitle(L("Tus álbumes"))
         .miniPlayer()
     }
 }
@@ -156,8 +165,8 @@ private struct AlbumsEmptyView: View {
     var body: some View {
         VStack(spacing: 10) {
             Image(systemName: "square.stack").font(.system(size: 40, weight: .regular)).foregroundStyle(.secondary)
-            Text("Todavía no tienes álbumes").font(.headline)
-            Text("Busca un álbum o entra en un artista y pulsa «Añadir a Tus álbumes» o «Descargar todo».")
+            Text(L("Todavía no tienes álbumes")).font(.headline)
+            Text(L("Busca un álbum o entra en un artista y pulsa «Añadir a Tus álbumes» o «Descargar todo»."))
                 .font(.subheadline).foregroundStyle(.secondary)
         }
         .multilineTextAlignment(.center)
@@ -168,12 +177,16 @@ private struct AlbumsEmptyView: View {
 struct ArtistsView: View {
     let artists: [ArtistGroup]
     @State private var query = ""
+    /// Orden A-Z / Z-A con el botón de arriba a la derecha (Fase 3.1); mismo ajuste que Android.
+    @AppStorage("artistsSort") private var sort = "az"
 
     var body: some View {
-        let shown = LocalSearch.filter(artists, query) { $0.name }
+        let ordered = artists.sorted { LocalSearch.fold($0.name) < LocalSearch.fold($1.name) }
+        let shown = LocalSearch.filter(sort == "za" ? ordered.reversed() : ordered, query) { $0.name }
         List(shown) { a in
+            // Al tocar se abre su perfil de YouTube Music (discografía completa); sin red o sin encontrarlo, sus canciones.
             NavigationLink {
-                SongListV11View(title: a.name, songs: a.songs)
+                ArtistProfileLoader(name: a.name, songs: a.songs)
             } label: {
                 HStack(spacing: 12) {
                     CoverImage(url: a.songs.first?.thumb(160))
@@ -189,14 +202,44 @@ struct ArtistsView: View {
             .glassRow()
         }
         .overlay {
-            if artists.isEmpty { Text("Guarda canciones para ver sus artistas").foregroundStyle(.secondary) }
+            if artists.isEmpty { Text(L("Guarda canciones para ver sus artistas")).foregroundStyle(.secondary) }
             else if shown.isEmpty { NoMatchesView(query: query) }
         }
-        .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Buscar artistas")
+        .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: L("Buscar artistas"))
         .scrollDismissesKeyboard(.interactively)
         .themed()
-        .navigationTitle("Artistas")
+        .navigationTitle(L("Artistas"))
+        .toolbar {
+            if !artists.isEmpty {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button { sort = sort == "za" ? "az" : "za" } label: {
+                        Label(sort == "za" ? "Z-A" : "A-Z", systemImage: "textformat").labelStyle(.titleAndIcon)
+                    }
+                    .accessibilityLabel(sort == "za" ? L("Ordenar de la A a la Z") : L("Ordenar de la Z a la A"))
+                }
+            }
+        }
         .miniPlayer()
+    }
+}
+
+/// Perfil (YouTube Music) del artista con ese nombre; si no se encuentra o no hay red, sus canciones guardadas.
+/// Desde «Tu música › Artistas» y desde la cabecera de un álbum (Fase 3.1), como `openArtistProfile` en Android.
+struct ArtistProfileLoader: View {
+    let name: String
+    let songs: [Song]
+    @State private var artist: RemoteArtist?
+    @State private var done = false
+
+    var body: some View {
+        Group {
+            if let artist { ArtistView(artist: artist) }
+            else if done { SongListV11View(title: name, songs: songs) }
+            else { ProgressView().frame(maxWidth: .infinity, maxHeight: .infinity).themed() }
+        }
+        .task {
+            if !done { artist = await YTClient.findArtist(name); done = true }
+        }
     }
 }
 
@@ -218,8 +261,8 @@ struct PlaylistEditor: View {
                         HStack { Spacer(); PlaylistCover(playlist: p, size: 150); Spacer() }
                             .listRowBackground(Color.clear)
                     }
-                    Section("Nombre") {
-                        TextField("Nombre", text: $name)
+                    Section(L("Nombre")) {
+                        TextField(L("Nombre"), text: $name)
                     }
                     Section {
                         PhotosPicker(selection: $photo, matching: .images) {
@@ -230,17 +273,17 @@ struct PlaylistEditor: View {
                                 Label("Quitar foto", systemImage: "trash")
                             }
                         }
-                    } header: { Text("Foto") } footer: {
-                        Text("Si hay foto se muestra en lugar del icono.")
+                    } header: { Text(L("Foto")) } footer: {
+                        Text(L("Si hay foto se muestra en lugar del icono."))
                     }
-                    Section("Icono") {
+                    Section(L("Icono")) {
                         LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 6), spacing: 10) {
                             Button { library.update(p.id) { $0.icon = nil } } label: {
                                 Image(systemName: "square.grid.2x2")
                                     .frame(width: 42, height: 42)
                                     .background(Circle().fill(.tint).opacity(p.icon == nil ? 0.25 : 0))
                             }
-                            .accessibilityLabel("Sin icono")
+                            .accessibilityLabel(L("Sin icono"))
                             .accessibilityAddTraits(p.icon == nil ? .isSelected : [])
                             ForEach(PlaylistStyle.icons, id: \.self) { icon in
                                 Button { library.update(p.id) { $0.icon = icon } } label: {
@@ -254,7 +297,7 @@ struct PlaylistEditor: View {
                         .buttonStyle(.plain)
                         .font(.title3)
                     }
-                    Section("Color") {
+                    Section(L("Color")) {
                         HStack(spacing: 10) {
                             ForEach(PlaylistStyle.palettes.indices, id: \.self) { i in
                                 Button { library.update(p.id) { $0.tint = i } } label: {
@@ -267,10 +310,10 @@ struct PlaylistEditor: View {
                         }
                     }
                 }
-                .navigationTitle("Editar playlist")
+                .navigationTitle(L("Editar playlist"))
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {
-                    Button("Listo") {
+                    Button(L("Listo")) {
                         let n = name.trimmingCharacters(in: .whitespaces)
                         if !n.isEmpty { library.update(p.id) { $0.name = n } }
                         dismiss()
@@ -353,22 +396,22 @@ struct ImportView: View {
                 case .matching(let name, let done, let total):
                     Section {
                         VStack(alignment: .leading, spacing: 8) {
-                            Text("Importando «\(name)»").font(.headline)
+                            Text(L("Importando «{0}»", name)).font(.headline)
                             ProgressView(value: Double(done), total: Double(max(total, 1)))
-                            Text("Buscando en YouTube Music… \(done) de \(total)")
+                            Text(L("Buscando en YouTube Music… {0} de {1}", done, total))
                                 .font(.caption).foregroundStyle(.secondary).monospacedDigit()
                         }
                         .padding(.vertical, 4)
-                    } footer: { Text("Puedes cerrar la app: al volver, la importación sigue donde se quedó.") }
+                    } footer: { Text(L("Puedes cerrar la app: al volver, la importación sigue donde se quedó.")) }
                 case .finished(let title, let detail):
                     Section {
                         Label(title, systemImage: "checkmark.circle.fill")
                             .font(.headline).foregroundStyle(.green)
                         Text(detail).font(.subheadline)
-                        Button("Listo") { dismiss() }
+                        Button(L("Listo")) { dismiss() }
                     }
                 case .reading:
-                    Section { HStack { ProgressView(); Text("Leyendo la playlist…").padding(.leading, 8) } }
+                    Section { HStack { ProgressView(); Text(L("Leyendo la playlist…")).padding(.leading, 8) } }
                 case .idle:
                     EmptyView()
                 }
@@ -377,14 +420,14 @@ struct ImportView: View {
                 if let p = pending, status == .idle {
                     Section {
                         LabeledContent("«\(p.playlist.name)»", value: "\(p.results.count) de \(p.playlist.tracks.count)")
-                        Button("Continuar") { match(p) }
-                        Button("Descartar", role: .destructive) { p.discard(); pending = nil }
-                    } header: { Text("Sin terminar") } footer: { Text("Se cortó a medias; sigue donde se quedó.") }
+                        Button(L("Continuar")) { match(p) }
+                        Button(L("Descartar"), role: .destructive) { p.discard(); pending = nil }
+                    } header: { Text(L("Sin terminar")) } footer: { Text(L("Se cortó a medias; sigue donde se quedó.")) }
                 }
 
                 Section {
                     // String y no LocalizedStringKey: como Markdown, la URL salía en azul como un enlace.
-                    TextField(String("Enlace de Spotify o Apple Music"), text: $link)
+                    TextField(String(L("Enlace de Spotify o Apple Music")), text: $link)
                         .keyboardType(.URL)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
@@ -396,23 +439,23 @@ struct ImportView: View {
                             .buttonStyle(.borderedProminent)
                             .disabled(link.isEmpty)
                     }
-                } header: { Text("Desde un enlace") } footer: {
-                    Text("Apple Music o Spotify: abre la playlist → Compartir → Copiar enlace. Tiene que ser pública. De Spotify llegan hasta unas 100 canciones; para listas más largas, usa el CSV de Exportify.")
+                } header: { Text(L("Desde un enlace")) } footer: {
+                    Text(L("Apple Music o Spotify: abre la playlist → Compartir → Copiar enlace. Tiene que ser pública. De Spotify llegan hasta unas 100 canciones; para listas más largas, usa el CSV de Exportify."))
                 }
                 .disabled(busy)
 
                 Section {
                     Button { fileMode = .csv; importingBackup = true } label: { Label("CSV de Exportify (Spotify)", systemImage: "doc.text") }
                     Button { fileMode = .simpMusic; importingBackup = true } label: { Label("Copia de SimpMusic (.backup)", systemImage: "clock.arrow.circlepath") }
-                } header: { Text("Desde un archivo") } footer: {
-                    Text("Spotify: exporta la playlist en exportify.app (gratis, entra con tu cuenta de Spotify) y elige el .csv; trae todas las canciones y su ISRC, que empareja mejor. SimpMusic: Ajustes › Copia de seguridad, y elige el archivo .backup; sus canciones ya son de YouTube Music, así que llegan exactas.")
+                } header: { Text(L("Desde un archivo")) } footer: {
+                    Text(L("Spotify: exporta la playlist en exportify.app (gratis, entra con tu cuenta de Spotify) y elige el .csv; trae todas las canciones y su ISRC, que empareja mejor. SimpMusic: Ajustes › Copia de seguridad, y elige el archivo .backup; sus canciones ya son de YouTube Music, así que llegan exactas."))
                 }
                 .disabled(busy)
 
                 Section {
                     if let lists = localLists {
                         if lists.isEmpty {
-                            Text("No hay playlists en la biblioteca de este iPhone.").foregroundStyle(.secondary)
+                            Text(L("No hay playlists en la biblioteca de este iPhone.")).foregroundStyle(.secondary)
                         }
                         ForEach(lists) { pl in
                             Button { Task { await importPlaylist(pl) } } label: {
@@ -428,8 +471,8 @@ struct ImportView: View {
                     } else {
                         Button { Task { await loadLocal() } } label: { Label("Ver mis playlists", systemImage: "music.note.house") }
                     }
-                } header: { Text("Desde la app Música de este iPhone") } footer: {
-                    Text("Lee las playlists de tu biblioteca (necesita «Sincronizar biblioteca» activado en Ajustes → Música).")
+                } header: { Text(L("Desde la app Música de este iPhone")) } footer: {
+                    Text(L("Lee las playlists de tu biblioteca (necesita «Sincronizar biblioteca» activado en Ajustes → Música)."))
                 }
                 .disabled(busy)
 
@@ -440,8 +483,8 @@ struct ImportView: View {
                         backup = LibraryBackup(data: library.exportData())
                         exportingBackup = true
                     } label: { Label("Exportar copia", systemImage: "square.and.arrow.up") }
-                } header: { Text("Copia de la biblioteca") } footer: {
-                    Text("Archivo library.json de Pear Music (también el de Android). Se añade lo que no tengas, sin borrar nada.")
+                } header: { Text(L("Copia de la biblioteca")) } footer: {
+                    Text(L("Archivo library.json de Pear Music (también el de Android). Se añade lo que no tengas, sin borrar nada."))
                 }
                 .disabled(busy)
 
@@ -463,18 +506,18 @@ struct ImportView: View {
             .background {
                 // Un selector por vista: con los dos en la misma, SwiftUI sólo presenta uno.
                 Color.clear.fileExporter(isPresented: $exportingBackup, document: backup, contentType: .json,
-                                         defaultFilename: "libremusic-library.json") { result in
+                                         defaultFilename: "pear-music-library.json") { result in
                     errorText = nil; notice = nil
                     switch result {
-                    case .success: notice = "Biblioteca exportada."
+                    case .success: notice = L("Biblioteca exportada.")
                     case .failure(let e) where (e as NSError).code == NSUserCancelledError: break
-                    case .failure: errorText = "No se pudo exportar la biblioteca."
+                    case .failure: errorText = L("No se pudo exportar la biblioteca.")
                     }
                 }
             }
-            .navigationTitle("Importar playlist")
+            .navigationTitle(L("Importar playlist"))
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar { Button("Cerrar") { dismiss() }.disabled(busy) }
+            .toolbar { Button(L("Cerrar")) { dismiss() }.disabled(busy) }
             .interactiveDismissDisabled(busy)
         }
     }
@@ -485,10 +528,10 @@ struct ImportView: View {
         let scoped = url.startAccessingSecurityScopedResource()
         defer { if scoped { url.stopAccessingSecurityScopedResource() } }
         guard let data = try? Data(contentsOf: url), let added = try? library.importData(data) else {
-            errorText = "No se pudo leer ese archivo de biblioteca."
+            errorText = L("No se pudo leer ese archivo de biblioteca.")
             return
         }
-        notice = "Importado: \(added.favorites) favoritas y \(added.playlists) playlists nuevas."
+        notice = L("Importado: {0} favoritas y {1} playlists nuevas.", added.favorites, added.playlists)
     }
 
     private func importLink() async {
@@ -524,9 +567,9 @@ struct ImportView: View {
         PendingImports.shared.set(id.uuidString, left)
         job?.discard()
         job = nil
-        status = .finished(title: "«\(pl.name)» importada",
-                           detail: "\(songs.count) de \(pl.tracks.count) canciones. Ya está en tu Biblioteca; no se ha descargado nada (usa «Descargar todo» si la quieres sin conexión)."
-                               + (left.isEmpty ? "" : " Las \(left.count) que faltan quedan en la playlist, en «Sin añadir», para buscarlas otra vez."))
+        status = .finished(title: L("«{0}» importada", pl.name),
+                           detail: L("{0} de {1} canciones. Ya está en tu Biblioteca; no se ha descargado nada (usa «Descargar todo» si la quieres sin conexión).", songs.count, pl.tracks.count)
+                               + (left.isEmpty ? "" : L(" Las {0} que faltan quedan en la playlist, en «Sin añadir», para buscarlas otra vez.", left.count)))
     }
 
     private func importCSV(_ result: Result<URL, Error>) {
@@ -549,7 +592,7 @@ struct ImportView: View {
         defer { if scoped { url.stopAccessingSecurityScopedResource() } }
         do {
             let lists = try SimpMusicBackup.read(url)
-            guard !lists.isEmpty else { errorText = "La copia no tiene playlists."; return }
+            guard !lists.isEmpty else { errorText = L("La copia no tiene playlists."); return }
             simpLists = lists
             status = .simpPick
         } catch {
@@ -563,8 +606,8 @@ struct ImportView: View {
             if let url = l.cover { cover = try? await URLSession.shared.data(from: url).0 }
             library.importPlaylist(name: l.name, songs: l.songs, cover: cover)
         }
-        status = .finished(title: chosen.count == 1 ? "Playlist importada" : "\(chosen.count) playlists importadas",
-                           detail: "\(chosen.reduce(0) { $0 + $1.songs.count }) canciones, iguales que en SimpMusic. No se ha descargado nada.")
+        status = .finished(title: chosen.count == 1 ? L("Playlist importada") : L("{0} playlists importadas", chosen.count),
+                           detail: L("{0} canciones, iguales que en SimpMusic. No se ha descargado nada.", chosen.reduce(0) { $0 + $1.songs.count }))
     }
 
     private func loadLocal() async {
@@ -608,22 +651,22 @@ struct ImportReviewSections: View {
 
         Section {
             VStack(alignment: .leading, spacing: 4) {
-                Text("\(good) bien · \(review.count) para revisar · \(none.count) no encontradas").font(.headline)
-                Text(review.isEmpty && none.isEmpty ? "Todas encajan con su versión en YouTube Music."
-                     : "Toca las dudosas para elegir la versión correcta. Las que dejes sin elegir no se añaden.")
+                Text(L("{0} bien · {1} para revisar · {2} no encontradas", good, review.count, none.count)).font(.headline)
+                Text(review.isEmpty && none.isEmpty ? L("Todas encajan con su versión en YouTube Music.")
+                     : L("Toca las dudosas para elegir la versión correcta. Las que dejes sin elegir no se añaden."))
                     .font(.subheadline).foregroundStyle(.secondary)
             }
             .padding(.vertical, 4)
         } header: { Text("«\(job.playlist.name)»") }
 
-        rows("Para revisar", review, all)
-        rows("No encontradas", none, all)
+        rows(L("Para revisar"), review, all)
+        rows(L("No encontradas"), none, all)
 
         Section {
-            Button { onCreate(songs, all.indices.filter { chosen($0) == nil }.map { all[$0].track }) } label: { Text("Crear playlist con \(songCount(songs.count))").frame(maxWidth: .infinity) }
+            Button { onCreate(songs, all.indices.filter { chosen($0) == nil }.map { all[$0].track }) } label: { Text(L("Crear playlist con {0}", songCount(songs.count))).frame(maxWidth: .infinity) }
                 .buttonStyle(PillButtonStyle(prominent: true))
                 .disabled(songs.isEmpty)
-            Button(role: .cancel, action: onCancel) { Text("Cancelar").frame(maxWidth: .infinity) }
+            Button(role: .cancel, action: onCancel) { Text(L("Cancelar")).frame(maxWidth: .infinity) }
                 .buttonStyle(PillButtonStyle(prominent: false))
         }
         .listRowBackground(Color.clear)
@@ -641,7 +684,7 @@ struct ImportReviewSections: View {
                         VStack(alignment: .leading, spacing: 2) {
                             Text(m.track.title).foregroundStyle(.primary)
                             Text(Self.line(m.track)).font(.footnote).foregroundStyle(.secondary)
-                            Text(pick.map { "→ \($0.title) · \($0.artist)" } ?? (m.candidates.isEmpty ? "Sin resultados" : "Sin elegir"))
+                            Text(pick.map { "→ \($0.title) · \($0.artist)" } ?? (m.candidates.isEmpty ? L("Sin resultados") : L("Sin elegir")))
                                 .font(.footnote).foregroundStyle(pick == nil ? AnyShapeStyle(.secondary) : AnyShapeStyle(.tint))
                         }
                     }
@@ -651,7 +694,7 @@ struct ImportReviewSections: View {
                                 HStack {
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(c.song.title).foregroundStyle(.primary)
-                                        Text(c.song.artist + (j == 0 ? " · más probable" : "")).font(.footnote).foregroundStyle(.secondary)
+                                        Text(c.song.artist + (j == 0 ? L(" · más probable") : "")).font(.footnote).foregroundStyle(.secondary)
                                     }
                                     Spacer()
                                     if pick?.id == c.song.id { Image(systemName: "checkmark").foregroundStyle(.tint) }
@@ -661,7 +704,7 @@ struct ImportReviewSections: View {
                         }
                         Button { picks[i] = .some(nil); open = nil } label: {
                             HStack {
-                                Text("Ninguna (no añadir)").foregroundStyle(.secondary)
+                                Text(L("Ninguna (no añadir)")).foregroundStyle(.secondary)
                                 Spacer()
                                 if pick == nil { Image(systemName: "checkmark").foregroundStyle(.tint) }
                             }
@@ -704,8 +747,8 @@ struct SimpMusicPickSections: View {
                 }
                 .disabled(l.songs.isEmpty)
             }
-        } header: { Text("Copia de SimpMusic") } footer: {
-            Text("Las canciones ya son de YouTube Music: llegan exactas, sin buscar. No se descarga nada.")
+        } header: { Text(L("Copia de SimpMusic")) } footer: {
+            Text(L("Las canciones ya son de YouTube Music: llegan exactas, sin buscar. No se descarga nada."))
         }
         .onAppear {
             guard !ready else { return }
@@ -715,11 +758,11 @@ struct SimpMusicPickSections: View {
 
         Section {
             Button { onImport(lists.filter { selected.contains($0.id) }) } label: {
-                Text(selected.count == 1 ? "Importar 1 playlist" : "Importar \(selected.count) playlists").frame(maxWidth: .infinity)
+                Text(selected.count == 1 ? L("Importar 1 playlist") : L("Importar {0} playlists", selected.count)).frame(maxWidth: .infinity)
             }
             .buttonStyle(PillButtonStyle(prominent: true))
             .disabled(selected.isEmpty)
-            Button(role: .cancel, action: onCancel) { Text("Cancelar").frame(maxWidth: .infinity) }
+            Button(role: .cancel, action: onCancel) { Text(L("Cancelar")).frame(maxWidth: .infinity) }
                 .buttonStyle(PillButtonStyle(prominent: false))
         }
         .listRowBackground(Color.clear)

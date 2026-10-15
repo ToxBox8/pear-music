@@ -1,5 +1,9 @@
 package app.libremusic.ui
 
+
+import app.libremusic.L
+import app.libremusic.data.SupportFilter
+
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -64,13 +68,14 @@ import java.util.Date
  * Mismo aspecto y textos que `SupportView` en iOS.
  */
 @Composable
-fun SupportScreen(draftId: String?) {
+fun SupportScreen(draftId: String?, suggestion: Boolean = false) {
     val c = Libre.colors
     val env = LocalEnv.current
     val context = LocalContext.current
     val store = remember { SupportStore.get(context) }
     val drafts by store.drafts.collectAsState()
-    val initial = remember(draftId) { drafts.firstOrNull { it.id == draftId } ?: SupportDraft() }
+    val kind = if (suggestion) "sugerencia" else "error"
+    val initial = remember(draftId) { drafts.firstOrNull { it.id == draftId } ?: SupportDraft(kind = kind) }
     var email by remember(draftId) { mutableStateOf(initial.email) }
     var text by remember(draftId) { mutableStateOf(initial.text) }
     var photos by remember(draftId) { mutableStateOf(initial.photos) }
@@ -78,7 +83,7 @@ fun SupportScreen(draftId: String?) {
     var sending by remember { mutableStateOf(false) }
     var sent by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-    val draft = SupportDraft(initial.id, email, text, photos)
+    val draft = SupportDraft(initial.id, email, text, photos, kind = initial.kind)
     val current by rememberUpdatedState(draft)
     val emailOk = SupportLimits.validEmail(email)
     val canSend = emailOk && SupportLimits.validText(text) && !sending
@@ -92,59 +97,99 @@ fun SupportScreen(draftId: String?) {
         scope.launch {
             val dir = store.photoDir(initial.id)
             val added = uris.take(room).mapNotNull { SupportClient.importPhoto(context, it, dir)?.path }
-            if (added.size < uris.take(room).size) env.app.toast = "Alguna foto no se pudo añadir"
+            if (added.size < uris.take(room).size) env.app.toast = L("Alguna foto no se pudo añadir")
             photos = photos + added
         }
     }
 
+    fun appeal(denialId: String) {
+        env.app.alert = AlertSpec(
+            L("Apelar"), L("Explica por qué es un reporte de verdad. Lo leerá una persona y te contestará al correo."),
+            field = L("Por qué es un reporte de verdad"),
+            buttons = listOf(
+                AlertButton(L("Enviar apelación")) { why ->
+                    scope.launch {
+                        val error = SupportClient.appeal(context, denialId, current.email, why)
+                        env.app.toast = error ?: L("Apelación enviada. Te contestaremos al correo.")
+                    }
+                },
+                AlertButton(L("Cancelar"), AlertButton.Role.Cancel),
+            ),
+        )
+    }
+
     fun send() {
         if (sending) return
+        // Primera capa: las mismas reglas que el servidor, sin gastar el envío.
+        SupportFilter.problem(current.text)?.let { problem ->
+            env.app.alert = AlertSpec(L("Revisa el mensaje"), problem, buttons = listOf(AlertButton(L("Reformular"), AlertButton.Role.Cancel)))
+            return
+        }
         sending = true
         scope.launch {
-            val error = SupportClient.send(context, current, BuildConfig.VERSION_NAME)
+            val result = SupportClient.send(context, current, BuildConfig.VERSION_NAME)
             sending = false
-            if (error == null) {
+            if (result.error == null) {
                 sent = true
                 store.delete(initial.id)
-                env.app.toast = "Reporte enviado. ¡Gracias!"
+                env.app.toast = (if (suggestion) L("Sugerencia enviada") else L("Reporte enviado")) +
+                    (result.ticket?.let { L(" (ticket #{0}). Te contestaremos en Avisos.", it) } ?: L(". ¡Gracias!"))
                 env.app.pop()
+            } else if (result.denialId != null) {
+                // Rechazado por el contenido: se puede reformular (sigue en el formulario) o apelar.
+                store.save(current)
+                env.app.alert = AlertSpec(
+                    L("No se pudo enviar"), L("{0}\n\nPuedes reformularlo o, si crees que es un error, apelar.", result.error),
+                    buttons = listOf(
+                        AlertButton(L("Reformular"), AlertButton.Role.Cancel),
+                        AlertButton(L("Apelar")) { appeal(result.denialId) },
+                    ),
+                )
             } else {
                 store.save(current)
                 env.app.alert = AlertSpec(
-                    "No se pudo enviar", "$error\n\nLo hemos guardado en Borradores para que lo envíes más tarde.",
-                    buttons = listOf(AlertButton("Vale", AlertButton.Role.Cancel)),
+                    L("No se pudo enviar"), L("{0}\n\nLo hemos guardado en Borradores para que lo envíes más tarde.", result.error),
+                    buttons = listOf(AlertButton(L("Vale"), AlertButton.Role.Cancel)),
                 )
             }
         }
     }
 
-    SettingsPage("Informar de un error") {
+    SettingsPage(if (suggestion) L("Buzón de sugerencias") else L("Informar de un error")) {
         val others = drafts.count { it.id != initial.id }
         if (others > 0) {
             FormSection(null) {
-                FormRow("Borradores", "$others", icon = Icons.Rounded.EditNote, tint = c.accent, chevron = true, last = true) {
+                FormRow(L("Borradores"), "$others", icon = Icons.Rounded.EditNote, tint = c.accent, chevron = true, last = true) {
                     env.app.push(Route.SupportDrafts)
                 }
             }
         }
-        FormSection("Tu correo", footer = if (emailTouched && email.isNotBlank() && !emailOk) "Revisa el correo: falta algo (por ejemplo, la @ o el dominio)." else "Para poder contestarte. No se usa para nada más.") {
+        FormSection(L("Tu correo"), footer = if (emailTouched && email.isNotBlank() && !emailOk) L("Revisa el correo: falta algo (por ejemplo, la @ o el dominio).") else L("Para poder contestarte. No se usa para nada más. La respuesta también te llega a Avisos, sólo a ti.")) {
             FormCustomRow {
                 SupportField(email, { email = it; emailTouched = true }, "nombre@correo.com", singleLine = true, keyboard = KeyboardType.Email)
             }
         }
-        FormSection("Qué ha pasado", footer = "Cuenta qué hacías y qué esperabas que pasara. Cuanto más concreto, mejor (mínimo ${SupportLimits.MIN_TEXT} caracteres).") {
+        FormSection(
+            if (suggestion) L("Tu idea") else L("Qué ha pasado"),
+            footer = if (suggestion) L("Qué te gustaría que hiciera Pear Music y para qué te serviría (mínimo {0} caracteres).", SupportLimits.MIN_TEXT)
+            else L("Cuenta qué hacías y qué esperabas que pasara. Cuanto más concreto, mejor (mínimo {0} caracteres).", SupportLimits.MIN_TEXT),
+        ) {
             FormCustomRow {
-                SupportField(text, { if (it.length <= SupportLimits.MAX_TEXT) text = it }, "Por ejemplo: al pulsar «Descargar todo» en un álbum, la app se cierra.", minHeight = 140)
+                SupportField(
+                    text, { if (it.length <= SupportLimits.MAX_TEXT) text = it },
+                    if (suggestion) L("Por ejemplo: poder ordenar mis playlists por artista.") else L("Por ejemplo: al pulsar «Descargar todo» en un álbum, la app se cierra."),
+                    minHeight = 140,
+                )
             }
         }
-        FormSection("Capturas", footer = "Hasta ${SupportLimits.MAX_PHOTOS}. Se reducen y se les quitan la ubicación y los demás datos de la foto antes de enviarlas.") {
+        FormSection(L("Capturas"), footer = L("Hasta {0}. Se reducen y se les quitan la ubicación y los demás datos de la foto antes de enviarlas.", SupportLimits.MAX_PHOTOS)) {
             FormCustomRow {
                 Row(Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()).padding(12.dp), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     photos.forEach { path ->
                         Box(Modifier.size(84.dp)) {
                             AsyncImage(File(path), null, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize().clip(RoundedCornerShape(12.dp)))
                             Box(
-                                Modifier.align(Alignment.TopEnd).size(44.dp).tactile(label = "Quitar foto") {
+                                Modifier.align(Alignment.TopEnd).size(44.dp).tactile(label = L("Quitar foto")) {
                                     photos = photos - path
                                     File(path).delete()
                                 },
@@ -159,7 +204,7 @@ fun SupportScreen(draftId: String?) {
                     if (photos.size < SupportLimits.MAX_PHOTOS) {
                         Box(
                             Modifier.size(84.dp).clip(RoundedCornerShape(12.dp)).border(1.dp, c.separator, RoundedCornerShape(12.dp))
-                                .tactile(label = "Añadir capturas") { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+                                .tactile(label = L("Añadir capturas")) { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
                             contentAlignment = Alignment.Center,
                         ) { Icon(Icons.Rounded.AddPhotoAlternate, null, tint = c.accent, modifier = Modifier.size(28.dp)) }
                     }
@@ -168,15 +213,16 @@ fun SupportScreen(draftId: String?) {
         }
         Box(Modifier.padding(horizontal = 16.dp, vertical = 22.dp)) {
             PillButton(
-                if (sending) "Enviando…" else "Enviar", null, prominent = true, modifier = Modifier.fillMaxWidth(), enabled = canSend,
+                if (sending) "Enviando…" else L("Enviar"), null, prominent = true, modifier = Modifier.fillMaxWidth(), enabled = canSend,
                 leading = if (sending) ({ Spinner(16.dp, c.onAccent) }) else null,
             ) {
                 env.app.alert = AlertSpec(
-                    "¿Enviar el reporte?",
-                    "Se enviarán tu correo, el texto${if (photos.isEmpty()) "" else ", ${photos.size} ${if (photos.size == 1) "foto" else "fotos"}"} y datos del móvil (modelo, versión de Android y de la app) al canal privado de soporte de Pear Music.",
+                    if (suggestion) L("¿Enviar la sugerencia?") else L("¿Enviar el reporte?"),
+                    if (photos.isEmpty()) L("Se enviarán tu correo, el texto y datos del móvil (modelo, versión de Android y de la app) al canal privado de soporte de Pear Music.")
+                    else L("Se enviarán tu correo, el texto, {0} foto(s) y datos del móvil (modelo, versión de Android y de la app) al canal privado de soporte de Pear Music.", photos.size),
                     buttons = listOf(
-                        AlertButton("Enviar") { send() },
-                        AlertButton("Cancelar", AlertButton.Role.Cancel),
+                        AlertButton(L("Enviar")) { send() },
+                        AlertButton(L("Cancelar"), AlertButton.Role.Cancel),
                     ),
                 )
             }
@@ -212,23 +258,23 @@ fun SupportDraftsScreen() {
     val store = remember { SupportStore.get(context) }
     val drafts by store.drafts.collectAsState()
     val fmt = remember { DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT) }
-    SettingsPage("Borradores") {
+    SettingsPage(L("Borradores")) {
         if (drafts.isEmpty()) {
-            CenterNote("No hay borradores", 60.dp)
+            CenterNote(L("No hay borradores"), 60.dp)
         } else {
-            FormSection(null, footer = "Se guardan en este móvil hasta que los envías o los eliminas.") {
+            FormSection(null, footer = L("Se guardan en este móvil hasta que los envías o los eliminas.")) {
                 drafts.forEachIndexed { i, d ->
                     FormRow(
-                        d.text.trim().lineSequence().firstOrNull()?.take(60)?.ifEmpty { null } ?: "Sin descripción",
+                        d.text.trim().lineSequence().firstOrNull()?.take(60)?.ifEmpty { null } ?: L("Sin descripción"),
                         subtitle = listOfNotNull(fmt.format(Date(d.updated)), d.photos.size.takeIf { it > 0 }?.let { "$it ${if (it == 1) "foto" else "fotos"}" }).joinToString(" · "),
                         last = i == drafts.lastIndex,
                         trailing = {
-                            IconTap(Icons.Rounded.Delete, "Eliminar borrador", tint = c.destructive) {
+                            IconTap(Icons.Rounded.Delete, L("Eliminar borrador"), tint = c.destructive) {
                                 env.app.alert = AlertSpec(
-                                    "¿Eliminar el borrador?", "Se borran el texto y sus fotos. No se puede deshacer.",
+                                    L("¿Eliminar el borrador?"), L("Se borran el texto y sus fotos. No se puede deshacer."),
                                     buttons = listOf(
-                                        AlertButton("Eliminar", AlertButton.Role.Destructive) { store.delete(d.id) },
-                                        AlertButton("Cancelar", AlertButton.Role.Cancel),
+                                        AlertButton(L("Eliminar"), AlertButton.Role.Destructive) { store.delete(d.id) },
+                                        AlertButton(L("Cancelar"), AlertButton.Role.Cancel),
                                     ),
                                 )
                             }

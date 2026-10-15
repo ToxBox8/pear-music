@@ -1,1 +1,1 @@
-# Reglas de R8 específicas de LibreMusic. Media3 y Compose traen sus propias reglas.
+# Reglas de R8 específicas de Pear Music. Media3 y Compose traen sus propias reglas.

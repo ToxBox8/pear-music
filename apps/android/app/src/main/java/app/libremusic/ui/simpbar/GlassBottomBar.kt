@@ -5,6 +5,8 @@
  */
 package app.libremusic.ui.simpbar
 
+
+import app.libremusic.L
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -151,7 +153,7 @@ private fun BottomBarV230(
             contentAlignment = Alignment.Center,
         ) {
             CompositionLocalProvider(LocalContentColor provides Libre.colors.accent) {
-                Icon(selected.icon(), contentDescription = "Desplegar barra (${selected.title})")
+                Icon(selected.icon(), contentDescription = L("Desplegar barra ({0})", selected.title))
             }
         }
     }
@@ -361,7 +363,7 @@ private fun BottomBarV220(
                             ).clickable { isExpanded = true },
                     contentAlignment = Alignment.Center,
                 ) {
-                    Icon(selected.icon(), contentDescription = "Desplegar barra (${selected.title})", tint = Libre.colors.accent)
+                    Icon(selected.icon(), contentDescription = L("Desplegar barra ({0})", selected.title), tint = Libre.colors.accent)
                 }
             }
         }
@@ -465,7 +467,7 @@ private fun MiniPlayer(
                 } else {
                     Modifier.flatSurface(shape)
                 },
-            ).clickable(onClickLabel = "Abrir reproductor", onClick = onOpen),
+            ).clickable(onClickLabel = L("Abrir reproductor"), onClick = onOpen),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Spacer(Modifier.width(8.dp))
@@ -482,14 +484,14 @@ private fun MiniPlayer(
         IconButton(onClick = onToggleLike) {
             Icon(
                 if (isLiked) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
-                contentDescription = if (isLiked) "Quitar de favoritos" else "Añadir a favoritos",
+                contentDescription = if (isLiked) L("Quitar de favoritos") else L("Añadir a favoritos"),
                 tint = if (isLiked) Libre.colors.accent else BarContent,
             )
         }
         IconButton(onClick = onTogglePlay) {
             Icon(
                 if (isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
-                contentDescription = if (isPlaying) "Pausa" else "Reproducir",
+                contentDescription = if (isPlaying) L("Pausa") else L("Reproducir"),
                 tint = BarContent,
             )
         }

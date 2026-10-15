@@ -57,9 +57,9 @@ fi
 
 # 5. Android: APK firmado con la clave de siempre y con la versión correcta.
 if [ "$plat" = android ]; then
-    apk="${2:-apps/android/app/build/outputs/apk/release/app-release.apk}"
+    apk="${2:-apps/android/app/build/outputs/apk/usr/release/app-usr-release.apk}"
     if [ ! -f "$apk" ]; then
-        warn "No hay APK en $apk (compila con assembleRelease o pásalo como segundo argumento)."
+        warn "No hay APK en $apk (compila con assembleUsrRelease o pásalo como segundo argumento)."
     else
         bt=$(ls -d "$HOME"/Android/Sdk/build-tools/* 2>/dev/null | sort -V | tail -1)
         if [ -n "$bt" ] && "$bt/apksigner" verify --print-certs "$apk" 2>/dev/null | grep -q "SHA-256 digest: 9a38c4d7"; then

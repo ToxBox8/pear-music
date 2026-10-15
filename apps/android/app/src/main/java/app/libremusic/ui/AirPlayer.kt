@@ -1,5 +1,7 @@
 package app.libremusic.ui
 
+
+import app.libremusic.L
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.withFrameNanos
@@ -126,7 +128,7 @@ data class AirColors(
 }
 
 @Composable
-fun AirPlayerView(song: Song, onQueue: () -> Unit, onClose: () -> Unit) {
+fun AirPlayerView(song: Song, onQueue: () -> Unit, onLyrics: () -> Unit, onClose: () -> Unit) {
     val c = AirColors.of(Libre.colors.dark)
     val env = LocalEnv.current
     val st by env.player.state.collectAsState()
@@ -136,11 +138,15 @@ fun AirPlayerView(song: Song, onQueue: () -> Unit, onClose: () -> Unit) {
     val favScale by animateFloatAsState(if (fav) 1.1f else 1f, spring(dampingRatio = 0.5f, stiffness = 400f), label = "fav")
     val header: @Composable () -> Unit = {
         Row(Modifier.fillMaxWidth().padding(start = 24.dp, end = 12.dp, top = 14.dp), verticalAlignment = Alignment.CenterVertically) {
-            Text("Música", style = Typo.air(30f, bold = true), color = c.ink, modifier = Modifier.weight(1f))
-            Box(Modifier.size(44.dp).tactile(label = if (fav) "Quitar de favoritos" else "Añadir a favoritos") { env.library.toggleFavorite(song) }, contentAlignment = Alignment.Center) {
+            Text(L("Música"), style = Typo.air(30f, bold = true), color = c.ink, modifier = Modifier.weight(1f))
+            // Los botones del reproductor Normal, en la tinta del Air (Fase 3.4): bucle, temporizador y «⋯» (con la letra).
+            RepeatButton(st.repeatMode, ink = c.ink) { env.player.cycleRepeat() }
+            SleepTimerButton(ink = c.ink)
+            SongMoreButton(song, onLyrics, ink = c.ink)
+            Box(Modifier.size(44.dp).tactile(label = if (fav) L("Quitar de favoritos") else L("Añadir a favoritos")) { env.library.toggleFavorite(song) }, contentAlignment = Alignment.Center) {
                 Icon(if (fav) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder, null, tint = c.ink, modifier = Modifier.size(26.dp).scale(favScale))
             }
-            IconTap(Icons.Rounded.KeyboardArrowDown, "Cerrar reproductor", tint = c.ink, size = 36.dp, onClick = onClose)
+            IconTap(Icons.Rounded.KeyboardArrowDown, L("Cerrar reproductor"), tint = c.ink, size = 36.dp, onClick = onClose)
         }
     }
     val title: @Composable () -> Unit = {
@@ -264,7 +270,7 @@ private fun AirDisc(
                     setScrub(null)
                     lastDot = -1
                 }
-            }.semanticsButton("Progreso: ${timeString(progress)} de ${timeString(duration)}") {},
+            }.semanticsButton(L("Progreso: {0} de {1}", timeString(progress), timeString(duration))) {},
         )
     }
 }
@@ -372,7 +378,7 @@ private fun AirSpeedKnob(colors: AirColors) {
     Box(
         Modifier.size(68.dp).shadow(8.dp, CircleShape, ambientColor = Color.Black.copy(0.05f), spotColor = Color.Black.copy(0.05f))
             .background(colors.wheel.copy(alpha = 0.7f), CircleShape)
-            .tactile(label = "Velocidad $label") { env.player.setRate(rates[(i + 1) % rates.size]) },
+            .tactile(label = L("Velocidad {0}", label)) { env.player.setRate(rates[(i + 1) % rates.size]) },
         contentAlignment = Alignment.Center,
     ) {
         Text(label, style = Typo.air(15f), color = colors.ink)
@@ -388,17 +394,17 @@ private fun currentRoute(am: AudioManager): AudioRoute {
     val outs = am.getDevices(AudioManager.GET_DEVICES_OUTPUTS)
     fun has(vararg types: Int) = outs.firstOrNull { it.type in types }
     has(AudioDeviceInfo.TYPE_BLUETOOTH_A2DP, AudioDeviceInfo.TYPE_BLE_HEADSET, AudioDeviceInfo.TYPE_BLE_SPEAKER)?.let {
-        return AudioRoute(it.productName?.toString()?.ifBlank { null } ?: "Bluetooth", Icons.Rounded.Headphones)
+        return AudioRoute(it.productName?.toString()?.ifBlank { null } ?: L("Bluetooth"), Icons.Rounded.Headphones)
     }
     has(AudioDeviceInfo.TYPE_WIRED_HEADPHONES, AudioDeviceInfo.TYPE_WIRED_HEADSET, AudioDeviceInfo.TYPE_USB_HEADSET)?.let {
-        return AudioRoute("Auriculares", Icons.Rounded.Headphones)
+        return AudioRoute(L("Auriculares"), Icons.Rounded.Headphones)
     }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        has(AudioDeviceInfo.TYPE_REMOTE_SUBMIX)?.let { return AudioRoute("Cast", Icons.Rounded.Cast) }
+        has(AudioDeviceInfo.TYPE_REMOTE_SUBMIX)?.let { return AudioRoute(L("Cast"), Icons.Rounded.Cast) }
     }
-    has(AudioDeviceInfo.TYPE_BUS)?.let { return AudioRoute("Coche", Icons.Rounded.DirectionsCar) }
+    has(AudioDeviceInfo.TYPE_BUS)?.let { return AudioRoute(L("Coche"), Icons.Rounded.DirectionsCar) }
     // iOS muestra «iPhone» para el altavoz del propio teléfono.
-    return AudioRoute("Este móvil", Icons.Rounded.Smartphone)
+    return AudioRoute(L("Este móvil"), Icons.Rounded.Smartphone)
 }
 
 /** Casilla blanca con el dispositivo de salida; tocarla abre el panel de salida de audio. */
@@ -419,7 +425,7 @@ private fun AirRouteTile(colors: AirColors) {
         Modifier.size(104.dp)
             .shadow(10.dp, RoundedCornerShape(24.dp), ambientColor = Color.Black.copy(0.05f), spotColor = Color.Black.copy(0.05f))
             .background(colors.wheelFill, RoundedCornerShape(24.dp))
-            .tactile(label = "Salida de audio: ${route.name}") { openOutputSwitcher(context) },
+            .tactile(label = L("Salida de audio: {0}", route.name)) { openOutputSwitcher(context) },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
@@ -534,7 +540,7 @@ private fun AirWheel(colors: AirColors, onQueue: () -> Unit, modifier: Modifier)
                     preview = null
                     pressed = null
                 }
-            }.semanticsButton(if (st.isPlaying) "Pausar" else "Reproducir") { env.player.togglePlay() },
+            }.semanticsButton(if (st.isPlaying) L("Pausar") else L("Reproducir")) { env.player.togglePlay() },
         )
     }
 }
@@ -549,7 +555,7 @@ private fun AirDownloadDots(song: Song, colors: AirColors, modifier: Modifier) {
     val busy = s?.isActive == true
     val pct = if (done) 1f else (s?.percent ?: 0f) / 100f
     Box(
-        modifier.size(44.dp).tactile(enabled = !done && !busy, label = if (done) "Descargada" else if (busy) "Descargando" else "Descargar") { env.library.toggleDownload(song) },
+        modifier.size(44.dp).tactile(enabled = !done && !busy, label = if (done) L("Descargada") else if (busy) L("Descargando") else L("Descargar")) { env.library.toggleDownload(song) },
         contentAlignment = Alignment.Center,
     ) {
         Canvas(Modifier.size(28.dp)) {

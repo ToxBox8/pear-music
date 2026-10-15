@@ -29,7 +29,7 @@ import org.robolectric.annotation.GraphicsMode
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [34], qualifiers = "w393dp-h852dp-xxhdpi")
+@Config(sdk = [34], qualifiers = "es-rES-w393dp-h852dp-xxhdpi")
 class ScreenshotTest : ShotBase() {
     @Test fun biblioteca_cristal() = shot("01_biblioteca_cristal") { tab = Tab.Library }
     @Test fun biblioteca_cristal_oscuro() = shot("02_biblioteca_cristal_oscuro", appearance = "dark") { tab = Tab.Library }
@@ -52,11 +52,34 @@ class ScreenshotTest : ShotBase() {
     @Test fun pestanas() = shot("19_pestanas") { tab = Tab.Settings; push(Route.TabOrderR) }
     @Test fun guia_inicial() = shot("20_guia_inicial", playing = false, guide = true) { tab = Tab.Home }
     @Test fun informar_error() = shot("21_informar_error", playing = false) { tab = Tab.Settings; push(Route.Support(null)) }
-    @Test fun icono_app() = shot("22_icono_app", playing = false) { tab = Tab.Settings; push(Route.AppIconR) }
     @Test fun temporizador() = try {
         app.libremusic.playback.SleepTimer.start(30)
         shot("23_temporizador") { showPlayer = true }
     } finally { app.libremusic.playback.SleepTimer.cancel() }
+    @Test fun privacidad() = shot("27_privacidad", playing = false, terms = false) { tab = Tab.Home }
+    @Test fun cuenta() = shot("28_cuenta", playing = false) { tab = Tab.Settings; push(Route.AccountR) }
+    @Test fun recorrido() = shot("29_recorrido", playing = false, intro = "tour") { tab = Tab.Home }
+    @Test fun historias() = shot("30_historias", playing = false, intro = "stories") { tab = Tab.Home }
+    @Test fun primeros_pasos() = shot("31_primeros_pasos", playing = false, firstSteps = true) { tab = Tab.Home }
+    @Test fun tus_datos() = shot("32_tus_datos", playing = false) { tab = Tab.Settings; push(Route.MyData) }
+    @Test fun aviso_version() = shot("33_aviso_version", playing = false) {
+        tab = Tab.Home
+        alert = AlertSpec(
+            "Pear Music 1.0.0: Bienvenida nueva y cuenta opcional",
+            "• Bienvenida nueva con recorrido e historias\n• Cuenta opcional cifrada\n\nSe actualiza encima: no pierdes tu biblioteca ni tus canciones descargadas.",
+            buttons = listOf(AlertButton("Descargar"), AlertButton("Recordarme mañana", AlertButton.Role.Cancel)),
+        )
+    }
+    @Test fun personalizacion() = shot("34_personalizacion", playing = false) { tab = Tab.Settings; push(Route.Personalization) }
+    @Test fun discografia() = shot("35_discografia", playing = false) {
+        tab = Tab.Home
+        val albums = listOf(
+            app.libremusic.data.RemoteCollection("MPREb_a", "Un verano sin ti", "Álbum • Bad Bunny • 2022", null),
+            app.libremusic.data.RemoteCollection("MPREb_b", "Nadie sabe lo que va a pasar mañana", "Álbum • Bad Bunny • 2023", null),
+        )
+        push(Route.Discography("Bad Bunny", "albums", albums, emptyList(), null, null))
+    }
+    @Test fun reproductor_air_botones() = shot("36_reproductor_air", AppTheme.Air, DeckStyle.Air) { showPlayer = true }
     @Test fun reproduccion() = shot("25_reproduccion", playing = false) { tab = Tab.Settings; push(Route.Audio) }
     @Test fun estadisticas() {
         val now = System.currentTimeMillis() / 1000
@@ -82,7 +105,7 @@ class ScreenshotTest : ShotBase() {
  */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [34], qualifiers = "w852dp-h393dp-land-xxhdpi")
+@Config(sdk = [34], qualifiers = "es-rES-w852dp-h393dp-land-xxhdpi")
 class LandscapeShotTest : ShotBase(landscape = true) {
     @Test fun horizontal_normal() = shot("h1_reproductor_normal") { showPlayer = true }
     @Test fun horizontal_air() = shot("h2_reproductor_air", AppTheme.Air, DeckStyle.Air) { showPlayer = true }
@@ -94,7 +117,7 @@ class LandscapeShotTest : ShotBase(landscape = true) {
 /** Letra grande (150 %): lo que más se rompe con «Tamaño de fuente» del sistema. Capturas `t*.png`. */
 @RunWith(RobolectricTestRunner::class)
 @GraphicsMode(GraphicsMode.Mode.NATIVE)
-@Config(sdk = [34], qualifiers = "w393dp-h852dp-port-xxhdpi", fontScale = 1.5f)
+@Config(sdk = [34], qualifiers = "es-rES-w393dp-h852dp-port-xxhdpi", fontScale = 1.5f)
 class LargeTextShotTest : ShotBase() {
     @Test fun biblioteca() = shot("t1_biblioteca") { tab = Tab.Library }
     @Test fun reproductor() = shot("t2_reproductor") { showPlayer = true }
@@ -144,10 +167,16 @@ abstract class ShotBase(private val landscape: Boolean = false) {
         playing: Boolean = true,
         guide: Boolean = false,
         artwork: Boolean = false,
+        terms: Boolean = true,
+        intro: String = "",
+        firstSteps: Boolean = false,
         setup: AppState.() -> Unit = {},
     ) {
         PlayerViewModel.connectToService = false
         Prefs.setOnboarded(!guide)
+        Prefs.setTermsAccepted(terms)
+        Prefs.setIntroStage(intro)
+        Prefs.resetFirstSteps(hidden = !firstSteps)
         Prefs.setArtworkColorsApp(artwork); Prefs.setArtworkColorsPlayer(artwork)
         Prefs.setTheme(theme)
         Prefs.setDeck(deck)

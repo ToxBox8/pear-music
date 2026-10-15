@@ -1,5 +1,12 @@
 package app.libremusic.ui
 
+
+import app.libremusic.L
+import app.libremusic.data.Incident
+import app.libremusic.playback.PlaylistWidget
+import app.libremusic.playback.RecentsWidget
+import app.libremusic.data.Telemetry
+import app.libremusic.data.Updates
 import app.libremusic.avisos.AvisosRepo
 import androidx.compose.runtime.snapshotFlow
 import app.libremusic.ui.theme.rememberSettingsTop
@@ -168,8 +175,11 @@ fun LibreMusicRoot(
     // con la clásica). Lo que no está en la barra sigue montado para conservar su pila.
     val simpBar = barStyle == "simpmusic"
     val settingsTop = rememberSettingsTop()
-    val tabs = TabOrder.visible(tabOrder, !simpBar && searchPlacement == "tab").map(Tab::of)
+    val showDiscover by Prefs.showDiscover.collectAsState()
+    val tabs = TabOrder.visible(tabOrder, !simpBar && searchPlacement == "tab", showDiscover).map(Tab::of)
         .filter { !(settingsTop && it == Tab.Settings) }
+    // Descubrir apagado mientras se estaba en ella: a Inicio.
+    LaunchedEffect(showDiscover) { if (!showDiscover && app.tab == Tab.Discover) app.tab = Tab.Home }
     val shownTabs = (tabs + listOfNotNull(Tab.Search.takeIf { simpBar }, Tab.Settings.takeIf { settingsTop })).distinct()
     LaunchedEffect(searchPlacement, simpBar) { if (!simpBar && app.tab == Tab.Search && searchPlacement != "tab") app.tab = Tab.Home }
     // Deslizar entre pestañas: estado compartido entre el contenido y las barras (ver TabPager).
@@ -200,6 +210,23 @@ fun LibreMusicRoot(
     // La app vuelve a abrirse en la última pestaña usada.
     LaunchedEffect(app.tab) { Prefs.setLastTab(app.tab.key) }
     // Atajos del icono de la app (mantener pulsado) y del Asistente.
+    // Widgets de recientes y de playlist: se redibujan al cambiar lo que enseñan.
+    val libForWidgets by libraryVm.data.collectAsState()
+    LaunchedEffect(libForWidgets.recents.take(4).map { it.id }, libForWidgets.playlists.map { it.id to it.pinned }) {
+        RecentsWidget.render(context.applicationContext)
+        PlaylistWidget.render(context.applicationContext)
+    }
+    // Widgets: reproducir una playlist fijada o una canción reciente.
+    val play by AppShortcuts.pendingPlay.collectAsState()
+    LaunchedEffect(play) {
+        val (type, id) = play ?: return@LaunchedEffect
+        AppShortcuts.pendingPlay.value = null
+        val lib = libraryVm.data.value
+        when (type) {
+            "playlist" -> lib.playlists.firstOrNull { it.id == id }?.songs?.takeIf { it.isNotEmpty() }?.let { playerVm.play(it, 0) }
+            "song" -> lib.recents.indexOfFirst { it.id == id }.takeIf { it >= 0 }?.let { playerVm.play(lib.recents, it) }
+        }
+    }
     val shortcut by AppShortcuts.pending.collectAsState()
     val libData by libraryVm.data.collectAsState()
     val downloadedNow by libraryVm.downloadedSongs.collectAsState()
@@ -208,9 +235,9 @@ fun LibreMusicRoot(
         AppShortcuts.pending.value = null
         when (k) {
             AppShortcuts.Kind.Favorites ->
-                if (libData.favorites.isEmpty()) app.toast = "Aún no hay favoritas" else playerVm.play(libData.favorites.shuffled())
+                if (libData.favorites.isEmpty()) app.toast = L("Aún no hay favoritas") else playerVm.play(libData.favorites.shuffled())
             AppShortcuts.Kind.Downloads ->
-                if (downloadedNow.isEmpty()) app.toast = "Aún no hay nada descargado" else playerVm.play(downloadedNow.shuffled())
+                if (downloadedNow.isEmpty()) app.toast = L("Aún no hay nada descargado") else playerVm.play(downloadedNow.shuffled())
             AppShortcuts.Kind.Discover -> app.tab = Tab.Discover
             AppShortcuts.Kind.Search -> app.tab = if (simpBar || searchPlacement == "tab") Tab.Search else Tab.Home
         }
@@ -219,8 +246,45 @@ fun LibreMusicRoot(
     // Cada vez que la app pasa a primer plano se bajan los avisos (como Open Menus): la campana de Inicio sale al día
     // sin esperar a la comprobación de fondo de cada 15 min. Lo que ya se ve en la app no se notifica después.
     val avisosScope = rememberCoroutineScope()
+    // Telemetría: sólo con consentimiento (Telemetry.kt); mide mientras la app está a la vista.
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { Telemetry.onForeground(context.applicationContext) }
+    LifecycleEventEffect(Lifecycle.Event.ON_STOP) { avisosScope.launch { Telemetry.onBackground(context.applicationContext) } }
     LifecycleEventEffect(Lifecycle.Event.ON_START) {
+        // Estado de incidencias firmado (Fase 4): al abrir; sin red, se queda el último válido.
+        avisosScope.launch { Incident.refresh(context.applicationContext) }
         avisosScope.launch { AvisosRepo.refrescarAlAbrir(context.applicationContext) }
+        // Versión nueva (sólo la variante pública, como mucho cada 6 h): novedades, «Descargar» o «Recordarme mañana».
+        avisosScope.launch {
+            val release = Updates.check(context.applicationContext) ?: return@launch
+            app.alert = AlertSpec(
+                L("Pear Music {0}", release.version) + if (release.title.isNotBlank()) ": ${release.title}" else "",
+                release.highlights.joinToString("\n") { "• $it" } +
+                    L("\n\nSe actualiza encima: no pierdes tu biblioteca ni tus canciones descargadas."),
+                buttons = listOf(
+                    AlertButton(L("Descargar")) {
+                        avisosScope.launch {
+                            app.toast = L("Descargando Pear Music {0}…", release.version)
+                            // Progreso en el mismo aviso, de 10 en 10 para no redibujar en cada bloque.
+                            var shown = -1
+                            val (apk, error) = Updates.download(context.applicationContext, release) { pct ->
+                                val step = pct / 10 * 10
+                                if (step != shown) {
+                                    shown = step
+                                    app.toast = L("Descargando Pear Music {0}… {1} %", release.version, step)
+                                }
+                            }
+                            if (apk == null) app.toast = error
+                            else if (!Updates.install(context, apk)) {
+                                app.toast = L("Permite instalar apps de Pear Music y vuelve a pulsar Descargar.")
+                            }
+                        }
+                    },
+                    AlertButton(L("Recordarme mañana"), AlertButton.Role.Cancel) {
+                        Updates.snooze(context.applicationContext, release)
+                    },
+                ),
+            )
+        }
     }
 
     // Pulsar una notificación de aviso abre Avisos (también con la app ya abierta).
@@ -241,6 +305,7 @@ fun LibreMusicRoot(
     CompositionLocalProvider(LocalReduceMotion provides reduceMotion, LocalGlass provides glass) {
         ProvideApp(app) {
             val env = ScreenEnv(app, playerVm, libraryVm, homeVm)
+            FirstStepsWatcher(env)
             CompositionLocalProvider(LocalEnv provides env) {
                 Box(Modifier.fillMaxSize().background(Libre.colors.background)) {
                     // Atrás dentro de una pestaña: lo gestiona TabStack (gesto del sistema con vista previa).
@@ -380,11 +445,37 @@ fun LibreMusicRoot(
 
                     if (immersive) ImmersiveDeck(deck)
 
-                    // Primera vez: guía de tres pantallas (también desde Ajustes › Ayuda y soporte).
+                    // Bienvenida (también desde Ajustes › Ayuda y soporte). Quien ya usaba la app antes de la 1.0 sólo ve la
+                    // pantalla de privacidad, una vez. Después: recorrido sobre la app → historias → (cuenta, si la pidió).
                     val onboarded by Prefs.onboarded.collectAsState()
+                    val termsAccepted by Prefs.termsAccepted.collectAsState()
+                    val introStage by Prefs.introStage.collectAsState()
                     androidx.compose.animation.AnimatedVisibility(
-                        !onboarded, enter = androidx.compose.animation.fadeIn(uiEaseOut(250)), exit = androidx.compose.animation.fadeOut(uiEaseOut(250)),
-                    ) { OnboardingScreen(onDone = { Prefs.setOnboarded(true) }) }
+                        !onboarded || !termsAccepted, enter = androidx.compose.animation.fadeIn(uiEaseOut(250)), exit = androidx.compose.animation.fadeOut(uiEaseOut(250)),
+                    ) {
+                        val privacyOnly = onboarded && !termsAccepted
+                        OnboardingScreen(privacyOnly = privacyOnly, onDone = {
+                            if (privacyOnly) {
+                                if (Prefs.openAccountAfterIntro) { Prefs.openAccountAfterIntro = false; app.tab = Tab.Settings; app.push(Route.AccountR) }
+                            } else {
+                                Prefs.setOnboarded(true)
+                                Prefs.setIntroStage("tour")
+                            }
+                        })
+                    }
+                    if (onboarded && termsAccepted && introStage == "tour") TourOverlay(onDone = { Prefs.setIntroStage("stories") })
+                    androidx.compose.animation.AnimatedVisibility(
+                        onboarded && termsAccepted && introStage == "stories",
+                        enter = androidx.compose.animation.fadeIn(uiEaseOut(300)), exit = androidx.compose.animation.fadeOut(uiEaseOut(250)),
+                    ) {
+                        StoriesScreen(onDone = {
+                            Prefs.setIntroStage("")
+                            if (Prefs.openAccountAfterIntro) { Prefs.openAccountAfterIntro = false; app.tab = Tab.Settings; app.push(Route.AccountR) }
+                        })
+                    }
+
+                    // Estado de incidencias (Fase 4): aviso o modo seguro arriba; bloqueo total a pantalla completa.
+                    IncidentOverlay()
 
                     app.alert?.let { AlertHost(it, onDismiss = { app.alert = null }) }
                     Toast(app.toast)
@@ -404,6 +495,7 @@ val LocalEnv = androidx.compose.runtime.staticCompositionLocalOf<ScreenEnv> { er
 fun RouteScreen(route: Route) {
     when (route) {
         is Route.Collection -> CollectionScreen(route.collection)
+        is Route.Discography -> DiscographyScreen(route)
         is Route.PlaylistR -> PlaylistDetailScreen(route.id)
         is Route.Smart -> SmartListScreen(route.kind)
         is Route.Songs -> SongListScreen(route.title, route.songs)
@@ -420,8 +512,16 @@ fun RouteScreen(route: Route) {
         Route.TabOrderR -> TabOrderScreen()
         Route.DownloadsSettings -> DownloadsSettingsScreen()
         Route.Help -> HelpScreen()
-        Route.AppIconR -> AppIconScreen()
+        Route.MyData -> MyDataScreen()
+        Route.AccountR -> AccountScreen()
+        Route.Personalization -> PersonalizationScreen()
+        Route.Admin -> AdminScreen()
         is Route.Support -> SupportScreen(route.draftId)
+        is Route.Suggest -> SupportScreen(route.draftId, suggestion = true)
+        Route.Language -> SettingsPage(L("Idioma")) {
+            Text(L("Toda la app cambia al momento. Lo que aún no está traducido se ve en español."), style = app.libremusic.ui.theme.Typo.footnote, color = app.libremusic.ui.theme.Libre.colors.secondaryLabel, modifier = Modifier.padding(start = 32.dp, end = 32.dp, top = 8.dp))
+            LanguagePicker()
+        }
         Route.SupportDrafts -> SupportDraftsScreen()
         Route.Appearance -> AppearanceScreen()
         Route.ThemePicker -> ThemePickerScreen()
@@ -491,6 +591,7 @@ private fun TabBar(tabs: List<Tab>, selected: Tab, dark: Boolean, follow: () -> 
                 Modifier
                     .weight(1f)
                     .height(54.dp)
+                    .tourTarget("tab:${t.key}")
                     .tactile(label = t.title) { onSelect(t) },
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
@@ -624,6 +725,7 @@ private fun LiquidTabBar(tabs: List<Tab>, selected: Tab, dark: Boolean, follow: 
                 Modifier
                     .weight(1f)
                     .height(54.dp)
+                    .tourTarget("tab:${t.key}")
                     .semantics { role = Role.Tab; this.selected = isSelected; contentDescription = t.title; onClick(label = null) { onSelect(t); true } },
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,

@@ -66,14 +66,17 @@ private func airTick() { UISelectionFeedbackGenerator().selectionChanged() }
 struct AirPlayerView: View {
     let song: Song
     @Binding var showQueue: Bool
+    /// Abre la letra (el panel «Cola | Letra» del reproductor), para el «⋯».
+    var onLyrics: () -> Void = {}
     @EnvironmentObject var player: Player
     @EnvironmentObject var library: Library
     @Environment(\.colorScheme) private var scheme
     @State private var scrub: Double?
 
-    init(song: Song, showQueue: Binding<Bool>) {
+    init(song: Song, showQueue: Binding<Bool>, onLyrics: @escaping () -> Void = {}) {
         self.song = song
         self._showQueue = showQueue
+        self.onLyrics = onLyrics
     }
 
     var body: some View {
@@ -99,8 +102,19 @@ struct AirPlayerView: View {
     private func header(_ c: AirColors) -> some View {
         let fav = library.isFavorite(song)
         return HStack(spacing: 4) {
-            Text("Música").font(.airDisplay(30)).tracking(-0.8)
+            Text(L("Música")).font(.airDisplay(30)).tracking(-0.8)
             Spacer()
+            // Los botones del reproductor Normal, en la tinta del Air (Fase 3.4): bucle, temporizador y «⋯» (con la letra).
+            RepeatButton()
+            SleepTimerButton()
+            Menu {
+                Button(action: onLyrics) { Label("Ver letra", systemImage: "quote.bubble") }
+                Divider()
+                SongMenuItems(song: song)
+            } label: {
+                Image(systemName: "ellipsis").font(.system(size: 19, weight: .semibold)).frame(width: 44, height: 44).contentShape(Rectangle())
+            }
+            .accessibilityLabel(L("Más opciones de {0}", song.title))
             Button { library.toggleFavorite(song) } label: {
                 Image(systemName: fav ? "heart.fill" : "heart")
                     .font(.system(size: 19, weight: .semibold))
@@ -109,14 +123,14 @@ struct AirPlayerView: View {
                     .frame(width: 44, height: 44)
                     .contentShape(Rectangle())
             }
-            .accessibilityLabel(fav ? "Quitar de favoritos" : "Añadir a favoritos")
+            .accessibilityLabel(fav ? L("Quitar de favoritos") : L("Añadir a favoritos"))
             Button { player.showFullPlayer = false } label: {
                 Image(systemName: "chevron.down")
                     .font(.system(size: 19, weight: .semibold))
                     .frame(width: 44, height: 44)
                     .contentShape(Rectangle())
             }
-            .accessibilityLabel("Cerrar reproductor")
+            .accessibilityLabel(L("Cerrar reproductor"))
         }
         .buttonStyle(TactileButtonStyle())
         .padding(.leading, 24)
@@ -230,7 +244,7 @@ private struct AirDisc: View {
         }
         .aspectRatio(1, contentMode: .fit)
         .accessibilityElement()
-        .accessibilityLabel("Progreso")
+        .accessibilityLabel(L("Progreso"))
         .accessibilityValue("\(timeString(clock.progress)) de \(timeString(clock.duration))")
         .accessibilityAdjustableAction { dir in
             let step = 10.0
@@ -387,9 +401,9 @@ private struct AirSpeedKnob: View {
             .shadow(color: .black.opacity(0.05), radius: 8, y: 4)
         }
         .buttonStyle(TactileButtonStyle())
-        .accessibilityLabel("Velocidad")
+        .accessibilityLabel(L("Velocidad"))
         .accessibilityValue(label(player.rate))
-        .accessibilityHint("Toca para cambiarla")
+        .accessibilityHint(L("Toca para cambiarla"))
     }
 
     private func label(_ r: Float) -> String {
@@ -426,7 +440,7 @@ private struct AirRouteTile: View {
             withAnimation(.uiEaseOut(0.25)) { route = AirRoute.current() }
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Salida de audio: \(route.name)")
+        .accessibilityLabel(L("Salida de audio: {0}", route.name))
         .accessibilityAddTraits(.isButton)
     }
 }
@@ -446,8 +460,8 @@ private struct AirRoute: Equatable {
         case .carAudio: return AirRoute(name: n, symbol: "car.fill")
         case .headphones: return AirRoute(name: n, symbol: "headphones")
         case .bluetoothA2DP, .bluetoothLE, .bluetoothHFP:
-            if n.localizedCaseInsensitiveContains("AirPods Max") { return AirRoute(name: n, symbol: "airpodsmax") }
-            if n.localizedCaseInsensitiveContains("AirPods Pro") { return AirRoute(name: n, symbol: "airpodspro") }
+            if n.localizedCaseInsensitiveContains(L("AirPods Max")) { return AirRoute(name: n, symbol: "airpodsmax") }
+            if n.localizedCaseInsensitiveContains(L("AirPods Pro")) { return AirRoute(name: n, symbol: "airpodspro") }
             if n.localizedCaseInsensitiveContains("AirPods") { return AirRoute(name: n, symbol: "airpods") }
             return AirRoute(name: n, symbol: "headphones")
         default: return AirRoute(name: n, symbol: "hifispeaker.fill")
@@ -518,10 +532,10 @@ private struct AirWheel: View {
         .aspectRatio(1, contentMode: .fit)
         .accessibilityRepresentation {
             HStack {
-                Button("Anterior") { player.previous() }
-                Button(player.isPlaying ? "Pausar" : "Reproducir") { player.toggle() }
-                Button("Siguiente") { player.next() }
-                Button("Cola") { showQueue = true }
+                Button(L("Anterior")) { player.previous() }
+                Button(player.isPlaying ? L("Pausar") : L("Reproducir")) { player.toggle() }
+                Button(L("Siguiente")) { player.next() }
+                Button(L("Cola")) { showQueue = true }
             }
         }
     }
@@ -628,7 +642,7 @@ private struct AirDownloadDots: View {
         }
         .buttonStyle(TactileButtonStyle())
         .disabled(done || busy)
-        .accessibilityLabel(done ? "Descargada" : busy ? "Descargando" : "Descargar")
+        .accessibilityLabel(done ? L("Descargada") : busy ? L("Descargando") : L("Descargar"))
     }
 }
 

@@ -1,5 +1,7 @@
 package app.libremusic.avisos
 
+
+import app.libremusic.L
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -32,6 +34,10 @@ class AvisosWorker(
     params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
     override suspend fun doWork(): Result {
+        // Estado de incidencias firmado (Fase 4): también en segundo plano, para que un modo seguro llegue antes.
+        app.libremusic.data.Incident.refresh(applicationContext)
+        // Telemetría (Fase 4b, sólo con consentimiento): el resumen de la semana que acabó, aunque no se abra la app.
+        app.libremusic.data.Telemetry.flushIfDue(applicationContext)
         val avisos = AvisosRepo.refrescar(applicationContext) ?: return Result.retry()
         if (!AvisosRepo.notificarActivado(applicationContext)) return Result.success()
         AvisosRepo.pendientesDeNotificar(applicationContext, avisos).forEach { notificar(applicationContext, it) }
@@ -66,12 +72,12 @@ class AvisosWorker(
             val gestor = context.getSystemService(NotificationManager::class.java)
             gestor.createNotificationChannel(
                 NotificationChannel(CANAL, "Avisos", NotificationManager.IMPORTANCE_DEFAULT).apply {
-                    description = "Avisos de Pear Music publicados en la web"
+                    description = L("Avisos de Pear Music publicados en la web")
                 },
             )
             gestor.createNotificationChannel(
-                NotificationChannel(CANAL_IMPORTANTES, "Avisos importantes", NotificationManager.IMPORTANCE_HIGH).apply {
-                    description = "Caídas y versiones urgentes"
+                NotificationChannel(CANAL_IMPORTANTES, L("Avisos importantes"), NotificationManager.IMPORTANCE_HIGH).apply {
+                    description = L("Caídas y versiones urgentes")
                 },
             )
         }

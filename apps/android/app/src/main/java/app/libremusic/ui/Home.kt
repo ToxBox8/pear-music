@@ -1,5 +1,13 @@
 package app.libremusic.ui
 
+
+import app.libremusic.L
+import androidx.compose.runtime.mutableIntStateOf
+
+import androidx.compose.ui.layout.onSizeChanged
+
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.text.font.FontWeight
 import kotlin.math.roundToInt
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.graphics.Color
@@ -160,9 +168,9 @@ class HomeViewModel(app: Application) : AndroidViewModel(app) {
 }
 
 private fun greeting(): String = when (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
-    in 6..12 -> "Buenos días"
-    in 13..20 -> "Buenas tardes"
-    else -> "Buenas noches"
+    in 6..12 -> L("Buenos días")
+    in 13..20 -> L("Buenas tardes")
+    else -> L("Buenas noches")
 }
 
 /** Botón redondo de la barra superior (Jam, +…), con la superficie del tema. */
@@ -212,10 +220,12 @@ fun HomeScreen() {
     }
     // Contenido pasando por debajo de la cabecera: aparece el fondo de la barra (scroll edge de iOS).
     val under by remember {
-        derivedStateOf { listState.firstVisibleItemIndex > 0 || listState.firstVisibleItemScrollOffset > titlePx + 4 }
+        // A la vez que aparece el título pequeño (antes salía más tarde y el saludo flotaba sobre el contenido).
+        derivedStateOf { listState.firstVisibleItemIndex > 0 || listState.firstVisibleItemScrollOffset > titlePx * 0.6f }
     }
     val barAlpha by animateFloatAsState(if (under) 1f else 0f, uiEaseOut(200), label = "bar")
     val statusTop = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+    var toolbarWidth by remember { mutableIntStateOf(0) }
 
     Box(Modifier.fillMaxSize()) {
         ThemeBackdrop(player.isPlaying, player.current)
@@ -224,15 +234,17 @@ fun HomeScreen() {
             if (showingSearch) {
                 searchResultItems(st)
             } else {
-                if (lib.recents.isNotEmpty()) item { HomeSection("Escuchado recientemente") { SongCardsRow(lib.recents.take(15)) } }
+                item { FirstStepsCard() }
+                item { PinnedRow() }
+                if (lib.recents.isNotEmpty()) item { HomeSection(L("Escuchado recientemente")) { SongCardsRow(lib.recents.take(15)) } }
                 if (st.forYou.isNotEmpty()) item {
-                    HomeSection("Para ti", st.seed?.let { "Porque escuchaste «${it.title}»" }) { QuickPicks(st.forYou) }
+                    HomeSection(L("Para ti"), st.seed?.let { L("Porque escuchaste «{0}»", it.title) }) { QuickPicks(st.forYou) }
                 }
                 if (st.releases.isNotEmpty()) item {
-                    HomeSection("Novedades de tus artistas", "Lo que han sacado este año") { ShelfContent(st.releases.map { HomeItem.CollectionItem(it) }) }
+                    HomeSection(L("Novedades de tus artistas"), L("Lo que han sacado este año")) { ShelfContent(st.releases.map { HomeItem.CollectionItem(it) }) }
                 }
                 if (lib.userPlaylists.isNotEmpty()) item {
-                    HomeSection("Tus playlists") { HomePlaylists() }
+                    HomeSection(L("Tus playlists")) { HomePlaylists() }
                 }
                 items(st.shelves.size) { i ->
                     val shelf = st.shelves[i]
@@ -243,9 +255,9 @@ fun HomeScreen() {
                 } else if (st.failed) {
                     item {
                         Column(Modifier.fillMaxWidth().padding(top = 20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text("No se pudieron cargar las recomendaciones.", style = Typo.body, color = c.secondaryLabel)
+                            Text(L("No se pudieron cargar las recomendaciones."), style = Typo.body, color = c.secondaryLabel)
                             Spacer(Modifier.height(10.dp))
-                            PillButton("Reintentar", Icons.Rounded.Refresh, prominent = false, modifier = Modifier.widthIn(max = 220.dp)) { env.home.load() }
+                            PillButton(L("Reintentar"), Icons.Rounded.Refresh, prominent = false, modifier = Modifier.widthIn(max = 220.dp)) { env.home.load() }
                         }
                     }
                 }
@@ -259,12 +271,11 @@ fun HomeScreen() {
                 .fillMaxWidth()
                 .drawBehind {
                     if (barAlpha > 0f) {
+                        // Fondo opaco (antes dejaba ver el contenido por debajo del saludo) y un borde suave abajo.
+                        val solid = c.background.copy(alpha = 1f)
                         drawRect(
-                            Brush.verticalGradient(
-                                0f to c.background.copy(alpha = 0.97f * barAlpha),
-                                0.82f to c.background.copy(alpha = 0.93f * barAlpha),
-                                1f to Color.Transparent,
-                            ),
+                            Brush.verticalGradient(0f to solid, 0.86f to solid, 1f to solid.copy(alpha = 0f)),
+                            alpha = barAlpha,
                         )
                     }
                 }
@@ -273,19 +284,34 @@ fun HomeScreen() {
         ) {
             Box(Modifier.fillMaxWidth().height(48.dp).padding(start = 16.dp, end = 12.dp, top = 4.dp)) {
                 // Título pequeño de la barra: aparece cuando el grande ya se ha escondido.
+                // Centrado, pero dejando a los dos lados el ancho de los botones: con «Buenas tardes» y Ajustes arriba se solapaba con el Jam.
                 Text(
-                    greeting(), style = Typo.headline, color = c.label, maxLines = 1,
-                    modifier = Modifier.align(Alignment.Center).graphicsLayer { alpha = ((collapse - 0.6f) / 0.4f).coerceIn(0f, 1f) },
+                    greeting(), style = Typo.headline, color = c.label, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                    // Con tres botones (Ajustes arriba) no cabe centrado: va a la izquierda, en el hueco libre.
+                    textAlign = if (settingsTop) TextAlign.Start else TextAlign.Center,
+                    modifier = Modifier.align(Alignment.Center).fillMaxWidth()
+                        .padding(
+                            start = if (settingsTop) 0.dp else with(density) { toolbarWidth.toDp() } + 8.dp,
+                            end = with(density) { toolbarWidth.toDp() } + 8.dp,
+                        )
+                        .graphicsLayer { alpha = ((collapse - 0.6f) / 0.4f).coerceIn(0f, 1f) },
                 )
-                Row(Modifier.align(Alignment.CenterEnd), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    ToolbarButton(
-                        JamIcon(filled = jamActive), if (jamActive) "Abrir el Jam" else "Jam con amigos",
-                        tint = if (jamActive) c.accent else c.label,
-                    ) { env.app.showJam = true }
+                Row(
+                    Modifier.align(Alignment.CenterEnd).onSizeChanged { toolbarWidth = it.width },
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Box(Modifier.tourTarget("jam")) {
+                        ToolbarButton(
+                            JamIcon(filled = jamActive), if (jamActive) L("Abrir el Jam") else L("Jam con amigos"),
+                            tint = if (jamActive) c.accent else c.label,
+                        ) { env.app.showJam = true }
+                    }
                     AvisosBell()
                     // Ajustes arriba (Ajustes › Aspecto): sale de la barra y vive aquí, junto al Jam.
                     if (settingsTop) {
-                        ToolbarButton(Icons.Rounded.Settings, "Ajustes", tint = c.label) { env.app.select(Tab.Settings) }
+                        Box(Modifier.tourTarget("tab:settings")) {
+                            ToolbarButton(Icons.Rounded.Settings, L("Ajustes"), tint = c.label) { env.app.select(Tab.Settings) }
+                        }
                     }
                 }
             }
@@ -413,21 +439,35 @@ fun CollectionScreen(collection: RemoteCollection) {
                     val shape = RoundedCornerShape(22.dp)
                     Box(Modifier.size(220.dp).shadowSoft(16.dp, shape, 0.25f).clip(shape)) { CoverImage(collection.thumb(600), Modifier.fillMaxSize()) }
                     Text(collection.title, style = Typo.title2, color = c.label, textAlign = TextAlign.Center)
-                    Text(collection.subtitle, style = Typo.subheadline, color = c.secondaryLabel, textAlign = TextAlign.Center)
+                    // «Álbum • Artista • año»: el artista se toca para ir a su perfil (Fase 3.1).
+                    val parts = collection.subtitle.split(" • ")
+                    if (isAlbum && parts.size >= 2 && parts[1].isNotBlank()) {
+                        val scope = rememberCoroutineScope()
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(parts[0] + " · ", style = Typo.subheadline, color = c.secondaryLabel)
+                            Text(
+                                parts[1], style = Typo.subheadline.copy(fontWeight = FontWeight.SemiBold), color = c.accent,
+                                modifier = Modifier.tactile(label = L("Ver el perfil de {0}", parts[1])) { openArtistProfile(env, scope, parts[1]) },
+                            )
+                            if (parts.size >= 3) Text(" · " + parts.last(), style = Typo.subheadline, color = c.secondaryLabel)
+                        }
+                    } else {
+                        Text(collection.subtitle, style = Typo.subheadline, color = c.secondaryLabel, textAlign = TextAlign.Center)
+                    }
                     PlayShuffleBar(songs) { list, i -> env.player.play(list, i) }
                     if (isAlbum) {
                         PillButton(
-                            if (inAlbums || saved) "En Tus álbumes" else "Añadir a Tus álbumes",
+                            if (inAlbums || saved) L("En Tus álbumes") else L("Añadir a Tus álbumes"),
                             if (inAlbums || saved) Icons.Rounded.Check else Icons.Rounded.Add,
                             prominent = false, modifier = Modifier.fillMaxWidth(), enabled = songs.isNotEmpty(),
                         ) {
                             if (inAlbums) {
                                 env.app.alert = AlertSpec(
-                                    title = "¿Quitar «${collection.title}» de Tus álbumes?",
-                                    message = "Las canciones descargadas se quedan en Descargadas.",
+                                    title = L("¿Quitar «{0}» de Tus álbumes?", collection.title),
+                                    message = L("Las canciones descargadas se quedan en Descargadas."),
                                     buttons = listOf(
-                                        AlertButton("Cancelar", AlertButton.Role.Cancel),
-                                        AlertButton("Quitar de Tus álbumes", AlertButton.Role.Destructive) {
+                                        AlertButton(L("Cancelar"), AlertButton.Role.Cancel),
+                                        AlertButton(L("Quitar de Tus álbumes"), AlertButton.Role.Destructive) {
                                             data.album(collection.id)?.let { env.library.deletePlaylist(it.id) }
                                             saved = false
                                         },
@@ -437,7 +477,7 @@ fun CollectionScreen(collection: RemoteCollection) {
                         }
                     } else {
                         PillButton(
-                            if (saved) "Guardada en tu biblioteca" else "Guardar en biblioteca",
+                            if (saved) L("Guardada en tu biblioteca") else L("Guardar en biblioteca"),
                             if (saved) Icons.Rounded.Check else Icons.Rounded.Add,
                             prominent = false, modifier = Modifier.fillMaxWidth(), enabled = songs.isNotEmpty() && !saved,
                         ) { save() }
@@ -450,7 +490,7 @@ fun CollectionScreen(collection: RemoteCollection) {
             }
             when {
                 loading -> item { Box(Modifier.fillMaxWidth().padding(top = 40.dp), contentAlignment = Alignment.Center) { Spinner() } }
-                songs.isEmpty() -> item { CenterNote("No se pudieron cargar las canciones", 32.dp) }
+                songs.isEmpty() -> item { CenterNote(L("No se pudieron cargar las canciones"), 32.dp) }
                 else -> items(songs, key = { it.id }) { s ->
                     SongRow(s, songs, Modifier.padding(start = 16.dp, end = 8.dp))
                     RowSeparator()
@@ -479,7 +519,7 @@ fun SearchTabScreen() {
         LazyColumn(Modifier.fillMaxSize()) {
             item {
                 Spacer(Modifier.statusBarsPadding().height(52.dp))
-                LargeTitle("Buscar")
+                LargeTitle(L("Buscar"))
                 SearchField(st.query, env.home::setQuery, env.home::search, Modifier.padding(16.dp, 8.dp))
             }
             searchResultItems(st)

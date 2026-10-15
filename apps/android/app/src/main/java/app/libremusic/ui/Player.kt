@@ -1,5 +1,7 @@
 package app.libremusic.ui
 
+
+import app.libremusic.L
 import app.libremusic.ui.theme.withArtwork
 import app.libremusic.ui.theme.ArtworkBackdrop
 import androidx.compose.foundation.layout.displayCutoutPadding
@@ -145,13 +147,13 @@ fun MiniPlayerAccessory(onOpen: () -> Unit) {
                 .height(48.dp)
                 .then(
                     if (glass) Modifier
-                        .glassInteractive(press, "Abrir reproductor", grow = 0.035f, onLongClick = { menu = true }, onClick = onOpen)
+                        .glassInteractive(press, L("Abrir reproductor"), grow = 0.035f, onLongClick = { menu = true }, onClick = onOpen)
                         .liquidGlass(shape, c.dark, GlassStyle.Bar, press = press)
                     else Modifier
                         .clip(shape)
                         .background(material(c.dark, thick = true))
                         .border(0.5.dp, Color.White.copy(alpha = if (c.dark) 0.12f else 0.6f), shape)
-                        .tactile(label = "Abrir reproductor", onLongClick = { menu = true }, onClick = onOpen),
+                        .tactile(label = L("Abrir reproductor"), onLongClick = { menu = true }, onClick = onOpen),
                 )
                 .padding(horizontal = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
@@ -172,12 +174,12 @@ fun MiniPlayerAccessory(onOpen: () -> Unit) {
             // Cajas de 44 y 40 dp (área táctil) con huecos más pequeños: los iconos quedan donde
             // estaban con cajas de 34 y 30 dp, pero se aciertan mejor.
             Spacer(Modifier.width(5.dp))
-            IconTap(if (st.isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow, if (st.isPlaying) "Pausa" else "Reproducir", size = 28.dp, box = 44.dp) { env.player.togglePlay() }
-            IconTap(Icons.Rounded.FastForward, "Siguiente", size = 24.dp, box = 40.dp) { env.player.next() }
+            IconTap(if (st.isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow, if (st.isPlaying) L("Pausa") else L("Reproducir"), size = 28.dp, box = 44.dp) { env.player.togglePlay() }
+            IconTap(Icons.Rounded.FastForward, L("Siguiente"), size = 24.dp, box = 40.dp) { env.player.next() }
         }
         ContextMenu(menu, { menu = false }, listOf(
-            MenuEntry.Sub("Reproductor", deck.icon(), deckMenu(deck)),
-            MenuEntry.Action("Abrir reproductor", Icons.Rounded.OpenInFull) { onOpen() },
+            MenuEntry.Sub(L("Reproductor"), deck.icon(), deckMenu(deck)),
+            MenuEntry.Action(L("Abrir reproductor"), Icons.Rounded.OpenInFull) { onOpen() },
         ))
     }
 }
@@ -212,7 +214,7 @@ private fun PlayerScreenContent(onClose: () -> Unit) {
         if (air) {
             Box(Modifier.fillMaxSize()) {
                 AirPaper(c.dark)
-                AirPlayerView(song, onQueue = { showQueue = true }, onClose = onClose)
+                AirPlayerView(song, onQueue = { showQueue = true }, onLyrics = openLyrics, onClose = onClose)
             }
         } else {
             Box(Modifier.fillMaxSize()) {
@@ -326,7 +328,7 @@ private fun TitleBlock(song: Song, error: String?, onLyrics: () -> Unit) {
 
 /** Luna del temporizador para dormir: en acento mientras cuenta; el menú elige minutos, «al acabar la canción» o apagarlo. */
 @Composable
-private fun SleepTimerButton() {
+internal fun SleepTimerButton(ink: Color? = null) {
     val c = Libre.colors
     val timer by SleepTimer.state.collectAsState()
     val on = timer != SleepTimer.State.Off
@@ -334,8 +336,8 @@ private fun SleepTimerButton() {
     Box {
         IconTap(
             if (on) Icons.Rounded.Bedtime else Icons.Outlined.Bedtime,
-            if (on) "Temporizador: ${SleepTimer.label(timer)}" else "Temporizador para dormir",
-            tint = if (on) c.accent else c.label,
+            if (on) "Temporizador: ${SleepTimer.label(timer)}" else L("Temporizador para dormir"),
+            tint = if (on) c.accent else ink ?: c.label,
         ) { menu = true }
         ContextMenu(menu, { menu = false }, sleepMenu(timer))
     }
@@ -346,10 +348,10 @@ private fun sleepMenu(timer: SleepTimer.State): List<MenuEntry> = buildList {
     SleepTimer.presets.forEach { m ->
         add(MenuEntry.Action("$m minutos", checked = (timer as? SleepTimer.State.At)?.minutes == m) { SleepTimer.start(m) })
     }
-    add(MenuEntry.Action("Al acabar la canción", Icons.Rounded.MusicNote, checked = timer == SleepTimer.State.EndOfSong) { SleepTimer.endOfSong() })
+    add(MenuEntry.Action(L("Al acabar la canción"), Icons.Rounded.MusicNote, checked = timer == SleepTimer.State.EndOfSong) { SleepTimer.endOfSong() })
     if (timer != SleepTimer.State.Off) {
         add(MenuEntry.Divider)
-        add(MenuEntry.Action("Desactivar temporizador", Icons.Rounded.Close, destructive = true) { SleepTimer.cancel() })
+        add(MenuEntry.Action(L("Desactivar temporizador"), Icons.Rounded.Close, destructive = true) { SleepTimer.cancel() })
     }
 }
 
@@ -367,11 +369,11 @@ private fun SleepTimerLabel() {
 
 /** «⋯» del reproductor: el mismo menú de canción que en el resto de la app. */
 @Composable
-private fun SongMoreButton(song: Song, onLyrics: () -> Unit) {
+internal fun SongMoreButton(song: Song, onLyrics: () -> Unit, ink: Color? = null) {
     var menu by remember { mutableStateOf(false) }
     Box {
-        IconTap(Icons.Rounded.MoreHoriz, "Más opciones de ${song.title}", tint = Libre.colors.label) { menu = true }
-        ContextMenu(menu, { menu = false }, listOf(MenuEntry.Action("Ver letra", Icons.Rounded.Lyrics, onClick = onLyrics), MenuEntry.Divider) + songMenu(song))
+        IconTap(Icons.Rounded.MoreHoriz, L("Más opciones de {0}", song.title), tint = ink ?: Libre.colors.label) { menu = true }
+        ContextMenu(menu, { menu = false }, listOf(MenuEntry.Action(L("Ver letra"), Icons.Rounded.Lyrics, onClick = onLyrics), MenuEntry.Divider) + songMenu(song))
     }
 }
 
@@ -381,7 +383,7 @@ enum class PlayerPanel { Queue, Lyrics }
 @Composable
 private fun PanelTabs(panel: PlayerPanel, onSelect: (PlayerPanel) -> Unit) {
     Box(Modifier.padding(horizontal = 20.dp)) {
-        Segmented(listOf("queue" to "Cola", "lyrics" to "Letra"), if (panel == PlayerPanel.Lyrics) "lyrics" else "queue") {
+        Segmented(listOf("queue" to L("Cola"), "lyrics" to L("Letra")), if (panel == PlayerPanel.Lyrics) "lyrics" else "queue") {
             onSelect(if (it == "lyrics") PlayerPanel.Lyrics else PlayerPanel.Queue)
         }
     }
@@ -403,7 +405,7 @@ private fun CompactHeader(song: Song, error: String?, deck: DeckStyle, onLyrics:
         SleepTimerButton()
         SongMoreButton(song, onLyrics)
         Box {
-            IconTap(deck.icon(), "Cambiar reproductor", tint = c.accent) { menu = true }
+            IconTap(deck.icon(), L("Cambiar reproductor"), tint = c.accent) { menu = true }
             ContextMenu(menu, { menu = false }, deckMenu(deck))
         }
     }
@@ -427,17 +429,17 @@ private fun Controls(song: Song, showQueue: Boolean, onQueue: () -> Unit) {
     ) {
         Scrubber()
         Row(horizontalArrangement = Arrangement.spacedBy(28.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconTap(Icons.Rounded.FastRewind, "Anterior", size = 50.dp, box = 56.dp) { env.player.previous() }
+            IconTap(Icons.Rounded.FastRewind, L("Anterior"), size = 50.dp, box = 56.dp) { env.player.previous() }
             if (glass) {
-                LipButton(if (st.isPlaying) "Pausa" else "Reproducir", onClick = { env.player.togglePlay() }) {
+                LipButton(if (st.isPlaying) L("Pausa") else L("Reproducir"), onClick = { env.player.togglePlay() }) {
                     Icon(if (st.isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow, null, tint = c.label, modifier = Modifier.size(44.dp))
                 }
             } else {
-                Box(Modifier.size(76.dp).tactile(label = if (st.isPlaying) "Pausa" else "Reproducir") { env.player.togglePlay() }, contentAlignment = Alignment.Center) {
+                Box(Modifier.size(76.dp).tactile(label = if (st.isPlaying) L("Pausa") else L("Reproducir")) { env.player.togglePlay() }, contentAlignment = Alignment.Center) {
                     Icon(if (st.isPlaying) Icons.Rounded.PauseCircleFilled else Icons.Rounded.PlayCircleFilled, null, tint = c.accent, modifier = Modifier.size(72.dp))
                 }
             }
-            IconTap(Icons.Rounded.FastForward, "Siguiente", size = 50.dp, box = 56.dp) { env.player.next() }
+            IconTap(Icons.Rounded.FastForward, L("Siguiente"), size = 50.dp, box = 56.dp) { env.player.next() }
         }
         SecondaryControls(song, showQueue, onQueue)
     }
@@ -481,13 +483,13 @@ private fun SecondaryControls(song: Song, showQueue: Boolean, onQueue: () -> Uni
     val fav = data.favorites.any { it.id == song.id }
     val favScale by animateFloatAsState(if (fav) 1.1f else 1f, spring(dampingRatio = 0.5f, stiffness = 400f), label = "fav")
     Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
-        Box(Modifier.size(44.dp).tactile(label = if (fav) "Quitar de favoritos" else "Añadir a favoritos") { env.library.toggleFavorite(song) }, contentAlignment = Alignment.Center) {
+        Box(Modifier.size(44.dp).tactile(label = if (fav) L("Quitar de favoritos") else L("Añadir a favoritos")) { env.library.toggleFavorite(song) }, contentAlignment = Alignment.Center) {
             Icon(if (fav) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder, null, tint = if (fav) c.accent else c.label, modifier = Modifier.size(26.dp).scale(favScale))
         }
         DownloadButton(song)
-        IconTap(Icons.Rounded.Cast, "Salida de audio", size = 24.dp) { openOutputSwitcher(context) }
+        IconTap(Icons.Rounded.Cast, L("Salida de audio"), size = 24.dp) { openOutputSwitcher(context) }
         RepeatButton(st.repeatMode) { env.player.cycleRepeat() }
-        IconTap(if (showQueue) Icons.Rounded.MusicNote else Icons.AutoMirrored.Rounded.FormatListBulleted, if (showQueue) "Ver carátula" else "Ver cola", size = 26.dp, onClick = onQueue)
+        IconTap(if (showQueue) Icons.Rounded.MusicNote else Icons.AutoMirrored.Rounded.FormatListBulleted, if (showQueue) L("Ver carátula") else L("Ver cola"), size = 26.dp, onClick = onQueue)
     }
 }
 
@@ -510,7 +512,7 @@ fun DownloadButton(song: Song) {
     Box(
         Modifier.height(34.dp).themeSurface(17.dp, c)
             .then(if (phase == 3) Modifier.border(1.dp, c.destructive.copy(alpha = 0.6f), CircleShape) else Modifier)
-            .tactile(enabled = phase == 0 || phase == 3, label = when (phase) { 0 -> "Descargar"; 1 -> "Descargando $pct %"; 2 -> "Descargado"; else -> "Reintentar descarga" }) { env.library.toggleDownload(song) }
+            .tactile(enabled = phase == 0 || phase == 3, label = when (phase) { 0 -> L("Descargar"); 1 -> L("Descargando {0} %", pct); 2 -> L("Descargado"); else -> L("Reintentar descarga") }) { env.library.toggleDownload(song) }
             .padding(horizontal = 14.dp),
         contentAlignment = Alignment.Center,
     ) {
@@ -529,7 +531,7 @@ fun DownloadButton(song: Song) {
                 if (!compact) {
                     Spacer(Modifier.width(6.dp))
                     Text(
-                        when (p) { 0 -> "Descargar"; 1 -> "Descargando $pct %"; 2 -> "Descargado"; else -> "Reintentar" },
+                        when (p) { 0 -> L("Descargar"); 1 -> L("Descargando {0} %", pct); 2 -> L("Descargado"); else -> L("Reintentar") },
                         style = Typo.subheadline.medium, color = fg,
                     )
                 }
@@ -596,11 +598,11 @@ private fun QueueView(modifier: Modifier) {
     Column(modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                Text("A continuación", style = Typo.headline, color = c.label)
+                Text(L("A continuación"), style = Typo.headline, color = c.label)
                 Text(songCount(upcoming), style = Typo.caption, color = c.secondaryLabel)
             }
             if (upcoming > 0) {
-                Text(if (editing) "Listo" else "Editar", style = Typo.subheadline.semibold, color = c.accent, modifier = Modifier.tactile(label = "Editar cola") { editing = !editing }.padding(8.dp))
+                Text(if (editing) L("Listo") else L("Editar"), style = Typo.subheadline.semibold, color = c.accent, modifier = Modifier.tactile(label = L("Editar cola")) { editing = !editing }.padding(8.dp))
             }
         }
         LazyColumn(Modifier.weight(1f).edgeFade()) {
@@ -617,7 +619,7 @@ private fun QueueView(modifier: Modifier) {
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         if (editing) {
-                            IconTap(Icons.Rounded.RemoveCircle, "Quitar ${song.title}", tint = c.destructive) { env.player.removeFromQueue(i) }
+                            IconTap(Icons.Rounded.RemoveCircle, L("Quitar {0}", song.title), tint = c.destructive) { env.player.removeFromQueue(i) }
                         }
                         if (i == st.index) {
                             Icon(Icons.AutoMirrored.Rounded.VolumeUp, null, tint = c.accent, modifier = Modifier.size(18.dp))
@@ -629,7 +631,7 @@ private fun QueueView(modifier: Modifier) {
                         }
                         if (editing) {
                             Icon(
-                                Icons.Rounded.DragHandle, "Mover", tint = c.tertiaryLabel,
+                                Icons.Rounded.DragHandle, L("Mover"), tint = c.tertiaryLabel,
                                 modifier = Modifier.size(44.dp).padding(10.dp).pointerInput(i) {
                                     detectDragGestures(
                                         onDragStart = { dragIndex = i; dragOffset = 0f },
@@ -647,7 +649,7 @@ private fun QueueView(modifier: Modifier) {
                     }
                 }
                 Box {
-                    if (editing) row() else SwipeToRemove("Eliminar", onRemove = { env.player.removeFromQueue(i) }) { row() }
+                    if (editing) row() else SwipeToRemove(L("Eliminar"), onRemove = { env.player.removeFromQueue(i) }) { row() }
                     // Mantener pulsada una fila de la cola abre el mismo menú de canción que en el resto de la app.
                     ContextMenu(menu, { menu = false }, songMenu(song), preview = { SongPreview(song) })
                 }
@@ -655,7 +657,7 @@ private fun QueueView(modifier: Modifier) {
         }
         if (upcoming > 0) {
             Box(Modifier.padding(horizontal = 20.dp)) {
-                HoldToConfirmButton("Mantén para vaciar la cola", Icons.Rounded.ClearAll) { env.player.clearUpcoming() }
+                HoldToConfirmButton(L("Mantén para vaciar la cola"), Icons.Rounded.ClearAll) { env.player.clearUpcoming() }
             }
         }
     }
@@ -691,13 +693,36 @@ fun ImmersiveDeck(style: DeckStyle) {
                             ScrambleText(song.title, Typo.title, maxLines = 3, enabled = scramble)
                             Text(song.artist, style = Typo.title3, color = c.secondaryLabel, maxLines = 2)
                             Text("${timeString(st.progress)} / ${timeString(st.duration)}", style = Typo.headline, color = c.secondaryLabel)
+                            ImmersiveControls()
                         }
                     }
                 } else {
                     Box(Modifier.fillMaxHeight().aspectRatio(1.58f)) { CassetteView(song) }
+                    // El casete ocupa todo el ancho: los controles van en una cápsula abajo, sin tapar las bobinas.
+                    ImmersiveControls(
+                        Modifier.align(Alignment.BottomCenter).background(Color.Black.copy(alpha = 0.45f), RoundedCornerShape(28.dp))
+                            .padding(horizontal = 10.dp),
+                    )
                 }
             }
         }
+    }
+}
+
+/**
+ * Controles de casete y vinilo a pantalla completa en horizontal (Fase 3.4): anterior, reproducir, siguiente,
+ * bucle y temporizador. El «⋯» con la letra se queda en vertical (la letra necesita el panel).
+ */
+@Composable
+private fun ImmersiveControls(modifier: Modifier = Modifier) {
+    val env = LocalEnv.current
+    val st by env.player.state.collectAsState()
+    Row(modifier, horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+        IconTap(Icons.Rounded.FastRewind, L("Anterior"), size = 30.dp) { env.player.previous() }
+        IconTap(if (st.isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow, if (st.isPlaying) L("Pausa") else L("Reproducir"), size = 36.dp) { env.player.togglePlay() }
+        IconTap(Icons.Rounded.FastForward, L("Siguiente"), size = 30.dp) { env.player.next() }
+        RepeatButton(st.repeatMode) { env.player.cycleRepeat() }
+        SleepTimerButton()
     }
 }
 
@@ -706,7 +731,7 @@ fun ImmersiveDeck(style: DeckStyle) {
  * color del tema y fondo suave al repetir la lista, y con el «1» al repetir la canción.
  */
 @Composable
-private fun RepeatButton(mode: Int, onClick: () -> Unit) {
+internal fun RepeatButton(mode: Int, ink: Color? = null, onClick: () -> Unit) {
     val c = Libre.colors
     val on = mode != androidx.media3.common.Player.REPEAT_MODE_OFF
     val bg by androidx.compose.animation.animateColorAsState(if (on) c.accent.copy(alpha = 0.16f) else Color.Transparent, uiEaseOut(200), label = "repeatBg")
@@ -718,7 +743,7 @@ private fun RepeatButton(mode: Int, onClick: () -> Unit) {
             Icon(
                 if (mode == androidx.media3.common.Player.REPEAT_MODE_ONE) Icons.Rounded.RepeatOne else Icons.Rounded.Repeat,
                 contentDescription = null,
-                tint = if (on) c.accent else c.label,
+                tint = if (on) c.accent else ink ?: c.label,
                 modifier = Modifier.size(24.dp),
             )
         }

@@ -1,0 +1,9 @@
+{
+  "name": "pear-music-estado",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --no-warnings --test test/*.test.js",
+    "deploy": "wrangler deploy"
+  }
+}

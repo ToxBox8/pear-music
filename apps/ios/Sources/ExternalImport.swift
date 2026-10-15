@@ -31,17 +31,17 @@ enum SpotifyImporter {
     /// largas, el CSV de Exportify.
     static func fetchPublic(_ link: String) async throws -> AMPlaylist {
         guard let id = playlistID(link), let url = URL(string: "https://open.spotify.com/embed/playlist/\(id)") else {
-            throw ImportFailure("Pega el enlace de una playlist de Spotify (Compartir → Copiar enlace).")
+            throw ImportFailure(L("Pega el enlace de una playlist de Spotify (Compartir → Copiar enlace)."))
         }
         var request = URLRequest(url: url)
         request.setValue(userAgent, forHTTPHeaderField: "User-Agent")
         let (data, response) = try await URLSession.shared.data(for: request)
-        guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw ImportFailure("Spotify no deja ver esa playlist. ¿Es pública?") }
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw ImportFailure(L("Spotify no deja ver esa playlist. ¿Es pública?")) }
         return try parseEmbed(String(decoding: data, as: UTF8.self))
     }
 
     static func parseEmbed(_ html: String) throws -> AMPlaylist {
-        let unreadable = ImportFailure("No se pudo leer la playlist. Prueba con el CSV de Exportify.")
+        let unreadable = ImportFailure(L("No se pudo leer la playlist. Prueba con el CSV de Exportify."))
         guard let r = html.range(of: #"<script id="__NEXT_DATA__"[^>]*>"#, options: .regularExpression),
               let end = html.range(of: "</script>", range: r.upperBound..<html.endIndex),
               let root = try? JSONSerialization.jsonObject(with: Data(html[r.upperBound..<end.lowerBound].utf8)) as? [String: Any],
@@ -56,9 +56,9 @@ enum SpotifyImporter {
                            duration: ((t["duration"] as? Double) ?? 0) / 1000,
                            explicit: t["isExplicit"] as? Bool)
         }
-        guard !tracks.isEmpty else { throw ImportFailure("La playlist está vacía o no es pública.") }
+        guard !tracks.isEmpty else { throw ImportFailure(L("La playlist está vacía o no es pública.")) }
         let cover = ((entity["coverArt"] as? [String: Any])?["sources"] as? [[String: Any]])?.first?["url"] as? String
-        let name = (entity["name"] as? String).flatMap { $0.isEmpty ? nil : $0 } ?? "Playlist de Spotify"
+        let name = (entity["name"] as? String).flatMap { $0.isEmpty ? nil : $0 } ?? L("Playlist de Spotify")
         return AMPlaylist(id: UUID().uuidString, name: name, tracks: tracks, artwork: cover.flatMap(URL.init(string:)))
     }
 }
@@ -72,9 +72,9 @@ enum ExportifyCSV {
         var body = text
         if body.hasPrefix("\u{FEFF}") { body.removeFirst() }
         let rows = Self.rows(body)
-        guard rows.count >= 2 else { throw ImportFailure("El archivo no tiene canciones.") }
+        guard rows.count >= 2 else { throw ImportFailure(L("El archivo no tiene canciones.")) }
         guard let start = rows[1].firstIndex(where: { $0.hasPrefix("spotify:track:") || $0.hasPrefix("spotify:local:") }) else {
-            throw ImportFailure("No parece un CSV de Exportify (falta la columna «Track URI»).")
+            throw ImportFailure(L("No parece un CSV de Exportify (falta la columna «Track URI»)."))
         }
         let isrcIndex = rows[0].firstIndex { $0.trimmingCharacters(in: .whitespaces).caseInsensitiveCompare("ISRC") == .orderedSame } ?? start + isrcCol
         let tracks = rows.dropFirst().compactMap { r -> AMTrack? in
@@ -90,9 +90,9 @@ enum ExportifyCSV {
                            isrc: isrc.isEmpty ? nil : isrc,
                            explicit: explicitText == "true" ? true : explicitText == "false" ? false : nil)
         }
-        guard !tracks.isEmpty else { throw ImportFailure("El archivo no tiene canciones.") }
+        guard !tracks.isEmpty else { throw ImportFailure(L("El archivo no tiene canciones.")) }
         var title = (fileName as NSString).deletingPathExtension.replacingOccurrences(of: "_", with: " ")
-        if title.trimmingCharacters(in: .whitespaces).isEmpty { title = "Playlist de Spotify" }
+        if title.trimmingCharacters(in: .whitespaces).isEmpty { title = L("Playlist de Spotify") }
         return AMPlaylist(id: UUID().uuidString, name: title, tracks: tracks, artwork: nil)
     }
 
@@ -141,7 +141,7 @@ enum SimpMusicBackup {
     static func read(_ url: URL) throws -> [SimpPlaylist] {
         let zip = try Data(contentsOf: url, options: .alwaysMapped)
         guard let db = try ZipReader.entry(named: database, in: zip) else {
-            throw ImportFailure("No es una copia de SimpMusic (en SimpMusic: Ajustes › Copia de seguridad).")
+            throw ImportFailure(L("No es una copia de SimpMusic (en SimpMusic: Ajustes › Copia de seguridad)."))
         }
         let tmp = FileManager.default.temporaryDirectory.appendingPathComponent("simpmusic-\(UUID().uuidString).db")
         try db.write(to: tmp)
@@ -152,7 +152,7 @@ enum SimpMusicBackup {
     static func readDatabase(_ url: URL) throws -> [SimpPlaylist] {
         var handle: OpaquePointer?
         guard sqlite3_open_v2(url.path, &handle, SQLITE_OPEN_READONLY, nil) == SQLITE_OK, let db = handle else {
-            throw ImportFailure("La copia de SimpMusic está dañada.")
+            throw ImportFailure(L("La copia de SimpMusic está dañada."))
         }
         defer { sqlite3_close(db) }
         var out: [SimpPlaylist] = []
@@ -162,7 +162,7 @@ enum SimpMusicBackup {
             out.append(SimpPlaylist(name: row[1] ?? "Playlist", songs: songs, cover: row[2].flatMap(URL.init(string:))))
         }
         let liked = songs(db, "SELECT videoId, title, artistName, thumbnails FROM song WHERE liked = 1 ORDER BY favoriteAt DESC")
-        if !liked.isEmpty { out.insert(SimpPlaylist(name: "Canciones que te gustan (SimpMusic)", songs: liked, cover: nil), at: 0) }
+        if !liked.isEmpty { out.insert(SimpPlaylist(name: L("Canciones que te gustan (SimpMusic)"), songs: liked, cover: nil), at: 0) }
         return out
     }
 
@@ -202,7 +202,7 @@ enum ZipReader {
             if u32(o) == 0x06054b50 { eocd = o; break }
             o -= 1
         }
-        guard eocd >= 0 else { throw ImportFailure("El archivo no es un ZIP válido.") }
+        guard eocd >= 0 else { throw ImportFailure(L("El archivo no es un ZIP válido.")) }
         let entries = u16(eocd + 10)
         var p = u32(eocd + 16)
         for _ in 0..<entries {
@@ -214,13 +214,13 @@ enum ZipReader {
             let entryName = String(decoding: zip[(zip.startIndex + p + 46)..<(zip.startIndex + p + 46 + nameLen)], as: UTF8.self)
             if (entryName as NSString).lastPathComponent == name {
                 if compressed == 0xFFFFFFFF || size == 0xFFFFFFFF || local == 0xFFFFFFFF {
-                    throw ImportFailure("La copia es demasiado grande. En SimpMusic, haz la copia sin las descargas.")
+                    throw ImportFailure(L("La copia es demasiado grande. En SimpMusic, haz la copia sin las descargas."))
                 }
                 let start = local + 30 + u16(local + 26) + u16(local + 28)
-                guard start + compressed <= count else { throw ImportFailure("El archivo está cortado.") }
+                guard start + compressed <= count else { throw ImportFailure(L("El archivo está cortado.")) }
                 let raw = zip[(zip.startIndex + start)..<(zip.startIndex + start + compressed)]
                 if method == 0 { return Data(raw) }
-                guard method == 8 else { throw ImportFailure("Compresión no admitida.") }
+                guard method == 8 else { throw ImportFailure(L("Compresión no admitida.")) }
                 return inflate(Data(raw), size: size)
             }
             p += 46 + nameLen + extraLen + commentLen

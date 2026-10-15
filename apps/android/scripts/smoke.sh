@@ -23,8 +23,8 @@ if adb shell dumpsys window | grep -q "mDreamingLockscreen=true\|isKeyguardShowi
     exit 1
 fi
 
-[ -f app/build/outputs/apk/debug/app-debug.apk ] || { echo "Compila antes: gradle assembleDebug" >&2; exit 1; }
-adb install -r app/build/outputs/apk/debug/app-debug.apk >/dev/null
+[ -f app/build/outputs/apk/usr/debug/app-usr-debug.apk ] || { echo "Compila antes: gradle assembleUsrDebug" >&2; exit 1; }
+adb install -r app/build/outputs/apk/usr/debug/app-usr-debug.apk >/dev/null
 adb logcat -b crash -c
 mkdir -p "$OUT"
 

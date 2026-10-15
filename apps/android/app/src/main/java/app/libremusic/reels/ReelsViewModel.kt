@@ -2,6 +2,9 @@
 
 package app.libremusic.reels
 
+
+import app.libremusic.L
+import app.libremusic.data.Logs
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -92,7 +95,7 @@ class ReelsViewModel(app: Application) : AndroidViewModel(app) {
                 if (isPlaying && activatedAt > 0L) {
                     // Desde que se elige el fragmento o se entra en Descubrir (lo que ocurra después).
                     val from = maxOf(activatedAt, visibleAt)
-                    android.util.Log.i("LMPerf", "reel_start_ms=${android.os.SystemClock.elapsedRealtime() - from}")
+                    Logs.i("LMPerf", "reel_start_ms=${android.os.SystemClock.elapsedRealtime() - from}")
                     activatedAt = 0L
                 }
                 update()
@@ -132,7 +135,7 @@ class ReelsViewModel(app: Application) : AndroidViewModel(app) {
         _state.value = ReelsState(loading = true)
         viewModelScope.launch {
             val merged = withContext(Dispatchers.IO) {
-                val pool = seeds.ifEmpty { runCatching { YTClient.search("éxitos del momento") }.getOrDefault(emptyList()) }
+                val pool = seeds.ifEmpty { runCatching { YTClient.search(L("éxitos del momento")) }.getOrDefault(emptyList()) }
                 val radios = pool.shuffled().take(3)
                     .map { seed -> async { runCatching { YTClient.radio(seed.id) }.getOrDefault(emptyList()) } }
                     .awaitAll()

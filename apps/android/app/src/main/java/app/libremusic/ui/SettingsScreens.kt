@@ -1,6 +1,17 @@
 package app.libremusic.ui
 
+import androidx.compose.material.icons.rounded.Language
+
+
+import app.libremusic.L
+import androidx.compose.material.icons.rounded.Mail
+
+import androidx.compose.material.icons.rounded.MarkunreadMailbox
+
+import androidx.compose.material.icons.rounded.Widgets
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
+import androidx.compose.ui.semantics.customActions
 
 import androidx.compose.runtime.rememberCoroutineScope
 
@@ -20,6 +31,9 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.material.icons.rounded.BugReport
+import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material.icons.rounded.AccountCircle
+import androidx.compose.material.icons.rounded.AdminPanelSettings
 import app.libremusic.data.TabOrder
 import app.libremusic.data.LocalSearch
 import app.libremusic.ui.theme.rememberPalette
@@ -137,7 +151,7 @@ import app.libremusic.ui.theme.themeSurface
 val LocalNativeForm = compositionLocalOf { false }
 
 /** Las filas dibujan su propia tarjeta (`.glassRow()` de iOS: una tarjeta por fila con los temas con estilo). */
-private val LocalRowCards = compositionLocalOf { false }
+internal val LocalRowCards = compositionLocalOf { false }
 
 /** Sección de formulario (Form de iOS 26): cabecera en gris y en negrita, grupo y pie. */
 @Composable
@@ -224,11 +238,21 @@ fun FormRow(
 }
 
 @Composable
-fun FormTextField(value: String, onChange: (String) -> Unit, placeholder: String) {
+fun FormTextField(
+    value: String,
+    onChange: (String) -> Unit,
+    placeholder: String,
+    keyboard: androidx.compose.foundation.text.KeyboardOptions = androidx.compose.foundation.text.KeyboardOptions.Default,
+    mono: Boolean = false,
+) {
     val c = Libre.colors
     Box(Modifier.fillMaxWidth().heightIn(min = 52.dp).padding(horizontal = 16.dp), contentAlignment = Alignment.CenterStart) {
         if (value.isEmpty()) Text(placeholder, style = Typo.body, color = c.tertiaryLabel)
-        BasicTextField(value, onChange, singleLine = true, textStyle = Typo.body.copy(color = c.label), cursorBrush = SolidColor(c.accent), modifier = Modifier.fillMaxWidth())
+        BasicTextField(
+            value, onChange, singleLine = true, keyboardOptions = keyboard,
+            textStyle = Typo.body.copy(color = c.label, fontFamily = if (mono) androidx.compose.ui.text.font.FontFamily.Monospace else Typo.body.fontFamily),
+            cursorBrush = SolidColor(c.accent), modifier = Modifier.fillMaxWidth(),
+        )
     }
 }
 
@@ -294,33 +318,39 @@ internal fun SettingsPage(
 /** Una entrada del buscador de Ajustes: dónde está cada opción. */
 private data class SettingEntry(val title: String, val section: String, val keywords: String, val route: Route?)
 
-private val settingsIndex = listOf(
-    SettingEntry("Avisos", "Ayuda y soporte", "notificaciones campana caídas novedades discord", Route.Avisos),
-    SettingEntry("Tema", "Aspecto", "color fondo cristal neón aire sistema apariencia", Route.ThemePicker),
-    SettingEntry("Claro u oscuro", "Aspecto", "modo noche oscuro claro automático", Route.ThemePicker),
-    SettingEntry("Reproductor", "Aspecto", "casete vinilo air normal", Route.PlayerPicker),
-    SettingEntry("Efecto en los títulos", "Aspecto", "símbolos animación scramble", Route.PlayerPicker),
-    SettingEntry("Colores de la portada", "Aspecto", "carátula color tinte sutil equilibrado intenso", Route.ArtworkColors),
-    SettingEntry("Pestañas", "Aspecto", "orden barra descubrir inicio biblioteca", Route.TabOrderR),
-    SettingEntry("Cristal líquido", "Aspecto", "glass transparente ios 26", Route.Appearance),
-    SettingEntry("Barra inferior", "Aspecto", "barra simpmusic cápsula pestañas plegar gota", Route.Appearance),
-    SettingEntry("Icono de la app", "Aspecto", "logo encendido violeta lanzador", Route.AppIconR),
-    SettingEntry("Calidad al escuchar", "Reproducción", "streaming datos ahorro máxima kbps", Route.Audio),
-    SettingEntry("Seguir con canciones parecidas", "Reproducción", "radio infinita autoplay automático cola acabar", Route.Audio),
-    SettingEntry("Copia automática", "Biblioteca", "copia seguridad backup drive nextcloud guardar exportar", Route.LibraryOptions),
-    SettingEntry("Ecualizador", "Reproducción", "graves agudos voces bajos sonido eq altavoz", Route.Audio),
-    SettingEntry("Fundido entre canciones", "Reproducción", "crossfade transición suave volumen cortes", Route.Audio),
-    SettingEntry("Salida de audio", "Reproducción", "bluetooth chromecast altavoz airplay", Route.Audio),
-    SettingEntry("Canciones descargadas", "Descargas", "espacio offline sin conexión borrar", Route.DownloadsSettings),
-    SettingEntry("Ordenar playlists", "Biblioteca", "orden a-z recientes a mano", Route.LibraryOptions),
-    SettingEntry("Descargadas y Favoritos", "Biblioteca", "carrusel tu música", Route.LibraryOptions),
-    SettingEntry("Dónde está Buscar", "Biblioteca", "buscar pestaña inicio barra", Route.LibraryOptions),
-    SettingEntry("Eliminar playlists", "Biblioteca", "borrar quitar", Route.ManagePlaylists),
-    SettingEntry("Informar de un error", "Ayuda y soporte", "bug fallo problema soporte reporte escarabajo contacto", Route.Support(null)),
-    SettingEntry("Guía inicial", "Ayuda y soporte", "tutorial bienvenida empezar", null),
-    SettingEntry("Acerca de", "Ayuda y soporte", "versión créditos licencia", Route.About),
-    SettingEntry("Vaciar caché de carátulas", "Avanzado", "memoria imágenes portadas", null),
-    SettingEntry("Tolerancia de duración", "Avanzado", "emparejar importar spotify segundos coincidencia", null),
+private val settingsIndex get() = listOf(
+    SettingEntry(L("Avisos"), L("Ayuda y soporte"), L("notificaciones campana caídas novedades discord"), Route.Avisos),
+    SettingEntry(L("Idioma"), L("Ajustes"), L("idioma lengua language català valencià galego euskara english esperanto"), Route.Language),
+    SettingEntry(L("Widgets"), L("Ajustes"), L("widgets widget personalización pantalla de inicio escritorio ahora suena recientes accesos rápidos playlist fijada tema"), Route.Personalization),
+    SettingEntry(L("Cuenta"), L("Ajustes"), L("cuenta correo nube sincronizar copia cifrada clave recuperación iniciar sesión"), Route.AccountR),
+    SettingEntry(L("Telemetría"), L("Ayuda y soporte"), L("telemetría rendimiento datos consentimiento privacidad fps"), Route.MyData),
+    SettingEntry(L("Tus datos"), L("Ayuda y soporte"), L("privacidad rgpd exportar borrar datos eliminar zip"), Route.MyData),
+    SettingEntry(L("Tema"), L("Aspecto"), L("color fondo cristal neón aire sistema apariencia"), Route.ThemePicker),
+    SettingEntry(L("Claro u oscuro"), L("Aspecto"), L("modo noche oscuro claro automático"), Route.ThemePicker),
+    SettingEntry(L("Reproductor"), L("Aspecto"), L("casete vinilo air normal"), Route.PlayerPicker),
+    SettingEntry(L("Efecto en los títulos"), L("Aspecto"), L("símbolos animación scramble"), Route.PlayerPicker),
+    SettingEntry(L("Colores de la portada"), L("Aspecto"), L("carátula color tinte sutil equilibrado intenso"), Route.ArtworkColors),
+    SettingEntry(L("Pestañas"), L("Aspecto"), L("orden barra descubrir inicio biblioteca"), Route.TabOrderR),
+    SettingEntry(L("Descubrir"), L("Aspecto"), L("ocultar quitar desactivar descubrir feed fragmentos reels"), Route.TabOrderR),
+    SettingEntry(L("Cristal líquido"), L("Aspecto"), L("glass transparente ios 26"), Route.Appearance),
+    SettingEntry(L("Barra inferior"), L("Aspecto"), L("barra simpmusic cápsula pestañas plegar gota"), Route.Appearance),
+    SettingEntry(L("Calidad al escuchar"), L("Reproducción"), L("streaming datos ahorro máxima kbps"), Route.Audio),
+    SettingEntry(L("Seguir con canciones parecidas"), L("Reproducción"), L("radio infinita autoplay automático cola acabar"), Route.Audio),
+    SettingEntry(L("Copia automática"), L("Biblioteca"), L("copia seguridad backup drive nextcloud guardar exportar"), Route.LibraryOptions),
+    SettingEntry(L("Ecualizador"), L("Reproducción"), L("graves agudos voces bajos sonido eq altavoz"), Route.Audio),
+    SettingEntry(L("Fundido entre canciones"), L("Reproducción"), L("crossfade transición suave volumen cortes"), Route.Audio),
+    SettingEntry(L("Salida de audio"), L("Reproducción"), L("bluetooth chromecast altavoz airplay"), Route.Audio),
+    SettingEntry(L("Canciones descargadas"), L("Descargas"), L("espacio offline sin conexión borrar"), Route.DownloadsSettings),
+    SettingEntry(L("Ordenar playlists"), L("Biblioteca"), L("orden a-z recientes a mano"), Route.LibraryOptions),
+    SettingEntry(L("Descargadas y Favoritos"), L("Biblioteca"), L("carrusel tu música"), Route.LibraryOptions),
+    SettingEntry(L("Dónde está Buscar"), L("Biblioteca"), L("buscar pestaña inicio barra"), Route.LibraryOptions),
+    SettingEntry(L("Eliminar playlists"), L("Biblioteca"), L("borrar quitar"), Route.ManagePlaylists),
+    SettingEntry(L("Informar de un error"), L("Ayuda y soporte"), L("bug fallo problema soporte reporte escarabajo contacto"), Route.Support(null)),
+    SettingEntry(L("Buzón de sugerencias"), L("Ayuda y soporte"), L("sugerencia idea propuesta mejora buzón"), Route.Suggest(null)),
+    SettingEntry(L("Guía inicial"), L("Ayuda y soporte"), L("tutorial bienvenida empezar"), null),
+    SettingEntry(L("Acerca de"), L("Ayuda y soporte"), L("versión créditos licencia"), Route.About),
+    SettingEntry(L("Vaciar caché de carátulas"), L("Avanzado"), L("memoria imágenes portadas"), null),
+    SettingEntry(L("Tolerancia de duración"), L("Avanzado"), L("emparejar importar spotify segundos coincidencia"), null),
 )
 
 @Composable
@@ -341,13 +371,17 @@ fun SettingsScreen() {
     val tolerance by Prefs.matchTolerance.collectAsState()
     var cleared by remember { mutableStateOf(false) }
     val keyboard = androidx.compose.ui.platform.LocalSoftwareKeyboardController.current
-    SettingsPage("Ajustes", large = true, trailing = {
-        IconTap(Icons.Rounded.BugReport, "Informar de un error", tint = c.accent) { env.app.push(Route.Support(null)) }
+    SettingsPage(L("Ajustes"), large = true, trailing = {
+        // Carta junto al escarabajo: el buzón de sugerencias (lo pidió Toxbox).
+        Row {
+            IconTap(Icons.Rounded.Mail, L("Buzón de sugerencias"), tint = c.accent) { env.app.push(Route.Suggest(null)) }
+            IconTap(Icons.Rounded.BugReport, L("Informar de un error"), tint = c.accent) { env.app.push(Route.Support(null)) }
+        }
     }) {
-        SearchField(query, { query = it }, { keyboard?.hide() }, Modifier.padding(start = 16.dp, end = 16.dp, top = 22.dp), placeholder = "Buscar en Ajustes")
+        SearchField(query, { query = it }, { keyboard?.hide() }, Modifier.padding(start = 16.dp, end = 16.dp, top = 22.dp), placeholder = L("Buscar en Ajustes"))
         if (query.isNotBlank()) {
             val hits = LocalSearch.filter(settingsIndex, query) { "${it.title} ${it.section} ${it.keywords}" }
-            if (hits.isEmpty()) CenterNote("Nada coincide con «${query.trim()}»", 40.dp)
+            if (hits.isEmpty()) CenterNote(L("Nada coincide con «{0}»", query.trim()), 40.dp)
             else FormSection(null) {
                 hits.forEachIndexed { i, e ->
                     FormRow(e.title, subtitle = e.section, chevron = true, last = i == hits.lastIndex) {
@@ -362,33 +396,49 @@ fun SettingsScreen() {
             }
             return@SettingsPage
         }
+        val account by app.libremusic.data.Account.state.collectAsState()
         FormSection(null) {
             FormRow(
-                "Aspecto", subtitle = "${theme.title} · ${deck.title}" + if (artworkOn && level.enabled) " · Colores ${level.title.lowercase()}" else "",
+                L("Cuenta"), subtitle = account.email ?: L("Opcional · guarda tu biblioteca cifrada en la nube"),
+                icon = Icons.Rounded.AccountCircle, iconPalette = 4, chevron = true, last = true,
+            ) { env.app.push(Route.AccountR) }
+        }
+        FormSection(null) {
+            FormRow(
+                L("Aspecto"), subtitle = "${theme.title} · ${deck.title}" + if (artworkOn && level.enabled) L(" · Colores {0}", level.title.lowercase()) else "",
                 icon = Icons.Rounded.Palette, iconPalette = 1, chevron = true,
             ) { env.app.push(Route.Appearance) }
+            // Idioma (Cierre 1.0).
             FormRow(
-                "Reproducción", subtitle = if (quality == "low") "Ahorro de datos" else "Calidad máxima",
+                L("Idioma"), subtitle = app.libremusic.I18n.LANGS.first { it.code == app.libremusic.I18n.lang.value }.name,
+                icon = Icons.Rounded.Language, iconPalette = 3, chevron = true,
+            ) { env.app.push(Route.Language) }
+            FormRow(
+                L("Widgets"), subtitle = L("Para la pantalla de inicio del móvil"),
+                icon = Icons.Rounded.Widgets, iconPalette = 2, chevron = true,
+            ) { env.app.push(Route.Personalization) }
+            FormRow(
+                L("Reproducción"), subtitle = if (quality == "low") L("Ahorro de datos") else L("Calidad máxima"),
                 icon = Icons.Rounded.GraphicEq, iconPalette = 3, chevron = true,
             ) { env.app.push(Route.Audio) }
             FormRow(
-                "Descargas", subtitle = if (downloaded.isEmpty()) "Ninguna canción descargada" else "${songCount(downloaded.size)} · " +
+                L("Descargas"), subtitle = if (downloaded.isEmpty()) L("Ninguna canción descargada") else "${songCount(downloaded.size)} · " +
                     android.text.format.Formatter.formatShortFileSize(context, MediaGraph.downloadBytes(context)),
                 icon = Icons.Rounded.DownloadForOffline, iconPalette = 2, chevron = true,
             ) { env.app.push(Route.DownloadsSettings) }
             FormRow(
-                "Biblioteca", subtitle = "Playlists: " + sortTitle(sort).lowercase() + " · Buscar " + if (search == "tab") "en su pestaña" else "en Inicio",
+                L("Biblioteca"), subtitle = L("Playlists: ") + sortTitle(sort).lowercase() + L(" · Buscar ") + if (search == "tab") L("en su pestaña") else L("en Inicio"),
                 icon = Icons.Rounded.LibraryBooks, iconPalette = 0, chevron = true,
             ) { env.app.push(Route.LibraryOptions) }
             FormRow(
-                "Ayuda y soporte", subtitle = "Informar de un error · Guía inicial · Versión ${BuildConfig.VERSION_NAME}",
+                L("Ayuda y soporte"), subtitle = L("Informar de un error · Guía inicial · Versión {0}", BuildConfig.VERSION_NAME),
                 icon = Icons.Rounded.Info, iconPalette = 6, chevron = true, last = true,
             ) { env.app.push(Route.Help) }
         }
         // Lo técnico, plegado: sólo quien lo busca lo ve.
-        FormSection(null, footer = if (advanced) "Las descargas se guardan siempre a la máxima calidad (Opus, unos 160 kbps)." else null) {
+        FormSection(null, footer = if (advanced) L("Las descargas se guardan siempre a la máxima calidad (Opus, unos 160 kbps).") else null) {
             FormRow(
-                "Avanzado", subtitle = if (advanced) null else "Calidad de descarga, tolerancia al importar y caché",
+                L("Avanzado"), subtitle = if (advanced) null else L("Calidad de descarga, tolerancia al importar y caché"),
                 last = !advanced,
                 trailing = {
                     val turn by androidx.compose.animation.core.animateFloatAsState(if (advanced) 90f else 0f, uiEaseOut(200), label = "adv")
@@ -396,13 +446,13 @@ fun SettingsScreen() {
                 },
             ) { advanced = !advanced }
             if (advanced) {
-                FormRow("Calidad de descarga", "Máxima", subtitle = "No se puede cambiar: así suenan igual sin conexión")
-                FormRow("Tolerancia de duración", subtitle = "Al importar de Spotify o Apple Music, cuánto puede durar distinta una canción para darla por buena")
+                FormRow(L("Calidad de descarga"), L("Máxima"), subtitle = L("No se puede cambiar: así suenan igual sin conexión"))
+                FormRow(L("Tolerancia de duración"), subtitle = L("Al importar de Spotify o Apple Music, cuánto puede durar distinta una canción para darla por buena"))
                 FormCustomRow { Box(Modifier.padding(start = 16.dp, end = 16.dp, bottom = 12.dp)) {
                     Segmented(listOf(2, 4, 6, 10).map { "$it" to "±$it s" }, "$tolerance") { Prefs.setMatchTolerance(it.toInt()) }
                 } }
                 FormRow(
-                    if (cleared) "Caché vaciada" else "Vaciar caché de carátulas", subtitle = "Libera memoria; se vuelven a descargar al verlas",
+                    if (cleared) L("Caché vaciada") else L("Vaciar caché de carátulas"), subtitle = L("Libera memoria; se vuelven a descargar al verlas"),
                     tint = c.accent, last = true, enabled = !cleared,
                 ) {
                     coil.Coil.imageLoader(context).memoryCache?.clear()
@@ -414,7 +464,7 @@ fun SettingsScreen() {
     }
 }
 
-private fun sortTitle(sort: String) = when (sort) { "name" -> "A-Z"; "nameDesc" -> "Z-A"; "count" -> "Por tamaño"; "custom" -> "A mano"; else -> "Recientes" }
+private fun sortTitle(sort: String) = when (sort) { "name" -> "A-Z"; "nameDesc" -> "Z-A"; "count" -> L("Por tamaño"); "custom" -> L("A mano"); else -> L("Recientes") }
 
 /** «Restablecer» al final de una sección de Ajustes, con confirmación. */
 @Composable
@@ -422,12 +472,12 @@ private fun ResetSection(section: String, what: String, reset: () -> Unit) {
     val c = Libre.colors
     val env = LocalEnv.current
     FormSection(null, footer = what) {
-        FormRow("Restablecer $section", tint = c.destructive, icon = Icons.Rounded.RestartAlt, last = true) {
+        FormRow(L("Restablecer {0}", section), tint = c.destructive, icon = Icons.Rounded.RestartAlt, last = true) {
             env.app.alert = AlertSpec(
-                "¿Restablecer $section?", what,
+                L("¿Restablecer {0}?", section), what,
                 buttons = listOf(
-                    AlertButton("Restablecer", AlertButton.Role.Destructive) { reset() },
-                    AlertButton("Cancelar", AlertButton.Role.Cancel),
+                    AlertButton(L("Restablecer"), AlertButton.Role.Destructive) { reset() },
+                    AlertButton(L("Cancelar"), AlertButton.Role.Cancel),
                 ),
             )
         }
@@ -466,52 +516,47 @@ fun AppearanceScreen() {
     val artworkApp by Prefs.artworkColorsApp.collectAsState()
     val level by Prefs.artworkLevel.collectAsState()
     val tabOrder by Prefs.tabOrder.collectAsState()
-    SettingsPage("Aspecto") {
+    SettingsPage(L("Aspecto")) {
         FormSection(null) {
             FormRow(
-                "Tema", subtitle = theme.title + " · " + when (theme.forcedDark ?: appearance) { true, "dark" -> "oscuro"; false, "light" -> "claro"; else -> "claro u oscuro según el móvil" },
+                L("Tema"), subtitle = theme.title + " · " + when (theme.forcedDark ?: appearance) { true, "dark" -> "oscuro"; false, "light" -> "claro"; else -> L("claro u oscuro según el móvil") },
                 icon = Icons.Rounded.Palette, iconPalette = 1, chevron = true,
             ) { env.app.push(Route.ThemePicker) }
             FormRow(
-                "Reproductor", subtitle = deck.title + if (scramble) " · títulos con efecto" else "",
+                L("Reproductor"), subtitle = deck.title + if (scramble) L(" · títulos con efecto") else "",
                 icon = Icons.Rounded.PlayCircle, iconPalette = 0, chevron = true,
             ) { env.app.push(Route.PlayerPicker) }
             FormRow(
-                "Colores de la portada",
-                subtitle = if (!(artworkPlayer || artworkApp) || !level.enabled) "Desactivado" else level.title + " · " +
-                    listOfNotNull("reproductor".takeIf { artworkPlayer }, "resto de la app".takeIf { artworkApp }).joinToString(" y "),
+                L("Colores de la portada"),
+                subtitle = if (!(artworkPlayer || artworkApp) || !level.enabled) L("Desactivado") else level.title + " · " +
+                    listOfNotNull("reproductor".takeIf { artworkPlayer }, L("resto de la app").takeIf { artworkApp }).joinToString(" y "),
                 icon = Icons.Rounded.AutoAwesome, iconPalette = 5, chevron = true,
             ) { env.app.push(Route.ArtworkColors) }
             FormRow(
-                "Pestañas", subtitle = tabOrder.joinToString(", ") { Tab.of(it).title },
-                icon = Icons.Rounded.SwapHoriz, iconPalette = 7, chevron = true,
+                L("Pestañas"), subtitle = tabOrder.joinToString(", ") { Tab.of(it).title },
+                icon = Icons.Rounded.SwapHoriz, iconPalette = 7, chevron = true, last = true,
             ) { env.app.push(Route.TabOrderR) }
-            val context = LocalContext.current
-            FormRow(
-                "Icono de la app", subtitle = remember { app.libremusic.data.AppIcon.current(context) }.title,
-                icon = Icons.Rounded.Apps, iconPalette = 3, chevron = true, last = true,
-            ) { env.app.push(Route.AppIconR) }
         }
         val barStyle by Prefs.barStyle.collectAsState()
         val settingsTop = app.libremusic.ui.theme.rememberSettingsTop()
         FormSection(
-            "Barra inferior",
-            footer = if (barStyle == "simpmusic") "Cápsula con tus pestañas y Buscar aparte, como SimpMusic. Arrastra la gota para cambiar de pestaña; al bajar por una lista se pliega junto al mini reproductor."
-            else "Las pestañas de siempre, como en el iPhone.",
+            L("Barra inferior"),
+            footer = if (barStyle == "simpmusic") L("Cápsula con tus pestañas y Buscar aparte, como SimpMusic. Arrastra la gota para cambiar de pestaña; al bajar por una lista se pliega junto al mini reproductor.")
+            else L("Las pestañas de siempre, como en el iPhone."),
         ) {
             Box(Modifier.padding(horizontal = 16.dp, vertical = 10.dp)) {
-                Segmented(listOf("classic" to "Clásica", "simpmusic" to "Estilo SimpMusic"), barStyle) { Prefs.setBarStyle(it) }
+                Segmented(listOf("classic" to L("Clásica"), "simpmusic" to L("Estilo SimpMusic")), barStyle) { Prefs.setBarStyle(it) }
             }
         }
         // Se guarda aparte para cada barra: con la clásica va en la barra y con la estilo SimpMusic arriba, salvo
         // que se cambie aquí.
         FormSection(
-            "Ajustes",
-            footer = if (settingsTop) "Ajustes está arriba en Inicio, junto al Jam, y no ocupa sitio en la barra."
-            else "Ajustes es una pestaña más de la barra; su sitio se elige en Pestañas.",
+            L("Ajustes"),
+            footer = if (settingsTop) L("Ajustes está arriba en Inicio, junto al Jam, y no ocupa sitio en la barra.")
+            else L("Ajustes es una pestaña más de la barra; su sitio se elige en Pestañas."),
         ) {
             Box(Modifier.padding(horizontal = 16.dp, vertical = 10.dp)) {
-                Segmented(listOf("bar" to "En la barra", "top" to "Arriba en Inicio"), if (settingsTop) "top" else "bar") {
+                Segmented(listOf("bar" to L("En la barra"), "top" to L("Arriba en Inicio")), if (settingsTop) "top" else "bar") {
                     Prefs.setSettingsTop(barStyle, it == "top")
                 }
             }
@@ -519,13 +564,13 @@ fun AppearanceScreen() {
         // Sólo en Android: iOS 26 ya dibuja así sus barras y menús.
         FormSection(null) {
             FormRow(
-                "Cristal líquido",
-                subtitle = if (glassSupported) "Barras, botones y menús de cristal que refractan lo de detrás, como iOS 26" else "Necesita Android 12 o posterior",
+                L("Cristal líquido"),
+                subtitle = if (glassSupported) L("Barras, botones y menús de cristal que refractan lo de detrás, como iOS 26") else L("Necesita Android 12 o posterior"),
                 icon = Icons.Rounded.BlurOn, iconPalette = 4, last = true,
-                trailing = { IosToggle(liquidGlass && glassSupported, Prefs::setLiquidGlass, enabled = glassSupported, label = "Cristal líquido") },
+                trailing = { IosToggle(liquidGlass && glassSupported, Prefs::setLiquidGlass, enabled = glassSupported, label = L("Cristal líquido")) },
             )
         }
-        ResetSection("Aspecto", "Vuelven el tema Cristal, el reproductor Normal, los colores de la portada apagados y el orden de pestañas de fábrica.") { Prefs.resetAppearance() }
+        ResetSection(L("Aspecto"), L("Vuelven el tema Cristal, el reproductor Normal, los colores de la portada apagados y el orden de pestañas de fábrica.")) { Prefs.resetAppearance() }
     }
 }
 
@@ -538,31 +583,31 @@ fun ArtworkColorsScreen() {
     val level by Prefs.artworkLevel.collectAsState()
     var custom by rememberSaveable { mutableStateOf(false) }
     val palette = rememberPalette()
-    SettingsPage("Colores de la portada") {
+    SettingsPage(L("Colores de la portada")) {
         // Previsualización fija: el tema actual teñido con la portada que suena (o una de ejemplo).
         SettingPreview(Modifier.padding(start = 16.dp, end = 16.dp, top = 18.dp)) { ArtworkPreview(palette[0], level) }
-        FormSection("Dónde", footer = "Al sonar una canción, la app y los menús toman colores parecidos a los de su portada, como Descubrir.") {
-            FormRow("En el reproductor", subtitle = "Fondo con la carátula desenfocada y controles de su color", icon = Icons.Rounded.PlayCircle, iconPalette = 5, trailing = { IosToggle(artworkPlayer, Prefs::setArtworkColorsPlayer, label = "Colores de la portada en el reproductor") })
-            FormRow("En el resto de la app", subtitle = "Botones del color de la canción y fondos y menús con un toque", icon = Icons.Rounded.Palette, iconPalette = 6, last = true, trailing = { IosToggle(artworkApp, Prefs::setArtworkColorsApp, label = "Colores de la portada en el resto de la app") })
+        FormSection(L("Dónde"), footer = L("Al sonar una canción, la app y los menús toman colores parecidos a los de su portada, como Descubrir.")) {
+            FormRow(L("En el reproductor"), subtitle = L("Fondo con la carátula desenfocada y controles de su color"), icon = Icons.Rounded.PlayCircle, iconPalette = 5, trailing = { IosToggle(artworkPlayer, Prefs::setArtworkColorsPlayer, label = L("Colores de la portada en el reproductor")) })
+            FormRow(L("En el resto de la app"), subtitle = L("Botones del color de la canción y fondos y menús con un toque"), icon = Icons.Rounded.Palette, iconPalette = 6, last = true, trailing = { IosToggle(artworkApp, Prefs::setArtworkColorsApp, label = L("Colores de la portada en el resto de la app")) })
         }
-        FormSection("Cuánto", footer = "El texto y los iconos mantienen siempre un contraste legible, aunque la portada sea muy clara o muy viva.") {
+        FormSection(L("Cuánto"), footer = L("El texto y los iconos mantienen siempre un contraste legible, aunque la portada sea muy clara o muy viva.")) {
             FormCustomRow { Box(Modifier.padding(horizontal = 12.dp, vertical = 15.dp)) {
-                val presets = listOf("off" to "No") + ArtworkLevel.presets.map { it.first to it.first }
+                val presets = listOf("off" to L("No")) + ArtworkLevel.presets.map { it.first to it.first }
                 val selected = if (!level.enabled) "off" else ArtworkLevel.presets.firstOrNull { it.first == level.title }?.first ?: ""
                 Segmented(presets, selected) { key ->
                     Prefs.setArtworkLevel(if (key == "off") ArtworkLevel.Off else ArtworkLevel.presets.first { it.first == key }.second)
                 }
             } }
             FormRow(
-                "Ajuste fino", subtitle = if (level.title == "Personalizado") "Personalizado" else null, last = !custom,
+                L("Ajuste fino"), subtitle = if (level.title == "Personalizado") L("Personalizado") else null, last = !custom,
                 trailing = {
                     val turn by androidx.compose.animation.core.animateFloatAsState(if (custom) 90f else 0f, uiEaseOut(200), label = "fine")
                     Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, null, tint = c.tertiaryLabel, modifier = Modifier.size(20.dp).graphicsLayer { rotationZ = turn })
                 },
             ) { custom = !custom }
             if (custom) {
-                LevelSlider("Exageración del color", "Cuánto se parecen los botones al color de la portada", level.intensity) { Prefs.setArtworkLevel(level.copy(intensity = it)) }
-                LevelSlider("Opacidad", "Cuánto se tiñen los fondos y los menús", level.opacity, last = true) { Prefs.setArtworkLevel(level.copy(opacity = it)) }
+                LevelSlider(L("Exageración del color"), L("Cuánto se parecen los botones al color de la portada"), level.intensity) { Prefs.setArtworkLevel(level.copy(intensity = it)) }
+                LevelSlider(L("Opacidad"), L("Cuánto se tiñen los fondos y los menús"), level.opacity, last = true) { Prefs.setArtworkLevel(level.copy(opacity = it)) }
             }
         }
     }
@@ -604,17 +649,17 @@ internal fun ArtworkPreview(art: Color, level: ArtworkLevel) {
                 Box(Modifier.size(44.dp).background(art, RoundedCornerShape(8.dp)))
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
-                    Text("Canción que suena", style = Typo.callout.semibold, color = c.label)
-                    Text("Artista", style = Typo.footnote, color = c.secondaryLabel)
+                    Text(L("Canción que suena"), style = Typo.callout.semibold, color = c.label)
+                    Text(L("Artista"), style = Typo.footnote, color = c.secondaryLabel)
                 }
                 Icon(Icons.Rounded.Favorite, null, tint = c.accent, modifier = Modifier.size(22.dp))
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Box(Modifier.weight(1f).height(36.dp).background(c.accent, CircleShape), contentAlignment = Alignment.Center) {
-                    Text("Reproducir", style = Typo.subheadline.semibold, color = c.onAccent)
+                    Text(L("Reproducir"), style = Typo.subheadline.semibold, color = c.onAccent)
                 }
                 Box(Modifier.weight(1f).height(36.dp).background(c.secondaryGrouped, CircleShape), contentAlignment = Alignment.Center) {
-                    Text("Menú", style = Typo.subheadline.semibold, color = c.label)
+                    Text(L("Menú"), style = Typo.subheadline.semibold, color = c.label)
                 }
             }
         }
@@ -632,25 +677,65 @@ fun TabOrderScreen() {
     var dragging by remember { mutableStateOf<String?>(null) }
     var dragOffset by remember { mutableStateOf(0f) }
     val settingsTop = app.libremusic.ui.theme.rememberSettingsTop()
-    SettingsPage("Pestañas") {
+    val showDiscover by Prefs.showDiscover.collectAsState()
+    SettingsPage(L("Pestañas")) {
         FormSection(
-            "Orden de la barra",
-            footer = "Arrastra ≡ para cambiar el orden; deslizar a los lados sigue el mismo orden. La app se abre en la última pestaña que usaste." +
-                if (settingsTop) " Ajustes está arriba en Inicio y no entra en el orden (se cambia en Aspecto)." else "",
+            L("Orden de la barra"),
+            footer = L("Arrastra ≡ para cambiar el orden; deslizar a los lados sigue el mismo orden. Desliza Descubrir a la izquierda para ocultarla (y a la derecha para volver a ponerla). La app se abre en la última pestaña que usaste.") +
+                if (settingsTop) L(" Ajustes está arriba en Inicio y no entra en el orden (se cambia en Aspecto).") else "",
         ) {
             items.forEachIndexed { i, key -> androidx.compose.runtime.key(key) {
                 val isDragging = dragging == key
                 val tab = Tab.of(key)
                 // Ajustes arriba: se ve apagado y sin asa, porque no está en la barra.
                 val fixedTop = settingsTop && tab == Tab.Settings
+                // Descubrir se oculta deslizándola a la izquierda (lo pidió Toxbox): queda difuminada y fuera de la barra.
+                val swipeable = tab == Tab.Discover
+                val hidden = swipeable && !showDiscover
+                val swipe = remember { androidx.compose.animation.core.Animatable(0f) }
+                val scope = rememberCoroutineScope()
                 Box(
                     Modifier.zIndex(if (isDragging) 1f else 0f).graphicsLayer {
                         translationY = if (isDragging) dragOffset else 0f
+                        translationX = swipe.value
+                        alpha = if (hidden) 0.45f else 1f
                         if (isDragging) { scaleX = 1.02f; scaleY = 1.02f; shadowElevation = 12.dp.toPx() }
-                    },
+                    }.then(
+                        if (!swipeable) Modifier else Modifier
+                            .semantics {
+                                customActions = listOf(
+                                    androidx.compose.ui.semantics.CustomAccessibilityAction(if (hidden) L("Mostrar Descubrir") else L("Ocultar Descubrir")) {
+                                        Prefs.setShowDiscover(hidden); true
+                                    },
+                                )
+                            }
+                            .pointerInput(hidden) {
+                                val limit = 120.dp.toPx()
+                                detectHorizontalDragGestures(
+                                    onDragEnd = {
+                                        val v = swipe.value
+                                        if (!hidden && v < -limit * 0.6f) Prefs.setShowDiscover(false)
+                                        if (hidden && v > limit * 0.6f) Prefs.setShowDiscover(true)
+                                        scope.launch { swipe.animateTo(0f, androidx.compose.animation.core.spring(dampingRatio = 0.8f)) }
+                                    },
+                                    onDragCancel = { scope.launch { swipe.animateTo(0f) } },
+                                    onHorizontalDrag = { change, amount ->
+                                        change.consume()
+                                        val next = (swipe.value + amount).coerceIn(if (hidden) 0f else -limit, if (hidden) limit else 0f)
+                                        scope.launch { swipe.snapTo(next) }
+                                    },
+                                )
+                            },
+                    ),
                 ) {
                     FormRow(
-                        tab.title, subtitle = if (fixedTop) "Arriba en Inicio" else null, icon = tab.settingsIcon(), tint = c.label,
+                        tab.title,
+                        subtitle = when {
+                            fixedTop -> L("Arriba en Inicio")
+                            hidden -> L("Oculta · desliza a la derecha para ponerla")
+                            else -> null
+                        },
+                        icon = tab.settingsIcon(), tint = c.label,
                         last = i == items.lastIndex, enabled = !fixedTop,
                         trailing = if (fixedTop) null else { {
                             Box(
@@ -676,49 +761,10 @@ fun TabOrderScreen() {
             } }
         }
         FormSection(null) {
-            FormRow("Orden de fábrica", subtitle = "Descubrir, Inicio, Biblioteca, Ajustes", tint = c.accent, last = true, enabled = order != TabOrder.DEFAULT) {
+            FormRow(L("Orden de fábrica"), subtitle = L("Descubrir, Inicio, Biblioteca, Ajustes"), tint = c.accent, last = true, enabled = order != TabOrder.DEFAULT) {
                 Prefs.setTabOrder(TabOrder.DEFAULT)
             }
         }
-    }
-}
-
-/** Icono de la app (Fase 5): el original de encendido (por defecto) o el violeta. */
-@Composable
-fun AppIconScreen() {
-    val c = Libre.colors
-    val context = LocalContext.current
-    var current by remember { mutableStateOf(app.libremusic.data.AppIcon.current(context)) }
-    SettingsPage("Icono de la app") {
-        Row(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, top = 22.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-            app.libremusic.data.AppIcon.entries.forEach { icon ->
-                val on = icon == current
-                Column(
-                    Modifier.weight(1f).tactile(label = "Icono ${icon.title}") { app.libremusic.data.AppIcon.set(context, icon); current = icon },
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    val shape = RoundedCornerShape(26.dp)
-                    Box(
-                        Modifier.size(112.dp).clip(shape).border(if (on) 3.dp else 1.dp, if (on) c.accent else c.separator, shape),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        when (icon) {
-                            app.libremusic.data.AppIcon.Power -> Box(Modifier.fillMaxSize().background(Color(0xFF07070A))) {
-                                Image(painterResource(R.drawable.ic_launcher_power), null, Modifier.fillMaxSize().scale(1.5f))
-                            }
-                            app.libremusic.data.AppIcon.Violet -> Image(painterResource(R.mipmap.ic_launcher_full), null, Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
-                        }
-                    }
-                    Spacer(Modifier.height(10.dp))
-                    Text(icon.title + if (icon == app.libremusic.data.AppIcon.Power) " (original)" else "", style = Typo.subheadline.copy(fontWeight = if (on) FontWeight.SemiBold else FontWeight.Normal), color = c.label)
-                    if (on) Icon(Icons.Rounded.CheckCircle, null, tint = c.accent, modifier = Modifier.padding(top = 6.dp).size(22.dp))
-                }
-            }
-        }
-        Text(
-            "Android puede tardar unos segundos en cambiar el icono y, según el lanzador, quitar el acceso directo de la pantalla de inicio: vuelve a ponerlo desde el cajón de apps.",
-            style = Typo.footnote, color = c.secondaryLabel, modifier = Modifier.padding(start = 32.dp, end = 32.dp, top = 22.dp),
-        )
     }
 }
 
@@ -733,14 +779,14 @@ private fun Tab.settingsIcon(): ImageVector = when (this) {
 @Composable
 fun SearchOptionsScreen() {
     val search by Prefs.searchPlacement.collectAsState()
-    SettingsPage("Buscar") {
+    SettingsPage(L("Buscar")) {
         FormSection(
-            "Dónde buscar",
-            footer = if (search == "tab") "Buscar tiene su propia pestaña en la barra de abajo."
-            else "La barra de búsqueda está siempre arriba en Inicio y la pestaña Buscar desaparece.",
+            L("Dónde buscar"),
+            footer = if (search == "tab") L("Buscar tiene su propia pestaña en la barra de abajo.")
+            else L("La barra de búsqueda está siempre arriba en Inicio y la pestaña Buscar desaparece."),
         ) {
-            FormRow("Barra arriba en Inicio", icon = Icons.Rounded.Home, tint = Libre.colors.label, checked = search != "tab") { Prefs.setSearchPlacement("home") }
-            FormRow("Pestaña aparte", icon = Icons.Rounded.Search, tint = Libre.colors.label, checked = search == "tab", last = true) { Prefs.setSearchPlacement("tab") }
+            FormRow(L("Barra arriba en Inicio"), icon = Icons.Rounded.Home, tint = Libre.colors.label, checked = search != "tab") { Prefs.setSearchPlacement("home") }
+            FormRow(L("Pestaña aparte"), icon = Icons.Rounded.Search, tint = Libre.colors.label, checked = search == "tab", last = true) { Prefs.setSearchPlacement("tab") }
         }
     }
 }
@@ -750,8 +796,8 @@ fun ThemePickerScreen() {
     val c = Libre.colors
     val current by Prefs.theme.collectAsState()
     val appearance by Prefs.appearance.collectAsState()
-    SettingsPage("Tema") {
-        Text("Tema", style = Typo.headline, color = c.secondaryLabel, modifier = Modifier.padding(start = 32.dp, top = 19.dp, bottom = 22.dp))
+    SettingsPage(L("Tema")) {
+        Text(L("Tema"), style = Typo.headline, color = c.secondaryLabel, modifier = Modifier.padding(start = 32.dp, top = 19.dp, bottom = 22.dp))
         Column(Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             AppTheme.ordered.chunked(2).forEach { pair ->
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -763,12 +809,12 @@ fun ThemePickerScreen() {
             }
         }
         Text(
-            "El tema cambia el fondo, las tarjetas, el color y la letra. Los fondos toman los colores de la carátula y se animan más mientras suena música.",
+            L("El tema cambia el fondo, las tarjetas, el color y la letra. Los fondos toman los colores de la carátula y se animan más mientras suena música."),
             style = Typo.footnote, color = c.secondaryLabel, modifier = Modifier.padding(start = 32.dp, end = 32.dp, top = 17.dp),
         )
-        FormSection("Claro u oscuro", footer = current.forcedDark?.let { "«${current.title}» usa siempre el modo ${if (it) "oscuro" else "claro"}." }) {
+        FormSection(L("Claro u oscuro"), footer = current.forcedDark?.let { if (it) L("«{0}» usa siempre el modo oscuro.", current.title) else L("«{0}» usa siempre el modo claro.", current.title) }) {
             FormCustomRow { Box(Modifier.padding(horizontal = 12.dp, vertical = 15.dp)) {
-                Segmented(listOf("system" to "Automático", "light" to "Claro", "dark" to "Oscuro"), appearance, enabled = current.forcedDark == null) {
+                Segmented(listOf("system" to L("Automático"), "light" to L("Claro"), "dark" to L("Oscuro")), appearance, enabled = current.forcedDark == null) {
                     Prefs.setAppearance(it)
                 }
             } }
@@ -796,7 +842,7 @@ internal fun ThemeCard(theme: AppTheme, selected: Boolean) {
                 ) {
                     Box(Modifier.size(8.dp).background(theme.accent, CircleShape))
                     Spacer(Modifier.width(6.dp))
-                    Text("Aa", style = Typo.subheadline.semibold, color = tc.label)
+                    Text(L("Aa"), style = Typo.subheadline.semibold, color = tc.label)
                 }
                 if (selected) {
                     Icon(Icons.Rounded.CheckCircle, null, tint = theme.accent, modifier = Modifier.align(Alignment.TopEnd).padding(8.dp).size(22.dp).background(Color.White, CircleShape))
@@ -813,17 +859,17 @@ internal fun ThemeCard(theme: AppTheme, selected: Boolean) {
 fun PlayerPickerScreen() {
     val c = Libre.colors
     val scramble by Prefs.scramble.collectAsState()
-    SettingsPage("Reproductor") {
+    SettingsPage(L("Reproductor")) {
         Text("REPRODUCTOR MULTIMEDIA", style = Typo.footnote, color = c.secondaryLabel, modifier = Modifier.padding(start = 32.dp, top = 22.dp, bottom = 7.dp))
         DeckPicker(Modifier.padding(horizontal = 16.dp))
         Text(
-            "Casete: gira una bobina o arrastra la cinta para avanzar o rebobinar. Vinilo: gira el disco con el dedo o mueve el brazo. Con el móvil en horizontal, el casete o el vinilo ocupan toda la pantalla. También puedes cambiarlo manteniendo pulsado el mini reproductor.",
+            L("Casete: gira una bobina o arrastra la cinta para avanzar o rebobinar. Vinilo: gira el disco con el dedo o mueve el brazo. Con el móvil en horizontal, el casete o el vinilo ocupan toda la pantalla. También puedes cambiarlo manteniendo pulsado el mini reproductor."),
             style = Typo.footnote, color = c.secondaryLabel, modifier = Modifier.padding(start = 32.dp, end = 32.dp, top = 7.dp),
         )
         FormSection(null) {
             FormRow(
-                "Efecto en los títulos", subtitle = "Al cambiar de canción, el título aparece entre símbolos que se ordenan",
-                last = true, trailing = { IosToggle(scramble, Prefs::setScramble, label = "Efecto en los títulos") },
+                L("Efecto en los títulos"), subtitle = L("Al cambiar de canción, el título aparece entre símbolos que se ordenan"),
+                last = true, trailing = { IosToggle(scramble, Prefs::setScramble, label = L("Efecto en los títulos")) },
             )
         }
     }
@@ -839,23 +885,23 @@ private fun BackupSection() {
     val pick = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
         if (uri != null) scope.launch {
             runCatching { app.libremusic.data.AutoBackup.setFolder(context, env.library.library, uri) }
-                .onSuccess { env.app.toast = "Copia guardada" }
-                .onFailure { env.app.toast = "No se pudo usar esa carpeta" }
+                .onSuccess { env.app.toast = L("Copia guardada") }
+                .onFailure { env.app.toast = L("No se pudo usar esa carpeta") }
         }
     }
     FormSection(
-        "Copia automática",
-        footer = st.error ?: if (st.folder == null) "Una copia al día de tus favoritos, playlists y álbumes en la carpeta que elijas. Elige una que se sincronice (Google Drive, Nextcloud…) para no perder nada al cambiar de móvil."
-        else "Se guarda una al día y se dejan las ${app.libremusic.data.AutoBackup.KEEP} últimas. Para recuperarla: Biblioteca › Importar › Importar copia.",
+        L("Copia automática"),
+        footer = st.error ?: if (st.folder == null) L("Una copia al día de tus favoritos, playlists y álbumes en la carpeta que elijas. Elige una que se sincronice (Google Drive, Nextcloud…) para no perder nada al cambiar de móvil.")
+        else L("Se guarda una al día y se dejan las {0} últimas. Para recuperarla: Biblioteca › Importar › Importar copia.", app.libremusic.data.AutoBackup.KEEP),
     ) {
         if (st.folder == null) {
-            FormRow("Elegir carpeta", icon = Icons.Rounded.CreateNewFolder, tint = Libre.colors.accent, last = true) { pick.launch(null) }
+            FormRow(L("Elegir carpeta"), icon = Icons.Rounded.CreateNewFolder, tint = Libre.colors.accent, last = true) { pick.launch(null) }
         } else {
-            FormRow("Carpeta", st.folderName ?: "Elegida", subtitle = st.lastDay?.let { "Última copia: $it" } ?: "Aún sin copia", chevron = true) { pick.launch(st.folder) }
-            FormRow("Hacer copia ahora", icon = Icons.Rounded.Backup, tint = Libre.colors.accent) {
-                scope.launch { env.app.toast = if (app.libremusic.data.AutoBackup.backup(context, env.library.library, force = true)) "Copia guardada" else "No se pudo guardar la copia" }
+            FormRow(L("Carpeta"), st.folderName ?: L("Elegida"), subtitle = st.lastDay?.let { L("Última copia: {0}", it) } ?: L("Aún sin copia"), chevron = true) { pick.launch(st.folder) }
+            FormRow(L("Hacer copia ahora"), icon = Icons.Rounded.Backup, tint = Libre.colors.accent) {
+                scope.launch { env.app.toast = if (app.libremusic.data.AutoBackup.backup(context, env.library.library, force = true)) L("Copia guardada") else L("No se pudo guardar la copia") }
             }
-            FormRow("Desactivar", tint = Libre.colors.destructive, last = true) { app.libremusic.data.AutoBackup.disable(context) }
+            FormRow(L("Desactivar"), tint = Libre.colors.destructive, last = true) { app.libremusic.data.AutoBackup.disable(context) }
         }
     }
 }
@@ -896,37 +942,37 @@ fun LibraryOptionsScreen() {
     val sort by Prefs.playlistSort.collectAsState()
     val placement by Prefs.smartPlacement.collectAsState()
     val search by Prefs.searchPlacement.collectAsState()
-    SettingsPage("Biblioteca") {
-        FormSection("Ordenar playlists por") {
-            FormRow("Añadidas recientemente", checked = sort == "recent") { Prefs.setPlaylistSort("recent") }
-            FormRow("Nombre (A-Z)", checked = sort == "name") { Prefs.setPlaylistSort("name") }
-            FormRow("Nombre (Z-A)", checked = sort == "nameDesc") { Prefs.setPlaylistSort("nameDesc") }
-            FormRow("Nº de canciones", checked = sort == "count") { Prefs.setPlaylistSort("count") }
-            FormRow("A mano", checked = sort == "custom", last = true) { Prefs.setPlaylistSort("custom") }
+    SettingsPage(L("Biblioteca")) {
+        FormSection(L("Ordenar playlists por")) {
+            FormRow(L("Añadidas recientemente"), checked = sort == "recent") { Prefs.setPlaylistSort("recent") }
+            FormRow(L("Nombre (A-Z)"), checked = sort == "name") { Prefs.setPlaylistSort("name") }
+            FormRow(L("Nombre (Z-A)"), checked = sort == "nameDesc") { Prefs.setPlaylistSort("nameDesc") }
+            FormRow(L("Nº de canciones"), checked = sort == "count") { Prefs.setPlaylistSort("count") }
+            FormRow(L("A mano"), checked = sort == "custom", last = true) { Prefs.setPlaylistSort("custom") }
         }
-        FormSection(null, footer = "Arrastra las playlists, Descargadas y Favoritos para colocarlas donde quieras.") {
-            FormRow("Ordenar a mano", icon = Icons.Rounded.DragHandle, tint = Libre.colors.accent, chevron = true, last = true) { env.app.push(Route.ReorderPlaylists) }
-        }
-        FormSection(
-            "Descargadas y Favoritos",
-            footer = if (placement == "music") "Aparecen como filas en «Tu música», encima de Canciones." else "Aparecen con su portada grande en el carrusel de Playlists.",
-        ) {
-            FormRow("En Playlists (portada grande)", checked = placement != "music") { Prefs.setSmartPlacement("playlists") }
-            FormRow("En «Tu música» (fila)", checked = placement == "music", last = true) { Prefs.setSmartPlacement("music") }
+        FormSection(null, footer = L("Arrastra las playlists, Descargadas y Favoritos para colocarlas donde quieras.")) {
+            FormRow(L("Editar playlists"), icon = Icons.Rounded.DragHandle, tint = Libre.colors.accent, chevron = true, last = true) { env.app.push(Route.ReorderPlaylists) }
         }
         FormSection(
-            "Dónde está Buscar",
-            footer = if (search == "tab") "Buscar tiene su propia pestaña en la barra de abajo, justo después de Inicio."
-            else "La barra de búsqueda está siempre arriba en Inicio.",
+            L("Descargadas y Favoritos"),
+            footer = if (placement == "music") L("Aparecen como filas en «Tu música», encima de Canciones.") else L("Aparecen con su portada grande en el carrusel de Playlists."),
         ) {
-            FormRow("Barra arriba en Inicio", checked = search != "tab") { Prefs.setSearchPlacement("home") }
-            FormRow("Pestaña aparte", checked = search == "tab", last = true) { Prefs.setSearchPlacement("tab") }
+            FormRow(L("En Playlists (portada grande)"), checked = placement != "music") { Prefs.setSmartPlacement("playlists") }
+            FormRow(L("En «Tu música» (fila)"), checked = placement == "music", last = true) { Prefs.setSmartPlacement("music") }
+        }
+        FormSection(
+            L("Dónde está Buscar"),
+            footer = if (search == "tab") L("Buscar tiene su propia pestaña en la barra de abajo, justo después de Inicio.")
+            else L("La barra de búsqueda está siempre arriba en Inicio."),
+        ) {
+            FormRow(L("Barra arriba en Inicio"), checked = search != "tab") { Prefs.setSearchPlacement("home") }
+            FormRow(L("Pestaña aparte"), checked = search == "tab", last = true) { Prefs.setSearchPlacement("tab") }
         }
         BackupSection()
-        FormSection(null, footer = "Antes de borrar se pide confirmación.") {
-            FormRow("Eliminar playlists", icon = Icons.Rounded.Delete, tint = Libre.colors.destructive, chevron = true, last = true) { env.app.push(Route.ManagePlaylists) }
+        FormSection(null, footer = L("Antes de borrar se pide confirmación.")) {
+            FormRow(L("Eliminar playlists"), icon = Icons.Rounded.Delete, tint = Libre.colors.destructive, chevron = true, last = true) { env.app.push(Route.ManagePlaylists) }
         }
-        ResetSection("Biblioteca", "Las playlists vuelven a ordenarse por recientes, Descargadas y Favoritos al carrusel y Buscar a Inicio. No se borra ninguna playlist.") { Prefs.resetLibrary() }
+        ResetSection(L("Biblioteca"), L("Las playlists vuelven a ordenarse por recientes, Descargadas y Favoritos al carrusel y Buscar a Inicio. No se borra ninguna playlist.")) { Prefs.resetLibrary() }
     }
 }
 
@@ -938,36 +984,36 @@ fun AudioScreen() {
     val autoplay by Prefs.autoplay.collectAsState()
     val normalize by Prefs.normalize.collectAsState()
     val context = LocalContext.current
-    SettingsPage("Reproducción") {
-        FormSection("Calidad al escuchar", footer = "«Máxima» usa Opus a unos 160 kbps; «Ahorro de datos», unos 50 kbps. Se aplica desde la siguiente canción.") {
-            FormRow("Máxima", subtitle = "Mejor sonido; gasta más datos", checked = quality == "max") { Prefs.setQuality("max") }
-            FormRow("Ahorro de datos", subtitle = "Para escuchar con datos móviles", checked = quality == "low", last = true) { Prefs.setQuality("low") }
+    SettingsPage(L("Reproducción")) {
+        FormSection(L("Calidad al escuchar"), footer = L("«Máxima» usa Opus a unos 160 kbps; «Ahorro de datos», unos 50 kbps. Se aplica desde la siguiente canción.")) {
+            FormRow(L("Máxima"), subtitle = L("Mejor sonido; gasta más datos"), checked = quality == "max") { Prefs.setQuality("max") }
+            FormRow(L("Ahorro de datos"), subtitle = L("Para escuchar con datos móviles"), checked = quality == "low", last = true) { Prefs.setQuality("low") }
         }
-        FormSection(null, footer = "Usa la sonoridad que YouTube mide de cada canción: las que suenan más fuerte bajan y las más flojas suben un poco, para no tocar el volumen entre canción y canción.") {
-            FormRow("Igualar el volumen", last = true, trailing = { IosToggle(normalize, { Prefs.setNormalize(it) }, label = "Igualar el volumen") })
+        FormSection(null, footer = L("Usa la sonoridad que YouTube mide de cada canción: las que suenan más fuerte bajan y las más flojas suben un poco, para no tocar el volumen entre canción y canción.")) {
+            FormRow(L("Igualar el volumen"), last = true, trailing = { IosToggle(normalize, { Prefs.setNormalize(it) }, label = L("Igualar el volumen")) })
         }
-        FormSection(null, footer = "Cuando se acaba lo que estás escuchando y el bucle está apagado, se añaden canciones parecidas a la última.") {
-            FormRow("Seguir con canciones parecidas", last = true, trailing = { IosToggle(autoplay, { Prefs.setAutoplay(it) }, label = "Seguir con canciones parecidas") })
+        FormSection(null, footer = L("Cuando se acaba lo que estás escuchando y el bucle está apagado, se añaden canciones parecidas a la última.")) {
+            FormRow(L("Seguir con canciones parecidas"), last = true, trailing = { IosToggle(autoplay, { Prefs.setAutoplay(it) }, label = L("Seguir con canciones parecidas")) })
         }
-        FormSection("Ecualizador", footer = "Se aplica al momento, también a lo que suena por Bluetooth.") {
+        FormSection(L("Ecualizador"), footer = L("Se aplica al momento, también a lo que suena por Bluetooth.")) {
             Eq.Preset.entries.forEachIndexed { i, p ->
                 FormRow(p.title, subtitle = p.subtitle, checked = equalizer == p, last = i == Eq.Preset.entries.lastIndex) { Prefs.setEqualizer(p) }
             }
         }
-        FormSection("Fundido entre canciones", footer = if (crossfade == 0) "Cada canción empieza y acaba a su volumen." else "La canción baja de volumen en sus últimos $crossfade s y la siguiente entra suavemente. Útil para listas variadas; en álbumes que van seguidos, mejor «No».") {
+        FormSection(L("Fundido entre canciones"), footer = if (crossfade == 0) L("Cada canción empieza y acaba a su volumen.") else L("La canción baja de volumen en sus últimos {0} s y la siguiente entra suavemente. Útil para listas variadas; en álbumes que van seguidos, mejor «No».", crossfade)) {
             FormCustomRow {
                 Box(Modifier.padding(16.dp, 12.dp)) {
-                    Segmented(Fade.options.map { "$it" to if (it == 0) "No" else "$it s" }, "$crossfade") { Prefs.setCrossfade(it.toInt()) }
+                    Segmented(Fade.options.map { "$it" to if (it == 0) L("No") else "$it s" }, "$crossfade") { Prefs.setCrossfade(it.toInt()) }
                 }
             }
         }
-        FormSection(null, footer = "El bucle (no repetir, repetir lista o canción) se cambia en el reproductor.") {
+        FormSection(null, footer = L("El bucle (no repetir, repetir lista o canción) se cambia en el reproductor.")) {
             FormRow(
-                "Salida de audio", subtitle = "Altavoces, auriculares y televisores con Bluetooth o Chromecast",
+                L("Salida de audio"), subtitle = L("Altavoces, auriculares y televisores con Bluetooth o Chromecast"),
                 icon = Icons.Rounded.Cast, iconPalette = 7, chevron = true, last = true,
             ) { openOutputSwitcher(context) }
         }
-        ResetSection("Reproducción", "La calidad al escuchar vuelve a «Máxima» y se quitan el ecualizador y el fundido; se vuelve a seguir con canciones parecidas.") { Prefs.resetPlayback() }
+        ResetSection(L("Reproducción"), L("La calidad al escuchar vuelve a «Máxima» y se quitan el ecualizador y el fundido; se vuelve a seguir con canciones parecidas.")) { Prefs.resetPlayback() }
     }
 }
 
@@ -976,19 +1022,19 @@ fun DownloadsSettingsScreen() {
     val env = LocalEnv.current
     val downloaded by env.library.downloadedSongs.collectAsState()
     val context = LocalContext.current
-    SettingsPage("Descargas") {
-        FormSection(null, footer = "Las descargas se guardan en este móvil a la máxima calidad y se ven en Biblioteca › Descargadas. Para bajar una lista o un álbum entero, usa «Descargar todo» en su página.") {
-            FormRow("Canciones", "${downloaded.size}")
+    SettingsPage(L("Descargas")) {
+        FormSection(null, footer = L("Las descargas se guardan en este móvil a la máxima calidad y se ven en Biblioteca › Descargadas. Para bajar una lista o un álbum entero, usa «Descargar todo» en su página.")) {
+            FormRow(L("Canciones"), "${downloaded.size}")
             FormRow(
-                "Espacio usado", android.text.format.Formatter.formatShortFileSize(context, MediaGraph.downloadBytes(context)),
+                L("Espacio usado"), android.text.format.Formatter.formatShortFileSize(context, MediaGraph.downloadBytes(context)),
                 last = true,
             )
         }
         if (downloaded.isNotEmpty()) {
-            FormSection(null, footer = "Dejarán de estar disponibles sin conexión. Las playlists y los favoritos no se tocan.") {
+            FormSection(null, footer = L("Dejarán de estar disponibles sin conexión. Las playlists y los favoritos no se tocan.")) {
                 FormCustomRow {
                     Box(Modifier.padding(16.dp, 8.dp)) {
-                        HoldToConfirmButton("Mantén para borrar las descargas") { downloaded.forEach { env.library.removeDownload(it) } }
+                        HoldToConfirmButton(L("Mantén para borrar las descargas")) { downloaded.forEach { env.library.removeDownload(it) } }
                     }
                 }
             }
@@ -999,19 +1045,33 @@ fun DownloadsSettingsScreen() {
 @Composable
 fun HelpScreen() {
     val env = LocalEnv.current
-    SettingsPage("Ayuda y soporte") {
+    SettingsPage(L("Ayuda y soporte")) {
         FormSection(null) {
-            FormRow("Avisos", subtitle = "Caídas, versiones nuevas y novedades de Pear Music", icon = Icons.Rounded.Notifications, iconPalette = 4, chevron = true) {
+            FormRow(L("Avisos"), subtitle = L("Caídas, versiones nuevas y novedades de Pear Music"), icon = Icons.Rounded.Notifications, iconPalette = 4, chevron = true) {
                 env.app.push(Route.Avisos)
             }
-            FormRow("Informar de un error", subtitle = "Cuéntanos qué ha fallado; puedes añadir capturas", icon = Icons.Rounded.BugReport, iconPalette = 0, chevron = true) {
+            FormRow(L("Informar de un error"), subtitle = L("Cuéntanos qué ha fallado; puedes añadir capturas"), icon = Icons.Rounded.BugReport, iconPalette = 0, chevron = true) {
                 env.app.push(Route.Support(null))
             }
-            FormRow("Guía inicial", subtitle = "Vuelve a ver los tres pasos del principio: tema, colores y descargas", icon = Icons.Rounded.School, iconPalette = 2, chevron = true) {
+            // Buzón de sugerencias (Cierre 1.0, lo pidió Toxbox): como el soporte, pero para ideas.
+            FormRow(L("Buzón de sugerencias"), subtitle = L("Cuéntanos qué te gustaría que hiciera Pear Music"), icon = Icons.Rounded.MarkunreadMailbox, iconPalette = 5, chevron = true) {
+                env.app.push(Route.Suggest(null))
+            }
+            FormRow(L("Guía inicial"), subtitle = L("Vuelve a ver la bienvenida, el recorrido y las historias"), icon = Icons.Rounded.School, iconPalette = 2, chevron = true) {
                 Prefs.setOnboarded(false)
             }
-            FormRow("Acerca de", subtitle = "Versión ${BuildConfig.VERSION_NAME} y créditos", icon = Icons.Rounded.Info, iconPalette = 6, chevron = true, last = true) {
+            FormRow(L("Tus datos"), subtitle = L("Exporta o borra todo lo que la app guarda de ti"), icon = Icons.Rounded.Lock, iconPalette = 5, chevron = true) {
+                env.app.push(Route.MyData)
+            }
+            FormRow(L("Acerca de"), subtitle = L("Versión {0} y créditos", BuildConfig.VERSION_NAME), icon = Icons.Rounded.Info, iconPalette = 6, chevron = true, last = true) {
                 env.app.push(Route.About)
+            }
+        }
+        if (BuildConfig.ADMIN_TOOLS) {
+            FormSection(L("Pear Dev")) {
+                FormRow(L("Administración"), subtitle = L("Canal, registro y botón de pánico"), icon = Icons.Rounded.AdminPanelSettings, iconPalette = 1, chevron = true, last = true) {
+                    env.app.push(Route.Admin)
+                }
             }
         }
     }
@@ -1021,25 +1081,27 @@ fun HelpScreen() {
 fun AboutScreen() {
     val c = Libre.colors
     val uri = LocalUriHandler.current
-    SettingsPage("Acerca de") {
+    SettingsPage(L("Acerca de")) {
         Column(Modifier.fillMaxWidth().padding(vertical = 16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
                 painterResource(R.drawable.logo), null,
                 Modifier.size(96.dp).shadowSoft(10.dp, RoundedCornerShape(22.dp), 0.2f).clip(RoundedCornerShape(22.dp)),
             )
             Spacer(Modifier.height(10.dp))
-            Text("Pear Music", style = Typo.title2, color = c.label)
-            Text("Versión ${BuildConfig.VERSION_NAME}", style = Typo.subheadline, color = c.secondaryLabel)
+            Text(L("Pear Music"), style = Typo.title2, color = c.label)
+            Text(L("Versión {0}", BuildConfig.VERSION_NAME), style = Typo.subheadline, color = c.secondaryLabel)
         }
         FormSection(null) {
             Text(
-                "Cliente no oficial de YouTube Music. Usa una API no oficial de YouTube, así que puede dejar de funcionar si YouTube la cambia. Las descargas se guardan en este móvil.",
+                L("Cliente no oficial de YouTube Music. Usa una API no oficial de YouTube, así que puede dejar de funcionar si YouTube la cambia. Las descargas se guardan en este móvil."),
                 style = Typo.subheadline, color = c.label, modifier = Modifier.padding(16.dp, 12.dp),
             )
         }
-        FormSection("Créditos") {
-            FormRow("Componentes inspirados en The Kitchen de dqnamo", icon = Icons.Rounded.Restaurant, tint = c.accent) { uri.openUri("https://www.dqnamo.com/kitchen") }
-            FormRow("Letra Inter, de Rasmus Andersson (OFL)", icon = Icons.Rounded.Album, tint = c.accent, last = true) { uri.openUri("https://rsms.me/inter/") }
+        FormSection(L("Créditos")) {
+            FormRow(L("Componentes inspirados en The Kitchen de dqnamo"), icon = Icons.Rounded.Restaurant, tint = c.accent) { uri.openUri("https://www.dqnamo.com/kitchen") }
+            // SimpMusic (GPL-3.0): la barra inferior de cristal está adaptada de su código. Lo pidió Toxbox.
+            FormRow(L("Barra inferior de SimpMusic, de maxrave-dev (GPL-3.0)"), icon = Icons.Rounded.LibraryMusic, tint = c.accent) { uri.openUri("https://github.com/maxrave-dev/SimpMusic") }
+            FormRow(L("Letra Inter, de Rasmus Andersson (OFL)"), icon = Icons.Rounded.Album, tint = c.accent, last = true) { uri.openUri("https://rsms.me/inter/") }
         }
     }
 }
@@ -1050,11 +1112,11 @@ fun ManagePlaylistsScreen() {
     val env = LocalEnv.current
     val data by env.library.data.collectAsState()
     val ver by env.library.coverVersion.collectAsState()
-    SettingsPage("Eliminar playlists") {
+    SettingsPage(L("Eliminar playlists")) {
         if (data.playlists.isEmpty()) {
-            CenterNote("No hay playlists", 60.dp)
+            CenterNote(L("No hay playlists"), 60.dp)
         } else {
-            FormSection(null, footer = "Eliminar una playlist no borra sus canciones de Favoritos ni de Descargas.") {
+            FormSection(null, footer = L("Eliminar una playlist no borra sus canciones de Favoritos ni de Descargas.")) {
                 data.playlists.forEachIndexed { i, p ->
                     Row(Modifier.fillMaxWidth().padding(start = 16.dp, end = 4.dp, top = 6.dp, bottom = 6.dp), verticalAlignment = Alignment.CenterVertically) {
                         PlaylistCover(p, 44.dp, coverFile = env.library.coverFile(p.id), coverVersion = ver)
@@ -1063,12 +1125,12 @@ fun ManagePlaylistsScreen() {
                             Text(p.name, style = Typo.body, color = c.label, maxLines = 1, overflow = TextOverflow.Ellipsis)
                             Text(songCount(p.songs.size), style = Typo.caption, color = c.secondaryLabel)
                         }
-                            IconTap(Icons.Rounded.Delete, "Eliminar ${p.name}", tint = c.destructive) {
+                            IconTap(Icons.Rounded.Delete, L("Eliminar {0}", p.name), tint = c.destructive) {
                                 env.app.alert = AlertSpec(
-                                    "¿Eliminar «${p.name}»?", "Se borrará la playlist y su portada. No se puede deshacer.",
+                                    L("¿Eliminar «{0}»?", p.name), L("Se borrará la playlist y su portada. No se puede deshacer."),
                                     buttons = listOf(
-                                        AlertButton("Eliminar playlist", AlertButton.Role.Destructive) { env.library.deletePlaylist(p.id) },
-                                        AlertButton("Cancelar", AlertButton.Role.Cancel),
+                                        AlertButton(L("Eliminar playlist"), AlertButton.Role.Destructive) { env.library.deletePlaylist(p.id) },
+                                        AlertButton(L("Cancelar"), AlertButton.Role.Cancel),
                                     ),
                                 )
                             }

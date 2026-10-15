@@ -1,6 +1,18 @@
 name: LibreMusic
 options:
   bundleIdPrefix: com.example
+# Tres apps con el mismo código (Fase 1 de la 2.0, ver docs/FLAVORS.md): Debug/Release son la pública (usr);
+# Pref y Dev, las de Toxbox, que no se publican. Cada una toma su bundle id, nombre y canal de Config/*.xcconfig.
+configs:
+  Debug: debug
+  Release: release
+  Pref: release
+  Dev: release
+configFiles:
+  Debug: Config/Usr.xcconfig
+  Release: Config/Usr.xcconfig
+  Pref: Config/Pref.xcconfig
+  Dev: Config/Dev.xcconfig
 targets:
   LibreMusic:
     type: application
@@ -10,10 +22,10 @@ targets:
     info:
       path: Info.plist
       properties:
-        CFBundleDisplayName: Pear Music
+        CFBundleDisplayName: $(APP_DISPLAY_NAME)
         # Versión de la app (ver docs/RELEASING.md). Súbela en cada versión publicada.
-        CFBundleShortVersionString: "1.4.1"
-        CFBundleVersion: "7"
+        CFBundleShortVersionString: "2.0.0"
+        CFBundleVersion: "12"
         UILaunchScreen: {}
         # fetch: comprobar los avisos en segundo plano (BGAppRefreshTask, ver Avisos.swift).
         UIBackgroundModes: [audio, fetch]
@@ -24,6 +36,8 @@ targets:
           - _lm-jam._tcp
           - _lm-jam._udp
           - _lm-jam2._tcp
+        # Para que el aviso de versión nueva pueda abrir AltStore o SideStore (Updates.swift).
+        LSApplicationQueriesSchemes: [altstore, sidestore]
         NSCameraUsageDescription: Pear Music usa la cámara para escanear el código QR de un Jam.
         CFBundleURLTypes:
           - CFBundleURLName: com.example.libremusic
@@ -39,10 +53,32 @@ targets:
           - UIInterfaceOrientationLandscapeRight
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.example.libremusic
         SWIFT_VERSION: "5.0"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        # Icono alternativo (Ajustes › Aspecto › Icono de la app): el violeta. El de por defecto es el
-        # original de encendido.
-        ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES: AppIcon-Violeta
-        ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS: YES
+
+# Un scheme por canal. `LibreMusic` es la pública y el que usan la CI y la release (no cambia de nombre).
+schemes:
+  LibreMusic:
+    build:
+      targets:
+        LibreMusic: all
+    run:
+      config: Debug
+    archive:
+      config: Release
+  Pear Pref:
+    build:
+      targets:
+        LibreMusic: all
+    run:
+      config: Pref
+    archive:
+      config: Pref
+  Pear Dev:
+    build:
+      targets:
+        LibreMusic: all
+    run:
+      config: Dev
+    archive:
+      config: Dev

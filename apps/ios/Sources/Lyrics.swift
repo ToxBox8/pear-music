@@ -153,8 +153,8 @@ struct LyricsView: View {
             case .loading: ProgressView()
             case .failed:
                 VStack(spacing: 12) {
-                    Text("No se pudo cargar la letra").font(.headline)
-                    Text("Revisa la conexión e inténtalo otra vez.").font(.subheadline).foregroundStyle(.secondary)
+                    Text(L("No se pudo cargar la letra")).font(.headline)
+                    Text(L("Revisa la conexión e inténtalo otra vez.")).font(.subheadline).foregroundStyle(.secondary)
                     Button { attempt += 1 } label: { Label("Reintentar", systemImage: "arrow.clockwise") }
                         .buttonStyle(.bordered)
                 }
@@ -171,7 +171,7 @@ struct LyricsView: View {
                             .padding(.horizontal, 24).padding(.vertical, 16)
                         }
                     }
-                } else { note("No hay letra para esta canción") }
+                } else { note(L("No hay letra para esta canción")) }
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -189,7 +189,7 @@ struct LyricsView: View {
     }
 
     private var credit: some View {
-        Text("Letra de LRCLIB").font(.caption).foregroundStyle(.tertiary).padding(.vertical, 20)
+        Text(L("Letra de LRCLIB")).font(.caption).foregroundStyle(.tertiary).padding(.vertical, 20)
     }
 
     private func synced(_ lyrics: Lyrics) -> some View {
@@ -227,7 +227,7 @@ private struct SyncedLyricsList: View {
                         .id(i)
                         .animation(.uiEaseOut(0.3), value: current)
                     }
-                    Text("Letra de LRCLIB").font(.caption).foregroundStyle(.tertiary).padding(.horizontal, 24).padding(.vertical, 20)
+                    Text(L("Letra de LRCLIB")).font(.caption).foregroundStyle(.tertiary).padding(.horizontal, 24).padding(.vertical, 20)
                     Color.clear.frame(height: 200)
                 }
             }

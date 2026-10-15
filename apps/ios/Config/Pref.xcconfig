@@ -1,0 +1,4 @@
+// Canal pref: la de Toxbox. Estable, sin herramientas de administración. No se publica.
+PRODUCT_BUNDLE_IDENTIFIER = com.example.libremusic.pref
+APP_DISPLAY_NAME = Pear Pref
+SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited) CHANNEL_PREF

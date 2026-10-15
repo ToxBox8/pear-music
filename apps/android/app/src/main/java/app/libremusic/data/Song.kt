@@ -62,7 +62,13 @@ data class ArtistPage(
     val songs: List<Song>,
     val albums: List<RemoteCollection>,
     val singles: List<RemoteCollection>,
+    /** «Ver todo» de cada sección (página de discografía de YouTube Music), si la hay. */
+    val albumsMore: BrowseRef? = null,
+    val singlesMore: BrowseRef? = null,
 )
+
+/** Una página de YouTube Music a la que se llega con browseId + params (p. ej. la discografía completa). */
+data class BrowseRef(val browseId: String, val params: String?)
 
 /** «Álbum • Beyoncé • 2024» → «Beyoncé · 2024»; los singles y EP conservan el tipo (como albumLine en iOS). */
 fun albumLine(subtitle: String): String =

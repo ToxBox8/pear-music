@@ -55,6 +55,19 @@ final class JamService: NSObject, ObservableObject {
     @Published private(set) var jam: JamState?
     @Published private(set) var searchStalled = false
     @Published private(set) var joiningCode: String?
+    /// Anfitrión: su dirección en la Wi-Fi para el QR (Fase 3.2).
+    @Published fileprivate(set) var direct: String?
+    /// Direcciones directas vistas en enlaces o QR, por código (desde cualquier hilo: el escáner no va en el principal).
+    final class DirectHints: @unchecked Sendable {
+        static let shared = DirectHints()
+        private let lock = NSLock()
+        private var map: [String: (String, UInt16)] = [:]
+        func remember(_ text: String) {
+            guard let c = JamService.code(from: text), let d = JamService.direct(from: text) else { return }
+            lock.lock(); map[c] = d; lock.unlock()
+        }
+        func take(_ code: String) -> (String, UInt16)? { lock.lock(); defer { lock.unlock() }; return map[code] }
+    }
     @Published var showSheet = false
     /// Código que llegó por enlace o QR y espera a que la hoja del Jam lo use.
     @Published var pendingCode: String?
@@ -92,10 +105,26 @@ final class JamService: NSObject, ObservableObject {
         return c.count == 6 && text.trimmingCharacters(in: .whitespacesAndNewlines).count == 6 ? c : nil
     }
 
-    static func link(_ code: String) -> String { "libremusic://jam/\(code)" }
+    /// Con `direct` («IP:puerto» del anfitrión) quien escanea el QR entra al momento (Fase 3.2). Las versiones viejas
+    /// sólo leen la ruta, así que ignoran `?h=`. Igual que `JamLink` en Android.
+    static func link(_ code: String, direct: String? = nil) -> String {
+        "libremusic://jam/\(code)" + (direct.map { "?h=\($0)" } ?? "")
+    }
+
+    /// La dirección directa de un enlace (sólo IPv4 privadas y puertos 1024–65535), o nil.
+    nonisolated static func direct(from text: String) -> (String, UInt16)? {
+        guard let comps = URLComponents(string: text), let h = comps.queryItems?.first(where: { $0.name == "h" })?.value else { return nil }
+        let parts = h.split(separator: ":")
+        guard parts.count == 2, let port = UInt16(parts[1]), port >= 1024 else { return nil }
+        let o = parts[0].split(separator: ".").compactMap { Int($0) }
+        guard o.count == 4, o.allSatisfy({ (0...255).contains($0) }) else { return nil }
+        let isPrivate = o[0] == 10 || (o[0] == 172 && (16...31).contains(o[1])) || (o[0] == 192 && o[1] == 168)
+        return isPrivate ? (String(parts[0]), port) : nil
+    }
 
     func handle(url: URL) {
         guard let c = Self.code(from: url.absoluteString) else { return }
+        DirectHints.shared.remember(url.absoluteString)
         pendingCode = c
         showSheet = true
     }
@@ -114,6 +143,7 @@ final class JamService: NSObject, ObservableObject {
         adv.startAdvertisingPeer()
         advertiser = adv
         let h = JamHostV2(name: jam?.name ?? "Jam", code: code, host: myName)
+        h?.onDirect = { [weak self] addr in Task { @MainActor in self?.direct = addr } }
         h?.onMessage = { [weak self] id, msg in Task { @MainActor in self?.received2(msg, from: id) } }
         h?.onClose = { [weak self] id in Task { @MainActor in self?.closed2(id) } }
         host2 = h
@@ -132,7 +162,7 @@ final class JamService: NSObject, ObservableObject {
         b.delegate = self
         b.startBrowsingForPeers()
         browser = b
-        let g = JamGuestV2(code: code, name: myName)
+        let g = JamGuestV2(code: code, name: myName, direct: DirectHints.shared.take(code))
         g.onMessage = { [weak self] msg in Task { @MainActor in self?.receivedFromHost2(msg) } }
         g.onClose = { [weak self] in Task { @MainActor in self?.hostClosed2() } }
         guest2 = g
@@ -283,12 +313,12 @@ final class JamService: NSObject, ObservableObject {
             jam = s
             phase = .joined
         case "ended":
-            let host = jam?.host ?? "El anfitrión"
+            let host = jam?.host ?? L("El anfitrión")
             disconnect()
-            phase = .lost("\(host) ha terminado el Jam.")
+            phase = .lost(L("{0} ha terminado el Jam.", host))
         case "error":
             disconnect()
-            phase = .lost(msg.reason == "full" ? "El Jam está lleno." : "El código no es válido.")
+            phase = .lost(msg.reason == "full" ? L("El Jam está lleno.") : L("El código no es válido."))
         default:
             break
         }
@@ -296,9 +326,9 @@ final class JamService: NSObject, ObservableObject {
 
     private func hostClosed2() {
         guard joinedViaV2, phase == .joined else { return }
-        let host = jam?.host ?? "el anfitrión"
+        let host = jam?.host ?? L("el anfitrión")
         disconnect()
-        phase = .lost("Se perdió la conexión con \(host).")
+        phase = .lost(L("Se perdió la conexión con {0}.", host))
     }
 
     private static func cleanName(_ raw: String) -> String {
@@ -340,9 +370,9 @@ final class JamService: NSObject, ObservableObject {
                 }
                 phase = .joined
             case .ended:
-                let host = jam?.host ?? "El anfitrión"
+                let host = jam?.host ?? L("El anfitrión")
                 disconnect()
-                phase = .lost("\(host) ha terminado el Jam.")
+                phase = .lost(L("{0} ha terminado el Jam.", host))
             case .hello, .add, .remove:
                 break
             }
@@ -361,9 +391,9 @@ final class JamService: NSObject, ObservableObject {
                     broadcast()
                 }
             } else if phase == .joined {
-                let host = jam?.host ?? "el anfitrión"
+                let host = jam?.host ?? L("el anfitrión")
                 disconnect()
-                phase = .lost("Se perdió la conexión con \(host).")
+                phase = .lost(L("Se perdió la conexión con {0}.", host))
             } else if phase == .searching {
                 // La invitación falló (p. ej. se rechazó por timeout): se vuelve a buscar.
                 browser?.stopBrowsingForPeers()
@@ -495,6 +525,7 @@ final class ScannerController: UIViewController, AVCaptureMetadataOutputObjectsD
     func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput objects: [AVMetadataObject], from connection: AVCaptureConnection) {
         guard !done, let text = (objects.first as? AVMetadataMachineReadableCodeObject)?.stringValue,
               let code = JamService.code(from: text) else { return }
+        JamService.DirectHints.shared.remember(text)
         done = true
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         onCode?(code)

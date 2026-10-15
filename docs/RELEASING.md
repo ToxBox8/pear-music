@@ -36,6 +36,7 @@ Para probar en el móvil antes de publicar: `apps/android/scripts/smoke.sh` (ins
    ```
 4. El workflow **Release** compila con el mismo workflow de CI de esa plataforma y crea la GitHub Release `iOS 1.1.0` / `Android 0.1.0` con el binario y su SHA-256.
 5. Actualiza la web de descarga (repo `libremusic-landing`): copia el binario a `public/downloads/` como `LibreMusic.ipa` / `LibreMusic.apk` (este repo es privado, así que los assets de la Release no se pueden enlazar) y actualiza versión, tamaño y SHA-256 en `src/config/downloads.ts`; para iOS, añade la versión a `public/altstore.json` y quita las que apunten a un archivo que ya no existe. Añade la versión arriba en `src/config/changelog.ts` (título y 3–6 novedades en lenguaje de usuario, sacadas de `CHANGELOG.md`), quita de `upcoming` lo que ya ha salido y ejecuta `bun scripts/gen-feeds.ts` (`version.json` y el RSS; avisan a quien se suscribió). Al hacer push a `main`, Cloudflare Workers Builds publica la web sola.
+6. Cuéntalo en Discord por los **dos** canales: en `#novedades` (público, webhook de `~/.config/pear-music/novedades-webhook`) y con `scripts/avisar.sh` de la web en `#avisos-pear-music`, que es el único que leen las apps: sin este segundo paso la campana y las notificaciones no se enteran de la versión nueva (Toxbox lo echó en falta el 14-10).
 
 Si sólo quieres publicar una plataforma, sube sólo su etiqueta. Las etiquetas también lanzan la CI normal de las dos apps; se puede cancelar, la Release compila por su cuenta.
 
@@ -46,9 +47,9 @@ Pasó con 0.8.1 (cuota de Actions agotada). El APK se compila y se firma en loca
 ```bash
 export ANDROID_KEYSTORE_PATH=…/firma-android/libremusic-release.jks
 export ANDROID_KEY_ALIAS=… ANDROID_KEYSTORE_PASSWORD=… ANDROID_KEY_PASSWORD=…   # de tu gestor de contraseñas
-cd apps/android && gradle assembleRelease
-apksigner verify --print-certs app/build/outputs/apk/release/app-release.apk   # SHA-256 9a38c4d7…
-cp app/build/outputs/apk/release/app-release.apk LibreMusic-android-X.Y.Z.apk && sha256sum LibreMusic-android-X.Y.Z.apk > SHA256SUMS.txt
+cd apps/android && gradle assembleUsrRelease
+apksigner verify --print-certs app/build/outputs/apk/usr/release/app-usr-release.apk   # SHA-256 9a38c4d7…
+cp app/build/outputs/apk/usr/release/app-usr-release.apk LibreMusic-android-X.Y.Z.apk && sha256sum LibreMusic-android-X.Y.Z.apk > SHA256SUMS.txt
 git tag -a android-vX.Y.Z -m "Android X.Y.Z" && git push origin android-vX.Y.Z
 gh release create android-vX.Y.Z LibreMusic-android-X.Y.Z.apk SHA256SUMS.txt --title "Android X.Y.Z" --notes-file notas.md
 ```
@@ -87,3 +88,19 @@ Sin esos secretos la CI firma con una clave de depuración temporal: el APK sirv
 - **Obtainium** (Android): puede seguir las Releases filtrando por la etiqueta `android-v`.
 - **AltStore / SideStore** (iOS): fuente `altstore.json` publicada en la web.
 - **Google Play / App Store**: no disponibles (sus políticas no admiten clientes no oficiales de YouTube).
+
+## Marcha atrás (rollback)
+
+Si una versión publicada sale mal (Cierre 1.0; también en `docs/RUNBOOK-INCIDENTES.md`):
+
+1. **Avisar y frenar:** kill switch al nivel 2 (modo seguro: las apps dejan de ofrecer la actualización) y aviso en
+   `#avisos-pear-music`.
+2. **Android:** `version.json` de la web vuelve a la versión anterior (con su `sha256`) y `downloads.ts` también;
+   la release mala de GitHub se marca como *pre-release* o se borra. Quien ya actualizó instala la buena **encima
+   con un versionCode mayor** (Android no deja bajar de versión sin desinstalar): se publica la anterior recompilada
+   como `X.Y.Z+1`.
+3. **iOS:** `altstore.json` vuelve a la entrada anterior (o se publica la arreglada) y `downloads.ts`; AltStore y
+   SideStore ofrecen esa versión.
+4. **Workers:** `npx wrangler rollback` en la carpeta del Worker (`services/api`, `services/estado`,
+   `services/soporte`); la web, revirtiendo el commit en `main` (nunca reescribiendo el historial: Lovable).
+5. **Volver a normal:** kill switch al nivel 0 cuando la buena esté publicada; aviso de «Resuelto».

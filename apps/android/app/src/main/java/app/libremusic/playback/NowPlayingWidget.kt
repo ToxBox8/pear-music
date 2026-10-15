@@ -90,11 +90,27 @@ class NowPlayingWidget : AppWidgetProvider() {
             render(context, song, playing, lastCover)
         }
 
+        /** Vuelve a dibujar con lo último conocido (al cambiar el tema de los widgets). */
+        fun refresh(context: Context) = render(context.applicationContext, last.first, last.second, lastCover)
+
+        /** Al añadir el grande: lo último conocido o la última cola guardada, como el pequeño. */
+        fun refreshOrLoad(context: Context) {
+            val song = last.first ?: LastQueue.load(context)?.let { it.songs[it.index] }
+            render(context.applicationContext, song, last.second, lastCover)
+        }
+
+        /** El pequeño (4×1) y el grande (4×2) comparten ids: se dibujan igual, cada uno con su diseño. */
         private fun render(context: Context, song: Song?, playing: Boolean, cover: Bitmap?) {
+            render(context, song, playing, cover, NowPlayingWidget::class.java, R.layout.widget_now_playing)
+            render(context, song, playing, cover, NowPlayingLargeWidget::class.java, R.layout.widget_now_playing_large)
+        }
+
+        private fun render(context: Context, song: Song?, playing: Boolean, cover: Bitmap?, provider: Class<*>, layout: Int) {
             val manager = AppWidgetManager.getInstance(context)
-            val ids = manager.getAppWidgetIds(ComponentName(context, NowPlayingWidget::class.java))
+            val ids = manager.getAppWidgetIds(ComponentName(context, provider))
             if (ids.isEmpty()) return
-            val v = RemoteViews(context.packageName, R.layout.widget_now_playing)
+            val v = RemoteViews(context.packageName, layout)
+            Widgets.applyTheme(context, v, R.id.widget_root, titles = listOf(R.id.widget_title), subtitles = listOf(R.id.widget_artist))
             val open = PendingIntent.getActivity(context, 0, Intent(context, AppActivity::class.java), PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
             v.setOnClickPendingIntent(R.id.widget_root, open)
             v.setTextViewText(R.id.widget_title, song?.title ?: context.getString(R.string.widget_idle_title))
@@ -136,4 +152,9 @@ class NowPlayingWidget : AppWidgetProvider() {
             return out
         }
     }
+}
+
+/** «Ahora suena» grande (4×2, Fase 3.4): lo dibuja [NowPlayingWidget] con su propio diseño. */
+class NowPlayingLargeWidget : AppWidgetProvider() {
+    override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) = NowPlayingWidget.refreshOrLoad(context)
 }

@@ -1,5 +1,7 @@
 package app.libremusic.playback
 
+
+import app.libremusic.L
 import android.net.Uri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
@@ -54,7 +56,7 @@ object StreamResolver {
      */
     fun resolve(spec: DataSpec, lowQuality: Boolean = false): DataSpec {
         if (spec.uri.scheme != "libremusic") return spec
-        val id = spec.uri.lastPathSegment ?: throw IOException("Canción sin identificador")
+        val id = spec.uri.lastPathSegment ?: throw IOException(L("Canción sin identificador"))
         val now = System.currentTimeMillis()
         val key = if (lowQuality) "$id|low" else id
         val info = cache[key]?.takeIf { now - it.at < TTL_MS }?.info

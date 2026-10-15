@@ -1,5 +1,7 @@
 package app.libremusic.data
 
+
+import app.libremusic.L
 import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -131,7 +133,7 @@ object LyricsClient {
         val url = "$BASE/search".toHttpUrl().newBuilder().apply { params.forEach { (k, v) -> addQueryParameter(k, v) } }.build()
         val req = Request.Builder().url(url).header("User-Agent", USER_AGENT).build()
         YTClient.http.newCall(req).execute().use { r ->
-            if (!r.isSuccessful) throw java.io.IOException("LRCLIB respondió ${r.code}")
+            if (!r.isSuccessful) throw java.io.IOException(L("LRCLIB respondió {0}", r.code))
             val arr = JSONArray(r.body?.string() ?: "[]")
             return (0 until arr.length()).map { arr.getJSONObject(it) }
         }

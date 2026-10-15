@@ -1,5 +1,15 @@
 package app.libremusic.ui
 
+
+import app.libremusic.L
+import androidx.compose.material.icons.rounded.Terminal
+
+import androidx.compose.material.icons.rounded.Celebration
+
+import androidx.compose.material.icons.rounded.ChatBubble
+
+import androidx.compose.material.icons.rounded.CheckCircle
+
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Build
@@ -72,7 +82,7 @@ fun AvisosBell() {
     val env = LocalEnv.current
     val c = Libre.colors
     val sinLeer by AvisosRepo.sinLeer.collectAsState()
-    val label = if (sinLeer > 0) "Avisos, $sinLeer sin leer" else "Avisos"
+    val label = if (sinLeer > 0) L("Avisos, {0} sin leer", sinLeer) else L("Avisos")
     Box {
         ToolbarButton(if (sinLeer > 0) Icons.Rounded.Notifications else Icons.Rounded.NotificationsNone, label, tint = c.label) {
             env.app.push(Route.Avisos)
@@ -141,30 +151,30 @@ fun AvisosScreen() {
     LaunchedEffect(estado) { AvisosRepo.marcarVistos(context) }
 
     PullToRefreshBox(isRefreshing = refrescando, onRefresh = ::refrescar) {
-        SettingsPage("Avisos") {
-            FormSection(null, footer = "Comprueba cada 15 minutos si hay avisos nuevos. Sólo se pide la lista de avisos, sin enviar nada tuyo.") {
+        SettingsPage(L("Avisos")) {
+            FormSection(null, footer = L("Comprueba cada 15 minutos si hay avisos nuevos. Sólo se pide la lista de avisos, sin enviar nada tuyo.")) {
                 FormRow(
-                    "Notificar en el móvil",
+                    L("Notificar en el móvil"),
                     icon = Icons.Rounded.Notifications,
                     iconPalette = 4,
                     last = true,
-                    trailing = { IosToggle(notificar, ::cambiarNotificar, label = "Notificar en el móvil") },
+                    trailing = { IosToggle(notificar, ::cambiarNotificar, label = L("Notificar en el móvil")) },
                 ) { cambiarNotificar(!notificar) }
             }
             when (val e = estado) {
                 EstadoAvisos.Cargando ->
                     Box(Modifier.fillMaxWidth().padding(top = 56.dp), contentAlignment = Alignment.Center) { Spinner() }
                 EstadoAvisos.Error ->
-                    Vacio(Icons.Rounded.CloudOff, "No se han podido cargar", "Comprueba la conexión y vuelve a intentarlo.") {
-                        PillButton("Reintentar", Icons.Rounded.Refresh, prominent = false, modifier = Modifier.widthIn(max = 220.dp)) { refrescar() }
+                    Vacio(Icons.Rounded.CloudOff, L("No se han podido cargar"), L("Comprueba la conexión y vuelve a intentarlo.")) {
+                        PillButton(L("Reintentar"), Icons.Rounded.Refresh, prominent = false, modifier = Modifier.widthIn(max = 220.dp)) { refrescar() }
                     }
                 is EstadoAvisos.Listo ->
                     if (e.avisos.isEmpty()) {
-                        Vacio(Icons.Rounded.NotificationsNone, "No hay avisos", "Cuando haya algo importante saldrá aquí.")
+                        Vacio(Icons.Rounded.NotificationsNone, L("No hay avisos"), L("Cuando haya algo importante saldrá aquí."))
                     } else {
                         FormSection(
-                            if (e.sinConexion) "Sin conexión" else null,
-                            footer = if (e.sinConexion) "Estos son los últimos avisos guardados." else null,
+                            if (e.sinConexion) L("Sin conexión") else null,
+                            footer = if (e.sinConexion) L("Estos son los últimos avisos guardados.") else null,
                         ) {
                             e.avisos.forEachIndexed { i, aviso -> AvisoRow(aviso, last = i == e.avisos.lastIndex) }
                         }
@@ -178,7 +188,20 @@ fun AvisosScreen() {
 private fun AvisoRow(aviso: Aviso, last: Boolean) {
     val c = Libre.colors
     val uri = LocalUriHandler.current
-    val color = if (aviso.importante) c.accent else c.secondaryLabel
+    // Respuestas del soporte sólo para ti (tickets): check al abrirse, bocadillo, confeti si se solucionó y una
+    // línea de comandos si «estamos en ello». Lo eligió Toxbox.
+    val personalIcon = when (aviso.personal) {
+        "abierto" -> Icons.Rounded.CheckCircle
+        "mensaje" -> Icons.Rounded.ChatBubble
+        "fiesta" -> Icons.Rounded.Celebration
+        "en-ello" -> Icons.Rounded.Terminal
+        else -> null
+    }
+    val color = when {
+        aviso.personal == "fiesta" -> c.green
+        personalIcon != null || aviso.importante -> c.accent
+        else -> c.secondaryLabel
+    }
     FormCustomRow {
         Column(Modifier.fillMaxWidth()) {
             Row(Modifier.fillMaxWidth().padding(16.dp, 14.dp)) {
@@ -187,7 +210,7 @@ private fun AvisoRow(aviso: Aviso, last: Boolean) {
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
-                        if (aviso.importante) Icons.Rounded.NotificationImportant else Icons.Rounded.Campaign,
+                        personalIcon ?: if (aviso.importante) Icons.Rounded.NotificationImportant else Icons.Rounded.Campaign,
                         null, tint = color, modifier = Modifier.size(22.dp),
                     )
                 }
@@ -195,7 +218,11 @@ private fun AvisoRow(aviso: Aviso, last: Boolean) {
                 Column(Modifier.weight(1f)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            if (aviso.importante) "Importante" else "Aviso",
+                            when {
+                                aviso.personal != null -> L("Sólo para ti") + (aviso.ticket?.let { L(" · ticket #{0}", it) } ?: "")
+                                aviso.importante -> L("Importante")
+                                else -> L("Aviso")
+                            },
                             style = Typo.footnote, fontWeight = FontWeight.SemiBold, color = color, modifier = Modifier.weight(1f),
                         )
                         Text(haceCuanto(aviso.fecha), style = Typo.footnote, color = c.secondaryLabel)
@@ -208,11 +235,11 @@ private fun AvisoRow(aviso: Aviso, last: Boolean) {
                     }
                     aviso.enlace?.let { enlace ->
                         Row(
-                            Modifier.padding(top = 8.dp).tactile(label = "Abrir enlace") { runCatching { uri.openUri(enlace) } },
+                            Modifier.padding(top = 8.dp).tactile(label = L("Abrir enlace")) { runCatching { uri.openUri(enlace) } },
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(4.dp),
                         ) {
-                            Text("Abrir enlace", style = Typo.subheadline, fontWeight = FontWeight.SemiBold, color = c.accent)
+                            Text(L("Abrir enlace"), style = Typo.subheadline, fontWeight = FontWeight.SemiBold, color = c.accent)
                             Icon(Icons.AutoMirrored.Rounded.OpenInNew, null, tint = c.accent, modifier = Modifier.size(15.dp))
                         }
                     }
@@ -244,12 +271,12 @@ private val formatoFecha = DateTimeFormatter.ofPattern("d MMM yyyy", Locale.forL
 /** Igual que la web: «ahora mismo», «hace 5 min», «hace 3 h», «ayer», «hace 3 días» o la fecha. */
 fun haceCuanto(fecha: Instant, ahora: Instant = Instant.now()): String {
     val seg = Duration.between(fecha, ahora).seconds.coerceAtLeast(0)
-    if (seg < 60) return "ahora mismo"
+    if (seg < 60) return L("ahora mismo")
     val min = Math.round(seg / 60.0)
-    if (min < 60) return "hace $min min"
+    if (min < 60) return L("hace {0} min", min)
     val h = Math.round(min / 60.0)
-    if (h < 24) return "hace $h h"
+    if (h < 24) return L("hace {0} h", h)
     val d = Math.round(h / 24.0)
-    if (d < 7) return if (d == 1L) "ayer" else "hace $d días"
+    if (d < 7) return if (d == 1L) L("ayer") else L("hace {0} días", d)
     return formatoFecha.format(fecha.atZone(ZoneId.systemDefault()))
 }

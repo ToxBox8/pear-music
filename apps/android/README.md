@@ -1,4 +1,4 @@
-# LibreMusic para Android
+# Pear Music para Android
 
 App nativa en **Kotlin + Jetpack Compose + Media3**. Paquete `app.libremusic` (las builds de depuración usan `app.libremusic.debug` y pueden convivir con la de release).
 
@@ -14,18 +14,18 @@ Estado: **Fase 1 (MVP)**: buscar, escuchar en segundo plano, cola y favoritos. D
 
 ```bash
 cd apps/android
-gradle testDebugUnitTest         # tests
-gradle assembleDebug             # APK de depuración
+gradle testUsrDebugUnitTest         # tests
+gradle assembleUsrDebug             # APK de depuración
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
-Sin entorno local: cada push que toque `apps/android/` lanza el workflow **Android** en GitHub Actions. El APK queda como artefacto `LibreMusic-android`.
+Sin entorno local: cada push que toque `apps/android/` lanza el workflow **Android** en GitHub Actions. El APK queda como artefacto `LibreMusic-android` (nombre técnico, no cambia).
 
 ## Estructura
 
 ```
 app/src/main/java/app/libremusic/
-├─ AppActivity.kt             Entrada y deep links (en el manifiesto, un activity-alias por icono de la app)
+├─ AppActivity.kt             Entrada y deep links (en el manifiesto, el alias `.MainActivity` lleva el icono)
 ├─ ui/                        Compose (HomeScreen, theme/)
 ├─ playback/PlaybackService   MediaSessionService + ExoPlayer
 └─ jam/JamLink                Código/enlace del Jam (compatible con iOS)

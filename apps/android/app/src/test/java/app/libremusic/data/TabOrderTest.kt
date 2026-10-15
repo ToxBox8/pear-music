@@ -23,4 +23,9 @@ class TabOrderTest {
         assertEquals("home", TabOrder.start("search", TabOrder.DEFAULT))
         assertEquals("home", TabOrder.start(null, TabOrder.DEFAULT))
     }
+
+    @Test fun descubrirOculta() {
+        org.junit.Assert.assertEquals(listOf("home", "search", "library", "settings"), TabOrder.visible(TabOrder.DEFAULT, searchTab = true, discover = false))
+        org.junit.Assert.assertEquals(TabOrder.DEFAULT, TabOrder.visible(TabOrder.DEFAULT, searchTab = false))
+    }
 }

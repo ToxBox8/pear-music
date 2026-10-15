@@ -105,3 +105,38 @@ export async function hashId(value) {
   const digest = await crypto.subtle.digest("SHA-256", bytes);
   return [...new Uint8Array(digest).slice(0, 12)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
+
+// Insultos y lenguaje de acoso (castellano e inglés), ya sin tildes. Una palabrota suelta de frustración
+// («esto es una mierda, se cierra») no basta para rechazar: hace falta un insulto fuerte o que el texto sea
+// sobre todo insultos. Así no se pierden reportes buenos de gente enfadada.
+const STRONG = [
+  "hijo de puta", "hija de puta", "hijoputa", "subnormal", "retrasado", "gilipollas", "malparido", "maricon",
+  "puta madre que te pario", "me cago en tu", "muerete", "ojala te mueras", "te voy a matar", "kill yourself",
+  "kys", "son of a bitch", "motherfucker", "retard", "faggot",
+];
+const MILD = new Set([
+  "puta", "puto", "mierda", "joder", "cabron", "cabrona", "imbecil", "idiota", "estupido", "estupida", "tonto",
+  "tonta", "pendejo", "pendeja", "capullo", "zorra", "coño", "cono", "polla", "fuck", "fucking", "shit", "bitch",
+  "asshole", "dick", "cunt", "stupid", "idiot", "moron",
+]);
+
+const plain = (s) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+
+/** null si se puede enviar, o el motivo. */
+export function abuseProblem(raw) {
+  const text = plain(String(raw ?? ""));
+  if (STRONG.some((w) => text.includes(w))) {
+    return "El mensaje tiene insultos. Cuéntanos qué ha fallado sin ellos y lo miramos encantados.";
+  }
+  const words = text.match(/\p{L}+/gu) ?? [];
+  const mild = words.filter((w) => MILD.has(w)).length;
+  if (mild >= 3 || (words.length > 0 && mild / words.length > 0.15)) {
+    return "El mensaje tiene demasiadas palabrotas. Cuéntanos qué ha fallado con calma y lo miramos.";
+  }
+  return null;
+}
+
+/** Huella del texto para detectar el mismo reporte repetido (sin mayúsculas, signos ni espacios). */
+export async function textFingerprint(raw) {
+  return hashId(plain(String(raw ?? "")).replace(/[^\p{L}\p{N}]+/gu, ""));
+}

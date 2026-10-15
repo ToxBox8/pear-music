@@ -1,5 +1,7 @@
 package app.libremusic.jam
 
+
+import app.libremusic.L
 import android.content.Context
 import android.graphics.Bitmap
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -149,7 +151,7 @@ fun JamScreen(playerVm: PlayerViewModel, libraryVm: LibraryViewModel, initialCod
         AnimatedContent(pane to state.phase, label = "jam", transitionSpec = { fadeIn(tween(300)) togetherWith fadeOut(tween(200)) }) { (p, phase) ->
             when {
                 p == JamPane.Add -> JamAddSongs(onDone = { pane = JamPane.Main })
-                p == JamPane.Qr && state.jam != null -> JamQr(state.jam!!, onDone = { pane = JamPane.Main })
+                p == JamPane.Qr && state.jam != null -> JamQr(state.jam!!, state.direct, onDone = { pane = JamPane.Main })
                 phase == JamPhase.Idle -> JamStart(initialCode, onClose)
                 phase == JamPhase.Searching -> JamSearching(state.joiningCode.orEmpty())
                 else -> JamRoom(state, playerVm, libraryVm, onClose, onAdd = { pane = JamPane.Add }, onQr = { pane = JamPane.Qr })
@@ -170,6 +172,7 @@ private fun JamStart(initialCode: String?, onClose: () -> Unit) {
     val hasName = name.isNotBlank()
     fun join() { saveName(context, name); JamService.join(code, name.trim()) }
     val scan = rememberLauncherForActivityResult(ScanContract()) { result ->
+        JamService.rememberLink(result.contents)
         JamLink.codeFrom(result.contents)?.let { code = it; if (name.isNotBlank()) join() }
     }
     // Llegó un código por enlace o QR del sistema: si ya hay nombre, se entra directamente.
@@ -183,26 +186,26 @@ private fun JamStart(initialCode: String?, onClose: () -> Unit) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text("Jam", style = Typo.display(46f, c.theme), color = c.label)
                 Text(
-                    "Una playlist que hacéis entre todos. Funciona con gente que está cerca, en la misma WiFi.",
+                    L("Una playlist que hacéis entre todos. Funciona con gente que está cerca, en la misma WiFi."),
                     style = Typo.body, color = c.secondaryLabel,
                 )
             }
-            JamTextField("Tu nombre", "Así te verán los demás", name) { name = it.take(30) }
+            JamTextField(L("Tu nombre"), L("Así te verán los demás"), name) { name = it.take(30) }
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("Crear uno", style = Typo.title3.bold, color = c.label)
-                JamTextField("Nombre del Jam", "Opcional, p. ej. Viaje a la playa", title) { title = it.take(60) }
-                PillButton("Crear Jam", app.libremusic.ui.theme.JamIcon(filled = true), prominent = true, modifier = Modifier.fillMaxWidth(), enabled = hasName) {
+                Text(L("Crear uno"), style = Typo.title3.bold, color = c.label)
+                JamTextField(L("Nombre del Jam"), L("Opcional, p. ej. Viaje a la playa"), title) { title = it.take(60) }
+                PillButton(L("Crear Jam"), app.libremusic.ui.theme.JamIcon(filled = true), prominent = true, modifier = Modifier.fillMaxWidth(), enabled = hasName) {
                     saveName(context, name)
                     JamService.host(title, name.trim())
                 }
             }
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("Unirme a uno", style = Typo.title3.bold, color = c.label)
-                Text("Pide el código a quien lo creó o escanea su QR.", style = Typo.subheadline, color = c.secondaryLabel)
+                Text(L("Unirme a uno"), style = Typo.title3.bold, color = c.label)
+                Text(L("Pide el código a quien lo creó o escanea su QR."), style = Typo.subheadline, color = c.secondaryLabel)
                 JamCodeField(code) { code = JamLink.normalize(it) }
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    PillButton("Escanear QR", Icons.Rounded.QrCodeScanner, prominent = false, modifier = Modifier.weight(1f)) {
-                        scan.launch(ScanOptions().setDesiredBarcodeFormats(ScanOptions.QR_CODE).setPrompt("Apunta al QR del Jam").setBeepEnabled(false).setOrientationLocked(false))
+                    PillButton(L("Escanear QR"), Icons.Rounded.QrCodeScanner, prominent = false, modifier = Modifier.weight(1f)) {
+                        scan.launch(ScanOptions().setDesiredBarcodeFormats(ScanOptions.QR_CODE).setPrompt(L("Apunta al QR del Jam")).setBeepEnabled(false).setOrientationLocked(false))
                     }
                     PillButton("Unirme", Icons.AutoMirrored.Rounded.ArrowForward, prominent = true, modifier = Modifier.weight(1f), enabled = hasName && code.length >= JamLink.CODE_LENGTH) { join() }
                 }
@@ -211,7 +214,7 @@ private fun JamStart(initialCode: String?, onClose: () -> Unit) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Outlined.Info, null, tint = c.secondaryLabel, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(6.dp))
-                    Text("Escribe tu nombre para crear un Jam o unirte.", style = Typo.footnote, color = c.secondaryLabel)
+                    Text(L("Escribe tu nombre para crear un Jam o unirte."), style = Typo.footnote, color = c.secondaryLabel)
                 }
             }
         }
@@ -237,7 +240,7 @@ private fun JamCodeField(code: String, onChange: (String) -> Unit) {
     val c = Libre.colors
     val focus = remember { FocusRequester() }
     var focused by remember { mutableStateOf(false) }
-    Box(Modifier.fillMaxWidth().height(58.dp).tactile(label = "Código del Jam, 6 caracteres") { focus.requestFocus() }) {
+    Box(Modifier.fillMaxWidth().height(58.dp).tactile(label = L("Código del Jam, 6 caracteres")) { focus.requestFocus() }) {
         BasicTextField(
             code, onChange, singleLine = true,
             textStyle = Typo.body.copy(color = Color.Transparent), cursorBrush = SolidColor(Color.Transparent),
@@ -270,12 +273,12 @@ private fun JamSearching(code: String) {
         Spacer(Modifier.weight(1f))
         JamRadar(c.accent, Modifier.size(180.dp))
         Spacer(Modifier.height(26.dp))
-        Text("Buscando el Jam", style = Typo.display(30f, c.theme), color = c.label)
+        Text(L("Buscando el Jam"), style = Typo.display(30f, c.theme), color = c.label)
         if (code.isNotEmpty()) { Spacer(Modifier.height(10.dp)); JamCodeText(code, 24f) }
         Spacer(Modifier.height(26.dp))
         Text(
-            if (stalled) "Todavía no aparece. Comprobad que el código es correcto, que estáis en la misma WiFi y que quien lo creó tiene Pear Music abierta."
-            else "Mantén Pear Music abierta. Suele tardar unos segundos.",
+            if (stalled) L("Todavía no aparece. Comprobad que el código es correcto, que estáis en la misma WiFi y que quien lo creó tiene Pear Music abierta.")
+            else L("Mantén Pear Music abierta. Suele tardar unos segundos."),
             style = Typo.subheadline, color = c.secondaryLabel, textAlign = TextAlign.Center,
         )
         Spacer(Modifier.weight(1f))
@@ -338,11 +341,11 @@ private fun JamRoom(state: JamUiState, playerVm: PlayerViewModel, libraryVm: Lib
         if (state.phase == JamPhase.Lost) { JamService.dismiss(); return }
         if (jam.entries.isEmpty() || savedName != null) { JamService.leave(); return }
         env.app.alert = AlertSpec(
-            "¿Guardar la lista antes de salir?",
-            if (state.isHost) "El Jam se terminará para todos." else "Podrás volver a entrar con el código mientras siga abierto.",
+            L("¿Guardar la lista antes de salir?"),
+            if (state.isHost) L("El Jam se terminará para todos.") else L("Podrás volver a entrar con el código mientras siga abierto."),
             buttons = listOf(
-                AlertButton("Guardar y salir") { save(); JamService.leave() },
-                AlertButton(if (state.isHost) "Terminar sin guardar" else "Salir sin guardar", AlertButton.Role.Destructive) { JamService.leave() },
+                AlertButton(L("Guardar y salir")) { save(); JamService.leave() },
+                AlertButton(if (state.isHost) L("Terminar sin guardar") else L("Salir sin guardar"), AlertButton.Role.Destructive) { JamService.leave() },
                 AlertButton("Cancelar", AlertButton.Role.Cancel),
             ),
         )
@@ -354,11 +357,11 @@ private fun JamRoom(state: JamUiState, playerVm: PlayerViewModel, libraryVm: Lib
                 ToolbarCapsule("Cerrar", onClick = onClose)
                 Spacer(Modifier.weight(1f))
                 Box {
-                    ToolbarButton(Icons.Rounded.MoreHoriz, "Opciones del Jam") { menu = true }
+                    ToolbarButton(Icons.Rounded.MoreHoriz, L("Opciones del Jam")) { menu = true }
                     ContextMenu(menu, { menu = false }, listOf(
-                        MenuEntry.Action(if (savedId == null) "Guardar como playlist" else "Actualizar playlist guardada", Icons.Rounded.Download, enabled = jam.entries.isNotEmpty()) { save() },
+                        MenuEntry.Action(if (savedId == null) L("Guardar como playlist") else L("Actualizar playlist guardada"), Icons.Rounded.Download, enabled = jam.entries.isNotEmpty()) { save() },
                         MenuEntry.Divider,
-                        MenuEntry.Action(if (state.isHost) "Terminar Jam" else "Salir del Jam", Icons.AutoMirrored.Rounded.Logout, destructive = true) { leave() },
+                        MenuEntry.Action(if (state.isHost) L("Terminar Jam") else L("Salir del Jam"), Icons.AutoMirrored.Rounded.Logout, destructive = true) { leave() },
                     ))
                 }
             }
@@ -369,22 +372,22 @@ private fun JamRoom(state: JamUiState, playerVm: PlayerViewModel, libraryVm: Lib
                     LiveBadge(live, c.accent)
                     Text(jam.name, style = Typo.display(34f, c.theme), color = c.label, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     val n = songCount(jam.entries.size)
-                    Text(if (state.isHost) "Lo has creado tú · $n" else "De ${jam.host} · $n", style = Typo.subheadline, color = c.secondaryLabel)
+                    Text(if (state.isHost) L("Lo has creado tú · {0}", n) else "De ${jam.host} · $n", style = Typo.subheadline, color = c.secondaryLabel)
                 }
                 Members(jam.members)
                 if (state.phase == JamPhase.Lost) {
                     Row(Modifier.fillMaxWidth().themeSurface(16.dp, c).padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Rounded.WifiOff, null, tint = c.label, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(8.dp))
-                        Text(state.reason ?: "Se perdió la conexión", style = Typo.subheadline.semibold, color = c.label)
+                        Text(state.reason ?: L("Se perdió la conexión"), style = Typo.subheadline.semibold, color = c.label)
                     }
                 } else {
                     Row(
-                        Modifier.fillMaxWidth().themeSurface(20.dp, c).tactile(label = "Muestra el código QR", onClick = onQr).padding(horizontal = 18.dp, vertical = 14.dp),
+                        Modifier.fillMaxWidth().themeSurface(20.dp, c).tactile(label = L("Muestra el código QR"), onClick = onQr).padding(horizontal = 18.dp, vertical = 14.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Column(Modifier.weight(1f)) {
-                            Text("Código para unirse", style = Typo.caption.semibold, color = c.secondaryLabel)
+                            Text(L("Código para unirse"), style = Typo.caption.semibold, color = c.secondaryLabel)
                             Spacer(Modifier.height(4.dp))
                             JamCodeText(jam.code, 26f)
                         }
@@ -393,9 +396,9 @@ private fun JamRoom(state: JamUiState, playerVm: PlayerViewModel, libraryVm: Lib
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     if (live) {
-                        PillButton("Añadir", Icons.Rounded.Add, prominent = true, modifier = Modifier.weight(1f), onClick = onAdd)
+                        PillButton(L("Añadir"), Icons.Rounded.Add, prominent = true, modifier = Modifier.weight(1f), onClick = onAdd)
                     } else if (savedName == null) {
-                        PillButton("Guardar lista", Icons.Rounded.Download, prominent = true, modifier = Modifier.weight(1f), enabled = jam.entries.isNotEmpty()) { save() }
+                        PillButton(L("Guardar lista"), Icons.Rounded.Download, prominent = true, modifier = Modifier.weight(1f), enabled = jam.entries.isNotEmpty()) { save() }
                     }
                     PillButton("Reproducir", Icons.Rounded.PlayArrow, prominent = false, modifier = Modifier.weight(1f), enabled = jam.entries.isNotEmpty()) {
                         playerVm.play(jam.entries.map { it.song }, 0)
@@ -405,7 +408,7 @@ private fun JamRoom(state: JamUiState, playerVm: PlayerViewModel, libraryVm: Lib
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Rounded.CheckCircle, null, tint = c.accent, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(6.dp))
-                        Text("Guardada en Biblioteca como «$it»", style = Typo.footnote.semibold, color = c.accent)
+                        Text(L("Guardada en Biblioteca como «{0}»", it), style = Typo.footnote.semibold, color = c.accent)
                     }
                 }
             }
@@ -418,7 +421,7 @@ private fun JamRoom(state: JamUiState, playerVm: PlayerViewModel, libraryVm: Lib
         }
         if (jam.entries.isEmpty()) item {
             Text(
-                if (live) "Aún no hay canciones. Añade la primera y aparecerá en el móvil de todos." else "La lista quedó vacía.",
+                if (live) L("Aún no hay canciones. Añade la primera y aparecerá en el móvil de todos.") else L("La lista quedó vacía."),
                 style = Typo.subheadline, color = c.secondaryLabel, textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 12.dp),
             )
@@ -435,7 +438,7 @@ private fun LiveBadge(live: Boolean, tint: Color) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.size(8.dp).background((if (live) tint else c.secondaryLabel).copy(alpha = if (live && !reduce) pulse else 1f), CircleShape))
         Spacer(Modifier.width(6.dp))
-        Text(if (live) "EN DIRECTO" else "SIN CONEXIÓN", style = Typo.caption.bold, color = if (live) tint else c.secondaryLabel)
+        Text(if (live) "EN DIRECTO" else L("SIN CONEXIÓN"), style = Typo.caption.bold, color = if (live) tint else c.secondaryLabel)
     }
 }
 
@@ -450,10 +453,10 @@ private fun Members(members: List<String>) {
         Spacer(Modifier.width(12.dp))
         val names = when (members.size) {
             0 -> ""
-            1 -> "Sólo ${members[0]} por ahora"
+            1 -> L("Sólo {0} por ahora", members[0])
             2 -> "${members[0]} y ${members[1]}"
             3 -> "${members[0]}, ${members[1]} y ${members[2]}"
-            else -> "${members[0]}, ${members[1]} y ${members.size - 2} más"
+            else -> L("{0}, {1} y {2} más", members[0], members[1], members.size - 2)
         }
         Text(names, style = Typo.subheadline.medium, color = c.label, maxLines = 2)
     }
@@ -489,7 +492,7 @@ private fun EntryRow(entry: JamEntry, context: List<Song>, isCurrent: Boolean, p
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
                 Text(entry.song.title, style = Typo.callout.copy(fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.SemiBold), color = c.label, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text("${entry.song.artist} · añadida por ${entry.by}", style = Typo.footnote, color = c.secondaryLabel, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(L("{0} · añadida por {1}", entry.song.artist, entry.by), style = Typo.footnote, color = c.secondaryLabel, maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
             Spacer(Modifier.width(8.dp))
             JamAvatar(entry.by, 26.dp)
@@ -501,21 +504,22 @@ private fun EntryRow(entry: JamEntry, context: List<Song>, isCurrent: Boolean, p
 // MARK: QR y añadir canciones ---------------------------------------------------------------------
 
 @Composable
-private fun JamQr(state: JamState, onDone: () -> Unit) {
+private fun JamQr(state: JamState, direct: String?, onDone: () -> Unit) {
     val c = Libre.colors
     Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         SheetHeader("", trailing = "Listo", onTrailing = onDone)
         Text(state.name, style = Typo.display(26f, c.theme), color = c.label, maxLines = 1, modifier = Modifier.padding(top = 8.dp))
         Spacer(Modifier.height(20.dp))
-        val qr = remember(state.code) { qrCode(JamLink.link(state.code)) }
+        // Con la dirección del anfitrión: quien lo escanea entra al momento, sin esperar a buscar en la Wi-Fi.
+        val qr = remember(state.code, direct) { qrCode(JamLink.link(state.code, direct)) }
         Box(Modifier.size(256.dp).background(Color.White, RoundedCornerShape(24.dp)).padding(18.dp)) {
-            Image(qr, "Código QR del Jam", Modifier.fillMaxSize())
+            Image(qr, L("Código QR del Jam"), Modifier.fillMaxSize())
         }
         Spacer(Modifier.height(20.dp))
         JamCodeText(state.code, 28f)
         Spacer(Modifier.height(20.dp))
         Text(
-            "Escanead con la cámara del móvil o desde Biblioteca → + → Jam con amigos.",
+            L("Escanead con la cámara del móvil o desde Biblioteca → + → Jam con amigos."),
             style = Typo.subheadline, color = c.secondaryLabel, textAlign = TextAlign.Center, modifier = Modifier.padding(horizontal = 32.dp),
         )
     }
@@ -541,24 +545,24 @@ private fun JamAddSongs(onDone: () -> Unit) {
         }
     }
     Column(Modifier.fillMaxSize()) {
-        SheetHeader("Añadir al Jam", trailing = "Listo", onTrailing = onDone)
+        SheetHeader(L("Añadir al Jam"), trailing = "Listo", onTrailing = onDone)
         SearchField(query, { query = it; if (it.isEmpty()) { results = emptyList(); failed = false } }, ::search, Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
         LazyColumn(Modifier.fillMaxSize()) {
             val added = jam.jam?.entries?.map { it.song.id }?.toSet().orEmpty()
             val active = jam.phase == JamPhase.Hosting || jam.phase == JamPhase.Joined
             if (query.isEmpty()) {
                 if (data.favorites.isNotEmpty()) {
-                    item { SectionHead("Tus favoritos") }
+                    item { SectionHead(L("Tus favoritos")) }
                     items(data.favorites.take(40), key = { "f" + it.id }) { PickRow(it, it.id in added, active) }
                 }
                 if (data.recents.isNotEmpty()) {
-                    item { SectionHead("Escuchado hace poco") }
+                    item { SectionHead(L("Escuchado hace poco")) }
                     items(data.recents.take(20), key = { "r" + it.id }) { PickRow(it, it.id in added, active) }
                 }
-                if (data.favorites.isEmpty() && data.recents.isEmpty()) item { Note("Busca una canción para añadirla") }
+                if (data.favorites.isEmpty() && data.recents.isEmpty()) item { Note(L("Busca una canción para añadirla")) }
             } else when {
                 searching -> item { Box(Modifier.fillMaxWidth().padding(top = 40.dp), contentAlignment = Alignment.Center) { Spinner() } }
-                failed -> item { Note("No se pudo buscar. Revisa tu conexión.") }
+                failed -> item { Note(L("No se pudo buscar. Revisa tu conexión.")) }
                 else -> items(results, key = { "s" + it.id }) { PickRow(it, it.id in added, active) }
             }
             item { Spacer(Modifier.height(40.dp)) }
@@ -580,7 +584,7 @@ private fun Note(text: String) {
 private fun PickRow(song: Song, added: Boolean, active: Boolean) {
     val c = Libre.colors
     Row(
-        Modifier.fillMaxWidth().tactile(enabled = !added && active, label = if (added) "${song.title}, ya está en el Jam" else "Añadir ${song.title} al Jam") { JamService.add(song) }
+        Modifier.fillMaxWidth().tactile(enabled = !added && active, label = if (added) L("{0}, ya está en el Jam", song.title) else L("Añadir {0} al Jam", song.title)) { JamService.add(song) }
             .padding(horizontal = 20.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

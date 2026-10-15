@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Sólo HTTPS y sólo certificados del sistema (no los que instale el usuario), también en Android 8 y 9, donde
+     el texto plano aún estaba permitido por defecto. La variante debug lo sustituye por el suyo (src/debug) para
+     leer la web en local. Sin certificate pinning: ver docs/SEGURIDAD-DATOS.md. -->
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+        </trust-anchors>
+    </base-config>
+</network-security-config>
