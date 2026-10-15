@@ -99,7 +99,7 @@ fun OnboardingScreen(privacyOnly: Boolean = false, onDone: () -> Unit) {
                     when (pages[p]) {
                         Page.Language -> {
                             // Primero el idioma (Cierre 1.0): «Elige tu idioma» también en inglés, por si no lee español.
-                            StepTitle(L("Elige tu idioma"), L("Choose your language · Tria la llengua · Escolle o idioma · Aukeratu hizkuntza · Elektu vian lingvon"))
+                            StepTitle(L("Elige tu idioma"), L("Choose your language · Tria la llengua · Escolle o idioma · Aukeratu hizkuntza · Elektu vian lingvon · Escolha o idioma"))
                             Box(Modifier.padding(horizontal = 0.dp)) { LanguagePicker() }
                         }
                         Page.Welcome -> WelcomeStep()
@@ -190,7 +190,7 @@ private fun PrivacyStep(terms: Boolean, onTerms: (Boolean) -> Unit, onAccount: (
         terms, onTerms,
         title = L("Acepto las condiciones de uso"),
         text = L("Pear Music es un proyecto personal y gratuito, sin relación con YouTube ni Google. Es necesario para usar la app."),
-        link = L("Leer las condiciones") to { uri.openUri("https://libremusic-landing.8toxbox8-69a.workers.dev/legal") },
+        link = L("Leer las condiciones") to { uri.openUri("https://pearmusic-by-toxbox.8toxbox8-69a.workers.dev/legal") },
     )
     Spacer(Modifier.height(10.dp))
     ConsentBox(
@@ -198,7 +198,7 @@ private fun PrivacyStep(terms: Boolean, onTerms: (Boolean) -> Unit, onAccount: (
         title = L("Enviar datos de rendimiento (opcional)"),
         text = L("Modelo y sistema, versión, cuánto tarda en abrir, fluidez, memoria y minutos de uso, con un identificador aleatorio. ") +
             L("Un resumen a la semana; nada de lo que escuchas ni buscas. Sirve sólo para que la app vaya mejor; se borra a los 90 días."),
-        link = L("Qué se envía exactamente") to { uri.openUri("https://libremusic-landing.8toxbox8-69a.workers.dev/privacidad") },
+        link = L("Qué se envía exactamente") to { uri.openUri("https://pearmusic-by-toxbox.8toxbox8-69a.workers.dev/privacidad") },
     )
     Spacer(Modifier.height(22.dp))
     AccountPitch(inset = 0.dp)

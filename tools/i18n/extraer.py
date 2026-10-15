@@ -213,7 +213,7 @@ def main():
           "PanelKey.kt", "SupportFilter.kt", "SupportFilter.swift", "Logs.kt",
           "AppShortcuts.swift")  # App Intents exige literales: L() no compila ahí
     swift_data = ("AppleMusic.swift", "ExternalImport.swift", "Telemetry.swift", "Incident.swift", "Updates.swift",
-                  "Account.swift", "Auth.swift", "UserData.swift", "Lyrics.swift", "Releases.swift", "PendingImports.swift", "JamNet.swift",
+                  "Account.swift", "Auth.swift", "Ficha.swift", "UserData.swift", "Lyrics.swift", "Releases.swift", "PendingImports.swift", "JamNet.swift",
                   "Jam.swift", "Discography.swift", "Store.swift", "Player.swift", "AutoBackup.swift", "PlayStats.swift")
     for f in kt:
         if os.path.basename(f) in no:

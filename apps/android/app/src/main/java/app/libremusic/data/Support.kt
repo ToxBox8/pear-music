@@ -200,7 +200,10 @@ object SupportClient {
                 if (res.isSuccessful) {
                     // Desde ahora la campana pregunta por las respuestas a sus tickets.
                     context.getSharedPreferences("settings", Context.MODE_PRIVATE).edit().putBoolean("supportSent", true).apply()
-                    return@use Result(null, ticket = json?.optInt("ticket")?.takeIf { it > 0 })
+                    val ticket = json?.optInt("ticket")?.takeIf { it > 0 }
+                    // La ficha de este móvil, unida al ticket (el formulario lo avisa antes de enviar).
+                    if (ticket != null) Ficha.send(context, deviceId, ticket, d.kind, appVersion)
+                    return@use Result(null, ticket = ticket)
                 }
                 Result(
                     json?.optString("error")?.ifEmpty { null } ?: L("El servidor de soporte no responde ({0}). Prueba más tarde.", res.code),

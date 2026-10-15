@@ -969,3 +969,61 @@
 971	Malsupra breto inspirita de SimpMusic, de maxrave-dev (GPL-3.0)
 972	hieraŭ
 973	Elŝutante Pear Music {0}… {1} %
+974	Via retpoŝtadreso, la teksto kaj la profilo de ĉi tiu iPhone (modelo, versio de iOS kaj de la aplikaĵo kaj, se vi ŝaltis la telemetrion, ĝia rendimento) estos senditaj al la privata subteno de Pear Music.
+975	Via retpoŝtadreso, la teksto kaj la profilo de ĉi tiu telefono (modelo, versio de Android kaj de la aplikaĵo kaj, se vi ŝaltis la telemetrion, ĝia rendimento) estos senditaj al la privata subteno de Pear Music.
+976	Via retpoŝtadreso, la teksto, {0} foto(j) kaj la profilo de ĉi tiu iPhone (modelo, versio de iOS kaj de la aplikaĵo kaj, se vi ŝaltis la telemetrion, ĝia rendimento) estos senditaj al la privata subteno de Pear Music.
+977	Via retpoŝtadreso, la teksto, {0} foto(j) kaj la profilo de ĉi tiu telefono (modelo, versio de Android kaj de la aplikaĵo kaj, se vi ŝaltis la telemetrion, ĝia rendimento) estos senditaj al la privata subteno de Pear Music.
+978	Ĝisdatigoj
+979	Ne nun
+980	Agordoj povas esti en la breto aŭ supre en Hejmo, apud la Jam.
+981	Elŝutante novan version vi vidas la progreson, kaj la klasika breto ne plu markas Malkovri dum vi estas en Agordoj.
+982	Elŝutante novan version vi vidas la progreson, kaj se oni devas permesi instaladon, ĝi ne elŝutiĝas denove.
+983	Klasika breto
+984	Vitraj bretoj, butonoj kaj menuoj, kiuj refraktas tion, kio estas malantaŭe, kiel en iOS 26.
+985	Leterkesto kaj eraroj
+986	Castellano
+987	Castellano, català, valencià, galego, euskara, English, Esperanto kaj português. Ŝanĝiĝas tuj.
+988	Choose your language · Tria la llengua · Escolle o idioma · Aukeratu hizkuntza · Elektu vian lingvon · Escolha o idioma
+989	Kvin fenestraĵoj por la hejmekrano: Nun ludas (malgranda kaj granda), rapidaj aliroj, fiksita ludlisto kaj lastatempaj.
+990	Kiel granda kovrilo en Ludlistoj aŭ kiel vico en «Via muziko».
+991	Kun ĉiu raporto aŭ sugesto iras la profilo de via telefono (modelo kaj versioj), por helpi vin pli frue.
+992	Vitro (lumo kun la koloroj de la kovrilo), Aero (arĝento), Neono (synthwave) aŭ Sistemo. Kaj hela, malhela aŭ laŭ la telefono.
+993	Kiam la vico finiĝas, ĝi daŭras per radio de kantoj similaj al la lasta.
+994	Kiom okupas viaj elŝutitaj kantoj, kaj forigi ilin.
+995	Montru al mi la novaĵojn
+996	Skribu tion, kion vi serĉas, ekzemple «egaligilo» aŭ «etoso», kaj ĝi kondukas vin rekte al la opcio.
+997	Eksportu ĉion, kion la aplikaĵo konservas pri vi, al dosiero, aŭ forigu ĝin. Ĉi tie oni ankaŭ ŝaltas aŭ malŝaltas la telemetrion.
+998	Basoj, mezoj kaj altoj laŭ via gusto, kun antaŭagordoj.
+999	Gvidilo de Agordoj
+1000	La aplikaĵo kaj la ludilo prenas la kolorojn de la kanto, kiu sonas. Elektu kie kaj kiom, per antaŭagordoj aŭ laŭ via gusto.
+1001	La kanto malfortiĝas fine kaj la sekva eniras milde: 3, 6 aŭ 10 sekundoj.
+1002	La letero malfermas la sugestan leterkeston kaj la skarabo, «Raporti eraron». Ĉiu sendaĵo havas biletnumeron kaj la respondo atingas nur vin, en la sonorilo.
+1003	La klasika aŭ la SimpMusic-stila: vitra kapsulo kun guto, kiun vi trenas, Serĉi aparte kaj faldiĝo dum rulumado.
+1004	La paneoj kaj novaĵoj de Pear Music, ankaŭ kiel sciigoj se vi volas.
+1005	La novaĵoj de Pear Music {0}
+1006	La teknikaĵoj, falditaj: elŝuta kvalito, toleremo dum importado de ludlistoj kaj kaŝmemoro de kovriloj.
+1007	Maksimuma, aŭ datuma ŝparo kiam vi ne havas wifi-on. Elŝutoj ĉiam estas maksimumaj.
+1008	Normala, Kasedo, Vinilo aŭ Air. Oni ankaŭ ŝanĝas ĝin tenante premita la miniludilon.
+1009	Novaĵoj
+1010	Nova: ĝi gvidas vin tra ĉiuj Agordoj kaj klarigas ĉiun opcion. Ĝi estas apud la letero.
+1011	Nedeviga. Konservu vian bibliotekon en la nubo, ĉifritan per ŝlosilo kiun nur vi havas, kaj transportu ĝin al alia telefono.
+1012	Ordigu la langetojn trenante ilin. Ŝovu Malkovri maldekstren por forigi ĝin el la breto.
+1013	Pear Music nun haveblas en la portugala. Kaj «Español» nun nomiĝas «Castellano».
+1014	Português
+1015	Ke ĉiuj kantoj sonu same laŭte, sen mane plialtigi kaj mallaŭtigi la volumon.
+1016	Lastatempaj, A-Z, Z-A, laŭ grandeco aŭ mane. Per «Redakti ludlistojn» vi ordigas ilin trenante.
+1017	Eliri
+1018	Eliri el la gvidilo
+1019	Pli rapida subteno
+1020	Fini
+1021	Trairo tra ĉiuj Agordoj, kiu klarigas al vi ĉiun opcion. Ĝi estas apud la letero.
+1022	Breto supre en Hejmo aŭ aparta langeto.
+1023	Vidu denove la bonvenon, la trairon kaj la rakontojn.
+1024	Kaj krome
+1025	Nun vi konas ĉiujn Agordojn. Revenu al ĉi tiu gvidilo kiam ajn per la butono apud la letero.
+1026	Ĝi ne plu markas Malkovri dum vi estas en Agordoj.
+1027	Nun vi povas uzi Pear Music en la portugala. Kaj «Español» nun nomiĝas «Castellano».
+1028	{0} el {1}
+1029	Preta!
+941	Choose your language · Tria la llengua · Escolle o idioma · Aukeratu hizkuntza · Elektu vian lingvon
+956	Castellano

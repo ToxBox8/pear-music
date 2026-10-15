@@ -47,6 +47,12 @@ object Telemetry {
     /** null = aún no se ha preguntado (la guía inicial lo pregunta). */
     fun asked(c: Context) = prefs(c).contains("consent")
 
+    /** Lo que contestó la persona (en Pear Dev se mide siempre, pero la decisión es la suya). */
+    fun consented(c: Context) = prefs(c).getBoolean("consent", false)
+
+    /** El identificador de la telemetría, sólo si está activada (para unirla a la ficha del soporte). */
+    fun installIfEnabled(c: Context): String? = if (enabled(c)) install(c) else null
+
     fun setConsent(c: Context, on: Boolean) {
         val was = enabled(c)
         prefs(c).edit().putBoolean("consent", on).putLong("consentAt", System.currentTimeMillis()).apply()

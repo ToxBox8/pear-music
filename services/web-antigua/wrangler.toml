@@ -1,0 +1,7 @@
+# Redirección de la dirección antigua de la web (libremusic-landing) a la nueva (pearmusic-by-toxbox).
+# OJO: sólo se despliega DESPUÉS de renombrar el Worker de la web en Cloudflare; si no, pisaría la web.
+name = "libremusic-landing"
+main = "src/worker.js"
+compatibility_date = "2026-09-01"
+workers_dev = true
+preview_urls = false

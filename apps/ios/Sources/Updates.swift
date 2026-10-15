@@ -9,7 +9,7 @@ import UIKit
 @MainActor
 final class Updates: ObservableObject {
     static let shared = Updates()
-    static let url = URL(string: "https://libremusic-landing.8toxbox8-69a.workers.dev/version.json")!
+    static let url = URL(string: "https://pearmusic-by-toxbox.8toxbox8-69a.workers.dev/version.json")!
     static let snoozeSeconds: TimeInterval = 24 * 3600
     private static let checkEvery: TimeInterval = 6 * 3600
 

@@ -51,6 +51,7 @@ libremusic/
 ├─ scripts/web-1.0.py                      Lo llama ../lanzar-1.0.sh: pone la 1.0/2.0 en downloads.ts, changelog.ts y altstore.json
 ├─ services/soporte/                       Worker de Cloudflare: reportes de errores → Discord, rechazos y apelaciones (README con el despliegue)
 ├─ services/api/                           Worker pear-music-api: cuenta opcional, biblioteca cifrada y telemetría (D1; README)
+├─ services/web-antigua/                   Worker «libremusic-landing»: redirige la dirección antigua de la web a la nueva (301/308)
 ├─ services/estado/                        Worker pear-music-estado: kill switch firmado y botón de pánico (README, scripts de Discord y secretos)
 ├─ tools/estado/estado.mjs                 PC de Toxbox: clave Ed25519, lotes prefirmados y publicar estados
 ├─ tools/i18n/                             extraer.py (textos → L("…") y catálogo) y construir.py (<idioma>.json a las dos apps)
@@ -59,6 +60,7 @@ libremusic/
 │  ├─ tokens.json                          Fuente única de colores, temas, radios y letra
 │  ├─ gen_tokens.py                        Genera Tokens.swift y Tokens.kt
 │  ├─ render_icon.py · AppIcon*.svg        Iconos: AppIcon-Encendido (el de Pear Music) y AppIcon (logo antiguo, sólo historia de la marca)
+│  ├─ render_variant_icons.py              Iconos de Pear Dev y Pear Pref (Android por flavor e iOS AppIcon-Dev/-Pref)
 │  ├─ compare_shots.py                     Hoja de capturas iOS | Android
 │  └─ Inter-LICENSE.txt                    Licencia de la letra de Android
 ├─ docs/
@@ -89,7 +91,9 @@ libremusic/
    └─ release.yml                          GitHub Release al crear ios-v* / android-v*
 ```
 
-La web de descarga vive en otro repo: `ToxBox8/libremusic-landing`.
+La web de descarga vive en otro repo: `ToxBox8/libremusic-landing`, publicada en el Worker `pearmusic-by-toxbox`
+(https://pearmusic-by-toxbox.8toxbox8-69a.workers.dev desde el 15-10-2026). La dirección antigua
+(`libremusic-landing.8toxbox8-69a.workers.dev`) la ocupa `services/web-antigua`, que lo redirige todo a la nueva.
 
 ## iOS (`apps/ios/Sources`)
 
@@ -114,7 +118,7 @@ La web de descarga vive en otro repo: `ToxBox8/libremusic-landing`.
 | Variante (`Channel`), registro (`Logs`), exportar y borrar datos (`UserData`), cifrado local (`SecureBox`); pantallas Tus datos y Administración | `UserData.swift`, `DataViews.swift` |
 | Cuenta opcional y biblioteca cifrada; `AccountPitch` | `Account.swift`, `AccountView.swift` |
 | Bienvenida (en `AppSettings.swift`), recorrido, historias y primeros pasos | `Intro.swift` |
-| Telemetría, aviso de versión nueva, filtro local del soporte | `Telemetry.swift`, `Updates.swift`, `SupportFilter.swift` |
+| Telemetría, aviso de versión nueva, filtro local del soporte, ficha del dispositivo e instalaciones activas | `Telemetry.swift`, `Updates.swift`, `SupportFilter.swift`, `Ficha.swift` |
 | Importar de Apple Music; `Matcher` (emparejado con confianza) | `AppleMusic.swift` |
 | Importar de Spotify (enlace y CSV de Exportify) y SimpMusic (`.backup`), emparejado de listas e importaciones a medias | `ExternalImport.swift` |
 | Modo de capturas (`-screenshotScenario`) | `Screenshots.swift` |
@@ -137,7 +141,7 @@ La web de descarga vive en otro repo: `ToxBox8/libremusic-landing`.
 | `data/Discography.kt`, `ui/Search.kt` (`DiscographyScreen`) | Discografía completa (YouTube Music + MusicBrainz) | `Discography.swift`, `SearchViews.swift` (`DiscographyView`) |
 | `playback/Widgets.kt`, `playback/NowPlayingWidget.kt`, `ui/PersonalizationScreen.kt` | Widgets (Ahora suena pequeño y grande, accesos rápidos, playlist fijada, recientes) y Ajustes › Widgets | — (iOS aún sin widgets) |
 | `data/Incident.kt` (`Incident`, `Panic`) | Estado firmado (kill switch, niveles 0–3) y botón de pánico de Pear Dev | `Incident.swift` |
-| `data/Telemetry.kt`, `data/PanelKey.kt`, `data/Updates.kt`, `data/SupportFilter.kt` | Telemetría con consentimiento (resumen semanal; `PanelKey`: llave del panel por USB, sólo dev), aviso de versión nueva (APK verificado), filtro local del soporte | `Telemetry.swift`, `Updates.swift`, `SupportFilter.swift` |
+| `data/Telemetry.kt`, `data/PanelKey.kt`, `data/Updates.kt`, `data/SupportFilter.kt`, `data/Ficha.kt` | Telemetría con consentimiento (resumen semanal; `PanelKey`: llave del panel por USB, sólo dev), aviso de versión nueva (APK verificado), filtro local del soporte | `Telemetry.swift`, `Updates.swift`, `SupportFilter.swift` |
 | `ui/Kitchen.kt` | Componentes comunes | `Kitchen.swift`, `Images.swift` |
 | `avisos/`, `ui/Avisos.kt` | Avisos de Pear Music (canal privado de Discord → `/api/avisos` de la web): `AvisosRepo` (descarga, copia guardada, vistos, regla de 48 h sin repetir), `AvisosWorker` (WorkManager cada 15 min, notificaciones), campana `AvisosBell` en Inicio y pantalla `AvisosScreen` | `Avisos.swift` |
 | `ui/simpbar/` | Barra inferior estilo SimpMusic (opción `barStyle`), copiada de Open Menus: vidrio de Kyant, gota arrastrable, Buscar aparte, plegado 2.2.0 | Barra de pestañas de iOS 26 (`tabBarMinimizeBehavior`) |

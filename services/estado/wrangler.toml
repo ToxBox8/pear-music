@@ -9,8 +9,8 @@ preview_urls = false
 [vars]
 # Clave pública Ed25519 (base64) de `node tools/estado/estado.mjs clave`. La privada nunca sale del PC.
 PUBLIC_KEY = "XBII1upMDF2PUHjTFrJwYEyHbbiUM3TT2O+9kHuTlgI="
-DISCORD_ADMIN_ROLE = ""
-DISCORD_ADMIN_CHANNEL = ""
+DISCORD_ADMIN_ROLE = "1560291195417133176"
+DISCORD_ADMIN_CHANNEL = "1560291208209764437"
 
 [[kv_namespaces]]
 binding = "ESTADO"

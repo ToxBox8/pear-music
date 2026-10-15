@@ -122,6 +122,8 @@ struct HomeView: View {
                 }
             }
             .sheet(isPresented: $showSettings) { SettingsView() }
+            // Guía de Ajustes o novedades (1.1) con Ajustes arriba: se abre su hoja.
+            .onReceive(Guide.shared.$active) { if $0 != nil && settingsTop { showSettings = true } }
             .navigationDestination(isPresented: $showAvisos) { AvisosView() }
             .onReceive(avisos.$abrir.filter { $0 }) { _ in
                 avisos.abrir = false

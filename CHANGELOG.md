@@ -4,6 +4,16 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). C
 
 ## iOS
 
+### [2.1.0] — 2026-10-15 (build 13)
+- **Novedades al actualizar**: la primera vez que abres una versión nueva te cuenta lo nuevo y, si quieres, te lo enseña con un recorrido.
+- **Guía de Ajustes**: el botón junto a la carta te lleva por todos los Ajustes explicándote cada opción y personalización.
+- **Português**, y «Español» pasa a llamarse «Castellano».
+- La web se mueve a pearmusic-by-toxbox.8toxbox8-69a.workers.dev (la dirección antigua sigue funcionando).
+- La ficha de tu móvil (modelo, versión del sistema y de la app) va con cada reporte o sugerencia, para poder ayudarte mejor; si tienes la telemetría activada, se une a su rendimiento. El formulario lo avisa antes de enviar.
+- La app cuenta una vez al día que está activa, sin ningún identificador, para saber cuántas instalaciones hay de cada versión.
+- En modo seguro, el aviso de versión nueva sólo ofrece la versión que arregla el problema.
+- Pear Dev y Pear Pref (sólo pruebas) tienen icono propio.
+
 ### [2.0.0] — 2026-10-15 (build 12)
 - Pear Music tiene un solo icono, el de encendido: desaparece «Icono de la app» de Ajustes › Aspecto y quien tuviera el violeta vuelve al de encendido (iOS avisa una vez del cambio).
 - La copia de la biblioteca se exporta como `pear-music-library.json`.
@@ -107,6 +117,18 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). C
 - Primera versión distribuida desde la web (compilación «air-plata»): biblioteca Nueva 1.1, tema Aire en plata, reproductor Air, Descubrir (reels), Jam con amigos, Buscar en Inicio.
 
 ## Android
+
+### [1.1.0] — 2026-10-15 (versionCode 20)
+- **Novedades al actualizar**: la primera vez que abres una versión nueva te cuenta lo nuevo y, si quieres, te lo enseña con un recorrido.
+- **Guía de Ajustes**: el botón junto a la carta te lleva por todos los Ajustes explicándote cada opción y personalización.
+- **Português**, y «Español» pasa a llamarse «Castellano».
+- La web se mueve a pearmusic-by-toxbox.8toxbox8-69a.workers.dev (la dirección antigua sigue funcionando).
+- La barra clásica ya no marca Descubrir cuando estás en Ajustes (con Ajustes arriba en Inicio y el cristal líquido).
+- La ficha de tu móvil (modelo, versión del sistema y de la app) va con cada reporte o sugerencia, para poder ayudarte mejor; si tienes la telemetría activada, se une a su rendimiento. El formulario lo avisa antes de enviar.
+- La app cuenta una vez al día que está activa, sin ningún identificador, para saber cuántas instalaciones hay de cada versión.
+- En modo seguro, el aviso de versión nueva sólo ofrece la versión que arregla el problema.
+- Al descargar una versión nueva se ve el porcentaje, y si hay que dar permiso para instalar no se vuelve a descargar.
+- Pear Dev y Pear Pref (sólo pruebas) tienen icono propio.
 
 ### [1.0.0] — 2026-10-15 (versionCode 19)
 - Pear Music tiene un solo icono, el de encendido: desaparece «Icono de la app» de Ajustes › Aspecto y quien tuviera el violeta vuelve al de encendido al abrir la app (según el lanzador, puede que haya que volver a poner el acceso directo).

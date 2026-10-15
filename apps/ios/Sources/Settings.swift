@@ -100,6 +100,7 @@ struct SettingsRow: View {
             Spacer()
             if let value { Text(value).foregroundStyle(.secondary) }
         }
+        .tourTarget("row:\(title)") // la guía de Ajustes puede resaltar cualquier fila
     }
 }
 
@@ -116,7 +117,7 @@ struct SearchSettings: View {
                 }
                 .pickerStyle(.inline)
                 .labelsHidden()
-            } header: { Text(L("Dónde buscar")) } footer: {
+            } header: { Text(L("Dónde buscar")).tourTarget("section:" + L("Dónde buscar")) } footer: {
                 Text(searchPlacement == "tab"
                      ? L("Buscar tiene su propia pestaña en la barra de abajo.")
                      : L("La barra de búsqueda está siempre arriba en Inicio y la pestaña Buscar desaparece."))
@@ -152,7 +153,7 @@ struct AppearanceSettings: View {
                 .padding(.vertical, 6)
                 .listRowBackground(Color.clear)
                 .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
-            } header: { Text(L("Tema")) } footer: {
+            } header: { Text(L("Tema")).tourTarget("section:" + L("Tema")) } footer: {
                 Text(L("El tema cambia el fondo, las tarjetas, el color y la letra. Los fondos toman los colores de la carátula y se animan más mientras suena música."))
             }
 
@@ -164,7 +165,7 @@ struct AppearanceSettings: View {
                 }
                 .pickerStyle(.segmented)
                 .disabled(theme.scheme != nil)
-            } header: { Text(L("Claro u oscuro")) } footer: {
+            } header: { Text(L("Claro u oscuro")).tourTarget("section:" + L("Claro u oscuro")) } footer: {
                 if let forced = theme.scheme {
                     Text(forced == .dark ? L("«{0}» usa siempre el modo oscuro.", theme.name) : L("«{0}» usa siempre el modo claro.", theme.name))
                 }
@@ -228,7 +229,7 @@ struct PlayerSettings: View {
                 DeckPicker()
                     .listRowBackground(Color.clear)
                     .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
-            } header: { Text(L("Reproductor multimedia")) } footer: {
+            } header: { Text(L("Reproductor multimedia")).tourTarget("section:" + L("Reproductor multimedia")) } footer: {
                 Text(L("Casete: gira una bobina o arrastra la cinta para avanzar o rebobinar. Vinilo: gira el disco con el dedo o mueve el brazo. Con el iPhone en horizontal, el casete o el vinilo ocupan toda la pantalla. También puedes cambiarlo manteniendo pulsado el mini reproductor."))
             }
 
@@ -258,7 +259,7 @@ struct LibrarySettings: View {
 
     var body: some View {
         Form {
-            Section(L("Ordenar playlists por")) {
+            Section {
                 Picker(L("Ordenar"), selection: $sort) {
                     Text(L("Añadidas recientemente")).tag("recent")
                     Text(L("Nombre (A-Z)")).tag("name")
@@ -268,7 +269,7 @@ struct LibrarySettings: View {
                 }
                 .pickerStyle(.inline)
                 .labelsHidden()
-            }
+            } header: { Text(L("Ordenar playlists por")).tourTarget("section:" + L("Ordenar playlists por")) }
             .glassRow()
 
             Section {
@@ -285,7 +286,7 @@ struct LibrarySettings: View {
                 }
                 .pickerStyle(.inline)
                 .labelsHidden()
-            } header: { Text(L("Descargadas y Favoritos")) } footer: {
+            } header: { Text(L("Descargadas y Favoritos")).tourTarget("section:" + L("Descargadas y Favoritos")) } footer: {
                 Text(placement == "music" ? L("Aparecen como filas en «Tu música», encima de Canciones.") : L("Aparecen con su portada grande en el carrusel de Playlists."))
             }
             .glassRow()
@@ -297,7 +298,7 @@ struct LibrarySettings: View {
                 }
                 .pickerStyle(.inline)
                 .labelsHidden()
-            } header: { Text(L("Dónde está Buscar")) } footer: {
+            } header: { Text(L("Dónde está Buscar")).tourTarget("section:" + L("Dónde está Buscar")) } footer: {
                 Text(searchPlacement == "tab"
                      ? L("Buscar tiene su propia pestaña en la barra de abajo, justo después de Inicio.")
                      : L("La barra de búsqueda está siempre arriba en Inicio."))

@@ -103,6 +103,13 @@ struct FlagView: View {
                 rect(CGRect(x: 0, y: h / 2 - h * 0.17, width: w, height: h * 0.34), .white)
                 rect(CGRect(x: w / 2 - h * 0.1, y: 0, width: h * 0.2, height: h), Color(hex: 0xC8102E))
                 rect(CGRect(x: 0, y: h / 2 - h * 0.1, width: w, height: h * 0.2), Color(hex: 0xC8102E))
+            case "pt":
+                // Portugal: verde y rojo (2:3) con la esfera armilar amarilla en la unión.
+                rect(CGRect(x: 0, y: 0, width: w * 0.4, height: h), Color(hex: 0x006600))
+                rect(CGRect(x: w * 0.4, y: 0, width: w * 0.6, height: h), Color(hex: 0xFF0000))
+                let c = CGPoint(x: w * 0.4, y: h / 2)
+                ctx.fill(Path(ellipseIn: CGRect(x: c.x - h * 0.24, y: c.y - h * 0.24, width: h * 0.48, height: h * 0.48)), with: .color(Color(hex: 0xFFCC00)))
+                ctx.fill(Path(ellipseIn: CGRect(x: c.x - h * 0.13, y: c.y - h * 0.13, width: h * 0.26, height: h * 0.26)), with: .color(Color(hex: 0xFF0000)))
             case "eo":
                 let green = Color(hex: 0x009900)
                 rect(CGRect(x: 0, y: 0, width: w, height: h), green)

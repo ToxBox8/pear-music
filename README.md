@@ -9,10 +9,10 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/licencia-GPL--3.0-8B5CF6" alt="Licencia GPL-3.0"></a>
 
   <h3>Descargar</h3>
-  <a href="https://libremusic-landing.8toxbox8-69a.workers.dev"><img src="https://img.shields.io/badge/Web-Pear%20Music-8B5CF6?style=for-the-badge&logoColor=white" alt="Web de Pear Music"></a>
+  <a href="https://pearmusic-by-toxbox.8toxbox8-69a.workers.dev"><img src="https://img.shields.io/badge/Web-Pear%20Music-8B5CF6?style=for-the-badge&logoColor=white" alt="Web de Pear Music"></a>
   <a href="https://github.com/ToxBox8/pear-music/releases?q=android&expanded=true"><img src="https://img.shields.io/badge/Android-APK-34C759?style=for-the-badge&logo=android&logoColor=white" alt="APK de Android"></a>
-  <a href="https://libremusic-landing.8toxbox8-69a.workers.dev/instalar/iphone"><img src="https://img.shields.io/badge/iPhone-AltStore%20%C2%B7%20SideStore-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="iPhone con AltStore o SideStore"></a>
-  <br><sub>Fuente de AltStore/SideStore: <code>https://libremusic-landing.8toxbox8-69a.workers.dev/altstore.json</code></sub>
+  <a href="https://pearmusic-by-toxbox.8toxbox8-69a.workers.dev/instalar/iphone"><img src="https://img.shields.io/badge/iPhone-AltStore%20%C2%B7%20SideStore-0A84FF?style=for-the-badge&logo=apple&logoColor=white" alt="iPhone con AltStore o SideStore"></a>
+  <br><sub>Fuente de AltStore/SideStore: <code>https://pearmusic-by-toxbox.8toxbox8-69a.workers.dev/altstore.json</code></sub>
 </div>
 
 ## Qué hace
@@ -47,9 +47,9 @@
 ## Instalar
 
 - **Android**: descarga el APK de [Releases](https://github.com/ToxBox8/pear-music/releases) o de la
-  [web](https://libremusic-landing.8toxbox8-69a.workers.dev/instalar/android). También con Obtainium.
+  [web](https://pearmusic-by-toxbox.8toxbox8-69a.workers.dev/instalar/android). También con Obtainium.
 - **iPhone**: con AltStore o SideStore, añade la fuente `altstore.json` (arriba) o instala el `.ipa` de Releases con
-  Sideloadly. Paso a paso en la [web](https://libremusic-landing.8toxbox8-69a.workers.dev/instalar/iphone).
+  Sideloadly. Paso a paso en la [web](https://pearmusic-by-toxbox.8toxbox8-69a.workers.dev/instalar/iphone).
 
 ## Créditos
 
@@ -75,7 +75,7 @@ derechos de autor de la música. Las descargas son para escuchar sin conexión d
 
 Sin anuncios ni rastreo. La biblioteca, las estadísticas y las descargas se quedan en el móvil. La telemetría de
 rendimiento y la cuenta son opcionales, están apagadas por defecto y se pueden borrar desde la app. Detalles en la
-[política de privacidad](https://libremusic-landing.8toxbox8-69a.workers.dev/privacidad).
+[política de privacidad](https://pearmusic-by-toxbox.8toxbox8-69a.workers.dev/privacidad).
 
 ## Código
 

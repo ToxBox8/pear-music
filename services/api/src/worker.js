@@ -6,6 +6,10 @@ import {
   decryptEmail, emailMac, encryptEmail, normalizeEmail, randomCode, randomToken, sameHex, sha256,
 } from "./crypto.js";
 import { RETENTION_DAYS, panelAuthorized, panelSummary, telemetryProblem } from "./telemetry.js";
+import {
+  ACTIVOS_RETENTION_DAYS, FICHA_RETENTION_DAYS, activoProblem, countActivo, countDecision, decisionProblem, dispositivos,
+  fichaProblem, saveFicha, today,
+} from "./fichas.js";
 
 export const LIMITS = {
   codeTtlMs: 10 * 60_000,
@@ -13,6 +17,8 @@ export const LIMITS = {
   codesPerEmailPerHour: 3,
   codesPerIpPerHour: 10,
   telemetryPerInstallPerHour: 6,
+  fichasPerDevicePerHour: 10,
+  activosPerIpPerHour: 30,
   libraryMaxBytes: 2_000_000, // base64 del blob cifrado
   bodyMaxBytes: 2_100_000,
 };
@@ -185,6 +191,39 @@ export async function handle(request, env, now = Date.now()) {
     return json(202, { ok: true });
   }
 
+  // Ficha del dispositivo: la app la manda al enviar un reporte o una sugerencia (el formulario lo avisa).
+  if (route === "POST /v1/ficha") {
+    const { body, error } = await readJson(request);
+    if (error) return error;
+    const problem = fichaProblem(body);
+    if (problem) return json(400, { error: problem });
+    if (await limited(env, `ficha:${body.ficha}`, LIMITS.fichasPerDevicePerHour, now)) return json(429, { error: "Demasiadas fichas." });
+    await saveFicha(env.DB, body, now);
+    return json(202, { ok: true });
+  }
+
+  // Instalaciones activas: cada app avisa una vez al día. Sólo se suma uno al contador; no se guarda nada más.
+  if (route === "POST /v1/activo") {
+    const { body, error } = await readJson(request);
+    if (error) return error;
+    const problem = activoProblem(body);
+    if (problem) return json(400, { error: problem });
+    if (await limited(env, `act:${request.headers.get("cf-connecting-ip") ?? "?"}`, LIMITS.activosPerIpPerHour, now)) return json(429, { error: "Demasiadas peticiones." });
+    await countActivo(env.DB, body, now);
+    return json(202, { ok: true });
+  }
+
+  // Decisión sobre la telemetría (sí/no): sólo contadores, sin identificadores.
+  if (route === "POST /v1/consentimiento") {
+    const { body, error } = await readJson(request);
+    if (error) return error;
+    const problem = decisionProblem(body);
+    if (problem) return json(400, { error: problem });
+    if (await limited(env, `dec:${request.headers.get("cf-connecting-ip") ?? "?"}`, LIMITS.activosPerIpPerHour, now)) return json(429, { error: "Demasiadas peticiones." });
+    await countDecision(env.DB, body);
+    return json(202, { ok: true });
+  }
+
   // Panel de telemetría (Fase 4b): sólo desde la web y con la llave que Pear Dev da por el cable.
   if (url.pathname === "/v1/telemetria/panel") {
     const cors = {
@@ -197,7 +236,7 @@ export async function handle(request, env, now = Date.now()) {
     if (request.method !== "GET") return json(405, { error: "Método no permitido." });
     if (await limited(env, `panel:${request.headers.get("cf-connecting-ip") ?? "?"}`, 60, now)) return json(429, { error: "Demasiadas peticiones." });
     const ok = await panelAuthorized(env, request.headers.get("authorization"), now);
-    const r = ok ? json(200, await panelSummary(env.DB)) : json(401, { error: "Conecta el móvil por USB y abre Pear Dev." });
+    const r = ok ? json(200, { ...(await panelSummary(env.DB)), dispositivos: await dispositivos(env.DB, now) }) : json(401, { error: "Conecta el móvil por USB y abre Pear Dev." });
     for (const [k, v] of Object.entries(cors)) r.headers.set(k, v);
     return r;
   }
@@ -207,7 +246,10 @@ export async function handle(request, env, now = Date.now()) {
     const { body, error } = await readJson(request);
     if (error) return error;
     if (typeof body?.install !== "string" || !/^[a-f0-9]{32,64}$/.test(body.install)) return json(400, { error: "Identificador no válido." });
-    await env.DB.prepare("DELETE FROM telemetry WHERE install = ?").bind(body.install).run();
+    await env.DB.batch([
+      env.DB.prepare("DELETE FROM telemetry WHERE install = ?").bind(body.install),
+      env.DB.prepare("UPDATE fichas SET install = NULL WHERE install = ?").bind(body.install),
+    ]);
     return json(200, { ok: true });
   }
 
@@ -219,6 +261,8 @@ export async function cleanup(env, now = Date.now()) {
   await env.DB.batch([
     env.DB.prepare("DELETE FROM telemetry WHERE received < ?").bind(now - RETENTION_DAYS * 86_400_000),
     env.DB.prepare("DELETE FROM codes WHERE expires < ?").bind(now),
+    env.DB.prepare("DELETE FROM fichas WHERE last_seen < ?").bind(now - FICHA_RETENTION_DAYS * 86_400_000),
+    env.DB.prepare("DELETE FROM activos WHERE day < ?").bind(today(now - ACTIVOS_RETENTION_DAYS * 86_400_000)),
   ]);
 }
 

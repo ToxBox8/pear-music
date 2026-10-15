@@ -33,7 +33,7 @@ enum EstadoAvisos: Equatable {
 @MainActor
 final class AvisosStore: ObservableObject {
     static let shared = AvisosStore()
-    static let url = URL(string: "https://libremusic-landing.8toxbox8-69a.workers.dev/api/avisos")!
+    static let url = URL(string: "https://pearmusic-by-toxbox.8toxbox8-69a.workers.dev/api/avisos")!
     /// Sólo se notifica en el móvil lo publicado en las últimas 48 h (como SimpMusic con su blog).
     static let ventanaNotificar: TimeInterval = 48 * 3600
     static let tareaFondo = "com.example.libremusic.avisos"

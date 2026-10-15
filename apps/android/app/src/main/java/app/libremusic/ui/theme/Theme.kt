@@ -132,6 +132,11 @@ object Prefs {
     private val _termsAccepted = MutableStateFlow(true)
     val termsAccepted: StateFlow<Boolean> = _termsAccepted.asStateFlow()
     /** Lo que queda de la bienvenida tras la guía: "tour" → "stories" → "" (y la lista de primeros pasos en Inicio). */
+    /** Última versión («1.1») cuyas novedades se han visto; en una instalación nueva, la actual (1.1). */
+    private val _whatsNewSeen = MutableStateFlow("")
+    val whatsNewSeen: StateFlow<String> = _whatsNewSeen.asStateFlow()
+    fun setWhatsNewSeen(v: String) { _whatsNewSeen.value = v; sp.edit().putString("whatsNewSeen", v).apply() }
+
     private val _introStage = MutableStateFlow("")
     val introStage: StateFlow<String> = _introStage.asStateFlow()
     /** Al acabar la bienvenida, abrir Ajustes › Cuenta (eligió «Crear mi cuenta»). */
@@ -176,6 +181,9 @@ object Prefs {
         _termsAccepted.value = sp.getLong("termsAcceptedAt", 0) > 0
         _showDiscover.value = sp.getBoolean("showDiscover", true)
         _introStage.value = sp.getString("introStage", "") ?: ""
+        _whatsNewSeen.value = sp.getString("whatsNewSeen", null) ?: if (fresh) app.libremusic.ui.WhatsNew.current.also {
+            sp.edit().putString("whatsNewSeen", it).apply()
+        } else ""
         _firstSteps.value = sp.getStringSet("firstSteps", null)?.toSet() ?: if (fresh) emptySet() else setOf("hidden")
         setMatchTolerance(sp.getInt("matchTolerance", 4), save = false)
         setCrossfade(sp.getInt("crossfade", 0), save = false)

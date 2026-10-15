@@ -51,6 +51,20 @@ Se borra sola a los **90 días** (tarea diaria).
   enviado desde esa instalación (`DELETE /v1/telemetria`) y cambia el identificador.
 - **Borrar todos mis datos** hace lo mismo antes de borrar el móvil.
 
+## Ficha del dispositivo e instalaciones activas (15-10-2026)
+
+- **Ficha** (`POST /v1/ficha`, `data/Ficha.kt` y `Ficha.swift`): con cada reporte o sugerencia que recibe número de
+  ticket. Campos: `ficha` (SHA-256 del id anónimo del soporte), `platform`, `channel`, `app_version`, `os_version`,
+  `device_model`, `ticket`, `kind` y, sólo con la telemetría activada, `install`. Lista cerrada como la telemetría.
+  Se guarda en la tabla `fichas` y se borra a los 180 días sin reportes; al retirar la telemetría se quita `install`.
+- **Activos** (`POST /v1/activo`): una vez al día (UTC), `platform`, `channel` y `app_version`. Sólo suma uno al
+  contador de ese día; no se guarda nada más. Se borra a los 400 días.
+- **Decisión** (`POST /v1/consentimiento`): tras contestar la privacidad, `decision` («si»/«no») y, si cambió, `antes`
+  para restarla. Sólo contadores por plataforma y variante (tabla `decisiones`); lo pidió Toxbox para saber cuántos
+  dicen que no.
+- En el panel (`/panel-t`), por pestañas: **Instalaciones** (activas y decisiones), **Dispositivos** (perfiles con
+  buscador: ficha, tickets e historial de telemetría de los 12 últimos informes, sin el id) y **Rendimiento**.
+
 ## Panel (sólo Toxbox)
 
 Página escondida de la web (`/panel-t`, sin enlaces y `noindex`) que **sólo existe con el móvil de Toxbox

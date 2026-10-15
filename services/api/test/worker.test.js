@@ -169,3 +169,98 @@ test("disponible: sólo con remitente configurado", async () => {
   assert.equal((await (await handle(req("GET", "/v1/cuenta/disponible"), fakeEnv())).json()).available, true);
   assert.equal((await (await handle(req("GET", "/v1/cuenta/disponible"), { ...fakeEnv(), MAIL_FROM: "" })).json()).available, false);
 });
+
+const ficha = {
+  ficha: "f".repeat(64), platform: "android", channel: "usr", app_version: "1.0.1",
+  os_version: "Android 16", device_model: "Nothing A065", ticket: 12, kind: "error",
+};
+
+test("ficha: se crea con el reporte, suma tickets y rechaza campos de más", async () => {
+  const env = fakeEnv();
+  const now = Date.now();
+  assert.equal((await handle(req("POST", "/v1/ficha", ficha), env, now)).status, 202);
+  assert.equal((await handle(req("POST", "/v1/ficha", { ...ficha, ticket: 13, kind: "sugerencia" }), env, now + 1)).status, 202);
+  assert.equal((await handle(req("POST", "/v1/ficha", { ...ficha, ticket: 13 }), env, now + 2)).status, 202, "repetido no duplica");
+  const row = env.DB.raw.prepare("SELECT * FROM fichas").get();
+  assert.deepEqual(JSON.parse(row.tickets).map((t) => t.n), [12, 13]);
+  assert.equal(row.first_seen, now);
+  assert.equal(row.install, null, "sin telemetría no hay id de telemetría");
+  assert.equal((await handle(req("POST", "/v1/ficha", { ...ficha, email: "x@y.es" }), env)).status, 400);
+  assert.equal((await handle(req("POST", "/v1/ficha", { ...ficha, ficha: "corto" }), env)).status, 400);
+  assert.equal((await handle(req("POST", "/v1/ficha", { ...ficha, kind: "otro" }), env)).status, 400);
+});
+
+test("ficha + telemetría: el panel las une sin enseñar el id; retirarla las separa", async () => {
+  const env = fakeEnv();
+  const { publicKey, privateKey } = await crypto.subtle.generateKey({ name: "Ed25519" }, true, ["sign", "verify"]);
+  env.PANEL_PUBLIC_KEY = btoa(String.fromCharCode(...new Uint8Array(await crypto.subtle.exportKey("raw", publicKey))));
+  const b64u = (u) => btoa(String.fromCharCode(...u)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  const now = Date.now();
+  const payload = new TextEncoder().encode(JSON.stringify({ exp: now + 60_000 }));
+  const auth = `Panel ${b64u(payload)}.${b64u(new Uint8Array(await crypto.subtle.sign({ name: "Ed25519" }, privateKey, payload)))}`;
+  await handle(req("POST", "/v1/telemetria", report), env, now);
+  await handle(req("POST", "/v1/ficha", { ...ficha, install: report.install }), env, now);
+  await handle(req("POST", "/v1/activo", { platform: "android", channel: "usr", app_version: "1.0.1" }), env, now);
+  await handle(req("POST", "/v1/activo", { platform: "ios", channel: "usr", app_version: "2.0.1" }), env, now);
+  const panel = async () => (await handle(req("GET", "/v1/telemetria/panel", undefined, { authorization: auth }), env, now)).json();
+  const data = await panel();
+  const [f] = data.dispositivos.fichas;
+  assert.equal(f.telemetria, true);
+  assert.equal(f.week, report.week);
+  assert.equal(f.tickets[0].n, 12);
+  assert.equal(f.id.length, 10);
+  assert.equal(data.dispositivos.activosPorDia[0].total, 2);
+  assert.equal(data.dispositivos.activosPorDia[0].ios, 1);
+  assert.ok(!JSON.stringify(data).includes(report.install), "el panel no enseña el id de telemetría");
+  await handle(req("DELETE", "/v1/telemetria", { install: report.install }), env, now);
+  assert.equal((await panel()).dispositivos.fichas[0].telemetria, false);
+});
+
+test("activos: sólo un contador, sin identificadores", async () => {
+  const env = fakeEnv();
+  const a = { platform: "android", channel: "usr", app_version: "1.0.0" };
+  for (let i = 0; i < 3; i++) assert.equal((await handle(req("POST", "/v1/activo", a), env)).status, 202);
+  assert.equal(env.DB.raw.prepare("SELECT n FROM activos").get().n, 3);
+  assert.deepEqual(Object.keys(env.DB.raw.prepare("SELECT * FROM activos").get()).sort(), ["app_version", "channel", "day", "n", "platform"]);
+  assert.equal((await handle(req("POST", "/v1/activo", { ...a, install: "a".repeat(32) }), env)).status, 400);
+});
+
+test("limpieza: fichas sin reportes en 180 días fuera", async () => {
+  const env = fakeEnv();
+  const now = Date.now();
+  await handle(req("POST", "/v1/ficha", ficha), env, now - 181 * 86_400_000);
+  await handle(req("POST", "/v1/ficha", { ...ficha, ficha: "e".repeat(64) }), env, now);
+  await cleanup(env, now);
+  assert.equal(env.DB.raw.prepare("SELECT count(*) AS n FROM fichas").get().n, 1);
+});
+
+test("decisiones: cuenta sí y no, y un cambio mueve el contador", async () => {
+  const env = fakeEnv();
+  const base = { platform: "android", channel: "usr", app_version: "1.0.1" };
+  await handle(req("POST", "/v1/consentimiento", { ...base, decision: "no" }), env);
+  await handle(req("POST", "/v1/consentimiento", { ...base, decision: "no" }), env);
+  await handle(req("POST", "/v1/consentimiento", { ...base, decision: "si", antes: "no" }), env);
+  const n = (d) => env.DB.raw.prepare("SELECT n FROM decisiones WHERE decision = ?").get(d).n;
+  assert.equal(n("no"), 1);
+  assert.equal(n("si"), 1);
+  assert.equal((await handle(req("POST", "/v1/consentimiento", { ...base, decision: "quizá" }), env)).status, 400);
+  assert.equal((await handle(req("POST", "/v1/consentimiento", { ...base, decision: "no", install: "a".repeat(32) }), env)).status, 400);
+});
+
+test("perfil: el historial de telemetría va con la ficha, sin el identificador", async () => {
+  const env = fakeEnv();
+  const { publicKey, privateKey } = await crypto.subtle.generateKey({ name: "Ed25519" }, true, ["sign", "verify"]);
+  env.PANEL_PUBLIC_KEY = btoa(String.fromCharCode(...new Uint8Array(await crypto.subtle.exportKey("raw", publicKey))));
+  const b64u = (u) => btoa(String.fromCharCode(...u)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  const now = Date.now();
+  const payload = new TextEncoder().encode(JSON.stringify({ exp: now + 60_000 }));
+  const auth = `Panel ${b64u(payload)}.${b64u(new Uint8Array(await crypto.subtle.sign({ name: "Ed25519" }, privateKey, payload)))}`;
+  await handle(req("POST", "/v1/telemetria", report), env, now - 1000);
+  await handle(req("POST", "/v1/telemetria", { ...report, week: "2026-W43" }), env, now);
+  await handle(req("POST", "/v1/ficha", { ...ficha, install: report.install }), env, now);
+  const data = await (await handle(req("GET", "/v1/telemetria/panel", undefined, { authorization: auth }), env, now)).json();
+  const [f] = data.dispositivos.fichas;
+  assert.deepEqual(f.historial.map((h) => h.week), ["2026-W43", "2026-W42"]);
+  assert.ok(!JSON.stringify(data).includes(report.install));
+  assert.ok(Array.isArray(data.dispositivos.decisiones));
+});

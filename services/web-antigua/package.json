@@ -1,0 +1,6 @@
+{
+  "name": "web-antigua",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node --no-warnings --test test/*.test.js" }
+}

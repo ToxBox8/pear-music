@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Icono de Pear Dev (sólo el móvil de Toxbox): generado por shared/design/render_variant_icons.py. -->
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@color/icon_variant_bg" />
+    <foreground android:drawable="@drawable/ic_launcher_variant" />
+    <monochrome android:drawable="@drawable/ic_launcher_power" />
+</adaptive-icon>

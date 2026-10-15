@@ -27,7 +27,7 @@ import java.security.MessageDigest
  * Igual que `Updates` en iOS (que abre AltStore/SideStore porque iOS no deja instalar desde la app).
  */
 object Updates {
-    const val URL = "https://libremusic-landing.8toxbox8-69a.workers.dev/version.json"
+    const val URL = "https://pearmusic-by-toxbox.8toxbox8-69a.workers.dev/version.json"
     private const val CHECK_EVERY_MS = 6 * 3_600_000L
     const val SNOOZE_MS = 24 * 3_600_000L
 

@@ -11,7 +11,7 @@ preview_urls = false
 MAIL_FROM = ""
 # Panel de telemetría (Fase 4b): clave pública de Pear Dev (Administración › Copiar clave pública) y la web.
 PANEL_PUBLIC_KEY = "nN1ybcOUBiQ3nmCDTYU8GSEQMEbVH1iAE6bdYqdFOuU="
-PANEL_ORIGIN = "https://libremusic-landing.8toxbox8-69a.workers.dev"
+PANEL_ORIGIN = "https://pearmusic-by-toxbox.8toxbox8-69a.workers.dev"
 
 [[d1_databases]]
 binding = "DB"

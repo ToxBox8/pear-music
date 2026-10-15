@@ -969,3 +969,61 @@
 971	Barra inferior inspirada en SimpMusic, de maxrave-dev (GPL-3.0)
 972	onte
 973	Descargando Pear Music {0}… {1} %
+974	Enviaranse o teu correo, o texto e a ficha deste iPhone (modelo, versión de iOS e da app e, se tes a telemetría activada, o seu rendemento) ao soporte privado de Pear Music.
+975	Enviaranse o teu correo, o texto e a ficha deste móbil (modelo, versión de Android e da app e, se tes a telemetría activada, o seu rendemento) ao soporte privado de Pear Music.
+976	Enviaranse o teu correo, o texto, {0} foto(s) e a ficha deste iPhone (modelo, versión de iOS e da app e, se tes a telemetría activada, o seu rendemento) ao soporte privado de Pear Music.
+977	Enviaranse o teu correo, o texto, {0} foto(s) e a ficha deste móbil (modelo, versión de Android e da app e, se tes a telemetría activada, o seu rendemento) ao soporte privado de Pear Music.
+978	Actualizacións
+979	Agora non
+980	Axustes pode ir na barra ou arriba en Inicio, xunto ao Jam.
+981	Ao descargar unha versión nova ves o progreso, e a barra clásica xa non marca Descubrir cando estás en Axustes.
+982	Ao descargar unha versión nova ves o progreso, e se hai que dar permiso para instalar non se volve descargar.
+983	Barra clásica
+984	Barras, botóns e menús de cristal que refractan o que hai detrás, como en iOS 26.
+985	Buzón e erros
+986	Castellano
+987	Castellano, català, valencià, galego, euskara, English, Esperanto e português. Cambia ao momento.
+988	Choose your language · Tria la llengua · Escolle o idioma · Aukeratu hizkuntza · Elektu vian lingvon · Escolha o idioma
+989	Cinco widgets para a pantalla de inicio: Agora soa (pequeno e grande), accesos rápidos, unha playlist fixada e recentes.
+990	Como portada grande en Playlists ou como fila en «A túa música».
+991	Con cada informe ou suxestión vai a ficha do teu móbil (modelo e versións), para axudarte antes.
+992	Cristal (luz coas cores da portada), Aire (prata), Neón (synthwave) ou Sistema. E claro, escuro ou segundo o móbil.
+993	Cando se acaba a cola, segue cunha radio de cancións parecidas á última.
+994	Canto ocupan as túas cancións descargadas e borralas.
+995	Amósame o novo
+996	Escribe o que buscas, por exemplo «ecualizador» ou «tema», e lévate directo á opción.
+997	Exporta todo o que a app garda de ti nun ficheiro ou bórrao. Aquí tamén se activa ou se quita a telemetría.
+998	Graves, medios e agudos ao teu gusto, con predefinidos.
+999	Guía de Axustes
+1000	A app e o reprodutor collen as cores da canción que soa. Escolle onde e canto, con predefinidos ou ao teu gusto.
+1001	A canción baixa ao final e a seguinte entra suave: 3, 6 ou 10 segundos.
+1002	A carta abre o buzón de suxestións e o escaravello, «Informar dun erro». Cada envío ten número de tíquet e a resposta chégache só a ti, á campá.
+1003	A clásica ou a estilo SimpMusic: cápsula de cristal cunha pinga que arrastras, Buscar á parte e pregada ao baixar.
+1004	As caídas e novidades de Pear Music, tamén como notificación se queres.
+1005	O novo de Pear Music {0}
+1006	O técnico, pregado: calidade de descarga, tolerancia ao importar playlists e caché de portadas.
+1007	Máxima, ou aforro de datos cando non tes wifi. As descargas sempre van á máxima.
+1008	Normal, Casete, Vinilo ou Air. Tamén se cambia mantendo premido o minirreprodutor.
+1009	Novidades
+1010	Nova: lévate por todos os Axustes e explícache cada opción. Está xunto á carta.
+1011	Opcional. Garda a túa biblioteca na nube, cifrada cunha chave que só tes ti, e pásaa a outro móbil.
+1012	Ordena as lapelas arrastrándoas. Despraza Descubrir á esquerda para quitala da barra.
+1013	Pear Music xa está en portugués. E «Español» agora chámase «Castellano».
+1014	Português
+1015	Que todas as cancións soen igual de forte, sen subir e baixar o volume a man.
+1016	Recentes, A-Z, Z-A, por tamaño ou a man. Con «Editar playlists» ordénalas arrastrando.
+1017	Saír
+1018	Saír da guía
+1019	Soporte máis rápido
+1020	Rematar
+1021	Un percorrido por todos os Axustes que che explica cada opción. Está xunto á carta.
+1022	Unha barra arriba en Inicio ou unha lapela á parte.
+1023	Volve ver a benvida, o percorrido e as historias.
+1024	E ademais
+1025	Xa coñeces todos os Axustes. Volve a esta guía cando queiras co botón xunto á carta.
+1026	Xa non marca Descubrir cando estás en Axustes.
+1027	Xa podes usar Pear Music en português. E «Español» agora chámase «Castellano».
+1028	{0} de {1}
+1029	Listo!
+941	Choose your language · Tria la llengua · Escolle o idioma · Aukeratu hizkuntza · Elektu vian lingvon
+956	Castellano

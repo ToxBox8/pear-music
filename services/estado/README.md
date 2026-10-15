@@ -72,8 +72,9 @@ Si el subdominio de workers.dev no es `8toxbox8-69a`, cambia la URL en `Incident
 
 **Desplegado el 15-10-2026** (KV `ESTADO` = `013da6ec…`). Hecho: pasos 1 y 5 (`ADMIN_TOKEN` en
 `~/.config/pear-music/estado.env`, primer lote de 20 cambios válido 30 días: **renovarlo antes del 14-11**). Sin
-estado publicado `/estado` responde 204 y las apps siguen normal. Falta (Toxbox): paso 2 sin el `ADMIN_TOKEN`
-(contraseña del pánico y TOTP), paso 3 (`ALERT_WEBHOOK`) y paso 4 (aplicación de Discord del pánico).
+estado publicado `/estado` responde 204 y las apps siguen normal. Pasos 3 y 4 hechos el mismo día (app «Pear Music panico» 1560290517122687078, `/panico`
+registrado, rol Admin Pear y canal privado #panico con el webhook de alertas; datos en
+`~/.config/pear-music/discord-panico.env`). Falta (Toxbox): paso 2, `node scripts/preparar-secretos.mjs` (contraseña y TOTP).
 
 ## Probar sin desplegar
 

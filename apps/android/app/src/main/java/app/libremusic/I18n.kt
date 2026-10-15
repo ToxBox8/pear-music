@@ -17,13 +17,15 @@ object I18n {
     data class Lang(val code: String, val name: String, val spain: Boolean)
 
     val LANGS = listOf(
-        Lang("es", "Español", true),
+        // «Castellano» (1.1, lo pidió Toxbox): dentro del grupo de España se distingue mejor de los otros cuatro.
+        Lang("es", "Castellano", true),
         Lang("ca", "Català", true),
         Lang("va", "Valencià", true),
         Lang("gl", "Galego", true),
         Lang("eu", "Euskara", true),
         Lang("en", "English", false),
         Lang("eo", "Esperanto", false),
+        Lang("pt", "Português", false),
     )
 
     private val _lang = MutableStateFlow("es")
@@ -36,7 +38,7 @@ object I18n {
     /** El del sistema si es uno de los nuestros (valenciano: catalán con la variante «valencia»); si no, español. */
     fun systemDefault(locale: java.util.Locale = java.util.Locale.getDefault()): String = when (locale.language) {
         "ca" -> if (locale.variant.equals("valencia", true) || locale.toLanguageTag().contains("valencia", true)) "va" else "ca"
-        "gl", "eu", "en", "eo" -> locale.language
+        "gl", "eu", "en", "eo", "pt" -> locale.language
         else -> "es"
     }
 

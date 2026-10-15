@@ -44,11 +44,13 @@ instalador del sistema; iOS: AltStore/SideStore) o «Recordarme mañana».
 
 **Incidentes (Fase 4):** al abrirse (y en Android cada 15 min) la app lee un estado firmado con Ed25519 del Worker `pear-music-estado` (`services/estado`): 0 normal, 1 aviso (banner 24 h), 2 modo seguro (sin actualizaciones salvo las marcadas como arreglo, sin búsqueda remota, soporte, telemetría ni cuenta; la música descargada sigue), 3 mantenimiento. Falla en abierto. Se cambia desde Pear Dev o `/panico` en Discord con contraseña + TOTP; la clave privada sólo está en el PC de Toxbox. Qué hacer: `docs/RUNBOOK-INCIDENTES.md`.
 
-**Idiomas (Cierre 1.0):** español, català, valencià, galego, euskara, English y Esperanto (bienvenida y Ajustes › Idioma, con banderas). Los textos van en español dentro de `L("…")` y el catálogo común está en `shared/i18n/` (`tools/i18n/`).
+**Idiomas (Cierre 1.0; 1.1):** castellano, català, valencià, galego, euskara, English, Esperanto y português (bienvenida y Ajustes › Idioma, con banderas). Los textos van en español dentro de `L("…")` y el catálogo común está en `shared/i18n/` (`tools/i18n/`).
+
+**Novedades y guía de Ajustes (1.1):** la primera vez que se abre una versión nueva sale un panel con lo nuevo (y un recorrido guiado por ello); el birrete junto a la carta de Ajustes abre una guía por todas las opciones.
 
 **Tickets y sugerencias:** cada reporte o sugerencia (Ayuda y soporte › Buzón de sugerencias, o la carta de Ajustes) tiene número; Toxbox contesta desde Discord con `/msg` y la respuesta sale sólo a esa persona en la campana (`services/soporte`).
 
-**Telemetría (Fase 4b):** con consentimiento, un resumen por semana a `pear-music-api` (desplegado el 14-10, sin correo). Pear Dev no envía sola: sólo «Enviar ahora», eligiendo campos, y dar una llave por USB para el panel escondido de la web (`/panel-t`), que sin el móvil de Toxbox conectado no existe (`docs/TELEMETRIA.md`).
+**Telemetría (Fase 4b):** con consentimiento, un resumen por semana a `pear-music-api` (desplegado el 14-10, sin correo). Con cada reporte o sugerencia va la **ficha** del móvil (y, con telemetría, se une a su rendimiento), y cada app cuenta una vez al día que está activa, sin identificadores; las dos cosas salen en el panel. Pear Dev no envía sola: sólo «Enviar ahora», eligiendo campos, y dar una llave por USB para el panel escondido de la web (`/panel-t`), que sin el móvil de Toxbox conectado no existe (`docs/TELEMETRIA.md`).
 
 Sobre las pestañas flota el **mini reproductor**: tocarlo abre el reproductor y mantenerlo pulsado deja elegir el tipo de reproductor.
 
@@ -131,8 +133,8 @@ Del mismo código salen tres apps (`docs/FLAVORS.md`): **Pear Music** (usr, la p
 
 | App | Versión | Estado |
 |---|---|---|
-| iOS | 1.4.1 (publicada) | Referencia de diseño. Publicada el 14-10 desde el repo público (`ToxBox8/pear-music`, release `ios-v1.4.1`, compilada por su CI), en la web y en la fuente de AltStore. Falta probarla en un iPhone. |
-| Android | 0.9.5 (publicada) | Misma interfaz que iOS (`docs/PARIDAD.md`). Publicada el 14-10 en GitHub Releases (`android-v0.9.5`; por la tarde, tras la 0.9.4 de la mañana; firmada en local con la clave de siempre) y en la web. Probada en un Nothing Phone (2) con Android 16 (`docs/pruebas/v0.9.0-manual`). |
+| iOS | 2.0.0 (publicada) | Referencia de diseño. Publicada el 15-10-2026 desde el repo público (`ToxBox8/pear-music`, release `ios-v2.0.0`, compilada por su CI), en la web y en la fuente de AltStore. Falta probarla en un iPhone. |
+| Android | 1.0.0 (publicada) | Publicada el 15-10-2026: release `android-1.0.0` en el repo público, `android-v1.0.0` en el privado y en la web (firmada en local con la clave de siempre). Desde esta versión avisa de las nuevas y se actualiza encima. |
 
 Pendientes y fases en `docs/ARCHITECTURE.md` y `CHANGELOG.md`.
 

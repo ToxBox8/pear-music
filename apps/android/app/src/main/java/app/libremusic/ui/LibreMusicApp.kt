@@ -2,6 +2,7 @@ package app.libremusic.ui
 
 
 import app.libremusic.L
+import app.libremusic.data.Ficha
 import app.libremusic.data.Incident
 import app.libremusic.playback.PlaylistWidget
 import app.libremusic.playback.RecentsWidget
@@ -253,6 +254,11 @@ fun LibreMusicRoot(
         // Estado de incidencias firmado (Fase 4): al abrir; sin red, se queda el último válido.
         avisosScope.launch { Incident.refresh(context.applicationContext) }
         avisosScope.launch { AvisosRepo.refrescarAlAbrir(context.applicationContext) }
+        // Instalaciones activas: un contador por versión, una vez al día y sin identificadores.
+        avisosScope.launch {
+            Ficha.pingActive(context.applicationContext)
+            Ficha.reportDecision(context.applicationContext)
+        }
         // Versión nueva (sólo la variante pública, como mucho cada 6 h): novedades, «Descargar» o «Recordarme mañana».
         avisosScope.launch {
             val release = Updates.check(context.applicationContext) ?: return@launch
@@ -474,6 +480,27 @@ fun LibreMusicRoot(
                         })
                     }
 
+                    // Novedades tras actualizar (1.1): una vez por versión, sin poder cerrarlo sin elegir.
+                    val whatsNewSeen by Prefs.whatsNewSeen.collectAsState()
+                    androidx.compose.animation.AnimatedVisibility(
+                        onboarded && termsAccepted && introStage.isEmpty() && app.guide == null && whatsNewSeen != WhatsNew.current,
+                        enter = androidx.compose.animation.fadeIn(uiEaseOut(300)), exit = androidx.compose.animation.fadeOut(uiEaseOut(250)),
+                    ) {
+                        WhatsNewScreen(
+                            onTour = { Prefs.setWhatsNewSeen(WhatsNew.current); app.guide = "whatsnew" },
+                            onClose = { Prefs.setWhatsNewSeen(WhatsNew.current) },
+                        )
+                    }
+                    // Guía de Ajustes (botón junto a la carta) y recorrido de lo nuevo: pasos con «Siguiente».
+                    app.guide?.let { g ->
+                        androidx.compose.runtime.key(g) {
+                            TourOverlay(steps = if (g == "settings") settingsGuideSteps else whatsNewSteps, guided = true, onDone = {
+                                app.guide = null
+                                app.openSettings()
+                            })
+                        }
+                    }
+
                     // Estado de incidencias (Fase 4): aviso o modo seguro arriba; bloqueo total a pantalla completa.
                     IncidentOverlay()
 
@@ -623,7 +650,9 @@ private fun LiquidTabBar(tabs: List<Tab>, selected: Tab, dark: Boolean, follow: 
     var barWidth by remember { mutableStateOf(0f) }
     val density = LocalDensity.current
     val padH = with(density) { 8.dp.toPx() }
-    val selIndex = tabs.indexOf(selected).coerceAtLeast(0)
+    // -1 si la pestaña actual no está en la barra (Ajustes arriba en Inicio): no se marca ninguna. Antes se tomaba
+    // la 0 y, estando en Ajustes, la barra clásica marcaba Descubrir (1.1).
+    val selIndex = tabs.indexOf(selected)
     val x = remember { Animatable(-1f) }
     val lift = remember { Animatable(0f) }
 
@@ -632,7 +661,7 @@ private fun LiquidTabBar(tabs: List<Tab>, selected: Tab, dark: Boolean, follow: 
     fun nearest(px: Float) = ((px - padH) / tabWidth()).toInt().coerceIn(0, tabs.lastIndex)
 
     LaunchedEffect(selIndex, barWidth, tabs.size) {
-        if (barWidth <= 0f) return@LaunchedEffect
+        if (barWidth <= 0f || selIndex < 0) return@LaunchedEffect
         if (x.value < 0f || reduce) x.snapTo(center(selIndex))
         else if (lift.value == 0f) x.animateTo(center(selIndex), spring(dampingRatio = 0.7f, stiffness = 380f))
     }
@@ -670,7 +699,7 @@ private fun LiquidTabBar(tabs: List<Tab>, selected: Tab, dark: Boolean, follow: 
                 val cx = x.value
                 val pillW = tabWidth() + 10.dp.toPx()
                 val pillH = 54.dp.toPx()
-                if (cx >= 0f) {
+                if (cx >= 0f && (selIndex >= 0 || lift.value > 0f)) {
                     drawRoundRect(
                         pill.copy(alpha = pill.alpha * (1f - lift.value).coerceIn(0f, 1f)),
                         Offset(cx - pillW / 2, (size.height - pillH) / 2), Size(pillW, pillH), CornerRadius(pillH / 2),

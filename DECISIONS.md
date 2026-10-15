@@ -6,6 +6,45 @@ Las entradas anteriores al 2026-10-12 se han reconstruido a partir del historial
 
 ---
 
+## 2026-10-15 (15) — Android 1.1 / iOS 2.1: novedades, guía de Ajustes, portugués y web nueva
+
+Lo pidió Toxbox para la .1:
+- **Panel de novedades** al abrir por primera vez una versión nueva («mayor.menor»; los arreglos no lo repiten), a
+  pantalla completa y sin cerrarse con atrás o deslizando: «Enséñame lo nuevo» (recorrido por lo nuevo) o «Ahora
+  no». En una instalación nueva no sale.
+- **Guía de Ajustes** (botón con el birrete junto a la carta): el recorrido de la bienvenida generalizado. Cada paso
+  abre su pantalla (en iOS, `NavigationStack(path:)` con `SettingsRoute`), se desplaza hasta lo que resalta y se
+  avanza con «Siguiente». Las filas (`FormRow`/`SettingsRow`) y cabeceras de sección se marcan solas. *Diferencias
+  aceptadas:* iOS salta el paso del buscador (es `.searchable`, del sistema) y los de opciones que sólo tiene Android
+  (widgets, cristal líquido, igualar el volumen, ecualizador).
+- **Português** (de Portugal, con su bandera) y «Español» pasa a «Castellano» en el selector.
+- **Barra clásica marcaba Descubrir en Ajustes**: con Ajustes arriba y el cristal líquido, `LiquidTabBar` tomaba la
+  pestaña 0 cuando la actual no estaba en la barra. iOS no lo tenía (Ajustes arriba es una hoja).
+- **Web en `pearmusic-by-toxbox`**: el Worker se renombró por la API (conserva Workers Builds y los secretos) y
+  `services/web-antigua` ocupa el nombre viejo y redirige todo (301/308) con la misma ruta: las apps 1.0/2.0, las
+  fuentes de AltStore ya añadidas y los enlaces viejos siguen funcionando. Se descartó dejar dos copias de la web.
+
+## 2026-10-15 (14) — Ficha del dispositivo, instalaciones activas e iconos de Pear Dev y Pear Pref
+
+- **Ficha con cada reporte o sugerencia** (lo eligió Toxbox: «siempre, avisando»): plataforma, variante, versión,
+  sistema, modelo y números de ticket en `pear-music-api` (tabla `fichas`), bajo el SHA-256 del id anónimo del
+  soporte (el mismo resumen que guarda `libremusic-soporte`). Si la telemetría está activada, lleva también su
+  identificador para que el panel una el ticket con el rendimiento; al retirarla se separan. Sin correo ni texto.
+  Se borra a los 180 días sin reportes. El aviso de «Enviar» lo dice.
+- **Instalaciones activas** (lo eligió Toxbox: «recuento anónimo + fichas»): una vez al día cada app suma uno al
+  contador de su plataforma, variante y versión (`activos`); sin identificador ni IP. Se descartó mandar un id de
+  cada instalación sin consentimiento (RGPD).
+- **Panel `/panel-t`** (lo pidió Toxbox: «más organizado por tipos», «un perfil por dispositivo» con buscador):
+  pestañas Instalaciones, Dispositivos y Rendimiento; cada perfil reúne ficha, tickets e historial de telemetría.
+- **Cuántos dicen que no a la telemetría** (lo pidió Toxbox): contador anónimo de decisiones por plataforma y
+  variante; al cambiar de opinión se resta la anterior. Se descartó guardar la decisión con un identificador.
+- **Iconos de Pear Dev y Pear Pref** (lo eligió Toxbox: cinta con el nombre y símbolo invertido): Dev con fondo
+  lila, Pref con fondo blanco, los dos con el símbolo noche y una cinta «DEV»/«PREF».
+  `shared/design/render_variant_icons.py` genera el icono adaptable de Android (por flavor) y el de iOS
+  (`APP_ICON_NAME` en cada `.xcconfig`).
+- **Medido en el Nothing Phone (2)** (gfxinfo, pestañas y deslizar): pública 0,49 % de fotogramas lentos, Pear Dev
+  release 0,96 % (la debug daba 1,8 %), Pear Pref 1,15 %.
+
 ## 2026-10-15 (13) — Revisión de las actualizaciones antes de publicar la 1.0
 
 - **Modo seguro y actualizaciones** (Toxbox aceptó la propuesta): con el kill switch en nivel 2 o más las apps sólo

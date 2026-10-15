@@ -16,8 +16,8 @@ android {
         minSdk = 26
         targetSdk = 35
         // Versión de la app (ver docs/RELEASING.md). versionCode siempre sube.
-        versionCode = 19
-        versionName = "1.0.0"
+        versionCode = 20
+        versionName = "1.1.0"
     }
 
     // Tres apps con el mismo código (Fase 1 de la 1.0). Lo que cambia entre ellas son estas banderas de

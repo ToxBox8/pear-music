@@ -48,3 +48,41 @@ CREATE TABLE IF NOT EXISTS telemetry (
 );
 CREATE INDEX IF NOT EXISTS telemetry_received ON telemetry(received);
 CREATE INDEX IF NOT EXISTS telemetry_week ON telemetry(week);
+
+-- Fichas de dispositivo (15-10-2026, lo pidió Toxbox): se crean al enviar un reporte o una sugerencia (el formulario
+-- lo avisa). Para ver en el panel qué móvil tiene cada ticket y, si tiene la telemetría activada, cómo le va.
+-- Se borran a los 180 días sin reportes nuevos.
+CREATE TABLE IF NOT EXISTS fichas (
+  id TEXT PRIMARY KEY,               -- SHA-256 del id anónimo del soporte (el mismo resumen que guarda libremusic-soporte)
+  platform TEXT NOT NULL,
+  channel TEXT NOT NULL,
+  app_version TEXT NOT NULL,
+  os_version TEXT,
+  device_model TEXT,
+  install TEXT,                      -- id de la telemetría, sólo si está activada en ese móvil (se quita al retirarla)
+  tickets TEXT NOT NULL DEFAULT '[]',-- [{"n": 12, "kind": "error", "at": ms}], los 50 últimos
+  first_seen INTEGER NOT NULL,
+  last_seen INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS fichas_install ON fichas(install);
+
+-- Instalaciones activas por día, versión y canal: sólo un contador (cada app avisa una vez al día), sin
+-- identificadores ni IPs. Se borra a los 400 días.
+CREATE TABLE IF NOT EXISTS activos (
+  day TEXT NOT NULL,                 -- AAAA-MM-DD (UTC)
+  platform TEXT NOT NULL,
+  channel TEXT NOT NULL,
+  app_version TEXT NOT NULL,
+  n INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (day, platform, channel, app_version)
+);
+
+-- Decisiones sobre la telemetría (15-10-2026, lo pidió Toxbox: «cuántos han dicho que no»). Sólo contadores: cada
+-- app manda su decisión al contestar (y, si cambia, la anterior para restarla). Sin identificadores ni IPs.
+CREATE TABLE IF NOT EXISTS decisiones (
+  platform TEXT NOT NULL,
+  channel TEXT NOT NULL,
+  decision TEXT NOT NULL,            -- «si» o «no»
+  n INTEGER NOT NULL DEFAULT 0,
+  PRIMARY KEY (platform, channel, decision)
+);

@@ -37,3 +37,6 @@ dist/
 *.p12
 *.mobileprovision
 CONTRASEÑAS*
+
+# Temporales de wrangler
+.wrangler/

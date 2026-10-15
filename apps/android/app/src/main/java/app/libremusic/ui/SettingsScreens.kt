@@ -158,7 +158,10 @@ internal val LocalRowCards = compositionLocalOf { false }
 fun FormSection(header: String?, footer: String? = null, content: @Composable ColumnScope.() -> Unit) {
     val c = Libre.colors
     val native = LocalNativeForm.current || !c.theme.styled
-    Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = if (header != null) 18.dp else 26.dp)) {
+    Column(
+        Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = if (header != null) 18.dp else 26.dp)
+            .then(if (header != null) Modifier.tourTarget(sectionKey(header)) else Modifier),
+    ) {
         if (header != null) {
             Text(header, style = Typo.headline, color = c.secondaryLabel, modifier = Modifier.padding(start = 16.dp, bottom = 10.dp))
         }
@@ -207,6 +210,7 @@ fun FormRow(
     val card = LocalRowCards.current
     Column(
         Modifier.fillMaxWidth()
+            .tourTarget(rowKey(title)) // la guía de Ajustes puede resaltar cualquier fila
             .then(if (card) Modifier.themeSurface(Tokens.Radius.Row.dp, c).clip(RoundedCornerShape(Tokens.Radius.Row.dp)) else Modifier)
             .then(if (onClick != null && enabled) Modifier.rowHighlight(onClick = onClick) else Modifier),
     ) {
@@ -374,11 +378,17 @@ fun SettingsScreen() {
     SettingsPage(L("Ajustes"), large = true, trailing = {
         // Carta junto al escarabajo: el buzón de sugerencias (lo pidió Toxbox).
         Row {
-            IconTap(Icons.Rounded.Mail, L("Buzón de sugerencias"), tint = c.accent) { env.app.push(Route.Suggest(null)) }
+            // Guía de Ajustes (1.1): recorre todas las opciones explicándolas.
+            Box(Modifier.tourTarget("settings:guide")) {
+                IconTap(Icons.Rounded.School, L("Guía de Ajustes"), tint = c.accent) { env.app.guide = "settings" }
+            }
+            Box(Modifier.tourTarget("settings:mail")) {
+                IconTap(Icons.Rounded.Mail, L("Buzón de sugerencias"), tint = c.accent) { env.app.push(Route.Suggest(null)) }
+            }
             IconTap(Icons.Rounded.BugReport, L("Informar de un error"), tint = c.accent) { env.app.push(Route.Support(null)) }
         }
     }) {
-        SearchField(query, { query = it }, { keyboard?.hide() }, Modifier.padding(start = 16.dp, end = 16.dp, top = 22.dp), placeholder = L("Buscar en Ajustes"))
+        SearchField(query, { query = it }, { keyboard?.hide() }, Modifier.padding(start = 16.dp, end = 16.dp, top = 22.dp).tourTarget("settings:search"), placeholder = L("Buscar en Ajustes"))
         if (query.isNotBlank()) {
             val hits = LocalSearch.filter(settingsIndex, query) { "${it.title} ${it.section} ${it.keywords}" }
             if (hits.isEmpty()) CenterNote(L("Nada coincide con «{0}»", query.trim()), 40.dp)

@@ -167,7 +167,10 @@ enum SupportClient {
             if (200..<300).contains(status) {
                 // Desde ahora la campana pregunta por las respuestas a sus tickets.
                 UserDefaults.standard.set(true, forKey: "supportSent")
-                return Result(error: nil, ticket: json?["ticket"] as? Int)
+                let ticket = json?["ticket"] as? Int
+                // La ficha de este iPhone, unida al ticket (el formulario lo avisa antes de enviar).
+                if let ticket { await Ficha.send(supportDeviceID: deviceID, ticket: ticket, kind: d.kind ?? "error", model: modelName) }
+                return Result(error: nil, ticket: ticket)
             }
             return Result(error: json?["error"] as? String ?? L("El servidor de soporte no responde ({0}). Prueba más tarde.", status),
                           denialID: json?["denialId"] as? String)
@@ -338,8 +341,8 @@ struct SupportView: View {
             Button(L("Enviar")) { send() }
             Button(L("Cancelar"), role: .cancel) {}
         } message: {
-            Text(draft.photos.isEmpty ? L("Se enviarán tu correo, el texto y datos del iPhone (modelo, versión de iOS y de la app) al canal privado de soporte de Pear Music.")
-                 : L("Se enviarán tu correo, el texto, {0} foto(s) y datos del iPhone (modelo, versión de iOS y de la app) al canal privado de soporte de Pear Music.", draft.photos.count))
+            Text(draft.photos.isEmpty ? L("Se enviarán tu correo, el texto y la ficha de este iPhone (modelo, versión de iOS y de la app y, si tienes la telemetría activada, su rendimiento) al soporte privado de Pear Music.")
+                 : L("Se enviarán tu correo, el texto, {0} foto(s) y la ficha de este iPhone (modelo, versión de iOS y de la app y, si tienes la telemetría activada, su rendimiento) al soporte privado de Pear Music.", draft.photos.count))
         }
         .alert(L("No se pudo enviar"), isPresented: Binding(get: { failure != nil }, set: { if !$0 { failure = nil } })) {
             Button(L("Vale"), role: .cancel) {}

@@ -24,7 +24,7 @@ import java.util.Base64
  */
 object PanelKey {
     const val PORT = 8765
-    const val ORIGIN = "https://libremusic-landing.8toxbox8-69a.workers.dev"
+    const val ORIGIN = "https://pearmusic-by-toxbox.8toxbox8-69a.workers.dev"
     private const val PREFS = "panel_key"
     private const val TTL_MS = 5 * 60_000L
     private const val AUTO_OFF_MS = 10 * 60_000L

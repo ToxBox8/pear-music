@@ -161,6 +161,8 @@ class AppState {
     /** Editor de playlist abierto como hoja (id). */
     var editing by mutableStateOf<String?>(null)
     var showImport by mutableStateOf(false)
+    /** Recorrido guiado en curso (1.1): «settings» (guía de Ajustes) o «whatsnew» (lo nuevo tras actualizar). */
+    var guide by mutableStateOf<String?>(null)
 
     fun stack(t: Tab): SnapshotStateList<Route> = stacks.getOrPut(t) { mutableStateListOf() }
     fun push(r: Route) { stack(tab).add(r) }

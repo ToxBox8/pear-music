@@ -47,7 +47,7 @@ sealed interface EstadoAvisos {
     data object Error : EstadoAvisos
 }
 
-const val URL_AVISOS = "https://libremusic-landing.8toxbox8-69a.workers.dev/api/avisos"
+const val URL_AVISOS = "https://pearmusic-by-toxbox.8toxbox8-69a.workers.dev/api/avisos"
 
 /** Solo se notifica en el móvil lo publicado en las últimas 48 h (como hace SimpMusic con su blog). */
 const val VENTANA_NOTIFICAR_MS = 48L * 60 * 60 * 1000

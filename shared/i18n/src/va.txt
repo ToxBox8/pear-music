@@ -969,3 +969,61 @@
 971	Barra inferior inspirada en SimpMusic, de maxrave-dev (GPL-3.0)
 972	ahir
 973	S'està baixant Pear Music {0}… {1} %
+974	S'enviaran el teu correu, el text i la fitxa d'este iPhone (model, versió d'iOS i de l'app i, si tens la telemetria activada, el seu rendiment) al suport privat de Pear Music.
+975	S'enviaran el teu correu, el text i la fitxa d'este mòbil (model, versió d'Android i de l'app i, si tens la telemetria activada, el seu rendiment) al suport privat de Pear Music.
+976	S'enviaran el teu correu, el text, {0} foto(s) i la fitxa d'este iPhone (model, versió d'iOS i de l'app i, si tens la telemetria activada, el seu rendiment) al suport privat de Pear Music.
+977	S'enviaran el teu correu, el text, {0} foto(s) i la fitxa d'este mòbil (model, versió d'Android i de l'app i, si tens la telemetria activada, el seu rendiment) al suport privat de Pear Music.
+978	Actualitzacions
+979	Ara no
+980	Configuració pot anar a la barra o a dalt a Inici, al costat del Jam.
+981	Quan baixes una versió nova en veus el progrés, i la barra clàssica ja no marca Descobrix quan ets a Configuració.
+982	Quan baixes una versió nova en veus el progrés, i si cal donar permís per instal·lar no es torna a baixar.
+983	Barra clàssica
+984	Barres, botons i menús de vidre que refracten el que hi ha al darrere, com a l'iOS 26.
+985	Bústia i errors
+986	Castellano
+987	Castellano, català, valencià, galego, euskara, English, Esperanto i português. Canvia a l'instant.
+988	Choose your language · Tria la llengua · Escolle o idioma · Aukeratu hizkuntza · Elektu vian lingvon · Escolha o idioma
+989	Cinc ginys per a la pantalla d'inici: Ara sona (petit i gran), accessos ràpids, una llista fixada i recents.
+990	Com a portada gran a Llistes o com a fila a «La teua música».
+991	Amb cada informe o suggeriment va la fitxa del teu mòbil (model i versions), per ajudar-te abans.
+992	Vidre (llum amb els colors de la caràtula), Aire (plata), Neó (synthwave) o Sistema. I clar, fosc o segons el mòbil.
+993	Quan s'acaba la cua, continua amb una ràdio de cançons semblants a l'última.
+994	Quant ocupen les cançons baixades i esborrar-les.
+995	Mostra'm el que és nou
+996	Escriu el que busques, per exemple «equalitzador» o «tema», i t'hi porta directament.
+997	Exporta tot el que l'app guarda de tu en un fitxer o esborra-ho. Aquí també s'activa o es treu la telemetria.
+998	Greus, mitjans i aguts al teu gust, amb predefinits.
+999	Guia de Configuració
+1000	L'app i el reproductor prenen els colors de la cançó que sona. Tria on i quant, amb predefinits o al teu gust.
+1001	La cançó baixa al final i la següent entra suau: 3, 6 o 10 segons.
+1002	La carta obre la bústia de suggeriments i l'escarabat, «Informa d'un error». Cada enviament té número de tiquet i la resposta t'arriba només a tu, a la campana.
+1003	La clàssica o l'estil SimpMusic: càpsula de vidre amb una gota que arrossegues, Cerca a part i plegat en baixar.
+1004	Les caigudes i novetats de Pear Music, també com a notificació si vols.
+1005	El que és nou de Pear Music {0}
+1006	El més tècnic, plegat: qualitat de baixada, tolerància en importar llistes i memòria cau de caràtules.
+1007	Màxima, o estalvi de dades quan no tens wifi. Les baixades sempre van a la màxima.
+1008	Normal, Casset, Vinil o Air. També es canvia mantenint premut el minireproductor.
+1009	Novetats
+1010	Nova: et porta per tota la Configuració i t'explica cada opció. És al costat de la carta.
+1011	Opcional. Guarda la teua biblioteca al núvol, xifrada amb una clau que només tens tu, i passa-la a un altre mòbil.
+1012	Ordena les pestanyes arrossegant-les. Llisca Descobrix cap a l'esquerra per treure-la de la barra.
+1013	Pear Music ja és en portuguès. I «Español» ara es diu «Castellano».
+1014	Português
+1015	Que totes les cançons sonen igual de fort, sense pujar i baixar el volum a mà.
+1016	Recents, A-Z, Z-A, per mida o a mà. Amb «Edita les llistes» les ordenes arrossegant.
+1017	Eixir de la guia
+1018	Eixir de la guia
+1019	Suport més ràpid
+1020	Acabar
+1021	Un recorregut per tota la Configuració que t'explica cada opció. És al costat de la carta.
+1022	Una barra a dalt a Inici o una pestanya a part.
+1023	Torna a veure la benvinguda, el recorregut i les històries.
+1024	I a més
+1025	Ja coneixes tota la Configuració. Torna a esta guia quan vulgues amb el botó del costat de la carta.
+1026	Ja no marca Descobrix quan ets a Configuració.
+1027	Ja pots fer servir Pear Music en português. I «Español» ara es diu «Castellano».
+1028	{0} de {1}
+1029	Fet!
+941	Choose your language · Tria la llengua · Escolle o idioma · Aukeratu hizkuntza · Elektu vian lingvon
+956	Castellano

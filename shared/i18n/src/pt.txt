@@ -1,0 +1,1029 @@
+1	\n\nAtualiza por cima com o AltStore ou o SideStore: não perdes a tua biblioteca nem as tuas músicas transferidas.
+2	\n\nAtualiza por cima: não perdes a tua biblioteca nem as tuas músicas transferidas.
+3	 (ticket #{0}). Respondemos-te nos Avisos.
+4	 As Definições estão em cima, no Início, e não entram na ordem (muda-se em Aspeto).
+5	 As {0} que faltam ficam na playlist, em «Por adicionar», para as procurares outra vez.
+6	 · Pesquisar 
+7	 · Cores {0}
+8	 · mais provável
+9	 · ticket #{0}
+10	 · títulos com efeito
+11	 · {0} offline
+12	. Obrigado!
+13	1 música
+14	A seguir
+15	À mão
+16	À mão…
+17	Aa
+18	Abre Descobrir no {0}
+19	Abre o Jam (o ícone das três pessoas)
+20	Abrir Definições
+21	Abrir Descobrir
+22	Abrir o Jam
+23	Abrir ligação
+24	Abrir leitor
+25	Acessos rápidos
+26	Aceita as condições para continuar
+27	Aceito as condições de utilização
+28	Acerca de
+29	Ativada
+30	Atualizar playlist guardada
+31	Ativa-o nas Definições ou escreve o código à mão.
+32	Administração
+33	Afeta todas as pessoas que usam o Pear Music assim que abrirem a app.
+34	Agora não, continuar
+35	A tocar
+36	A tocar (grande)
+37	Poupança de dados
+38	Air
+39	AirPods Max
+40	AirPods Pro
+41	Ajuste fino
+42	Definições
+43	As Definições são mais um separador da barra; o seu lugar escolhe-se em Separadores.
+44	As Definições estão em cima, no Início, junto ao Jam, e não ocupam lugar na barra.
+45	No fim da música
+46	Ao mudar de música, o título aparece entre símbolos que se ordenam
+47	Ao importar do Spotify ou do Apple Music, quanto pode durar de forma diferente uma música para a dar como boa
+48	Quando toca uma música, a app e os menus ganham cores parecidas com as da capa, como o Descobrir.
+49	Aleatório
+50	Não foi possível adicionar alguma foto
+51	Não foi possível adicionar alguma foto.
+52	Colunas, HomePod e Apple TV
+53	Colunas, auscultadores e televisores com Bluetooth ou Chromecast
+54	Coluna pequena
+55	Anterior
+56	Antes de apagar pede-se confirmação.
+57	Antes de começar
+58	Desativada
+59	Aparecem como linhas em «A tua música», por cima de Músicas.
+60	Aparecem com a capa grande no carrossel de Playlists.
+61	Recurso
+62	Recurso enviado. Respondemos-te por email.
+63	Recorrer
+64	Apple Music ou Spotify: abre a playlist → Partilhar → Copiar ligação. Tem de ser pública. Do Spotify chegam até cerca de 100 músicas; para listas maiores, usa o CSV do Exportify.
+65	Aponta para o QR do Jam
+66	Ficheiro library.json do Pear Music (também o do Android). Junta-se o que não tens, sem apagar nada.
+67	Ficheiro library.json do Pear Music (também o do iOS). Junta-se o que não tens, sem apagar nada.
+68	Arrasta as pastas para mudar a ordem.
+69	Arrasta as playlists, Transferidas e Favoritos para as pores onde quiseres.
+70	Arrasta para mudar a ordem
+71	Arrasta para mudar a ordem do carrossel. Ao mover algo, as Playlists ficam ordenadas «À mão».
+72	Arrasta ≡ para mudar a ordem do carrossel. Ao mover algo, as Playlists ficam ordenadas «À mão».
+73	Arrasta ≡ para mudar a ordem.
+74	Arrasta ≡ para mudar a ordem; deslizar para os lados segue a mesma ordem. Desliza Descobrir para a esquerda para a esconder (e para a direita para a voltar a pôr). A app abre no último separador que usaste.
+75	Em cima, no Início
+76	Arrasta-o para outro sulco para mudar a posição
+77	Artista
+78	Artista {0}
+79	Artistas
+80	Aspeto
+81	Aspeto dos widgets
+82	Assim te verão os outros
+83	Voltar
+84	Auscultadores
+85	Automático
+86	Avançado
+87	Aviso
+88	Avisos
+89	Avisos do Pear Music publicados na web
+90	Avisos importantes
+91	Avisos, {0} por ler
+92	Ajuda e suporte
+93	Ajudas a melhorar o Pear Music
+94	Adicionada à playlist
+95	Adicionadas recentemente
+96	Adicionar
+97	Adicionar aos Teus álbuns
+98	Adicionar aos favoritos
+99	Adicionar à fila
+100	Adicionar à playlist
+101	Adicionar a uma playlist
+102	Adicionar ao Jam
+103	Adicionar capturas
+104	Adicionar playlist
+105	Adicionar {0} ao ecrã principal
+106	Adicionar {0} ao Jam
+107	Ainda não guardaste nada
+108	Ainda não marcaste favoritas aqui.
+109	Ainda não há músicas. Adiciona a primeira e aparecerá no telemóvel de todos.
+110	Ainda não há audições neste período. Conta cada música que toca pelo menos 30 segundos.
+111	Ainda não há favoritas
+112	Ainda não há nada transferido
+113	Ainda sem cópia
+114	Graves e bombos com mais corpo
+115	Barra em cima, no Início
+116	Barra inferior
+117	Barras, botões e menus de vidro que refratam o que está atrás, como o iOS 26
+118	Biblioteca
+119	Biblioteca exportada.
+120	Biblioteca guardada
+121	Biblioteca guardada na nuvem
+122	Bloqueio
+123	Bloqueio total
+124	Bluetooth
+125	Apaga a biblioteca, as transferências, as estatísticas e as definições, e fecha a app. Não se pode desfazer.
+126	Rascunhos
+127	Apagar
+128	Apagar a conta
+129	Apagar a conta elimina de imediato o teu email e a cópia na nuvem. A biblioteca deste telemóvel fica.
+130	Apagar tudo
+131	Apagar todos os meus dados
+132	Botões da cor da música e fundos e menus com um toque
+133	Botão de pânico
+134	Braço
+135	Boa noite
+136	Boa tarde
+137	Bom dia
+138	Procura músicas, álbuns ou artistas
+139	Procura música no {0}
+140	Procura um álbum ou entra num artista e carrega em «Adicionar aos Teus álbuns» ou «Transferir tudo».
+141	Procura uma música para a adicionar
+142	A procurar o Jam
+143	A procurar no YouTube Music… {0} de {1}
+144	A procurar música para ti…
+145	Pesquisar
+146	Procurar artistas
+147	Pesquisar nas Definições
+148	Procurar nas playlists
+149	Procurar nos teus álbuns
+150	Procurar em {0}
+151	Procurar música
+152	Procurar outra vez
+153	A Pesquisa tem o seu próprio separador na barra de baixo, logo a seguir ao Início.
+154	A Pesquisa tem o seu próprio separador na barra de baixo.
+155	Caixa de sugestões
+156	CSV do Exportify (Spotify)
+157	Cache esvaziada
+158	Cada música começa e acaba no seu volume.
+159	Qualidade
+160	Qualidade ao ouvir
+161	Qualidade ao ouvir sem transferir
+162	Qualidade de transferência
+163	Qualidade de transferência, tolerância ao importar e cache
+164	Qualidade máxima
+165	Muda o fundo, os cartões, a cor e a letra de toda a app. Podes mudá-lo quando quiseres em Definições › Aspeto.
+166	Alterna entre não repetir, repetir lista e repetir música
+167	Mudar o email
+168	Mudar foto
+169	Mudar leitor
+170	Canal
+171	Canal, registo e botão de pânico
+172	Cancelar
+173	Cancelar bloqueio pendente
+174	Cancelar a transferência; o que já foi transferido fica
+175	Músicas
+176	Músicas transferidas
+177	Músicas mais ouvidas
+178	Músicas de que gostas (SimpMusic)
+179	Músicas, artistas…
+180	Músicas, álbuns, artistas…
+181	Música que está a tocar
+182	Música sem identificador
+183	Capturas
+184	Pasta
+185	Capa de {0}
+186	Capa grande e controlos (4×2).
+187	Capa, título e controlos numa linha (4×1).
+188	Cassete
+189	Cassete com bobinas que rodas com o dedo, vinil que se pode «scratchar» ou o Air prateado. Mantém premido o minileitor para mudar.
+190	Cassete: roda uma bobina ou arrasta a fita para avançar ou rebobinar. Vinil: roda o disco com o dedo ou move o braço. Com o iPhone na horizontal, a cassete ou o vinil ocupam o ecrã todo. Também podes mudá-lo mantendo premido o minileitor.
+191	Cassete: roda uma bobina ou arrasta a fita para avançar ou rebobinar. Vinil: roda o disco com o dedo ou move o braço. Com o telemóvel na horizontal, a cassete ou o vinil ocupam o ecrã todo. Também podes mudá-lo mantendo premido o minileitor.
+192	Cast
+193	Falhas e versões urgentes
+194	Falhas, versões novas e novidades do Pear Music
+195	Fechar
+196	Fechar o aviso
+197	Fechar as histórias
+198	Fechar leitor
+199	Terminar sessão
+200	Fita
+201	Claro
+202	Claro ou escuro
+203	Chave copiada
+204	Chave de recuperação
+205	Chave pública copiada
+206	Cliente não oficial do YouTube Music. Usa uma API não oficial do YouTube, por isso pode deixar de funcionar se o YouTube a mudar. As transferências guardam-se neste iPhone.
+207	Cliente não oficial do YouTube Music. Usa uma API não oficial do YouTube, por isso pode deixar de funcionar se o YouTube a mudar. As transferências guardam-se neste telemóvel.
+208	Clássica
+209	Carro
+210	Fila
+211	Cor
+212	Cor {0}
+213	Cores da capa
+214	Cores da capa no leitor
+215	Cores da capa no resto da app
+216	Partilhar
+217	Componentes inspirados no The Kitchen de dqnamo
+218	Compressão não suportada.
+219	Verifica a cada 15 minutos se há avisos novos. Só se pede a lista de avisos, sem enviar nada teu.
+220	Verifica de vez em quando se há avisos novos. Só se pede a lista de avisos, sem enviar nada teu.
+221	Verifica a ligação e tenta outra vez.
+222	Com isto ligado e o telemóvel por cabo (adb forward tcp:8765 tcp:8765), a página escondida da web pede aqui uma chave de 5 minutos. Só escuta dentro do telemóvel e desliga-se sozinho aos 10 minutos. A chave pública vai uma vez em PANEL_PUBLIC_KEY do Worker.
+223	Confirmar bloqueio pendente
+224	Continuar
+225	Palavra-passe
+226	Cópia automática
+227	Cópia do SimpMusic
+228	Cópia do SimpMusic (.backup)
+229	Cópia da biblioteca
+230	Cópia guardada
+231	Copiar
+232	Copiar chave pública
+233	Copiar registo
+234	Email
+235	Cria uma playlist com + ou traz as tuas do Apple Music.
+236	Cria uma playlist na Biblioteca
+237	Cria uma playlist ou guarda um álbum para o escolher.
+238	Criar
+239	Criar Jam
+240	Criar a minha conta
+241	Criar playlist com {0}
+242	Criar um
+243	Vidro líquido
+244	Vidro, Ar, Néon ou Sistema, e cores que saem da capa. Tudo em Definições › Aspeto.
+245	Créditos
+246	Quando houver algo importante, aparecerá aqui.
+247	Quando acaba o que estás a ouvir e a repetição está desligada, juntam-se músicas parecidas com a última.
+248	Conta
+249	Conta apagada
+250	Conta criada
+251	Conta o que estavas a fazer e o que esperavas que acontecesse. Quanto mais concreto, melhor (mínimo {0} caracteres).
+252	Quanto
+253	Quanto se parecem os botões com a cor da capa
+254	Quanto se tingem os fundos e os menus
+255	Conta-nos o que falhou; podes juntar capturas
+256	Conta-nos o que gostavas que o Pear Music fizesse
+257	Cápsula com os teus separadores e a Pesquisa à parte, como o SimpMusic. Arrasta a gota para mudar de separador; ao descer numa lista dobra-se junto ao minileitor.
+258	Código QR do Jam
+259	Código de 6 algarismos
+260	Código do Jam, 6 caracteres
+261	Código para entrar
+262	Dados exportados
+263	Da importação. Toca para as procurar outra vez.
+264	Deixa de transferir; o que já foi transferido fica
+265	Deixarão de estar disponíveis offline, também noutras listas que as tenham.
+266	Deixarão de estar disponíveis offline. As playlists e os favoritos não mudam.
+267	Desativada
+268	Desativado
+269	Desativar
+270	Desativar temporizador
+271	Transfere algo para o ouvir offline
+272	Transfere músicas com a seta de cada linha ou com «Transferir tudo» numa playlist.
+273	Transfere músicas, álbuns e playlists na qualidade máxima.
+274	Transfere uma música com a sua seta, ou uma playlist ou um álbum inteiro com «Transferir tudo». Guardam-se neste iPhone na qualidade máxima e tens-nas em Biblioteca › Transferidas, também offline.
+275	Transfere uma música com a sua seta, ou uma playlist ou um álbum inteiro com «Transferir tudo». Guardam-se neste telemóvel na qualidade máxima e tens-nas em Biblioteca › Transferidas, também offline.
+276	Transferida
+277	Transferidas
+278	Transferidas e Favoritos
+279	Transferido
+280	A transferir
+281	A transferir o Pear Music {0}…
+282	A transferir {0} %
+283	Transferir
+284	Transferir as {0} que faltam
+285	Transferir tudo
+286	Transferências
+287	Descartar
+288	Descartar {0}
+289	Desconhecido
+290	Descobrir
+291	Descobrir, Início, Biblioteca, Definições
+292	Da app Música deste iPhone
+293	De um ficheiro
+294	De uma ligação
+295	Desliza um bocado no Descobrir
+296	Abrir barra ({0})
+297	Disco
+298	Disponível offline
+299	Duas coisas, em separado. Podes mudar a segunda quando quiseres em Definições › Ajuda e suporte › Os teus dados.
+300	Onde
+301	Onde pesquisar
+302	Onde fica a Pesquisa
+303	Equalizador
+304	Editar
+305	Editar fila
+306	Editar a ordem das playlists
+307	Editar playlist
+308	Editar playlists
+309	Efeito nos títulos
+310	O Jam está cheio.
+311	O Jam vai terminar para todos.
+312	O anfitrião
+313	O anfitrião terminou o Jam.
+314	O ficheiro está cortado.
+315	O ficheiro leva a tua biblioteca, estatísticas, letras, rascunhos de suporte e definições; não as músicas transferidas.
+316	O ficheiro não é um ZIP válido.
+317	O ficheiro não tem músicas.
+318	A repetição (não repetir, repetir lista ou música) muda-se no leitor.
+319	O código não é válido.
+320	O servidor de suporte não responde ({0}). Tenta mais tarde.
+321	O servidor não responde ({0}). Tenta mais tarde.
+322	O som tal como é
+323	O suporte está em pausa enquanto resolvemos um incidente. O teu relatório fica nos Rascunhos.
+324	O tema muda o fundo, os cartões, a cor e a letra. Os fundos ganham as cores da capa e animam-se mais enquanto toca música.
+325	O texto e os ícones mantêm sempre um contraste legível, mesmo que a capa seja muito clara ou muito viva.
+326	Escolhida
+327	Escolher pasta
+328	Escolher foto
+329	Escolhe o teu tema
+330	Eliminar
+331	Eliminar rascunho
+332	Eliminar transferência
+333	Eliminar playlist
+334	Eliminar playlists
+335	Eliminar uma playlist não apaga as suas músicas dos Favoritos nem das Transferências.
+336	Eliminar {0}
+337	Começar
+338	Começar a ouvir
+339	Começar do zero
+340	Em Playlists (capa grande)
+341	Nos Teus álbuns
+342	Ao vivo
+343	No leitor
+344	No resto da app
+345	Na barra
+346	Em manutenção
+347	Na tua biblioteca: {0}
+348	Em «A tua música» (linha)
+349	Ligada
+350	Ligação do Spotify ou do Apple Music
+351	Entrar
+352	Enviado ({0} campos)
+353	Enviar
+354	Enviar agora
+355	Enviar recurso
+356	Enviar dados de desempenho (opcional)
+357	Equilibrado
+358	Essa chave não tem o formato correto.
+359	Digitalizem com a câmara do iPhone ou em Biblioteca → + → Jam com amigos.
+360	Digitalizem com a câmara do telemóvel ou em Biblioteca → + → Jam com amigos.
+361	Ler QR
+362	Escreve a tua chave de recuperação
+363	Escreve o teu nome para criar um Jam ou entrar num.
+364	Ouve o que quiseres
+365	Ouve uma música
+366	Ouvido há pouco
+367	Ouvido recentemente
+368	Ouvir completa
+369	Ouvir as minhas transferências
+370	Espaço usado
+371	Esta app
+372	Estatísticas
+373	Estamos a preparar coisas só para quem tiver conta. Avisamos-te nos Avisos.
+374	Este artista não tem músicas nem álbuns disponíveis.
+375	Este ano
+376	Não foi possível carregar este excerto
+377	Este mês
+378	Este telemóvel
+379	Estilo SimpMusic
+380	Estes são os últimos avisos guardados.
+381	Exagero da cor
+382	Explica porque é um relatório a sério. Uma pessoa vai lê-lo e responder-te por email.
+383	Exporta ou apaga tudo o que a app guarda sobre ti
+384	Exportar cópia
+385	Exportar os meus dados
+386	Erro ao reproduzir: tempo de espera esgotado
+387	Erro ao reproduzir: {0}
+388	Falta a chave de recuperação.
+389	Favoritas
+390	Favoritos
+391	Fixa um álbum ou uma playlist com o pionés
+392	Fixado em cima na Biblioteca e no Início
+393	Fixados
+394	Fixar em cima
+395	Fundo com a capa desfocada e controlos da sua cor
+396	Foto
+397	Excertos de músicas de que podes gostar, em ecrã inteiro. Desliza para a seguinte e toca duas vezes para «Gosto». Se não o usas, desliza-o para a esquerda em Definições › Aspeto › Separadores.
+398	Excertos de músicas de que podes gostar, em ecrã inteiro. Desliza para a seguinte e toca duas vezes para «Gosto». Se não o usas, desliza-o para a esquerda em Definições › Aspeto › Separadores. Toca no separador Descobrir.
+399	Transição
+400	Transição entre músicas
+401	Gasta menos dados móveis (48 kbps).
+402	Roda uma bobina ou arrasta a fita para avançar ou rebobinar
+403	Guarda músicas para veres os seus artistas
+404	Guarda uma favorita com o coração
+405	Guardada na Biblioteca como «{0}»
+406	Guardada na tua biblioteca
+407	Guardar agora na nuvem
+408	Guardar como playlist
+409	Guardar na biblioteca
+410	Guardar lista
+411	Guardar e sair
+412	Guarda-a no teu gestor de palavras-passe ou aponta-a. É o que cifra a tua biblioteca: sem ela não é possível 
+413	Guarda-a no teu gestor de palavras-passe ou aponta-a. É o que cifra a tua biblioteca: sem ela não é possível recuperar a cópia da nuvem noutro telemóvel. O Pear Music não a guarda e não a consegue recuperar.
+414	Guia inicial
+415	Roda-o para avançar ou recuar
+416	Fazer cópia agora
+417	Até {0}. São reduzidas e tiram-se-lhes a localização e os outros dados da foto antes de as enviar.
+418	Torna-a tua
+419	Feito
+420	História {0} de {1}: {2}. {3}
+421	Ícone
+422	Igualar o volume
+423	Importado: {0} favoritas e {1} playlists novas.
+424	A importar «{0}»
+425	Importante
+426	Importar
+427	Importar 1 playlist
+428	Importar cópia
+429	Importar do Apple Music
+430	Importar playlist
+431	Importar {0} playlists
+432	Comunicar um erro
+433	Comunicar um erro · Guia inicial · Versão {0}
+434	Início
+435	Instrumental
+436	Intenso
+437	Jam
+438	Jam com amigos
+439	Jam com os teus amigos
+440	Jam ao vivo · {0}
+441	Jam sem ligação
+442	Jam {0}, código {1}
+443	O LRCLIB respondeu {0}
+444	A barra de pesquisa está sempre em cima no Início e o separador Pesquisar desaparece.
+445	A barra de pesquisa está sempre em cima no Início.
+446	A qualidade ao ouvir volta a «Máxima», tira-se a transição e volta-se a continuar com músicas parecidas.
+447	A qualidade ao ouvir volta a «Máxima» e tiram-se o equalizador e a transição; volta-se a continuar com músicas parecidas.
+448	A música baixa de volume nos últimos {0} s e a seguinte entra suavemente. Útil para listas variadas; em álbuns que vão seguidos, melhor «Não».
+449	A chave de recuperação não é a desta conta.
+450	A cópia do SimpMusic é demasiado grande.
+451	A cópia do SimpMusic está danificada.
+452	A cópia é demasiado grande. No SimpMusic, faz a cópia sem as transferências.
+453	A cópia não tem playlists.
+454	A conta está em pausa enquanto resolvemos um incidente.
+455	A transferência não coincide com a publicada e não foi instalada, por segurança.
+456	Já a guardei
+457	A letra, ao compasso
+458	A lista ficou vazia.
+459	A playlist está vazia ou não é pública.
+460	A playlist que escolheres abaixo, para a pôr a tocar com um toque (2×2).
+461	A primeira fixada na Biblioteca
+462	A que guardaste ao criar a conta. 26 letras e números; tanto faz maiúsculas ou hífenes.
+463	A que aparece no widget «Playlist fixada».
+464	As músicas transferidas ficam em Transferidas.
+465	As músicas já são do YouTube Music: chegam exatas, sem procurar. Não se transfere nada.
+466	As quatro últimas músicas que ouviste (4×2).
+467	As contas vão estar disponíveis muito em breve
+468	As transferências guardam-se neste iPhone na qualidade máxima e veem-se em Biblioteca › Transferidas. Para transferir uma lista ou um álbum inteiro, usa «Transferir tudo» na sua página.
+469	As transferências guardam-se neste telemóvel na qualidade máxima e veem-se em Biblioteca › Transferidas. Para transferir uma lista ou um álbum inteiro, usa «Transferir tudo» na sua página.
+470	As transferências guardam-se sempre na qualidade máxima (AAC 128 kbps), assim soam igual offline.
+471	As transferências guardam-se sempre na qualidade máxima (Opus, cerca de 160 kbps).
+472	Os separadores de sempre, como no iPhone.
+473	Os separadores de sempre.
+474	As playlists voltam a ordenar-se por recentes, Transferidas e Favoritos vão para o carrossel e a Pesquisa para o Início. Não se apaga nenhuma playlist.
+475	As últimas {0} linhas, só em memória. Nunca levam dados pessoais.
+476	Lê as playlists da tua biblioteca (precisa de «Sincronizar biblioteca» ativado em Definições → Música).
+477	Ler as condições
+478	Letra
+479	Letra Inter, de Rasmus Andersson (OFL)
+480	Letra do LRCLIB
+481	A ler a playlist…
+482	Liberta memória; voltam a transferir-se ao vê-las
+483	Pronto
+484	Chave do painel por USB
+485	Leva-a offline
+486	Criado por ti · {0}
+487	O que lançaram este ano
+488	O que mais ouves
+489	O que ouviste por último, rádios feitas para ti, o novo dos teus artistas e o que fixares em cima. O sino traz os avisos do Pear Music.
+490	O que ouviste por último, rádios feitas para ti, o novo dos teus artistas e o que fixares em cima. O sino traz os avisos do Pear Music. Toca no separador Início.
+491	Logótipo
+492	Linha demasiado longa
+493	Envia já o resumo desta semana com os campos marcados (os obrigatórios vão sempre: identificador, plataforma, variante, versão e semana). O resumo semanal continua a sair sozinho se a telemetria estiver ativada.
+494	Enviar-me um código
+495	Mantém o Pear Music aberto. Costuma demorar uns segundos.
+496	Mantém para apagar as transferências
+497	Mantém para apagar as estatísticas
+498	Mantém para esvaziar a fila
+499	Mantém premida uma música em Pesquisar ou Início para a adicionar.
+500	Mantém premido para confirmar
+501	Marcada
+502	Gosto
+503	Melhor som (AAC 128 kbps).
+504	Melhor som (Opus, cerca de 160 kbps).
+505	Melhor som; gasta mais dados
+506	Menu
+507	Mistura as minhas favoritas no {0}
+508	Misturar favoritas
+509	Misturar favoritas ou transferidas, Descobrir e Pesquisar (4×1).
+510	Misturar o transferido
+511	Misturar as minhas favoritas
+512	Misturar outra vez
+513	Enquanto toca uma música, a app ganha cores parecidas com as da capa. Escolhe quanto; o texto lê-se sempre bem.
+514	Entretanto não se pode pesquisar, atualizar nem enviar nada. A tua música transferida continua aqui.
+515	Entretanto, tudo funciona sem conta.
+516	Minutos por sessão
+517	Modelo e sistema, versão, quanto demora a abrir, fluidez, memória e minutos de uso, com um identificador aleatório. 
+518	Modelo e sistema, versão, quanto demora a abrir, fluidez, memória e minutos de uso, com um identificador aleatório. Um resumo por semana; nada do que ouves nem pesquisas. Serve só para a app funcionar melhor; apaga-se ao fim de 90 dias.
+519	Modo
+520	Modo seguro
+521	Mosaico
+522	Mostrar Descobrir
+523	Mover
+524	Mostra o código QR
+525	Muito em breve, vantagens
+526	Mais
+527	Mais agudos
+528	Mais brilho e detalhe
+529	Mais graves
+530	Mais opções
+531	Mais opções de {0}
+532	Máxima
+533	Música
+534	Nada coincide com «{0}»
+535	Precisa do Android 12 ou posterior
+536	Nenhuma (não adicionar)
+537	Nenhuma música desta lista está transferida.
+538	Nenhuma música transferida
+539	Nível
+540	Não
+541	Não disponível para ouvir
+542	Não encontradas
+543	Não é uma cópia do SimpMusic (no SimpMusic: Definições › Cópia de segurança).
+544	Não há avisos
+545	Não há rascunhos
+546	Não há excertos neste momento
+547	Não há letra para esta música
+548	Não há nada para retomar
+549	Não há playlists
+550	Não há playlists na biblioteca deste iPhone.
+551	Não há resultados para «{0}»
+552	Não há singles nem EP.
+553	Não há álbuns.
+554	Não precisas dela para nada: o Pear Music funciona igual sem ela. Mas, se a criares, ajudas-nos imenso a melhorar a app, e levas a tua música para onde fores.
+555	Não parece um CSV do Exportify (falta a coluna «Track URI»).
+556	Não falta nenhuma música por adicionar
+557	Não foram encontradas músicas. A playlist é pública?
+558	Não foi encontrado nenhum Jam com o código {0}. Verifiquem que estão na mesma Wi-Fi.
+559	Não foi possível carregar
+560	Não foi possível carregar as músicas
+561	Não foi possível carregar as recomendações.
+562	Não foi possível exportar os dados
+563	Não foi possível abrir a porta 8765
+564	Não foi possível anunciar o Jam na Wi-Fi ({0}).
+565	Não foi possível procurar na Wi-Fi ({0}).
+566	Não foi possível pesquisar. Verifica a tua ligação.
+567	Não foi possível carregar o artista. Verifica a tua ligação.
+568	Não foi possível carregar a letra
+569	Não foi possível ligar ao Jam.
+570	Não foi possível criar o Jam nesta rede.
+571	Não foi possível transferir «{0}»: {1}
+572	Não foi possível transferir. Tenta com outra ligação.
+573	Não foi possível enviar
+574	Não foi possível exportar a biblioteca.
+575	Não foi possível guardar a cópia
+576	Não foi possível guardar a cópia. Volta a escolher a pasta.
+577	Não foi possível ler esse ficheiro de biblioteca.
+578	Não foi possível ler a cópia.
+579	Não foi possível ler a playlist.
+580	Não foi possível ler a playlist. Tenta com o CSV do Exportify.
+581	Não foi possível obter o áudio: {0}
+582	Não foi possível reproduzir: {0}
+583	Não foi possível usar essa pasta
+584	Não foi possível usar essa pasta.
+585	Não se pode mudar: assim soam igual offline
+586	Não tenho a chave: começar do zero
+587	Nome
+588	Nome (A-Z)
+589	Nome (Z-A)
+590	Nome do Jam
+591	Normal
+592	Notificar no telemóvel
+593	Novidades dos teus artistas
+594	Nova playlist
+595	Nunca
+596	N.º de músicas
+597	Escondida · desliza para a direita para a pôr
+598	Esconder
+599	Esconder Descobrir
+600	Esconder primeiros passos
+601	Oferece retirar as transferências
+602	Opacidade
+603	Opcional · grátis
+604	Opcional · guarda a tua biblioteca cifrada na nuvem
+605	Opcional, p. ex. Viagem à praia
+606	Opções do Jam
+607	Ordem de fábrica
+608	Ordem da barra
+609	Ordenar
+610	Ordenar de A a Z
+611	Ordenar de Z a A
+612	Ordenar playlists
+613	Ordenar playlists por
+614	Ordenar por
+615	Escuro
+616	Painel
+617	Pacote
+618	Para o altifalante do telemóvel ou uma coluna portátil
+619	Para ouvir com dados móveis
+620	Para o ecrã principal do telemóvel
+621	Para te podermos responder. Não se usa para mais nada. A resposta também te chega aos Avisos, só a ti.
+622	Por rever
+623	Para ti
+624	Pausa
+625	Pausa a transferência da lista
+626	Pausar
+627	Pear Dev
+628	Pear Music
+629	O Pear Music é um projeto pessoal e gratuito, sem relação com o YouTube nem com a Google. É necessário para usar a app.
+630	O Pear Music não tem contas nem servidor com os teus dados: está tudo neste telemóvel. 
+631	O Pear Music não tem contas nem servidor com os teus dados: está tudo neste telemóvel. O ficheiro leva a tua biblioteca, estatísticas, letras, rascunhos de suporte e definições; não as músicas transferidas.
+632	O Pear Music não tem permissão para usar a câmara
+633	Pear Music {0}
+634	Pedir bloqueio total
+635	Cola a ligação de uma playlist do Spotify (Partilhar → Copiar ligação).
+636	Cola uma ligação de music.apple.com (Partilhar → Copiar ligação).
+637	Colar
+638	Permite instalar apps do Pear Music e volta a carregar em Transferir.
+639	Personalizado
+640	Separador à parte
+641	Separadores
+642	Pede o código a quem o criou ou lê o seu QR.
+643	Playlist do Apple Music
+644	Playlist do Spotify
+645	Playlist fixada
+646	Playlist importada
+647	Playlists
+648	Playlists com a tua foto, ícone e cor, favoritos e transferências num só sítio. Fixa em cima o que mais ouves e abre a discografia completa de cada artista.
+649	Playlists e favoritos num minuto, também entre iPhone e Android.
+650	Vais poder voltar a entrar com o código enquanto continuar aberto.
+651	Põe o transferido no {0}
+652	Põe as minhas favoritas no {0}
+653	Por exemplo: ao carregar em «Transferir tudo» num álbum, a app fecha-se.
+654	Por exemplo: poder ordenar as minhas playlists por artista.
+655	Porque é um relatório a sério
+656	Por tamanho
+657	Porque ouviste «{0}»
+658	Primeiros passos
+659	Progresso
+660	Progresso: {0} de {1}
+661	Publica um dos estados assinados no PC. Aviso: faixa que caduca sozinha. Modo seguro: desliga atualizações, pesquisa, suporte, telemetria e conta. Bloqueio: ecrã de manutenção; confirma-se aos 10 min com outro código. Normal: tudo volta a funcionar.
+662	Publicar
+663	Publicar este nível
+664	Podes fechar a app: ao voltares, a importação continua onde ficou.
+665	Posto
+666	Passa-a para outro telemóvel
+667	Retirar
+668	Retirar dos Teus álbuns
+669	Retirar dos favoritos
+670	Retirar foto
+671	Retirar {0}
+672	O que aconteceu
+673	O que se envia exatamente
+674	O que gostavas que o Pear Music fizesse e para que te serviria (mínimo {0} caracteres).
+675	Retomar · {0} de {1}
+676	Recentes
+677	Lembrar-me amanhã
+678	Percurso: {0}. {1}
+679	Reformular
+680	Registo
+681	Registo copiado
+682	Tentar outra vez
+683	Tentar transferir outra vez
+684	Repetir música
+685	Repetir lista
+686	Repetir: não
+687	Relatório enviado
+688	Reprodução
+689	Reproduzir
+690	Reproduzir a seguir
+691	Leitor
+692	Leitor multimédia
+693	Leitores com personalidade
+694	Resposta do Pear Music
+695	Resposta inesperada do servidor.
+696	Repor
+697	Repor {0}
+698	Revê o email: falta algo (por exemplo, a @ ou o domínio).
+699	Revê a mensagem
+700	Verifica a ligação e tenta outra vez.
+701	Verifica a ligação e volta a tentar.
+702	SEM LIGAÇÃO
+703	Saber quantos são diz-nos onde pôr o esforço.
+704	Saída de áudio
+705	Saída de áudio: {0}
+706	Sair do Jam
+707	Sair sem guardar
+708	Saltar
+709	Saltar o percurso
+710	Saltar o guia
+711	Aplica-se de imediato, também ao que toca por Bluetooth.
+712	Apagam-se o texto e as fotos. Não se pode desfazer.
+713	Apagam-se o teu email e a cópia na nuvem. Não se pode desfazer.
+714	Vai apagar-se a cópia da nuvem que não consegues abrir e criar-se uma chave nova. A biblioteca deste telemóvel não muda.
+715	Vai apagar-se a playlist e a sua capa. Não se pode desfazer.
+716	Vão apagar-se as tuas playlists, favoritos, transferências, estatísticas e definições deste telemóvel, e a app vai fechar-se. 
+717	Vão apagar-se as tuas playlists, favoritos, transferências, estatísticas e definições deste telemóvel, e a app vai fechar-se. Se quiseres guardar algo, exporta antes os teus dados.
+718	Voltam a procurar-se no YouTube Music (às vezes aparecem versões novas). Escolhe a boa e junta-se à playlist.
+719	Ficou cortada a meio; continua onde ficou.
+720	Guarda-se uma por dia e ficam as {0} últimas. Para a recuperar: Biblioteca › Importar › Importar cópia.
+721	Ficam guardados neste telemóvel até os enviares ou eliminares.
+722	Guardam-se só neste telemóvel e não aparecem na cópia da biblioteca.
+723	Perdeu-se a ligação com o anfitrião.
+724	Para no fim da música
+725	Para dentro de {0} min
+726	Para dentro de {0} s
+727	A ligação perdeu-se
+728	A ligação com {0} perdeu-se.
+729	Continuar
+730	Continuar com músicas parecidas
+731	Seguro
+732	Sessão terminada
+733	Se houver foto, mostra-se em vez do ícone.
+734	Se a ativares, uma vez por semana envia-se um resumo de desempenho: modelo e sistema, versão, quanto 
+735	Se a ativares, uma vez por semana envia-se um resumo de desempenho: modelo e sistema, versão, quanto demora a abrir, fluidez (FPS e soluços), memória e minutos de uso, com um identificador aleatório que não é o da tua conta. Nada do que ouves nem pesquisas. Apaga-se ao fim de 90 dias; ao desligá-la apaga-se de imediato.
+736	Se quiseres guardar algo, exporta antes os teus dados.
+737	Continua com as que faltam
+738	Seguinte
+739	Sem anúncios, sem limites e sem conta obrigatória.
+740	Por adicionar
+741	Por adicionar: {0}
+742	Offline
+743	Sem ligação ao servidor de estado.
+744	Sem ligação. Tenta quando tiveres internet.
+745	Sem descrição
+746	Por escolher
+747	Sem ícone
+748	Ainda sem linhas
+749	Por marcar
+750	Sem permissão para ler a app Música. Ativa-a em Definições → Pear Music.
+751	Sem rastreio nem publicidade. Tu decides o que partilhas.
+752	Sem resultados
+753	Por terminar
+754	Singles e EP
+755	Soltar de cima
+756	O Spotify não deixa ver essa playlist. É pública?
+757	Spotify: exporta a playlist em exportify.app (grátis, entra com a tua conta do Spotify) e escolhe o .csv; traz todas as músicas e o seu ISRC, que emparelha melhor. SimpMusic: Definições › Cópia de segurança, e escolhe o ficheiro .backup; as músicas já são do YouTube Music, por isso chegam exatas.
+758	Sugestão enviada
+759	Subtil
+760	Só para ti
+761	Só tu tens a chave. Nem nós a conseguimos ler.
+762	Só {0} por agora
+763	Também podes manter premido o ecrã principal › Widgets › Pear Music. Podem mudar de tamanho.
+764	Damos-te as boas-vindas ao Pear Music
+765	Enviámos para {0}. Caduca em 10 minutos.
+766	Telemetria
+767	Telemetria de desempenho
+768	Tema
+769	Tema, leitor (cassete, vinil, Air), a tua conta opcional, os teus dados e ajuda.
+770	Tema, leitor (cassete, vinil, Air), widgets, a tua conta opcional, os teus dados e ajuda.
+771	Temporizador para dormir
+772	Terminar Jam
+773	Terminar de ordenar
+774	Terminar sem guardar
+775	Tipo
+776	Toca no coração de uma música para a guardar aqui.
+777	Toca na fila e escolhe Letra: segue a música linha a linha e guarda-se para a veres offline.
+778	Toca nas duvidosas para escolher a versão certa. As que ficarem por escolher não se adicionam.
+779	Toca no que está realçado para continuar
+780	Toca para a mudar
+781	Toca para continuar · mantém para pausar
+782	Toda a música do YouTube Music, grátis e sem anúncios. Com o ecrã desligado, offline e com um Jam para ouvir com os teus amigos.
+783	Todas
+784	Todas coincidem com a sua versão no YouTube Music.
+785	Ainda não aparece. Verifiquem que o código está certo, que estão na mesma Wi-Fi ou com o Bluetooth ativado e que quem o criou tem o Pear Music aberto.
+786	Ainda não aparece. Verifiquem que o código está certo, que estão na mesma Wi-Fi e que quem o criou tem o Pear Music aberto.
+787	Ainda não há nada aqui
+788	Ainda não há playlists
+789	Ainda não tens álbuns
+790	Tolerância
+791	Tolerância de duração
+792	Trazer da nuvem
+793	Trazer a minha biblioteca
+794	Trazidas {0} favoritas e {1} playlists
+795	A tua biblioteca viaja cifrada com a tua chave de recuperação: o servidor não a consegue ler.
+796	A tua biblioteca, à tua maneira
+797	A tua biblioteca, cifrada na nuvem
+798	A tua chave de recuperação
+799	O teu email
+800	A tua conta do Pear Music
+801	A tua ideia
+802	O teu launcher não deixa adicioná-lo daqui: mantém premido o ecrã principal › Widgets
+803	A tua música
+804	O teu nome
+805	Os teus artistas
+806	Os teus dados
+807	Os teus dados são teus
+808	Os teus favoritos
+809	Os teus separadores na barra e a Pesquisa à parte, como o SimpMusic. No iOS 26 a barra dobra-se ao descer numa lista.
+810	As tuas playlists
+811	As tuas playlists, favoritos e transferências, também offline. Fixa em cima o que mais ouves com o pionés e toca num artista para veres toda a sua discografia.
+812	As tuas playlists, favoritos e transferências, também offline. Fixa em cima o que mais ouves com o pionés e toca num artista para veres toda a sua discografia. Toca no separador Biblioteca.
+813	Os teus álbuns
+814	Um ficheiro .zip com tudo o que a app guarda sobre ti
+815	Um resumo por semana; nada do que ouves nem pesquisas. Serve só para a app funcionar melhor; apaga-se ao fim de 90 dias.
+816	Uma cópia por dia dos teus favoritos, playlists e álbuns na pasta que escolheres. Escolhe uma que se sincronize (Google Drive, Nextcloud…) para não perderes nada ao mudar de telemóvel.
+817	Uma cópia por dia dos teus favoritos, playlists e álbuns na pasta que escolheres. Escolhe uma que se sincronize (iCloud Drive, Google Drive…) para não perderes nada ao mudar de telemóvel.
+818	Uma playlist a que todos juntam músicas a partir do seu telemóvel, iPhone ou Android, na mesma Wi-Fi. Com o QR entra-se de imediato.
+819	Uma playlist partilhada com quem estiver contigo, mesmo que tenha um Android. Lê o QR para entrar de imediato, ou escreve o código.
+820	Uma playlist partilhada com quem estiver contigo, mesmo que tenha um iPhone. Lê o QR para entrar de imediato, ou escreve o código.
+821	Uma playlist feita por todos. Funciona com pessoas que estão perto, na mesma Wi-Fi ou com o Bluetooth ativado.
+822	Uma playlist feita por todos. Funciona com pessoas que estão perto, na mesma Wi-Fi.
+823	Junta a cópia com o que há neste telemóvel, sem apagar nada
+824	Entrar num
+825	Usa a sonoridade que o YouTube mede em cada música: as que soam mais alto baixam e as mais fracas sobem um pouco, para não mexer no volume entre músicas.
+826	Esvaziar cache de capas
+827	Esvaziar registo
+828	Vazia ou importada
+829	OK
+830	Velocidade
+831	Velocidade {0}
+832	Ver capa
+833	Ver chave de recuperação
+834	Ver fila
+835	Ver o perfil de {0}
+836	Ver estado e auditoria
+837	Ver letra
+838	Ver todas
+839	Ver tudo
+840	Ver todos: {0}
+841	Ver as tuas músicas de {0}
+842	Versão
+843	Versão do sistema
+844	Versão {0}
+845	Versão {0} e créditos
+846	Vinil
+847	Pré-visualização das cores da capa
+848	Vozes claras
+849	Vozes e podcasts mais presentes
+850	Voltar ao início
+851	Volta a entrar na tua conta.
+852	Volta a ver as boas-vindas, o percurso e as histórias
+853	Voltam o tema Vidro, o leitor Normal, as cores da capa desligadas e a ordem de separadores de fábrica.
+854	Widgets
+855	Já está no Jam
+856	Já não está fixado
+857	Já tenho uma chave (de outro telemóvel)
+858	agora mesmo
+859	barra simpmusic cápsula separadores dobrar gota
+860	barra simpmusic dobrar pesquisar
+861	bluetooth chromecast coluna airplay
+862	apagar retirar
+863	bug erro problema suporte relatório escaravelho contacto
+864	pesquisar separador início barra
+865	carrossel a tua música
+866	capa cor tom subtil equilibrado intenso
+867	cassete vinil air normal
+868	claro ou escuro conforme o iPhone
+869	cor fundo vidro néon ar sistema aparência
+870	cópia segurança backup drive nextcloud guardar exportar
+871	cópia segurança backup icloud drive guardar exportar
+872	crossfade transição suave volume cortes
+873	conta email nuvem sincronizar cópia cifrada chave recuperação iniciar sessão
+874	o anfitrião
+875	o da tua conta. Nada do que ouves nem pesquisas. Apaga-se ao fim de 90 dias; ao desligá-la apaga-se de imediato.
+876	emparelhar importar spotify segundos coincidência
+877	no Início
+878	no seu separador
+879	espaço offline sem ligação apagar
+880	glass transparente ios 26
+881	graves agudos vozes baixos som eq coluna
+882	há {0} dias
+883	há {0} h
+884	há {0} min
+885	memória imagens capas
+886	modo noite escuro claro automático
+887	notificações sino falhas novidades discord
+888	esconder retirar desativar descobrir feed excertos reels
+889	ordem a-z recentes à mão
+890	ordem barra descobrir início biblioteca
+891	privacidade rgpd exportar apagar dados eliminar zip
+892	rádio infinita autoplay automático fila acabar
+893	recuperar a cópia da nuvem noutro telemóvel. O Pear Music não a guarda e não a consegue recuperar.
+894	resto da app
+895	saída áudio coluna homepod apple tv bluetooth
+896	streaming dados poupança máxima kbps
+897	sugestão ideia proposta melhoria caixa
+898	símbolos animação scramble
+899	demora a abrir, fluidez (FPS e soluços), memória e minutos de uso, com um identificador aleatório que não é 
+900	telemetria desempenho dados consentimento privacidade fps
+901	tutorial boas-vindas começar
+902	versão créditos licença
+903	widgets widget personalização ecrã principal ambiente de trabalho a tocar recentes acessos rápidos playlist fixada tema
+904	{0}\n\nGuardámo-lo nos Rascunhos para o enviares mais tarde.
+905	{0}\n\nPodes reformulá-lo ou, se achares que é um erro, recorrer.
+906	{0} %
+907	{0} bem · {1} por rever · {2} não encontradas
+908	{0} músicas, iguais às do SimpMusic. Não se transferiu nada.
+909	{0} de {1} músicas. Já está na tua Biblioteca; não se transferiu nada (usa «Transferir tudo» se a quiseres offline).
+910	{0} de {1} · Pausar
+911	{0} de {1} · marcam-se sozinhos
+912	{0} terminou o Jam.
+913	{0} playlists importadas
+914	{0} · adicionada por {1}
+915	{0} · {1}
+916	{0} · {1} offline
+917	{0}, já está no Jam
+918	{0}, {1} e mais {2}
+919	{0}. Mantém premido para confirmar
+920	«Máxima» usa AAC a 128 kbps; «Poupança de dados», 48 kbps. Aplica-se a partir da música seguinte.
+921	«Máxima» usa Opus a cerca de 160 kbps; «Poupança de dados», cerca de 50 kbps. Aplica-se a partir da música seguinte.
+922	«{0}» importada
+923	Apagar todos os teus dados?
+924	Apagar a tua conta?
+925	Eliminar o rascunho?
+926	Eliminar «{0}»?
+927	Começar do zero?
+928	Enviar o relatório?
+929	Enviar a sugestão?
+930	Guardar a lista antes de sair?
+931	Retirar «{0}» dos Teus álbuns?
+932	Repor {0}?
+933	Álbum
+934	Álbuns
+935	Última cópia na nuvem
+936	Última cópia: {0}
+937	êxitos do momento
+938	…
+939	❌ Erro {0}
+940	claro ou escuro conforme o telemóvel
+941	Choose your language · Tria la llengua · Escolle o idioma · Aukeratu hizkuntza · Elektu vian lingvon
+942	Escolhido
+943	Escolhe o teu idioma
+944	Espanha
+945	Idioma
+946	A app toda muda de imediato. O que ainda não está traduzido aparece em castelhano.
+947	idioma língua language català valencià galego euskara english esperanto português
+948	Ar
+949	Prata com Helvetica preta e um anel de pontos.
+950	Vidro
+951	Luz difusa com as cores da capa.
+952	Néon
+953	Grelha synthwave que avança enquanto toca.
+954	Sistema
+955	Sem efeitos nem fundos animados.
+956	Castellano
+957	Código {0}
+958	Pessoas: {0}
+959	Playlists: 
+960	Vão enviar-se o teu email, o texto e dados do iPhone (modelo, versão do iOS e da app) para o canal privado de suporte do Pear Music.
+961	Vão enviar-se o teu email, o texto e dados do telemóvel (modelo, versão do Android e da app) para o canal privado de suporte do Pear Music.
+962	Vão enviar-se o teu email, o texto, {0} foto(s) e dados do iPhone (modelo, versão do iOS e da app) para o canal privado de suporte do Pear Music.
+963	Vão enviar-se o teu email, o texto, {0} foto(s) e dados do telemóvel (modelo, versão do Android e da app) para o canal privado de suporte do Pear Music.
+964	Obrigado! É o ticket #{0}. Respondemos-te nos Avisos (só a ti) e no email que indicaste.
+965	Obrigado! Respondemos-te nos Avisos (só a ti) e no email que indicaste.
+966	«{0}» usa sempre o modo claro.
+967	«{0}» usa sempre o modo escuro.
+968	Retirar as transferências de «{0}»?
+969	Retirar as transferências?
+970	Barra inferior do SimpMusic, de maxrave-dev (GPL-3.0)
+971	Barra inferior inspirada no SimpMusic, de maxrave-dev (GPL-3.0)
+972	ontem
+973	A transferir o Pear Music {0}… {1} %
+974	Vão enviar-se o teu email, o texto e a ficha deste iPhone (modelo, versão do iOS e da app e, se tiveres a telemetria ativada, o seu desempenho) para o suporte privado do Pear Music.
+975	Vão enviar-se o teu email, o texto e a ficha deste telemóvel (modelo, versão do Android e da app e, se tiveres a telemetria ativada, o seu desempenho) para o suporte privado do Pear Music.
+976	Vão enviar-se o teu email, o texto, {0} foto(s) e a ficha deste iPhone (modelo, versão do iOS e da app e, se tiveres a telemetria ativada, o seu desempenho) para o suporte privado do Pear Music.
+977	Vão enviar-se o teu email, o texto, {0} foto(s) e a ficha deste telemóvel (modelo, versão do Android e da app e, se tiveres a telemetria ativada, o seu desempenho) para o suporte privado do Pear Music.
+978	Atualizações
+979	Agora não
+980	As Definições podem ir na barra ou em cima no Início, junto ao Jam.
+981	Ao transferir uma versão nova vês o progresso, e a barra clássica já não marca Descobrir quando estás nas Definições.
+982	Ao transferir uma versão nova vês o progresso, e se for preciso dar permissão para instalar não volta a transferir.
+983	Barra clássica
+984	Barras, botões e menus de vidro que refratam o que está atrás, como no iOS 26.
+985	Caixa e erros
+986	Castellano
+987	Castellano, català, valencià, galego, euskara, English, Esperanto e português. Muda de imediato.
+988	Choose your language · Tria la llengua · Escolle o idioma · Aukeratu hizkuntza · Elektu vian lingvon · Escolha o idioma
+989	Cinco widgets para o ecrã principal: A tocar (pequeno e grande), acessos rápidos, uma playlist fixada e recentes.
+990	Como capa grande em Playlists ou como linha em «A tua música».
+991	Com cada relatório ou sugestão vai a ficha do teu telemóvel (modelo e versões), para te ajudarmos mais depressa.
+992	Vidro (luz com as cores da capa), Ar (prata), Néon (synthwave) ou Sistema. E claro, escuro ou conforme o telemóvel.
+993	Quando a fila acaba, continua com uma rádio de músicas parecidas com a última.
+994	Quanto ocupam as tuas músicas transferidas, e apagá-las.
+995	Mostra-me as novidades
+996	Escreve o que procuras, por exemplo «equalizador» ou «tema», e leva-te diretamente à opção.
+997	Exporta tudo o que a app guarda sobre ti para um ficheiro ou apaga-o. Aqui também se ativa ou desativa a telemetria.
+998	Graves, médios e agudos a teu gosto, com predefinições.
+999	Guia das Definições
+1000	A app e o leitor ganham as cores da música que está a tocar. Escolhe onde e quanto, com predefinições ou a teu gosto.
+1001	A música baixa no fim e a seguinte entra suave: 3, 6 ou 10 segundos.
+1002	A carta abre a caixa de sugestões e o escaravelho, «Comunicar um erro». Cada envio tem número de ticket e a resposta chega só a ti, no sino.
+1003	A clássica ou a estilo SimpMusic: cápsula de vidro com uma gota que arrastas, Pesquisa à parte e dobrada ao descer.
+1004	As falhas e novidades do Pear Music, também como notificação se quiseres.
+1005	O que há de novo no Pear Music {0}
+1006	O técnico, dobrado: qualidade de transferência, tolerância ao importar playlists e cache de capas.
+1007	Máxima, ou poupança de dados quando não tens wifi. As transferências vão sempre na máxima.
+1008	Normal, Cassete, Vinil ou Air. Também se muda mantendo premido o minileitor.
+1009	Novidades
+1010	Novo: leva-te por todas as Definições e explica-te cada opção. Está junto à carta.
+1011	Opcional. Guarda a tua biblioteca na nuvem, cifrada com uma chave que só tu tens, e passa-a para outro telemóvel.
+1012	Ordena os separadores arrastando-os. Desliza Descobrir para a esquerda para o tirar da barra.
+1013	O Pear Music já está em português. E «Español» agora chama-se «Castellano».
+1014	Português
+1015	Que todas as músicas soem igualmente alto, sem subir e baixar o volume à mão.
+1016	Recentes, A-Z, Z-A, por tamanho ou à mão. Com «Editar playlists» ordenas arrastando.
+1017	Sair
+1018	Sair do guia
+1019	Suporte mais rápido
+1020	Terminar
+1021	Um percurso por todas as Definições que te explica cada opção. Está junto à carta.
+1022	Uma barra em cima no Início ou um separador à parte.
+1023	Volta a ver as boas-vindas, o percurso e as histórias.
+1024	E ainda
+1025	Já conheces todas as Definições. Volta a este guia quando quiseres com o botão junto à carta.
+1026	Já não marca Descobrir quando estás nas Definições.
+1027	Já podes usar o Pear Music em português. E «Español» agora chama-se «Castellano».
+1028	{0} de {1}
+1029	Pronto!

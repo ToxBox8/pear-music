@@ -218,8 +218,8 @@ fun SupportScreen(draftId: String?, suggestion: Boolean = false) {
             ) {
                 env.app.alert = AlertSpec(
                     if (suggestion) L("¿Enviar la sugerencia?") else L("¿Enviar el reporte?"),
-                    if (photos.isEmpty()) L("Se enviarán tu correo, el texto y datos del móvil (modelo, versión de Android y de la app) al canal privado de soporte de Pear Music.")
-                    else L("Se enviarán tu correo, el texto, {0} foto(s) y datos del móvil (modelo, versión de Android y de la app) al canal privado de soporte de Pear Music.", photos.size),
+                    if (photos.isEmpty()) L("Se enviarán tu correo, el texto y la ficha de este móvil (modelo, versión de Android y de la app y, si tienes la telemetría activada, su rendimiento) al soporte privado de Pear Music.")
+                    else L("Se enviarán tu correo, el texto, {0} foto(s) y la ficha de este móvil (modelo, versión de Android y de la app y, si tienes la telemetría activada, su rendimiento) al soporte privado de Pear Music.", photos.size),
                     buttons = listOf(
                         AlertButton(L("Enviar")) { send() },
                         AlertButton(L("Cancelar"), AlertButton.Role.Cancel),

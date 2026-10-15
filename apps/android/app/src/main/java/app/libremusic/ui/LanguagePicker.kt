@@ -136,6 +136,13 @@ fun Flag(code: String, modifier: Modifier) {
                 drawLine(Color.White, Offset(0f, size.height / 2), Offset(size.width, size.height / 2), w)
             }
             "en" -> unionJack()
+            "pt" -> {
+                // Portugal: verde y rojo (2:3) con la esfera armilar amarilla en la unión.
+                drawRect(PT_GREEN, size = Size(size.width * 0.4f, size.height))
+                drawRect(PT_RED, Offset(size.width * 0.4f, 0f), Size(size.width * 0.6f, size.height))
+                drawCircle(PT_YELLOW, size.height * 0.24f, Offset(size.width * 0.4f, size.height / 2))
+                drawCircle(PT_RED, size.height * 0.13f, Offset(size.width * 0.4f, size.height / 2))
+            }
             "eo" -> {
                 drawRect(EO_GREEN)
                 val s = size.height / 2
@@ -196,3 +203,6 @@ private val EU_GREEN = Color(0xFF009B48)
 private val UK_BLUE = Color(0xFF012169)
 private val UK_RED = Color(0xFFC8102E)
 private val EO_GREEN = Color(0xFF009900)
+private val PT_GREEN = Color(0xFF006600)
+private val PT_RED = Color(0xFFFF0000)
+private val PT_YELLOW = Color(0xFFFFCC00)

@@ -62,7 +62,9 @@ URL de interacciones):
 La app pide sus avisos con `GET /mensajes?device=<id anónimo>` sólo si ya envió algo desde ese móvil. Aquí se guarda
 el resumen SHA-256 del id, nunca el id ni el correo (6 meses).
 
-Activarlo (Toxbox, una vez):
+**Activado el 15-10-2026**: app «Pear Music soporte» (1560289479758184451), `/msg` y `/rp` registrados, rol
+Admin Pear y canal privado #tickets (`wrangler.toml`), secretos subidos con `scripts/activar-discord.sh` (datos en
+`~/.config/pear-music/discord-soporte.env`, 600). Para repetirlo desde cero:
 1. Portal de desarrolladores de Discord › nueva aplicación «Pear Music · soporte» › *Public Key* →
    `npx wrangler secret put DISCORD_PUBLIC_KEY`; *Bot* › token → `npx wrangler secret put DISCORD_BOT_TOKEN`.
 2. *Interactions Endpoint URL*: `https://libremusic-soporte.8toxbox8-69a.workers.dev/discord`.

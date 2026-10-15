@@ -87,6 +87,9 @@ struct RootView: View {
     @AppStorage("showDiscover") private var showDiscover = true
     @AppStorage("introStage") private var introStage = ""
     @AppStorage("openAccountAfterIntro") private var openAccountAfterIntro = false
+    /// Última versión («2.1») cuyas novedades se han visto (1.1).
+    @AppStorage("whatsNewSeen") private var whatsNewSeen = ""
+    @ObservedObject private var guide = Guide.shared
     @State private var showAccount = false
     @State private var tab = RootView.startTab()
     @State private var demoImport = Demo.current?.showImport ?? false
@@ -171,6 +174,21 @@ struct RootView: View {
             }
         }
         .sheet(isPresented: $showAccount) { NavigationStack { AccountView() }.environmentObject(library) }
+        // Novedades tras actualizar (1.1): una vez por versión; no se cierra deslizando, hay que elegir.
+        .background(EmptyView().fullScreenCover(isPresented: Binding(
+            get: { onboarded && termsAcceptedAt > 0 && introStage.isEmpty && whatsNewSeen != WhatsNew.current && guide.active == nil && Demo.current == nil },
+            set: { _ in }
+        )) {
+            WhatsNewView(onTour: { whatsNewSeen = WhatsNew.current; guide.active = "whatsnew" },
+                         onClose: { whatsNewSeen = WhatsNew.current })
+        })
+        // Instalación nueva: ya está la bienvenida, así que estas novedades no salen.
+        .onAppear { if !onboarded && whatsNewSeen.isEmpty { whatsNewSeen = WhatsNew.current } }
+        // La guía y el recorrido de novedades empiezan en Ajustes: en su pestaña o, si está arriba, en Inicio.
+        .onChange(of: guide.active) { g in
+            guard g != nil else { return }
+            tab = TabOrder.tag(settingsTop ? TabOrder.home : TabOrder.settings)
+        }
         // Primeros pasos: se marcan solos (Intro.swift).
         .onChange(of: tab) { if $0 == TabOrder.tag("discover") { FirstSteps.mark("discover") } }
         // Descubrir apagado mientras se estaba en ella: a Inicio.
@@ -229,6 +247,8 @@ struct RootView: View {
             if phase == .active { Task { await AvisosStore.shared.refrescarAlAbrir() } }
             // Estado de incidencias firmado (Fase 4): al abrir; sin red, se queda el último válido.
             if phase == .active { Task { await Incident.shared.refresh() } }
+            // Instalaciones activas: un contador por versión, una vez al día y sin identificadores.
+            if phase == .active { Task { await Ficha.pingActive(); await Ficha.reportDecision() } }
             // Telemetría, sólo con consentimiento: mide mientras la app está a la vista y manda un resumen a la semana (Fase 4b).
             if phase == .active { Telemetry.shared.foreground() }
             if phase == .background { Telemetry.shared.background() }
