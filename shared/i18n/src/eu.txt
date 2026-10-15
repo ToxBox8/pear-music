@@ -969,3 +969,61 @@
 971	SimpMusic-en inspiratutako beheko barra, maxrave-dev-ena (GPL-3.0)
 972	atzo
 973	Pear Music {0} deskargatzen… % {1}
+974	Zure posta, testua eta iPhone honen fitxa (modeloa, iOS eta aplikazioaren bertsioa eta, telemetria aktibatuta baduzu, haren errendimendua) Pear Music-en laguntza pribatura bidaliko dira.
+975	Zure posta, testua eta mugikor honen fitxa (modeloa, Android eta aplikazioaren bertsioa eta, telemetria aktibatuta baduzu, haren errendimendua) Pear Music-en laguntza pribatura bidaliko dira.
+976	Zure posta, testua, {0} argazki eta iPhone honen fitxa (modeloa, iOS eta aplikazioaren bertsioa eta, telemetria aktibatuta baduzu, haren errendimendua) Pear Music-en laguntza pribatura bidaliko dira.
+977	Zure posta, testua, {0} argazki eta mugikor honen fitxa (modeloa, Android eta aplikazioaren bertsioa eta, telemetria aktibatuta baduzu, haren errendimendua) Pear Music-en laguntza pribatura bidaliko dira.
+978	Eguneraketak
+979	Orain ez
+980	Ezarpenak barran edo goian, Hasieran, Jam-aren ondoan egon daitezke.
+981	Bertsio berri bat deskargatzean aurrerapena ikusten duzu, eta barra klasikoak ez du Aurkitu markatzen Ezarpenetan zaudenean.
+982	Bertsio berri bat deskargatzean aurrerapena ikusten duzu, eta instalatzeko baimena eman behar bada ez da berriro deskargatzen.
+983	Barra klasikoa
+984	Atzean dagoena errefraktatzen duten kristalezko barrak, botoiak eta menuak, iOS 26-n bezala.
+985	Postontzia eta akatsak
+986	Castellano
+987	Castellano, català, valencià, galego, euskara, English, Esperanto eta português. Berehala aldatzen da.
+988	Choose your language · Tria la llengua · Escolle o idioma · Aukeratu hizkuntza · Elektu vian lingvon · Escolha o idioma
+989	Hasierako pantailarako bost widget: Orain jotzen (txikia eta handia), lasterbideak, finkatutako zerrenda bat eta azkenak.
+990	Azal handi gisa Zerrendetan edo errenkada gisa «Zure musika»-n.
+991	Txosten edo iradokizun bakoitzarekin zure mugikorraren fitxa doa (modeloa eta bertsioak), lehenago laguntzeko.
+992	Kristala (azalaren koloreekin argia), Airea (zilarra), Neoia (synthwave) edo Sistema. Eta argia, iluna edo mugikorraren arabera.
+993	Ilara amaitzean, azkenaren antzeko abestien irrati batekin jarraitzen du.
+994	Deskargatutako abestiek zenbat hartzen duten eta haiek ezabatzea.
+995	Erakutsi berria
+996	Idatzi bilatzen duzuna, adibidez «ekualizadorea» edo «gaia», eta zuzenean aukerara eramaten zaitu.
+997	Esportatu aplikazioak zutaz gordetzen duen guztia fitxategi batera edo ezabatu. Hemen aktibatzen edo kentzen da telemetria ere.
+998	Baxuak, ertainak eta altuak zure gustura, aurrezarpenekin.
+999	Ezarpenen gida
+1000	Aplikazioak eta erreproduzigailuak jotzen ari den abestiaren koloreak hartzen dituzte. Aukeratu non eta zenbat, aurrezarpenekin edo zure gustura.
+1001	Abestia amaieran jaisten da eta hurrengoa leun sartzen da: 3, 6 edo 10 segundo.
+1002	Gutunak iradokizunen postontzia irekitzen du eta kakalardoak, «Akats baten berri eman». Bidalketa bakoitzak txartel-zenbakia du eta erantzuna zuri bakarrik iristen zaizu, kanpaira.
+1003	Klasikoa edo SimpMusic estilokoa: kristalezko kapsula arrastatzen duzun tanta batekin, Bilatu aparte eta jaistean tolestuta.
+1004	Pear Music-en etenak eta berritasunak, nahi baduzu jakinarazpen gisa ere bai.
+1005	Pear Music {0}-ren berritasunak
+1006	Teknikoa, tolestuta: deskargaren kalitatea, zerrendak inportatzeko tolerantzia eta azalen cachea.
+1007	Gehienekoa, edo datu-aurrezpena wifirik ez duzunean. Deskargak beti gehienekoan.
+1008	Normala, Kasetea, Biniloa edo Air. Mini erreproduzigailua sakatuta edukita ere aldatzen da.
+1009	Berritasunak
+1010	Berria: Ezarpen guztietan zehar eramaten zaitu eta aukera bakoitza azaltzen dizu. Gutunaren ondoan dago.
+1011	Aukerakoa. Gorde zure liburutegia hodeian, zuk bakarrik duzun gako batekin zifratuta, eta eraman beste mugikor batera.
+1012	Ordenatu fitxak arrastatuta. Irristatu Aurkitu ezkerrera barratik kentzeko.
+1013	Pear Music portugesez dago orain. Eta «Español»-i «Castellano» deitzen zaio orain.
+1014	Português
+1015	Abesti guztiek bolumen berean jo dezaten, bolumena eskuz igo eta jaitsi gabe.
+1016	Azkenak, A-Z, Z-A, tamainaren arabera edo eskuz. «Editatu zerrendak» erabiliz arrastatuta ordenatzen dituzu.
+1017	Irten
+1018	Irten gidatik
+1019	Laguntza azkarragoa
+1020	Amaitu
+1021	Ezarpen guztietan zeharreko ibilbidea, aukera bakoitza azaltzen dizuna. Gutunaren ondoan dago.
+1022	Barra bat goian, Hasieran, edo fitxa bat aparte.
+1023	Ikusi berriro ongietorria, ibilbidea eta istorioak.
+1024	Eta gainera
+1025	Ezarpen guztiak ezagutzen dituzu orain. Itzuli gida honetara nahi duzunean gutunaren ondoko botoiarekin.
+1026	Ez du Aurkitu markatzen Ezarpenetan zaudenean.
+1027	Pear Music português-ez erabil dezakezu orain. Eta «Español»-i «Castellano» deitzen zaio orain.
+1028	{0}/{1}
+1029	Prest!
+941	Choose your language · Tria la llengua · Escolle o idioma · Aukeratu hizkuntza · Elektu vian lingvon
+956	Castellano

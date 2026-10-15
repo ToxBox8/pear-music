@@ -2,3 +2,4 @@
 PRODUCT_BUNDLE_IDENTIFIER = com.example.libremusic
 APP_DISPLAY_NAME = Pear Music
 SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited)
+APP_ICON_NAME = AppIcon

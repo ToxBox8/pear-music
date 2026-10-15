@@ -7,13 +7,15 @@ enum I18n {
     struct Lang: Identifiable { let id: String; let name: String; let spain: Bool }
 
     static let langs: [Lang] = [
-        Lang(id: "es", name: "Español", spain: true),
+        // «Castellano» (1.1, lo pidió Toxbox): dentro del grupo de España se distingue mejor de los otros cuatro.
+        Lang(id: "es", name: "Castellano", spain: true),
         Lang(id: "ca", name: "Català", spain: true),
         Lang(id: "va", name: "Valencià", spain: true),
         Lang(id: "gl", name: "Galego", spain: true),
         Lang(id: "eu", name: "Euskara", spain: true),
         Lang(id: "en", name: "English", spain: false),
         Lang(id: "eo", name: "Esperanto", spain: false),
+        Lang(id: "pt", name: "Português", spain: false),
     ]
 
     private static let lock = NSLock()
@@ -24,7 +26,7 @@ enum I18n {
     static func systemDefault() -> String {
         let id = Locale.preferredLanguages.first?.lowercased() ?? "es"
         if id.hasPrefix("ca") { return id.contains("valencia") ? "va" : "ca" }
-        for code in ["gl", "eu", "en", "eo"] where id.hasPrefix(code) { return code }
+        for code in ["gl", "eu", "en", "eo", "pt"] where id.hasPrefix(code) { return code }
         return "es"
     }
 

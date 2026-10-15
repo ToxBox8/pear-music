@@ -971,3 +971,59 @@ Barra inferior de SimpMusic, de maxrave-dev (GPL-3.0)
 Barra inferior inspirada en SimpMusic, de maxrave-dev (GPL-3.0)
 ayer
 Descargando Pear Music {0}… {1} %
+Se enviarán tu correo, el texto y la ficha de este iPhone (modelo, versión de iOS y de la app y, si tienes la telemetría activada, su rendimiento) al soporte privado de Pear Music.
+Se enviarán tu correo, el texto y la ficha de este móvil (modelo, versión de Android y de la app y, si tienes la telemetría activada, su rendimiento) al soporte privado de Pear Music.
+Se enviarán tu correo, el texto, {0} foto(s) y la ficha de este iPhone (modelo, versión de iOS y de la app y, si tienes la telemetría activada, su rendimiento) al soporte privado de Pear Music.
+Se enviarán tu correo, el texto, {0} foto(s) y la ficha de este móvil (modelo, versión de Android y de la app y, si tienes la telemetría activada, su rendimiento) al soporte privado de Pear Music.
+Actualizaciones
+Ahora no
+Ajustes puede ir en la barra o arriba en Inicio, junto al Jam.
+Al descargar una versión nueva ves el progreso, y la barra clásica ya no marca Descubrir cuando estás en Ajustes.
+Al descargar una versión nueva ves el progreso, y si hay que dar permiso para instalar no se vuelve a descargar.
+Barra clásica
+Barras, botones y menús de cristal que refractan lo que hay detrás, como en iOS 26.
+Buzón y errores
+Castellano
+Castellano, català, valencià, galego, euskara, English, Esperanto y português. Cambia al momento.
+Choose your language · Tria la llengua · Escolle o idioma · Aukeratu hizkuntza · Elektu vian lingvon · Escolha o idioma
+Cinco widgets para la pantalla de inicio: Ahora suena (pequeño y grande), accesos rápidos, una playlist fijada y recientes.
+Como portada grande en Playlists o como fila en «Tu música».
+Con cada reporte o sugerencia va la ficha de tu móvil (modelo y versiones), para ayudarte antes.
+Cristal (luz con los colores de la carátula), Aire (plata), Neón (synthwave) o Sistema. Y claro, oscuro o según el móvil.
+Cuando se acaba la cola, sigue con una radio de canciones parecidas a la última.
+Cuánto ocupan tus canciones descargadas y borrarlas.
+Enséñame lo nuevo
+Escribe lo que buscas, por ejemplo «ecualizador» o «tema», y te lleva directo a la opción.
+Exporta todo lo que la app guarda de ti en un archivo o bórralo. Aquí también se activa o se quita la telemetría.
+Graves, medios y agudos a tu gusto, con presets.
+Guía de Ajustes
+La app y el reproductor toman los colores de la canción que suena. Elige dónde y cuánto, con presets o a tu gusto.
+La canción baja al final y la siguiente entra suave: 3, 6 o 10 segundos.
+La carta abre el buzón de sugerencias y el escarabajo, «Informar de un error». Cada envío tiene número de ticket y la respuesta te llega sólo a ti, a la campana.
+La clásica o la estilo SimpMusic: cápsula de cristal con una gota que arrastras, Buscar aparte y plegado al bajar.
+Las caídas y novedades de Pear Music, también como notificación si quieres.
+Lo nuevo de Pear Music {0}
+Lo técnico, plegado: calidad de descarga, tolerancia al importar playlists y caché de carátulas.
+Máxima, o ahorro de datos cuando no tienes wifi. Las descargas siempre van a la máxima.
+Normal, Casete, Vinilo o Air. También se cambia manteniendo pulsado el mini reproductor.
+Novedades
+Nueva: te lleva por todos los Ajustes y te explica cada opción. Está junto a la carta.
+Opcional. Guarda tu biblioteca en la nube, cifrada con una clave que sólo tienes tú, y pásala a otro móvil.
+Ordena las pestañas arrastrándolas. Desliza Descubrir a la izquierda para quitarla de la barra.
+Pear Music ya está en portugués. Y «Español» ahora se llama «Castellano».
+Português
+Que todas las canciones suenen igual de fuerte, sin subir y bajar el volumen a mano.
+Recientes, A-Z, Z-A, por tamaño o a mano. Con «Editar playlists» las ordenas arrastrando.
+Salir
+Salir de la guía
+Soporte más rápido
+Terminar
+Un recorrido por todos los Ajustes que te explica cada opción. Está junto a la carta.
+Una barra arriba en Inicio o una pestaña aparte.
+Vuelve a ver la bienvenida, el recorrido y las historias.
+Y además
+Ya conoces todos los Ajustes. Vuelve a esta guía cuando quieras con el botón junto a la carta.
+Ya no marca Descubrir cuando estás en Ajustes.
+Ya puedes usar Pear Music en português. Y «Español» ahora se llama «Castellano».
+{0} de {1}
+¡Listo!

@@ -969,3 +969,61 @@
 971	Bottom bar inspired by SimpMusic, by maxrave-dev (GPL-3.0)
 972	yesterday
 973	Downloading Pear Music {0}… {1}%
+974	Your email, the text and this iPhone's profile (model, iOS and app version and, if you have telemetry on, its performance) will be sent to Pear Music's private support.
+975	Your email, the text and this phone's profile (model, Android and app version and, if you have telemetry on, its performance) will be sent to Pear Music's private support.
+976	Your email, the text, {0} photo(s) and this iPhone's profile (model, iOS and app version and, if you have telemetry on, its performance) will be sent to Pear Music's private support.
+977	Your email, the text, {0} photo(s) and this phone's profile (model, Android and app version and, if you have telemetry on, its performance) will be sent to Pear Music's private support.
+978	Updates
+979	Not now
+980	Settings can go in the bar or at the top of Home, next to Jam.
+981	When you download a new version you see the progress, and the classic bar no longer highlights Discover while you're in Settings.
+982	When you download a new version you see the progress, and if you need to allow installs it doesn't download again.
+983	Classic bar
+984	Glass bars, buttons and menus that refract what's behind them, like iOS 26.
+985	Inbox and bugs
+986	Castellano
+987	Castellano, català, valencià, galego, euskara, English, Esperanto and português. It changes instantly.
+988	Choose your language · Tria la llengua · Escolle o idioma · Aukeratu hizkuntza · Elektu vian lingvon · Escolha o idioma
+989	Five home screen widgets: Now Playing (small and large), shortcuts, a pinned playlist and recents.
+990	As a big cover in Playlists or as a row in «Your music».
+991	Your phone's profile (model and versions) goes with every report or suggestion, so we can help you sooner.
+992	Glass (light with the artwork's colours), Air (silver), Neon (synthwave) or System. And light, dark or following the phone.
+993	When the queue ends, it carries on with a radio of songs similar to the last one.
+994	How much space your downloaded songs take, and deleting them.
+995	Show me what's new
+996	Type what you're looking for, like «equalizer» or «theme», and it takes you straight to the option.
+997	Export everything the app keeps about you to a file, or delete it. Telemetry is turned on or off here too.
+998	Bass, mids and treble to your taste, with presets.
+999	Settings guide
+1000	The app and the player take on the colours of the song that's playing. Choose where and how much, with presets or your own way.
+1001	The song fades out at the end and the next one comes in softly: 3, 6 or 10 seconds.
+1002	The envelope opens the suggestions inbox and the bug, «Report a problem». Each one gets a ticket number and the reply reaches only you, in the bell.
+1003	The classic one or the SimpMusic-style one: a glass capsule with a drop you can drag, Search on its own and folding as you scroll.
+1004	Pear Music outages and news, also as notifications if you want.
+1005	What's new in Pear Music {0}
+1006	The technical stuff, folded away: download quality, import tolerance for playlists and artwork cache.
+1007	Maximum, or data saver when you're not on wifi. Downloads always use maximum.
+1008	Normal, Cassette, Vinyl or Air. You can also change it by holding the mini player.
+1009	What's new
+1010	New: it walks you through all of Settings and explains each option. It's next to the envelope.
+1011	Optional. Keep your library in the cloud, encrypted with a key only you have, and move it to another phone.
+1012	Reorder the tabs by dragging them. Swipe Discover to the left to remove it from the bar.
+1013	Pear Music is now available in Portuguese. And «Español» is now called «Castellano».
+1014	Português
+1015	Every song plays equally loud, without turning the volume up and down yourself.
+1016	Recent, A-Z, Z-A, by size or by hand. With «Edit playlists» you reorder them by dragging.
+1017	Exit
+1018	Exit the guide
+1019	Faster support
+1020	Finish
+1021	A tour through all of Settings that explains each option. It's next to the envelope.
+1022	A bar at the top of Home or a separate tab.
+1023	See the welcome, the tour and the stories again.
+1024	And also
+1025	Now you know all of Settings. Come back to this guide whenever you like with the button next to the envelope.
+1026	It no longer highlights Discover while you're in Settings.
+1027	You can now use Pear Music in Portuguese. And «Español» is now called «Castellano».
+1028	{0} of {1}
+1029	Done!
+941	Choose your language · Tria la llengua · Escolle o idioma · Aukeratu hizkuntza · Elektu vian lingvon
+956	Castellano

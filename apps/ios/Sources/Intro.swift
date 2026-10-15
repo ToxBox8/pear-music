@@ -16,6 +16,8 @@ extension View {
             Color.clear
                 .onAppear { TourTargets.shared.rects[key] = g.frame(in: .global) }
                 .onChange(of: g.frame(in: .global)) { TourTargets.shared.rects[key] = $0 }
+                // Fuera de la pantalla: nada de focos sobre un sitio que ya no existe (guía de Ajustes, 1.1).
+                .onDisappear { TourTargets.shared.rects[key] = nil }
         })
     }
 }
@@ -106,6 +108,223 @@ struct TourOverlay: View {
             .shadow(color: .black.opacity(0.3), radius: 18, y: 8))
         .accessibilityElement(children: .contain)
         .accessibilityLabel(L("Recorrido: {0}. {1}", step.title, step.text))
+    }
+}
+
+// MARK: - Guía de Ajustes y novedades (1.1)
+/// Igual que `TourOverlay(guided = true)` en Android: cada paso abre su pantalla de Ajustes (`Guide.path`), espera a
+/// que se pinte lo que resalta y se avanza con «Siguiente». Un paso sin elemento enseña sólo la tarjeta; uno cuyo
+/// elemento no existe en este iPhone se salta. Diferencia aceptada: el buscador de Ajustes es del sistema
+/// (`.searchable`) y no se puede medir, así que su paso se salta en iOS.
+enum SettingsRoute: Hashable { case aspect, audio, library, help }
+
+@MainActor
+final class Guide: ObservableObject {
+    static let shared = Guide()
+    /// «settings» (botón junto a la carta) o «whatsnew» (desde el panel de novedades).
+    @Published var active: String?
+    /// La pila de Ajustes mientras dura la guía.
+    @Published var path: [SettingsRoute] = []
+}
+
+struct GuideStep {
+    let keys: [String]
+    let title: String
+    let text: String
+    var route: [SettingsRoute] = []
+}
+
+enum GuideSteps {
+    private static func row(_ title: String, _ text: String, _ route: SettingsRoute? = nil) -> GuideStep {
+        GuideStep(keys: ["row:\(title)", "section:\(title)"], title: title, text: text, route: route.map { [$0] } ?? [])
+    }
+
+    static var settings: [GuideStep] { [
+        GuideStep(keys: ["settings:search"], title: L("Buscar en Ajustes"), text: L("Escribe lo que buscas, por ejemplo «ecualizador» o «tema», y te lleva directo a la opción.")),
+        GuideStep(keys: ["settings:mail"], title: L("Buzón y errores"), text: L("La carta abre el buzón de sugerencias y el escarabajo, «Informar de un error». Cada envío tiene número de ticket y la respuesta te llega sólo a ti, a la campana.")),
+        row(L("Cuenta"), L("Opcional. Guarda tu biblioteca en la nube, cifrada con una clave que sólo tienes tú, y pásala a otro móvil.")),
+        row(L("Tema"), L("Cristal (luz con los colores de la carátula), Aire (plata), Neón (synthwave) o Sistema. Y claro, oscuro o según el móvil."), .aspect),
+        row(L("Reproductor"), L("Normal, Casete, Vinilo o Air. También se cambia manteniendo pulsado el mini reproductor."), .aspect),
+        row(L("Colores de la portada"), L("La app y el reproductor toman los colores de la canción que suena. Elige dónde y cuánto, con presets o a tu gusto."), .aspect),
+        row(L("Pestañas"), L("Ordena las pestañas arrastrándolas. Desliza Descubrir a la izquierda para quitarla de la barra."), .aspect),
+        row(L("Barra inferior"), L("La clásica o la estilo SimpMusic: cápsula de cristal con una gota que arrastras, Buscar aparte y plegado al bajar."), .aspect),
+        row(L("Ajustes"), L("Ajustes puede ir en la barra o arriba en Inicio, junto al Jam."), .aspect),
+        row(L("Idioma"), L("Castellano, català, valencià, galego, euskara, English, Esperanto y português. Cambia al momento.")),
+        row(L("Calidad al escuchar"), L("Máxima, o ahorro de datos cuando no tienes wifi. Las descargas siempre van a la máxima."), .audio),
+        row(L("Seguir con canciones parecidas"), L("Cuando se acaba la cola, sigue con una radio de canciones parecidas a la última."), .audio),
+        row(L("Fundido entre canciones"), L("La canción baja al final y la siguiente entra suave: 3, 6 o 10 segundos."), .audio),
+        row(L("Descargas"), L("Cuánto ocupan tus canciones descargadas y borrarlas.")),
+        row(L("Ordenar playlists por"), L("Recientes, A-Z, Z-A, por tamaño o a mano. Con «Editar playlists» las ordenas arrastrando."), .library),
+        row(L("Descargadas y Favoritos"), L("Como portada grande en Playlists o como fila en «Tu música»."), .library),
+        row(L("Dónde está Buscar"), L("Una barra arriba en Inicio o una pestaña aparte."), .library),
+        row(L("Avisos"), L("Las caídas y novedades de Pear Music, también como notificación si quieres."), .help),
+        row(L("Guía inicial"), L("Vuelve a ver la bienvenida, el recorrido y las historias."), .help),
+        row(L("Tus datos"), L("Exporta todo lo que la app guarda de ti en un archivo o bórralo. Aquí también se activa o se quita la telemetría."), .help),
+        row(L("Avanzado"), L("Lo técnico, plegado: calidad de descarga, tolerancia al importar playlists y caché de carátulas.")),
+        GuideStep(keys: [], title: L("¡Listo!"), text: L("Ya conoces todos los Ajustes. Vuelve a esta guía cuando quieras con el botón junto a la carta.")),
+    ] }
+
+    static var whatsNew: [GuideStep] { [
+        GuideStep(keys: ["settings:guide"], title: L("Guía de Ajustes"), text: L("Nueva: te lleva por todos los Ajustes y te explica cada opción. Está junto a la carta.")),
+        row(L("Idioma"), L("Ya puedes usar Pear Music en português. Y «Español» ahora se llama «Castellano».")),
+        GuideStep(keys: ["settings:mail"], title: L("Buzón y errores"), text: L("Con cada reporte o sugerencia va la ficha de tu móvil (modelo y versiones), para ayudarte antes.")),
+        GuideStep(keys: [], title: L("Y además"), text: L("Al descargar una versión nueva ves el progreso, y la barra clásica ya no marca Descubrir cuando estás en Ajustes.")),
+    ] }
+}
+
+struct GuideOverlay: View {
+    let steps: [GuideStep]
+    let onDone: () -> Void
+    @ObservedObject private var targets = TourTargets.shared
+    @ObservedObject private var guide = Guide.shared
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var index = 0
+    @State private var key: String?
+    @State private var ready = false
+    @State private var pulse = false
+
+    var body: some View {
+        GeometryReader { g in
+            let origin = g.frame(in: .global).origin
+            let hole = key.flatMap { targets.rects[$0] }?.offsetBy(dx: -origin.x, dy: -origin.y).insetBy(dx: -8, dy: -8)
+            ZStack(alignment: .topLeading) {
+                if ready, let hole {
+                    Color.black.opacity(0.62)
+                        .mask {
+                            Rectangle().overlay(RoundedRectangle(cornerRadius: hole.height / 2.6, style: .continuous)
+                                .frame(width: hole.width, height: hole.height).position(x: hole.midX, y: hole.midY).blendMode(.destinationOut))
+                                .compositingGroup()
+                        }
+                    RoundedRectangle(cornerRadius: hole.height / 2.6 + (pulse ? 12 : 0), style: .continuous)
+                        .stroke(Color.accentColor.opacity(pulse ? 0 : 0.9), lineWidth: 2.5)
+                        .frame(width: hole.width + (pulse ? 24 : 0), height: hole.height + (pulse ? 24 : 0))
+                        .position(x: hole.midX, y: hole.midY)
+                } else {
+                    Color.black.opacity(0.62)
+                }
+                if ready, index < steps.count {
+                    card(steps[index])
+                        .padding(.horizontal, 20)
+                        .frame(maxWidth: 520)
+                        .position(x: g.size.width / 2,
+                                  y: hole.map { $0.midY < 360 ? $0.maxY + 120 : $0.minY - 120 } ?? g.size.height / 2)
+                }
+            }
+            .contentShape(Rectangle())
+            .onTapGesture { p in if ready, let hole, hole.contains(p) { advance() } }
+            .animation(.uiEaseOut(0.42), value: index)
+            .onAppear {
+                guard !reduceMotion else { return }
+                withAnimation(.easeOut(duration: 1.4).repeatForever(autoreverses: false)) { pulse = true }
+            }
+        }
+        .ignoresSafeArea()
+        .task(id: index) { await prepare() }
+    }
+
+    /// Abre la pantalla del paso y espera (hasta 2 s) a que su elemento esté pintado.
+    private func prepare() async {
+        guard index < steps.count else { onDone(); return }
+        ready = false
+        key = nil
+        let step = steps[index]
+        if guide.path != step.route { guide.path = step.route }
+        var found: String?
+        for _ in 0..<40 {
+            found = step.keys.first { targets.rects[$0].map { !$0.isEmpty } == true }
+            if found != nil { break }
+            try? await Task.sleep(nanoseconds: 50_000_000)
+        }
+        if found == nil, !step.keys.isEmpty { advance(); return }
+        if found != nil { try? await Task.sleep(nanoseconds: 300_000_000) } // que termine la animación de entrar
+        key = found
+        ready = true
+    }
+
+    private func advance() {
+        if index >= steps.count - 1 { onDone() } else { index += 1 }
+    }
+
+    private func card(_ step: GuideStep) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack {
+                Text(step.title).font(.title3.bold())
+                Spacer()
+                Text(L("{0} de {1}", index + 1, steps.count)).font(.footnote).foregroundStyle(.secondary)
+            }
+            Text(step.text).font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+            HStack {
+                Button(L("Salir"), action: onDone).font(.subheadline).foregroundStyle(.secondary)
+                    .accessibilityLabel(L("Salir de la guía"))
+                Spacer()
+                Button(index >= steps.count - 1 ? L("Terminar") : L("Siguiente"), action: advance)
+                    .buttonStyle(PillButtonStyle(prominent: true))
+                    .fixedSize()
+            }
+            .padding(.top, 8)
+        }
+        .padding(20)
+        .background(RoundedRectangle(cornerRadius: 22, style: .continuous).fill(Color(uiColor: .systemBackground))
+            .shadow(color: .black.opacity(0.3), radius: 18, y: 8))
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel(L("Recorrido: {0}. {1}", step.title, step.text))
+    }
+}
+
+// MARK: - Novedades tras actualizar (1.1)
+/// Igual que `WhatsNewScreen` en Android: la primera vez que se abre una versión nueva, a pantalla completa y sin
+/// poder cerrarla deslizando; «Enséñame lo nuevo» abre el recorrido de novedades y «Ahora no» lo cierra.
+enum WhatsNew {
+    /// Versión «mayor.menor»: los arreglos (2.1.1) no vuelven a enseñar el panel.
+    static var current: String { AboutView.version.split(separator: ".").prefix(2).joined(separator: ".") }
+
+    struct Item: Identifiable { let id = UUID(); let icon: String; let palette: Int; let title: String; let text: String }
+
+    static var items: [Item] { [
+        Item(icon: "graduationcap.fill", palette: 4, title: L("Guía de Ajustes"), text: L("Un recorrido por todos los Ajustes que te explica cada opción. Está junto a la carta.")),
+        Item(icon: "globe", palette: 3, title: L("Português"), text: L("Pear Music ya está en portugués. Y «Español» ahora se llama «Castellano».")),
+        Item(icon: "envelope.fill", palette: 1, title: L("Soporte más rápido"), text: L("Con cada reporte o sugerencia va la ficha de tu móvil (modelo y versiones), para ayudarte antes.")),
+        Item(icon: "arrow.down.circle.fill", palette: 2, title: L("Actualizaciones"), text: L("Al descargar una versión nueva ves el progreso, y si hay que dar permiso para instalar no se vuelve a descargar.")),
+    ] }
+}
+
+struct WhatsNewView: View {
+    let onTour: () -> Void
+    let onClose: () -> Void
+
+    var body: some View {
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text(L("Novedades")).font(.largeTitle.bold()).padding(.top, 40)
+                    Text(L("Lo nuevo de Pear Music {0}", WhatsNew.current)).foregroundStyle(.secondary).padding(.top, 6)
+                    VStack(alignment: .leading, spacing: 22) {
+                        ForEach(WhatsNew.items) { item in
+                            HStack(alignment: .top, spacing: 16) {
+                                GradientIcon(systemName: item.icon, palette: item.palette, size: 40)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(item.title).font(.headline)
+                                    Text(item.text).font(.subheadline).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                                }
+                            }
+                        }
+                    }
+                    .padding(.top, 28)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 20)
+            }
+            VStack(spacing: 10) {
+                Button(action: onTour) { Text(L("Enséñame lo nuevo")).frame(maxWidth: .infinity) }
+                    .buttonStyle(PillButtonStyle(prominent: true))
+                Button(action: onClose) { Text(L("Ahora no")).frame(maxWidth: .infinity) }
+                    .buttonStyle(PillButtonStyle(prominent: false))
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 14)
+        }
+        .themed()
+        .interactiveDismissDisabled()
     }
 }
 

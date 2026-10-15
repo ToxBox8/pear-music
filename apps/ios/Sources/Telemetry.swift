@@ -25,6 +25,9 @@ final class Telemetry: NSObject {
     var enabled: Bool { Channel.adminTools || defaults.bool(forKey: "telemetry.consent") }
     var asked: Bool { defaults.object(forKey: "telemetry.consent") != nil }
 
+    /// El identificador de la telemetría, sólo si está activada (para unirla a la ficha del soporte).
+    var installIfEnabled: String? { enabled ? install : nil }
+
     func setConsent(_ on: Bool) {
         let was = enabled
         defaults.set(on, forKey: "telemetry.consent")
