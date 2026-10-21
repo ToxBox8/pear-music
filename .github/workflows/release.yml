@@ -62,7 +62,7 @@ jobs:
           sha256sum LibreMusic-* > SHA256SUMS.txt
           ls -l
 
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@v3
         with:
           name: ${{ steps.meta.outputs.title }}
           files: dist/*
