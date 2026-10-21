@@ -45,7 +45,7 @@ jobs:
         working-directory: .
         run: python3 shared/design/gen_tokens.py --check
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "17"
