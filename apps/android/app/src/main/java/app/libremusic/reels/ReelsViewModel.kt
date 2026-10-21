@@ -40,6 +40,8 @@ data class ReelsState(
     /** Avance dentro del fragmento de 30 s (0‥1). */
     val clipProgress: Float = 0f,
     val broken: Set<String> = emptySet(),
+    /** «No me interesa» recién pulsado (canción y su sitio), para «Deshacer» durante 4 s. */
+    val undo: Pair<Song, Int>? = null,
 ) {
     val current: Song? get() = items.getOrNull(index)
 }
@@ -148,7 +150,7 @@ class ReelsViewModel(app: Application) : AndroidViewModel(app) {
             }
             known.clear()
             known += exclude
-            val items = merged.filter { known.add(it.id) }
+            val items = app.libremusic.data.ReelsSkip.filter(merged).filter { known.add(it.id) }
             _state.value = ReelsState(items = items, failed = items.isEmpty())
             if (items.isNotEmpty()) activate()
         }
@@ -161,10 +163,33 @@ class ReelsViewModel(app: Application) : AndroidViewModel(app) {
         loadingMore = true
         viewModelScope.launch {
             val more = withContext(Dispatchers.IO) { runCatching { YTClient.radio(seed.id) }.getOrDefault(emptyList()) }
-            _state.value = _state.value.copy(items = _state.value.items + more.filter { known.add(it.id) })
+            _state.value = _state.value.copy(items = _state.value.items + app.libremusic.data.ReelsSkip.filter(more).filter { known.add(it.id) })
             loadingMore = false
         }
     }
+
+    /** «No me interesa» (2.7 de x.1.1): se guarda, sale del feed y el siguiente ocupa su sitio. */
+    fun notInterested(song: Song) {
+        app.libremusic.data.ReelsSkip.add(song)
+        val s = _state.value
+        val i = s.items.indexOfFirst { it.id == song.id }
+        if (i < 0) return
+        val items = s.items.toMutableList().apply { removeAt(i) }
+        _state.value = s.copy(items = items, index = s.index.coerceAtMost(items.lastIndex).coerceAtLeast(0), undo = song to i, clipProgress = 0f)
+        if (items.isEmpty()) { player.stop(); return }
+        activate()
+        loadMoreIfNeeded()
+    }
+
+    fun undoNotInterested() {
+        val (song, i) = _state.value.undo ?: return
+        app.libremusic.data.ReelsSkip.remove(song.id)
+        val items = _state.value.items.toMutableList().apply { add(i.coerceAtMost(size), song) }
+        _state.value = _state.value.copy(items = items, index = i.coerceAtMost(items.lastIndex), undo = null, clipProgress = 0f)
+        activate()
+    }
+
+    fun clearUndo() { _state.value = _state.value.copy(undo = null) }
 
     fun go(index: Int) {
         if (index == _state.value.index && player.mediaItemCount > 0) return

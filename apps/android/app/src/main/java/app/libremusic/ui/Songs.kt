@@ -149,7 +149,7 @@ fun SongRow(
 ) {
     val c = Libre.colors
     val env = LocalEnv.current
-    val player by env.player.state.collectAsState()
+    val player by env.player.track.collectAsState()
     val isCurrent = player.current?.id == song.id
     var menu by remember { mutableStateOf(false) }
     Row(modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {

@@ -9,7 +9,8 @@ export const FIELDS = {
   os_version: (v) => v == null || (typeof v === "string" && v.length <= 32),
   device_model: (v) => v == null || (typeof v === "string" && v.length <= 64),
   week: (v) => typeof v === "string" && /^\d{4}-W(0[1-9]|[1-4]\d|5[0-3])$/.test(v),
-  kind: (v) => v === "semanal" || v === "manual",
+  // «forzado» (2.12 de x.1.1): la semana en curso, porque el panel lo pidió.
+  kind: (v) => v === "semanal" || v === "manual" || v === "forzado",
   sessions: (v) => v == null || (Number.isInteger(v) && v >= 0 && v < 10_000),
   startup_ms: (v) => v == null || (Number.isInteger(v) && v >= 0 && v < 120_000),
   fps_median: (v) => v == null || (typeof v === "number" && v >= 0 && v <= 240),
@@ -62,5 +63,17 @@ export async function panelSummary(db) {
     versions: await all("SELECT platform, channel, app_version, count(DISTINCT install) AS installs FROM telemetry GROUP BY platform, channel, app_version ORDER BY installs DESC LIMIT 30"),
     devices: await all(`SELECT platform, device_model, count(DISTINCT install) AS installs, ${avg} FROM telemetry WHERE device_model IS NOT NULL GROUP BY platform, device_model ORDER BY installs DESC LIMIT 20`),
     latest: await all("SELECT received, kind, week, platform, channel, app_version, os_version, device_model, sessions, startup_ms, fps_median, jank_percent, memory_mb, session_minutes FROM telemetry ORDER BY received DESC LIMIT 30"),
+    // Órdenes del panel y cuántas apps han respondido a cada «forzar» (2.12 de x.1.1).
+    ordenes: await all("SELECT o.id, o.kind, o.at, o.borradas, (SELECT count(*) FROM telemetry t WHERE o.kind = 'forzar' AND t.kind = 'forzado' AND t.received >= o.at) AS respuestas FROM ordenes o ORDER BY o.at DESC LIMIT 10"),
   };
+}
+
+/** Entre dos «forzar», al menos esto (para no tirar del panel sin querer). */
+export const FORZAR_EVERY_MS = 10 * 60_000;
+/** Las apps atienden un «forzar» durante una semana (lo ven en su latido diario). */
+export const ORDEN_TTL_MS = 7 * 86_400_000;
+
+/** El último «forzar» vigente, o null. */
+export async function ordenVigente(db, now) {
+  return db.prepare("SELECT id FROM ordenes WHERE kind = 'forzar' AND at > ? ORDER BY at DESC LIMIT 1").bind(now - ORDEN_TTL_MS).first("id");
 }

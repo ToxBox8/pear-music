@@ -117,19 +117,31 @@ object AvisosRepo {
         lista ?: guardado?.let { runCatching { parsearPersonales(it) }.getOrNull() }.orEmpty()
     }
 
+    /**
+     * Título de una respuesta del soporte en el idioma de la app, por su tipo (1.12 de x.1.1): el Worker lo manda en
+     * español. Lo que escribe Toxbox se queda como lo escribe; el texto por defecto de «abierto» llega como plantilla.
+     */
+    fun tituloPersonal(tipo: String): String = when (tipo) {
+        "abierto" -> L("Abrimos tu incidencia")
+        "fiesta" -> L("¡Solucionado! Gracias")
+        "en-ello" -> L("Estamos en ello")
+        else -> L("Respuesta de Pear Music")
+    }
+
     fun parsearPersonales(json: String): List<Aviso> {
         val lista = JSONObject(json).getJSONArray("mensajes")
         return (0 until lista.length()).map { i ->
             val m = lista.getJSONObject(i)
             val n = m.optInt("ticket")
+            val tipo = m.optString("tipo").takeIf { it in setOf("abierto", "mensaje", "fiesta", "en-ello") } ?: "mensaje"
             Aviso(
                 id = "ticket-" + m.getString("id"),
                 importante = false,
-                titulo = m.optString("title").ifEmpty { L("Respuesta de Pear Music") },
-                texto = m.optString("text"),
+                titulo = tituloPersonal(tipo),
+                texto = if (m.optString("plantilla") == "abierto") L("Hemos abierto tu incidencia y la estamos mirando. Te avisaremos aquí.") else m.optString("text"),
                 enlace = null,
                 fecha = Instant.parse(m.getString("at")),
-                personal = m.optString("tipo").takeIf { it in setOf("abierto", "mensaje", "fiesta", "en-ello") } ?: "mensaje",
+                personal = tipo,
                 ticket = n.takeIf { it > 0 },
             )
         }

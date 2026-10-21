@@ -46,7 +46,7 @@ Transporte abierto que ambas plataformas implementan con APIs nativas:
 - Sin límite fijo de 8; Android limita a 16 (`{"type":"error","reason":"full"}` si está lleno).
 - Nombres repetidos: el anfitrión los desambigua («Ana (2)»).
 - Android usa `NsdManager` con `_lm-jam2._tcp.`; iOS usa `NWListener`/`NWBrowser` (`apps/ios/Sources/JamNet.swift`) con `_lm-jam2._tcp`.
-- Sincronización de reproducción (opcional, v2.1): `{"type":"sync","videoId":"…","positionMs":12345,"serverTimeMs":…}`.
+- Sincronización de reproducción: ver **v2.1** abajo.
 
 ## Permisos
 
@@ -70,3 +70,23 @@ Transporte abierto que ambas plataformas implementan con APIs nativas:
 - **Cola de resolución en Android** en lugar de reintentos con espera: antes, con varios Jams en la red, el bueno
   podía descartarse tras 5 reintentos.
 - Tiempo de entrada en el registro: `LMJam join_ms=… via=directo|wifi` (`adb logcat -s LMJam`).
+
+## v2.1 · Cada uno en su móvil (x.1.1)
+
+Lo pidió Toxbox (2.6): además de «un altavoz» (suena sólo en el anfitrión, como siempre), el anfitrión puede elegir
+**cada uno en su móvil**: todos oyen lo mismo a la vez, **cada uno con su propio audio** (nadie transmite sonido; cada
+móvil resuelve la canción él mismo). Sigue siendo `"v":2`: los mensajes nuevos son añadidos y quien no los entiende
+los ignora (y sigue en «un altavoz»).
+
+- `state.mode`: `"altavoz"` (por defecto, también si falta) o `"todos"`. Lo cambia sólo el anfitrión.
+- Anfitrión → todos, sólo con `"todos"`: `{"v":2,"type":"play","song":{…}|ausente,"positionMs":30000,"atMs":<su hora en ms>,"playing":true}`
+  al cambiar de canción o de pausa y cada 5 s. A quien entra se le manda el último al momento.
+- Reloj (como NTP): el invitado manda `{"type":"ping","t0":<su hora>}` 4 veces al entrar y luego cada 30 s; el
+  anfitrión contesta `{"type":"pong","t0":…,"th":<su hora>}`. Diferencia = `th − (t0 + t1)/2`; vale la media de las
+  dos medidas con menos ida y vuelta.
+- Invitado: posición esperada = `positionMs + (ahora + diferencia − atMs)`. Cada 2 s: más de 250 ms de desfase, salto;
+  entre 60 y 250 ms, velocidad ×1,03 o ×0,97 hasta alcanzarlo; menos, velocidad normal. Mientras carga no se corrige.
+- El invitado puede quitar «Escuchar también aquí» (p. ej. si está al lado del altavoz).
+- Sólo en el transporte v2 (TCP). Un iPhone que haya entrado por MultipeerConnectivity (v1) no lo sigue.
+- Lógica sin red, con tests: `JamSync` (Kotlin y Swift). Objetivo medido: < 80 ms (pendiente de medir con dos móviles).
+

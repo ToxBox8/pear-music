@@ -54,7 +54,7 @@ private struct JamStartView: View {
                     Button {
                         jam.host(title: title, as: name)
                     } label: {
-                        Label("Crear Jam", systemImage: "person.3.fill")
+                        Label(L("Crear Jam"), systemImage: "person.3.fill")
                     }
                     .buttonStyle(PillButtonStyle(prominent: true))
                     .disabled(!hasName)
@@ -67,11 +67,11 @@ private struct JamStartView: View {
                     JamCodeField(code: $code)
                     HStack(spacing: 12) {
                         Button { scanning = true } label: {
-                            Label("Escanear QR", systemImage: "qrcode.viewfinder")
+                            Label(L("Escanear QR"), systemImage: "qrcode.viewfinder")
                         }
                         .buttonStyle(PillButtonStyle(prominent: false))
                         Button { join() } label: {
-                            Label("Unirme", systemImage: "arrow.right")
+                            Label(L("Unirme"), systemImage: "arrow.right")
                         }
                         .buttonStyle(PillButtonStyle(prominent: true))
                         .disabled(!hasName || code.count < 6)
@@ -79,7 +79,7 @@ private struct JamStartView: View {
                 }
 
                 if !hasName {
-                    Label("Escribe tu nombre para crear un Jam o unirte.", systemImage: "info.circle")
+                    Label(L("Escribe tu nombre para crear un Jam o unirte."), systemImage: "info.circle")
                         .font(.footnote).foregroundStyle(.secondary)
                 }
             }
@@ -281,7 +281,7 @@ private struct JamRoomView: View {
                             .listRowInsets(EdgeInsets(top: 6, leading: 20, bottom: 6, trailing: 16))
                             .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                                 if jam.isActive && jam.canRemove(e) {
-                                    Button(role: .destructive) { jam.remove(e) } label: { Label("Quitar", systemImage: "minus.circle") }
+                                    Button(role: .destructive) { jam.remove(e) } label: { Label(L("Quitar"), systemImage: "minus.circle") }
                                 }
                             }
                     }
@@ -338,6 +338,8 @@ private struct JamRoomView: View {
 
             JamMembers(members: state.members)
 
+            if jam.isActive { JamListenMode() }
+
             if case .lost(let why) = jam.phase {
                 Label(why, systemImage: "wifi.slash")
                     .font(.subheadline.weight(.semibold))
@@ -367,17 +369,17 @@ private struct JamRoomView: View {
 
             HStack(spacing: 12) {
                 if jam.isActive {
-                    Button { adding = true } label: { Label("Añadir", systemImage: "plus") }
+                    Button { adding = true } label: { Label(L("Añadir"), systemImage: "plus") }
                         .buttonStyle(PillButtonStyle(prominent: true))
                 } else if savedName == nil {
-                    Button { save(state) } label: { Label("Guardar lista", systemImage: "square.and.arrow.down") }
+                    Button { save(state) } label: { Label(L("Guardar lista"), systemImage: "square.and.arrow.down") }
                         .buttonStyle(PillButtonStyle(prominent: true))
                         .disabled(state.entries.isEmpty)
                 }
                 Button {
                     let songs = state.entries.map(\.song)
                     if let f = songs.first { player.play(f, in: songs) }
-                } label: { Label("Reproducir", systemImage: "play.fill") }
+                } label: { Label(L("Reproducir"), systemImage: "play.fill") }
                     .buttonStyle(PillButtonStyle(prominent: false))
                     .disabled(state.entries.isEmpty)
             }
@@ -393,8 +395,8 @@ private struct JamRoomView: View {
 
     private func subtitle(_ s: JamState) -> String {
         let n = s.entries.count
-        let songs = n == 1 ? L("1 canción") : "\(n) canciones"
-        return jam.isHost ? L("Lo has creado tú · {0}", songs) : "De \(s.host) · \(songs)"
+        let songs = songCount(n)
+        return jam.isHost ? L("Lo has creado tú · {0}", songs) : L("De {0} · {1}", s.host, songs)
     }
 
     private func save(_ s: JamState) {
@@ -410,6 +412,38 @@ private struct JamRoomView: View {
 
     private func askLeave(_ s: JamState) {
         if s.entries.isEmpty || savedName != nil { jam.leave() } else { confirmLeave = true }
+    }
+}
+
+/// Dónde suena (2.6 de x.1.1): el anfitrión elige un altavoz (el suyo) o cada uno en su móvil, a la vez. El
+/// invitado, con «cada uno en su móvil», puede quitarlo en el suyo. Igual que `ListenMode` en Android.
+private struct JamListenMode: View {
+    @EnvironmentObject var jam: JamService
+
+    var body: some View {
+        let everyone = jam.jam?.everyone == true
+        if jam.isHost {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(L("Dónde suena")).font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                Picker(L("Dónde suena"), selection: Binding(get: { everyone ? JamSync.everyone : JamSync.speaker }, set: { jam.setMode($0) })) {
+                    Text(L("Un altavoz")).tag(JamSync.speaker)
+                    Text(L("Cada uno en su móvil")).tag(JamSync.everyone)
+                }
+                .pickerStyle(.segmented)
+                Text(everyone ? L("Lo que suena aquí suena a la vez en el móvil de cada uno, con su propio audio. Pon algo de la lista.")
+                              : L("Suena sólo en este móvil; los demás añaden canciones."))
+                    .font(.footnote).foregroundStyle(.secondary)
+            }
+        } else if everyone, let host = jam.jam?.host {
+            Toggle(isOn: $jam.listenHere) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(L("Escuchar también aquí")).font(.subheadline.weight(.semibold))
+                    Text(L("Suena lo mismo que en el móvil de {0}, a la vez.", host)).font(.footnote).foregroundStyle(.secondary)
+                }
+            }
+            .padding(.leading, 14).padding(.trailing, 10).padding(.vertical, 8)
+            .background(ThemeSurface(radius: 16))
+        }
     }
 }
 
@@ -459,8 +493,8 @@ private struct JamMembers: View {
         switch members.count {
         case 0: return ""
         case 1: return L("Sólo {0} por ahora", members[0])
-        case 2: return "\(members[0]) y \(members[1])"
-        case 3: return "\(members[0]), \(members[1]) y \(members[2])"
+        case 2: return L("{0} y {1}", members[0], members[1])
+        case 3: return L("{0}, {1} y {2}", members[0], members[1], members[2])
         default: return L("{0}, {1} y {2} más", members[0], members[1], members.count - 2)
         }
     }

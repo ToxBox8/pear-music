@@ -86,3 +86,12 @@ CREATE TABLE IF NOT EXISTS decisiones (
   n INTEGER NOT NULL DEFAULT 0,
   PRIMARY KEY (platform, channel, decision)
 );
+
+-- Órdenes del panel (2.12 y 2.12.1 de x.1.1): «forzar» pide a las apps con consentimiento el resumen de la semana en
+-- curso (lo recogen en su latido diario); «reset» deja constancia de que se borró la telemetría.
+CREATE TABLE IF NOT EXISTS ordenes (
+  id TEXT PRIMARY KEY,
+  kind TEXT NOT NULL,                -- forzar | reset
+  at INTEGER NOT NULL,
+  borradas INTEGER                   -- reset: cuántos informes se borraron
+);

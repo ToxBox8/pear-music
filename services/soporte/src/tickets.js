@@ -28,20 +28,92 @@ export async function nextTicket(env) {
   return n;
 }
 
-export async function saveTicket(env, n, { kind, deviceId, text, platform }) {
-  const t = { n, kind, device: await hashId(deviceId), summary: text.trim().replace(/\s+/g, " ").slice(0, 80), platform, status: "nuevo", at: new Date().toISOString() };
+/**
+ * Autor para los listados (2.1 de x.1.1), sin guardar el correo ni el id: «an…@gmail.com · disp. 7F3A». El
+ * dispositivo son 4 letras del resumen SHA-256 que ya se guardaba.
+ */
+export function author(email, deviceHash) {
+  const [local = "", domain = ""] = String(email ?? "").trim().toLowerCase().split("@");
+  const mail = local && domain ? `${local.slice(0, 2)}…@${domain}` : "anónimo";
+  return `${mail} · disp. ${String(deviceHash ?? "").slice(0, 4).toUpperCase()}`;
+}
+
+export async function saveTicket(env, n, { kind, deviceId, text, platform, email, appVersion }) {
+  const device = await hashId(deviceId);
+  // El índice antes de guardar el ticket: si toca rellenarlo, el nuevo no debe entrar dos veces.
+  const index = await getIndex(env);
+  const t = { n, kind, device, summary: text.trim().replace(/\s+/g, " ").slice(0, 80), platform, status: "nuevo", at: new Date().toISOString() };
   await putJSON(env, `t:${n}`, t);
   const open = await getJSON(env, "tickets:open", []);
   open.unshift({ n, kind, summary: t.summary });
   await putJSON(env, "tickets:open", open.slice(0, 200));
+  // Índice para /sugerencias y /reportes: una sola lectura de KV por listado (listar claves es lento y tiene límite).
+  index.unshift({ n, kind, summary: t.summary, author: author(email, device), platform, version: String(appVersion ?? "").slice(0, 20), status: "nuevo", at: t.at });
+  await putJSON(env, "tickets:index", index.slice(0, INDEX_MAX));
   return t;
 }
 
+const INDEX_MAX = 1000;
+const PAGE = 20;
+
+/**
+ * El índice; si aún no existe (tickets de antes de x.1.1), se rellena una vez con los `t:<n>` guardados. De esos no
+ * hay correo ni versión: salen como «anónimo · disp. XXXX».
+ */
+async function getIndex(env) {
+  const saved = await getJSON(env, "tickets:index", null);
+  if (saved) return saved;
+  const seq = parseInt((await env.RATE.get("ticket:seq")) ?? "0", 10);
+  const index = [];
+  for (let n = seq; n >= 1 && index.length < INDEX_MAX; n--) {
+    const t = await getJSON(env, `t:${n}`, null);
+    if (t) index.push({ n, kind: t.kind, summary: t.summary, author: author("", t.device), platform: t.platform, version: "", status: t.status, at: t.at });
+  }
+  await putJSON(env, "tickets:index", index);
+  return index;
+}
+
+async function setIndexStatus(env, n, status) {
+  const index = await getIndex(env);
+  const row = index.find((r) => r.n === n);
+  if (row) { row.status = status; await putJSON(env, "tickets:index", index); }
+}
+
+/** Las filas de un listado: por tipo, estado («abiertas» = nuevo o abierto) y antigüedad en días. */
+export function listRows(index, { kind, estado = "abiertas", desde, now = Date.now() }) {
+  return index.filter((r) =>
+    r.kind === kind &&
+    (estado === "todas" || (estado === "cerradas" ? r.status === "cerrado" : r.status !== "cerrado")) &&
+    (!desde || now - Date.parse(r.at) <= desde * 86_400_000));
+}
+
+/** Mensaje efímero con una página del listado y botones ◀ ▶ (custom_id con el filtro y la página). */
+export function listMessage(rows, { kind, estado, desde, page = 0 }) {
+  const pages = Math.max(1, Math.ceil(rows.length / PAGE));
+  const p = Math.min(Math.max(0, page), pages - 1);
+  const title = `${kind === "sugerencia" ? "💡 Sugerencias" : "🐞 Reportes"} ${estado}${desde ? ` · últimos ${desde} días` : ""} · ${rows.length}`;
+  const lines = rows.slice(p * PAGE, p * PAGE + PAGE).map((r) =>
+    `**#${r.n}** · ${r.at.slice(0, 10)} · ${r.author ?? "anónimo"} · ${r.summary}` +
+    (kind === "error" ? ` · ${r.platform || "?"} ${r.version || ""}`.trimEnd() : ""));
+  const content = `${title}${pages > 1 ? ` · página ${p + 1}/${pages}` : ""}\n${lines.join("\n") || "Nada por aquí."}`.slice(0, 2000);
+  const id = (to) => `list:${kind}:${estado}:${desde ?? 0}:${to}`;
+  const components = pages > 1 ? [{ type: 1, components: [
+    { type: 2, style: 2, label: "◀", custom_id: id(p - 1), disabled: p === 0 },
+    { type: 2, style: 2, label: "▶", custom_id: id(p + 1), disabled: p >= pages - 1 },
+  ] }] : [];
+  return { content, flags: 64, components, allowed_mentions: { parse: [] } };
+}
+
 /** Aviso para la persona del ticket. */
-export async function notify(env, ticket, tipo, text) {
+// La app pone el título en su idioma según `tipo`; `title` se queda para las versiones anteriores a x.1.1. Con
+// `plantilla`, el texto es el predeterminado y la app también lo traduce (1.12 de x.1.1).
+export const PLANTILLAS = { abierto: "Hemos abierto tu incidencia y la estamos mirando. Te avisaremos aquí." };
+
+export async function notify(env, ticket, tipo, text, plantilla) {
   const key = `msgs:${ticket.device}`;
   const list = await getJSON(env, key, []);
-  const m = { id: crypto.randomUUID(), ticket: ticket.n, kind: ticket.kind, tipo, title: TIPOS[tipo] ?? TIPOS.mensaje, text: String(text ?? "").slice(0, 2000), at: new Date().toISOString() };
+  const m = { id: crypto.randomUUID(), ticket: ticket.n, kind: ticket.kind, tipo, title: TIPOS[tipo] ?? TIPOS.mensaje, text: String(text ?? PLANTILLAS[plantilla] ?? "").slice(0, 2000), at: new Date().toISOString() };
+  if (plantilla && text == null) m.plantilla = plantilla;
   list.unshift(m);
   await putJSON(env, key, list.slice(0, KEEP_MESSAGES));
   return m;
@@ -90,6 +162,23 @@ export async function discord(env, request) {
   const roles = i.member?.roles ?? [];
   if (env.DISCORD_ADMIN_ROLE && !roles.includes(env.DISCORD_ADMIN_ROLE)) return ephemeral("Sólo para el rol de soporte.");
 
+  // Botones ◀ ▶ de un listado: se cambia la página en el mismo mensaje.
+  if (i.type === 3 && String(i.data?.custom_id ?? "").startsWith("list:")) {
+    const [, kind, estado, desde, page] = i.data.custom_id.split(":");
+    const filter = { kind, estado, desde: Number(desde) || undefined };
+    const rows = listRows(await getIndex(env), filter);
+    return json({ type: 7, data: listMessage(rows, { ...filter, page: Number(page) }) });
+  }
+
+  // /sugerencias y /reportes (2.1 de x.1.1): listado efímero, 20 por página.
+  if (i.type === 2 && (i.data.name === "sugerencias" || i.data.name === "reportes")) {
+    const kind = i.data.name === "sugerencias" ? "sugerencia" : "error";
+    const estado = option(i, "estado")?.value ?? "abiertas";
+    const desde = Number(option(i, "desde")?.value) || undefined;
+    const rows = listRows(await getIndex(env), { kind, estado, desde });
+    return json({ type: 4, data: listMessage(rows, { kind, estado, desde }) });
+  }
+
   // Autocompletar: los tickets abiertos que coinciden con lo escrito.
   if (i.type === 4) {
     const typed = String(option(i, "ticket")?.value ?? "").toLowerCase();
@@ -122,21 +211,24 @@ export async function discord(env, request) {
     const accion = option(i, "accion")?.value;
     if (accion === "o") {
       ticket.status = "abierto";
-      // Hilo propio para tenerlo localizado (necesita el bot en el servidor y DISCORD_TICKETS_CHANNEL).
-      if (!ticket.thread && env.DISCORD_TICKETS_CHANNEL) {
-        const th = await bot(env, "POST", `/channels/${env.DISCORD_TICKETS_CHANNEL}/threads`, { name: `Ticket #${n} · ${ticket.summary}`.slice(0, 100), type: 11, auto_archive_duration: 10080 });
+      await setIndexStatus(env, n, "abierto");
+      // Hilo propio para tenerlo localizado, en el canal de su tipo (2.8 de x.1.1) o, si no lo hay, en #tickets.
+      const channel = (ticket.kind === "sugerencia" ? env.CANAL_SUGERENCIAS : env.CANAL_REPORTES) || env.DISCORD_TICKETS_CHANNEL;
+      if (!ticket.thread && channel) {
+        const th = await bot(env, "POST", `/channels/${channel}/threads`, { name: `Ticket #${n} · ${ticket.summary}`.slice(0, 100), type: 11, auto_archive_duration: 10080 });
         if (th?.id) {
           ticket.thread = th.id;
           await bot(env, "POST", `/channels/${th.id}/messages`, { content: `${ticket.kind === "sugerencia" ? "💡 Sugerencia" : "🐞 Error"} #${n} (${ticket.platform}): ${ticket.summary}`, allowed_mentions: { parse: [] } });
         }
       }
       await putJSON(env, `t:${n}`, ticket);
-      await notify(env, ticket, "abierto", option(i, "texto")?.value ?? "Hemos abierto tu incidencia y la estamos mirando. Te avisaremos aquí.");
+      await notify(env, ticket, "abierto", option(i, "texto")?.value, "abierto");
       return ephemeral(`📂 Ticket #${n} abierto${ticket.thread ? ` en <#${ticket.thread}>` : ""}. La persona ve el aviso con un check.`);
     }
     if (accion === "c") {
       ticket.status = "cerrado";
       await putJSON(env, `t:${n}`, ticket);
+      await setIndexStatus(env, n, "cerrado");
       const open = await getJSON(env, "tickets:open", []);
       await putJSON(env, "tickets:open", open.filter((t) => t.n !== n));
       if (ticket.thread) await bot(env, "PATCH", `/channels/${ticket.thread}`, { archived: true, locked: true });

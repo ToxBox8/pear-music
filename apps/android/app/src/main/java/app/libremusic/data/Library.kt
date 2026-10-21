@@ -223,6 +223,21 @@ class Library(context: Context) {
         return playlist
     }
 
+    /**
+     * Una playlist compartida por QR (0.6 de x.1.1): con su icono y color, y un nombre que no choque con otra
+     * («Atardecer (2)»).
+     */
+    fun importShared(name: String, songs: List<Song>, icon: String?, tint: Int?): Playlist {
+        val taken = _data.value.userPlaylists.map { it.name }.toSet()
+        val base = name.trim().ifEmpty { "Playlist" }
+        var unique = base
+        var i = 2
+        while (unique in taken) unique = "$base (${i++})"
+        val playlist = Playlist(name = unique, songs = songs, icon = icon, tint = tint ?: (0 until 8).random())
+        update { it.copy(playlists = it.playlists + playlist) }
+        return playlist
+    }
+
     fun addToPlaylist(playlistId: String, song: Song) = update { d ->
         d.copy(
             playlists = d.playlists.map { p ->
@@ -261,6 +276,12 @@ class Library(context: Context) {
         val order = app.libremusic.ui.theme.Prefs.playlistOrder.value
         if (order.isNotEmpty()) o.put("playlistOrder", JSONArray(order))
         o.put("playlistSort", app.libremusic.ui.theme.Prefs.playlistSort.value)
+        // Orden de «Tus álbumes» (2.9 de x.1.1), como el de las playlists.
+        val albumOrder = app.libremusic.ui.theme.Prefs.albumOrder.value
+        if (albumOrder.isNotEmpty()) o.put("albumOrder", JSONArray(albumOrder))
+        o.put("albumSort", app.libremusic.ui.theme.Prefs.albumSort.value)
+        // Orden de «Fijados» (x.1.1).
+        app.libremusic.ui.theme.Prefs.pinnedOrder.value.takeIf { it.isNotEmpty() }?.let { o.put("pinnedOrder", JSONArray(it)) }
         // Orden de las carpetas de «Tu música» (Cierre 1.0), sólo si no es el de fábrica.
         app.libremusic.ui.theme.Prefs.musicOrder.value.takeIf { it != app.libremusic.ui.theme.Prefs.MUSIC_DEFAULT }?.let { o.put("musicOrder", JSONArray(it)) }
         return o.toString(2)
@@ -293,6 +314,17 @@ class Library(context: Context) {
             prefs.setPlaylistOrder(mergeOrder(local, incomingOrder))
             val sort = json.optString("playlistSort")
             if (local.isEmpty() && sort.isNotEmpty()) prefs.setPlaylistSort(sort)
+        }
+        json.optJSONArray("albumOrder")?.let { arr ->
+            val prefs = app.libremusic.ui.theme.Prefs
+            val local = prefs.albumOrder.value
+            prefs.setAlbumOrder(mergeOrder(local, (0 until arr.length()).map { arr.getString(it) }))
+            val sort = json.optString("albumSort")
+            if (local.isEmpty() && sort.isNotEmpty()) prefs.setAlbumSort(sort)
+        }
+        json.optJSONArray("pinnedOrder")?.let { arr ->
+            val prefs = app.libremusic.ui.theme.Prefs
+            prefs.setPinnedOrder(mergeOrder(prefs.pinnedOrder.value, (0 until arr.length()).map { arr.getString(it) }))
         }
         json.optJSONArray("musicOrder")?.let { arr ->
             val prefs = app.libremusic.ui.theme.Prefs

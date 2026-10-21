@@ -1,9 +1,21 @@
 # Seguridad
 
-Si encuentras un fallo de seguridad (en las apps, en la web o en el servidor de soporte), **no abras un issue
-público**. Escribe por el formulario de la app (Ajustes › Ayuda y soporte › Informar de un error, marcando que es de
-seguridad) o con un aviso privado de GitHub (*Security › Report a vulnerability*).
+Si encuentras un fallo de seguridad en Pear Music (las apps, la web o sus servidores), **no abras un issue
+público**. Avísalo en privado desde GitHub: pestaña **Security › Report a vulnerability** de este repositorio.
 
-Intentaremos responder en una semana. Versiones con arreglos de seguridad: la última de cada plataforma.
+Cuéntanos qué has visto, cómo reproducirlo y qué versión usas (Ajustes › Ayuda y soporte › Acerca de). Contestamos
+en unos días y te decimos cuándo sale el arreglo. Si quieres, te damos las gracias por tu nombre en las novedades.
 
-Fuera de alcance: que YouTube cambie su API (la app deja de sonar, no es un fallo de seguridad).
+## Qué entra
+
+- Las apps de Android e iPhone, la web y los Workers (`services/`).
+- Especialmente: la firma de las publicaciones (`version.json`, `altstore.json`), el estado firmado (interruptor de
+  emergencia), la cuenta y la copia cifrada de la biblioteca, el Jam en la red local y el soporte.
+
+## Qué no entra
+
+- Ataques que necesiten un móvil ya comprometido (root, jailbreak) o acceso físico desbloqueado.
+- Denegación de servicio por volumen y spam.
+- Lo que dependa de YouTube o de Google.
+
+Qué datos se guardan y dónde: `docs/SEGURIDAD.md` y `docs/TELEMETRIA.md`.

@@ -19,6 +19,8 @@ enum Demo {
         var showPlayer = false
         var showJam = false
         var showImport = false
+        var barStyle = "classic"
+        var discover = true
     }
 
     /// Los mismos nombres que las PNG de Android (shared/design/compare_shots.py los empareja).
@@ -38,6 +40,9 @@ enum Demo {
         "13_reproductor_neon": Scenario(theme: .neon, showPlayer: true),
         "14_jam": Scenario(playing: false, showJam: true),
         "15_importar": Scenario(playing: false, showImport: true),
+        // x.1.1 (1.5 y 1.3): con Descubrir oculta y Ajustes arriba quedan dos pestañas; tienen que ir centradas.
+        "37_barra_dos_pestanas": Scenario(playing: false, discover: false),
+        "38_barra_simpmusic_dos": Scenario(playing: false, barStyle: "simpmusic", discover: false),
     ]
 
     static let current: Scenario? = UserDefaults.standard.string(forKey: "screenshotScenario").flatMap { scenarios[$0] }
@@ -63,6 +68,8 @@ enum Demo {
         d.set("home", forKey: "searchPlacement")
         d.set("recent", forKey: "playlistSort")
         d.set("", forKey: "jamName")
+        d.set(s.barStyle, forKey: "barStyle")
+        d.set(s.discover, forKey: "showDiscover")
     }
 
     /// Los mismos pasos que `seed()` en ScreenshotTest.kt, en el mismo orden.

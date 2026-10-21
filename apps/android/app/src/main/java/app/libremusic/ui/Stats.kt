@@ -41,7 +41,7 @@ import app.libremusic.ui.theme.Typo
 fun StatsScreen() {
     val c = Libre.colors
     val env = LocalEnv.current
-    val player by env.player.state.collectAsState()
+    val player by env.player.track.collectAsState()
     val data by PlayStats.data.collectAsState()
     var periodKey by rememberSaveable { mutableStateOf(PlayStats.Period.Month.key) }
     val period = PlayStats.Period.entries.first { it.key == periodKey }

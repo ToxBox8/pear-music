@@ -17,6 +17,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.Block
+import androidx.compose.material.icons.rounded.GridView
+import androidx.compose.material.icons.rounded.QrCode2
+import androidx.compose.material.icons.rounded.Groups
 import androidx.compose.material.icons.rounded.DownloadForOffline
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Mail
@@ -46,11 +51,12 @@ object WhatsNew {
     data class Item(val icon: ImageVector, val palette: Int, val title: String, val text: String)
 
     val items get() = listOf(
-        Item(Icons.Rounded.School, 4, L("Guía de Ajustes"), L("Un recorrido por todos los Ajustes que te explica cada opción. Está junto a la carta.")),
-        Item(Icons.Rounded.Language, 3, L("Português"), L("Pear Music ya está en portugués. Y «Español» ahora se llama «Castellano».")),
-        Item(Icons.Rounded.Mail, 1, L("Soporte más rápido"), L("Con cada reporte o sugerencia va la ficha de tu móvil (modelo y versiones), para ayudarte antes.")),
-        Item(Icons.Rounded.DownloadForOffline, 2, L("Actualizaciones"), L("Al descargar una versión nueva ves el progreso, y si hay que dar permiso para instalar no se vuelve a descargar.")),
-        Item(Icons.Rounded.TableRows, 0, L("Barra clásica"), L("Ya no marca Descubrir cuando estás en Ajustes.")),
+        // 1.2 (x.1.1). Texto público: lo aprueba Toxbox antes de publicar.
+        Item(Icons.Rounded.Groups, 4, L("Jam: cada uno en su móvil"), L("Quien crea el Jam elige: que suene en un altavoz o en el móvil de cada uno a la vez, con sus cascos.")),
+        Item(Icons.Rounded.QrCode2, 3, L("Comparte playlists con un QR"), L("Otro móvil lo escanea con la cámara y se la lleva con sus canciones y su orden.")),
+        Item(Icons.Rounded.GridView, 1, L("Biblioteca a tu gusto"), L("Playlists en cuadrícula, como Tus álbumes. Mantén pulsada una portada y arrástrala para ordenarlas.")),
+        Item(Icons.Rounded.Block, 2, L("No me interesa"), L("En Descubrir, en «⋯». Esa canción no vuelve, y si un artista no te va, deja de salir un tiempo.")),
+        Item(Icons.Rounded.Settings, 0, L("Ajustes, arriba a la izquierda"), L("En Inicio. Y en Ajustes › Aspecto › Barra está todo lo de la barra junto.")),
     )
 }
 

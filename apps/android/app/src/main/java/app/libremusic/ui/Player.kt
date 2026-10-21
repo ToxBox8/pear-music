@@ -5,6 +5,9 @@ import app.libremusic.L
 import app.libremusic.ui.theme.withArtwork
 import app.libremusic.ui.theme.ArtworkBackdrop
 import androidx.compose.foundation.layout.displayCutoutPadding
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.animateFloatAsState
@@ -212,6 +215,16 @@ private fun PlayerScreenContent(onClose: () -> Unit) {
 
     AnimatedContent(deck == DeckStyle.Air && !showQueue, label = "deck", transitionSpec = { fadeIn(uiEaseOut(300)) togetherWith fadeOut(uiEaseOut(300)) }) { air ->
         if (air) {
+            // Air se queda en vertical aunque se gire el móvil (x.1.1): no tiene vista horizontal.
+            val context = androidx.compose.ui.platform.LocalContext.current
+            val activity = remember(context) {
+                generateSequence(context) { (it as? android.content.ContextWrapper)?.baseContext }.filterIsInstance<android.app.Activity>().firstOrNull()
+            }
+            androidx.compose.runtime.DisposableEffect(activity) {
+                val before = activity?.requestedOrientation
+                activity?.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                onDispose { before?.let { activity.requestedOrientation = it } }
+            }
             Box(Modifier.fillMaxSize()) {
                 AirPaper(c.dark)
                 AirPlayerView(song, onQueue = { showQueue = true }, onLyrics = openLyrics, onClose = onClose)
@@ -685,7 +698,20 @@ fun ImmersiveDeck(style: DeckStyle) {
         val c = Libre.colors
         Box(Modifier.fillMaxSize().background(Color.Black)) {
             Box(Modifier.fillMaxSize().graphicsLayer { alpha = 0.55f }) { ThemeBackdrop(st.isPlaying, song) }
-            Box(Modifier.fillMaxSize().padding(horizontal = 8.dp, vertical = 12.dp), contentAlignment = Alignment.Center) {
+            // Sólo el objeto, sin barra de acciones encima: la gracia es manejar las teclas del casete o el brazo del
+            // vinilo (lo pidió Toxbox, x.1.1). Las acciones básicas siguen en TalkBack como acciones del objeto.
+            // Márgenes: el recorte de la cámara y las esquinas, más un poco, para que nada roce el borde.
+            val playLabel = if (st.isPlaying) L("Pausa") else L("Reproducir")
+            val actions = listOf(
+                CustomAccessibilityAction(playLabel) { env.player.togglePlay(); true },
+                CustomAccessibilityAction(L("Siguiente")) { env.player.next(); true },
+                CustomAccessibilityAction(L("Anterior")) { env.player.previous(); true },
+            )
+            Box(
+                Modifier.fillMaxSize().displayCutoutPadding().padding(12.dp)
+                    .semantics { customActions = actions },
+                contentAlignment = Alignment.Center,
+            ) {
                 if (style == DeckStyle.Vinyl) {
                     Row(horizontalArrangement = Arrangement.spacedBy(28.dp), verticalAlignment = Alignment.CenterVertically) {
                         Box(Modifier.fillMaxHeight().aspectRatio(1f)) { VinylView(song) }
@@ -693,36 +719,13 @@ fun ImmersiveDeck(style: DeckStyle) {
                             ScrambleText(song.title, Typo.title, maxLines = 3, enabled = scramble)
                             Text(song.artist, style = Typo.title3, color = c.secondaryLabel, maxLines = 2)
                             Text("${timeString(st.progress)} / ${timeString(st.duration)}", style = Typo.headline, color = c.secondaryLabel)
-                            ImmersiveControls()
                         }
                     }
                 } else {
                     Box(Modifier.fillMaxHeight().aspectRatio(1.58f)) { CassetteView(song) }
-                    // El casete ocupa todo el ancho: los controles van en una cápsula abajo, sin tapar las bobinas.
-                    ImmersiveControls(
-                        Modifier.align(Alignment.BottomCenter).background(Color.Black.copy(alpha = 0.45f), RoundedCornerShape(28.dp))
-                            .padding(horizontal = 10.dp),
-                    )
                 }
             }
         }
-    }
-}
-
-/**
- * Controles de casete y vinilo a pantalla completa en horizontal (Fase 3.4): anterior, reproducir, siguiente,
- * bucle y temporizador. El «⋯» con la letra se queda en vertical (la letra necesita el panel).
- */
-@Composable
-private fun ImmersiveControls(modifier: Modifier = Modifier) {
-    val env = LocalEnv.current
-    val st by env.player.state.collectAsState()
-    Row(modifier, horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-        IconTap(Icons.Rounded.FastRewind, L("Anterior"), size = 30.dp) { env.player.previous() }
-        IconTap(if (st.isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow, if (st.isPlaying) L("Pausa") else L("Reproducir"), size = 36.dp) { env.player.togglePlay() }
-        IconTap(Icons.Rounded.FastForward, L("Siguiente"), size = 30.dp) { env.player.next() }
-        RepeatButton(st.repeatMode) { env.player.cycleRepeat() }
-        SleepTimerButton()
     }
 }
 

@@ -33,6 +33,7 @@ class AppActivity : ComponentActivity() {
         enableEdgeToEdge()
         app.libremusic.jam.JamService.rememberLink(intent?.dataString)
         jamCode = JamLink.codeFrom(intent?.dataString)
+        app.libremusic.data.PlaylistShare.receive(intent?.dataString)
         app.libremusic.data.AppShortcuts.handle(intent)
         app.libremusic.data.AppShortcuts.publish(this)
         abrirAvisosSi(intent)
@@ -58,6 +59,7 @@ class AppActivity : ComponentActivity() {
         super.onNewIntent(intent)
         app.libremusic.jam.JamService.rememberLink(intent.dataString)
         JamLink.codeFrom(intent.dataString)?.let { jamCode = it }
+        app.libremusic.data.PlaylistShare.receive(intent.dataString)
         app.libremusic.data.AppShortcuts.handle(intent)
         abrirAvisosSi(intent)
     }

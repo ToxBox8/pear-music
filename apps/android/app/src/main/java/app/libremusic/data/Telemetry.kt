@@ -53,9 +53,17 @@ object Telemetry {
     /** El identificador de la telemetría, sólo si está activada (para unirla a la ficha del soporte). */
     fun installIfEnabled(c: Context): String? = if (enabled(c)) install(c) else null
 
+    /**
+     * Versión del texto de consentimiento que se enseña. La 2 añadirá «y a veces antes, si el responsable lo pide»
+     * (2.12 de x.1.1): **hasta que Toxbox apruebe ese texto, sigue en 1** y nadie recibe el resumen «forzado».
+     */
+    const val CONSENT_TEXT = 1
+    /** Desde qué texto aceptado se atiende «forzar». */
+    private const val FORCED_FROM_TEXT = 2
+
     fun setConsent(c: Context, on: Boolean) {
         val was = enabled(c)
-        prefs(c).edit().putBoolean("consent", on).putLong("consentAt", System.currentTimeMillis()).apply()
+        prefs(c).edit().putBoolean("consent", on).putLong("consentAt", System.currentTimeMillis()).putInt("consentText", if (on) CONSENT_TEXT else 0).apply()
         if (was && !on) withdrawLater(c.applicationContext)
     }
 
@@ -165,6 +173,17 @@ object Telemetry {
         }
         val pending = prefs(c).getString("pending", null)?.let { runCatching { JSONObject(it) }.getOrNull() } ?: return@withContext
         if (runCatching { post(summarize(c, pending, "semanal")) }.getOrDefault(false)) prefs(c).edit().remove("pending").apply()
+    }
+
+    /**
+     * «Forzar extracción» del panel (2.12 de x.1.1): la orden llega en el latido diario (`/v1/activo`). Sólo la
+     * atiende quien aceptó un texto que lo dice, en la variante pública; Pear Dev y pref no tienen envío automático.
+     * Manda la semana en curso una vez por orden.
+     */
+    suspend fun sendForced(c: Context, orden: String) = withContext(Dispatchers.IO) {
+        if (BuildConfig.CHANNEL != "usr" || !consented(c) || Incident.restricted) return@withContext
+        if (prefs(c).getInt("consentText", 0) < FORCED_FROM_TEXT || prefs(c).getString("lastOrden", null) == orden) return@withContext
+        if (runCatching { post(summarize(c, bucket(c), "forzado")) }.getOrDefault(false)) prefs(c).edit().putString("lastOrden", orden).apply()
     }
 
     /** Campos que se pueden elegir en «Enviar ahora» de Pear Dev. */

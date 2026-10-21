@@ -1,5 +1,7 @@
 package app.libremusic.data
 
+
+import app.libremusic.L
 import org.json.JSONObject
 
 /** Canción o vídeo de YouTube Music. Mismo modelo que `Song` en iOS (Client.swift). */
@@ -72,7 +74,7 @@ data class BrowseRef(val browseId: String, val params: String?)
 
 /** «Álbum • Beyoncé • 2024» → «Beyoncé · 2024»; los singles y EP conservan el tipo (como albumLine en iOS). */
 fun albumLine(subtitle: String): String =
-    subtitle.split(" • ").filter { it != "Álbum" && it != "Album" && it.isNotEmpty() }.joinToString(" · ")
+    subtitle.split(" • ").filter { it != "Álbum" && it != "Album" && it != "Àlbum" && it != "Albuma" && it.isNotEmpty() }.joinToString(" · ")
 
 sealed interface HomeItem {
     val key: String

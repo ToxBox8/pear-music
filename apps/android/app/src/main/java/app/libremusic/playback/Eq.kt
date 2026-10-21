@@ -11,15 +11,15 @@ import kotlin.math.log2
  * tenga el móvil (suelen ser 5). Sólo Android: iOS reproduce HLS con AVPlayer, que no deja procesar el audio.
  */
 object Eq {
-    enum class Preset(val key: String, private val titleEs: String, private val subtitleEs: String) {
-        Off("off", "No", L("El sonido tal cual")),
-        Bass("bass", L("Más graves"), L("Bajos y bombos con más cuerpo")),
-        Vocal("vocal", L("Voces claras"), L("Voces y pódcast más presentes")),
-        Treble("treble", L("Más agudos"), L("Más brillo y detalle")),
-        Small("small", L("Altavoz pequeño"), L("Para el altavoz del móvil o uno portátil")),
+    enum class Preset(val key: String, private val titleText: () -> String, private val subtitleText: () -> String) {
+        Off("off", { L("No") }, { L("El sonido tal cual") }),
+        Bass("bass", { L("Más graves") }, { L("Bajos y bombos con más cuerpo") }),
+        Vocal("vocal", { L("Voces claras") }, { L("Voces y pódcast más presentes") }),
+        Treble("treble", { L("Más agudos") }, { L("Más brillo y detalle") }),
+        Small("small", { L("Altavoz pequeño") }, { L("Para el altavoz del móvil o uno portátil") }),
         ;
-    val title: String get() = L(titleEs)
-    val subtitle: String get() = L(subtitleEs)
+    val title: String get() = titleText()
+    val subtitle: String get() = subtitleText()
 
         companion object {
             fun of(key: String?) = entries.firstOrNull { it.key == key } ?: Off

@@ -23,7 +23,7 @@ bloques de texto largos miden un poco más o menos.
 | Deslizar entre pestañas | iOS cambia al soltar; Android enseña la pestaña vecina mientras se arrastra | `TabView` de SwiftUI no deja dibujar la vecina |
 | Colores de la portada | Mismos presets, barras y contraste mínimo; el tinte de Android se calcula con HSV y el de iOS con HSB | Cada sistema tiene su espacio de color |
 | Ajustes › Aspecto | «Cristal líquido» sólo en Android | El cristal de iOS 26 lo da el sistema |
-| Recorrido de la bienvenida | Android pone el foco en cada pestaña; iOS resalta la barra entera (el Jam y Ajustes arriba, con foco exacto) | La barra de pestañas de iOS es del sistema y no deja medir cada botón |
+| Recorrido de la bienvenida | Android pone el foco en cada pestaña; iOS resalta la barra entera (el Jam y el engranaje de Ajustes de Inicio, con foco exacto) | La barra de pestañas de iOS es del sistema y no deja medir cada botón |
 | Aviso de versión nueva | Android descarga, verifica e instala el APK; iOS abre AltStore/SideStore | iOS no deja que una app se instale sola |
 | Widgets y Ajustes › Personalización | Sólo Android por ahora | iOS necesita una extensión de WidgetKit; se hará cuando se pueda compilar iOS (CI) |
 | 07 Ajustes | «AirPlay» con su selector (iOS) / «Salida de audio» con chevron (Android); versión de la app | AirPlay sólo existe en Apple |
@@ -62,6 +62,17 @@ Lo nuevo se hizo igual en las dos apps (mismos textos, ajustes y formatos). Andr
 | Icono | Violeta | Encendido (logo de Pear Music); el violeta ya no está |
 | Menú de canción con música (Android) | Fallaba la mitad de las veces | Sale siempre (el gesto ya no se reinicia al redibujar) |
 | Casete y vinilo en horizontal (Android) | Barra de estado encima | Sin barras del sistema, como iOS |
+
+## x.1.1 · Fase 1 (2026-10-21, sin compilar)
+
+| Qué | Antes | Ahora |
+|---|---|---|
+| Casete y vinilo en horizontal | Cápsula de controles encima del objeto | Sólo el objeto (acciones en VoiceOver/TalkBack), márgenes de la isla y del recorte |
+| Air al girar el móvil | Se giraba | Se queda en vertical en las dos apps |
+| Bienvenida (iOS) | Recorrido, novedades y aviso de versión podían salir encima | Uno detrás de otro |
+| Recorrido | Ajustes se señalaba desde Biblioteca | Ajustes va tras el Jam, en Inicio |
+| Tema en la bienvenida (iOS) | Sólo respondía el texto bajo la tarjeta; «Oscuro» no se veía | Toda la tarjeta; el modo se aplica al momento |
+| Teclado de Inicio (iOS) | No se quitaba | Se quita al buscar y al bajar |
 
 ## Revisión del 2026-10-12 (iOS 1.3.1 · Android 0.7.1)
 

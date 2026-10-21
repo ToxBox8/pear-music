@@ -44,9 +44,9 @@ enum class AppTheme(val key: String) {
     }
 }
 
-enum class DeckStyle(val key: String, private val titleEs: String) {
-    Normal("normal", L("Normal")), Cassette("cassette", L("Casete")), Vinyl("vinyl", L("Vinilo")), Air("air", L("Air"));
-    val title: String get() = L(titleEs)
+enum class DeckStyle(val key: String, private val titleText: () -> String) {
+    Normal("normal", { L("Normal") }), Cassette("cassette", { L("Casete") }), Vinyl("vinyl", { L("Vinilo") }), Air("air", { L("Air") });
+    val title: String get() = titleText()
 
     /** Objeto físico que llena la pantalla en horizontal. */
     val isObject: Boolean get() = this == Cassette || this == Vinyl
@@ -97,14 +97,6 @@ object Prefs {
     /** Barra inferior: «classic» (pestañas como iOS 26) o «simpmusic» (cápsula + Buscar aparte, se pliega). */
     private val _barStyle = MutableStateFlow("classic")
     val barStyle: StateFlow<String> = _barStyle.asStateFlow()
-    /**
-     * Ajustes arriba en Inicio (junto al Jam) en vez de en la barra, guardado aparte para cada barra: por defecto en
-     * la barra con la clásica y arriba con la estilo SimpMusic (lo pidió Toxbox). Arriba, sale del orden de pestañas.
-     */
-    private val _settingsTopClassic = MutableStateFlow(false)
-    val settingsTopClassic: StateFlow<Boolean> = _settingsTopClassic.asStateFlow()
-    private val _settingsTopSimp = MutableStateFlow(true)
-    val settingsTopSimp: StateFlow<Boolean> = _settingsTopSimp.asStateFlow()
     /** Orden de las pestañas (`TabOrder`) y la última abierta, para volver a ella al abrir la app. */
     private val _tabOrder = MutableStateFlow(app.libremusic.data.TabOrder.DEFAULT)
     val tabOrder: StateFlow<List<String>> = _tabOrder.asStateFlow()
@@ -168,8 +160,6 @@ object Prefs {
         _normalize.value = sp.getBoolean("normalize", true)
         _liquidGlass.value = sp.getBoolean("liquidGlass", false)
         _barStyle.value = sp.getString("barStyle", "classic") ?: "classic"
-        _settingsTopClassic.value = sp.getBoolean("settingsTop.classic", false)
-        _settingsTopSimp.value = sp.getBoolean("settingsTop.simpmusic", true)
         _artworkColorsPlayer.value = sp.getBoolean("artworkColorsPlayer", false)
         _artworkColorsApp.value = sp.getBoolean("artworkColorsApp", false)
         _playlistOrder.value = sp.getString("playlistOrder", "").orEmpty().split("\n").filter { it.isNotEmpty() }
@@ -180,6 +170,10 @@ object Prefs {
         _onboarded.value = sp.getBoolean("onboarded", !fresh)
         _termsAccepted.value = sp.getLong("termsAcceptedAt", 0) > 0
         _showDiscover.value = sp.getBoolean("showDiscover", true)
+        _albumSort.value = sp.getString("albumSort", "recent") ?: "recent"
+        _albumOrder.value = sp.getString("albumOrder", "").orEmpty().split("\n").filter { it.isNotEmpty() }
+        _pinnedOrder.value = sp.getString("pinnedOrder", "").orEmpty().split("\n").filter { it.isNotEmpty() }
+        _barRestoreIdle.value = sp.getBoolean("barRestoreIdle", true)
         _introStage.value = sp.getString("introStage", "") ?: ""
         _whatsNewSeen.value = sp.getString("whatsNewSeen", null) ?: if (fresh) app.libremusic.ui.WhatsNew.current.also {
             sp.edit().putString("whatsNewSeen", it).apply()
@@ -240,17 +234,38 @@ object Prefs {
     private val _showDiscover = MutableStateFlow(true)
     val showDiscover: StateFlow<Boolean> = _showDiscover.asStateFlow()
     fun setShowDiscover(v: Boolean) { _showDiscover.value = v; sp.edit().putBoolean("showDiscover", v).apply() }
+    /** «Buscar vuelve al parar» (Ajustes › Aspecto › Barra, 2.10 de x.1.1): la barra SimpMusic se despliega tras 1,5 s quieta. */
+    private val _barRestoreIdle = MutableStateFlow(true)
+    val barRestoreIdle: StateFlow<Boolean> = _barRestoreIdle.asStateFlow()
+    fun setBarRestoreIdle(v: Boolean) { _barRestoreIdle.value = v; sp.edit().putBoolean("barRestoreIdle", v).apply() }
 
     /** Orden de las carpetas de «Tu música» (lo pidió Toxbox: mantener pulsado y moverlas). Igual en iOS. */
-    val MUSIC_DEFAULT = listOf("downloads", "favorites", "albums", "songs", "artists", "recents", "stats")
+    // «playlists» (2.9 de x.1.1): la carpeta con todas las playlists, arriba del todo.
+    val MUSIC_DEFAULT = listOf("playlists", "downloads", "favorites", "albums", "songs", "artists", "recents", "stats")
     private val _musicOrder = MutableStateFlow(MUSIC_DEFAULT)
     val musicOrder: StateFlow<List<String>> = _musicOrder.asStateFlow()
     fun setMusicOrder(v: List<String>) { _musicOrder.value = v; sp.edit().putString("musicOrder", v.joinToString(",")).apply() }
-    /** Lo guardado más lo que falte (si una versión nueva añade carpetas), sin repetir ni desconocidos. */
+    /**
+     * Lo guardado más lo que falte (si una versión nueva añade carpetas), sin repetir ni desconocidos. Lo que falta
+     * entra en su sitio de fábrica (así «Playlists» sale arriba también a quien ya tenía un orden propio).
+     */
     fun decodeMusicOrder(raw: String?): List<String> {
-        val saved = raw.orEmpty().split(",").filter { it in MUSIC_DEFAULT }.distinct()
-        return saved + MUSIC_DEFAULT.filter { it !in saved }
+        val out = raw.orEmpty().split(",").filter { it in MUSIC_DEFAULT }.distinct().toMutableList()
+        if (out.isEmpty()) return MUSIC_DEFAULT
+        MUSIC_DEFAULT.forEachIndexed { i, k -> if (k !in out) out.add(minOf(i, out.size), k) }
+        return out
     }
+    /** Orden de «Tus álbumes» (2.9 de x.1.1): «recent» (como se guardaron) o «custom» (arrastrando, [albumOrder]). */
+    private val _albumSort = MutableStateFlow("recent")
+    val albumSort: StateFlow<String> = _albumSort.asStateFlow()
+    fun setAlbumSort(v: String) { _albumSort.value = v; sp.edit().putString("albumSort", v).apply() }
+    private val _albumOrder = MutableStateFlow<List<String>>(emptyList())
+    val albumOrder: StateFlow<List<String>> = _albumOrder.asStateFlow()
+    fun setAlbumOrder(v: List<String>) { _albumOrder.value = v; sp.edit().putString("albumOrder", v.joinToString("\n")).apply() }
+    /** Orden de «Fijados» (x.1.1), arrastrando en Biblioteca; lo recién fijado va al final. */
+    private val _pinnedOrder = MutableStateFlow<List<String>>(emptyList())
+    val pinnedOrder: StateFlow<List<String>> = _pinnedOrder.asStateFlow()
+    fun setPinnedOrder(v: List<String>) { _pinnedOrder.value = v; sp.edit().putString("pinnedOrder", v.joinToString("\n")).apply() }
     /** «Tu música › Artistas» de la Z a la A (Fase 3.1). */
     var artistsDescending: Boolean
         get() = sp.getString("artistsSort", "az") == "za"
@@ -283,11 +298,6 @@ object Prefs {
     fun setArtworkColorsApp(v: Boolean) { _artworkColorsApp.value = v; sp.edit().putBoolean("artworkColorsApp", v).apply() }
     fun setLiquidGlass(v: Boolean) { _liquidGlass.value = v; sp.edit().putBoolean("liquidGlass", v).apply() }
     fun setBarStyle(v: String) { _barStyle.value = v; sp.edit().putString("barStyle", v).apply() }
-    /** Ajustes arriba ([top]) o en la barra, para la barra [style] («classic» o «simpmusic»). */
-    fun setSettingsTop(style: String, top: Boolean) {
-        if (style == "simpmusic") _settingsTopSimp.value = top else _settingsTopClassic.value = top
-        sp.edit().putBoolean("settingsTop.$style", top).apply()
-    }
 }
 
 /** Colores del sistema de iOS (label, secondaryLabel…) para el modo activo, más el acento del tema. */
@@ -450,13 +460,4 @@ fun ProvideLibre(colors: LibreColors, content: @Composable () -> Unit) {
 fun DarkSection(content: @Composable () -> Unit) {
     val c = Libre.colors
     ProvideLibre(LibreColors.of(c.theme, true).copy(accent = c.accent, onAccent = c.onAccent), content)
-}
-
-/** Si Ajustes va arriba en Inicio con la barra que está puesta ahora. */
-@androidx.compose.runtime.Composable
-fun rememberSettingsTop(): Boolean {
-    val style by Prefs.barStyle.collectAsState()
-    val classic by Prefs.settingsTopClassic.collectAsState()
-    val simp by Prefs.settingsTopSimp.collectAsState()
-    return if (style == "simpmusic") simp else classic
 }

@@ -145,19 +145,29 @@ final class Player: ObservableObject {
     }
 
     // MARK: Cola
+    /// Lo añadido a la cola que aún no ha sonado (ver `UpNext`).
+    private var queued = Set<String>()
+
     /// Reproduce `song` y usa `list` como cola (empezando en esa canción).
     func play(_ song: Song, in list: [Song]) {
         queue = list.isEmpty ? [song] : list
         index = queue.firstIndex(where: { $0.id == song.id }) ?? 0
         lastRadioSeed = nil // cola nueva: aunque sea la misma canción de antes, vuelve a tocar radio
+        queued.removeAll()
         load()
     }
+    /// Cola de verdad (sugerencia del ticket 7): la canción suena justo después de la actual o, si ya habías añadido
+    /// otras, detrás de ellas; antes iba al final de la playlist o de la radio.
     func enqueue(_ song: Song) {
-        queue.append(song)
-        if queue.count == 1 { index = 0; load() }
+        if queue.isEmpty { queue = [song]; index = 0; load(); return }
+        queue.insert(song, at: UpNext.insertAt(queue.map(\.id), current: index, queued: queued))
+        queued.insert(song.id)
     }
+    /// Justo después de la actual, por delante de lo que ya estaba en la cola (y cuenta como parte de ella).
     func playNext(_ song: Song) {
-        if queue.isEmpty { enqueue(song) } else { queue.insert(song, at: index + 1) }
+        if queue.isEmpty { enqueue(song); return }
+        queue.insert(song, at: index + 1)
+        queued.insert(song.id)
     }
     func jump(to i: Int) {
         guard queue.indices.contains(i) else { return }
@@ -217,6 +227,10 @@ final class Player: ObservableObject {
         updateNowPlaying()
     }
     func resume() { player.play(); isPlaying = true; updateNowPlaying() }
+    /// Jam «cada uno en su móvil» (2.6 de x.1.1): acelera o frena un poco para alcanzar al anfitrión, sin tocar la
+    /// velocidad elegida (`rate`), y dónde va exactamente la canción.
+    func nudge(_ factor: Float) { if isPlaying { player.rate = rate * factor } }
+    var livePosition: Double { player.currentTime().seconds }
     /// Volumen propio de la app = temporizador × fundido; no toca el volumen del sistema.
     private var sleepVolume: Float = 1 { didSet { applyVolume() } }
     private var fadeVolume: Float = 1 { didSet { applyVolume() } }
@@ -244,6 +258,8 @@ final class Player: ObservableObject {
         loadTask?.cancel()
         loadTimeout?.cancel()
         guard let song = current else { return }
+        // Lo de la cola deja de serlo al sonar.
+        queued.remove(song.id)
         try? AVAudioSession.sharedInstance().setActive(true)
         error = nil; progress = 0; duration = 0; artwork = nil
         playCounted = false
@@ -379,5 +395,17 @@ enum RepeatMode: String, CaseIterable {
     }
     init(remote: MPRepeatType) {
         switch remote { case .one: self = .one; case .all: self = .all; default: self = .off }
+    }
+}
+
+/// Cola de verdad (sugerencia del ticket 7): lo que se añade a la cola suena justo después de la canción actual y, si
+/// ya habías añadido otras, detrás de ellas. `queued` son los ids añadidos así que aún no han sonado. Igual que
+/// `UpNext` en Android.
+enum UpNext {
+    /// Dónde meter una canción nueva: tras la actual, saltando las que ya están en la cola.
+    static func insertAt(_ ids: [String], current: Int, queued: Set<String>) -> Int {
+        var at = min(max(current + 1, 0), ids.count)
+        while at < ids.count && queued.contains(ids[at]) { at += 1 }
+        return at
     }
 }

@@ -147,8 +147,9 @@ export default {
     const out = new FormData();
     out.append("payload_json", JSON.stringify(discordPayload(report)));
     photos.forEach((p, i) => out.append(`files[${i}]`, new Blob([p], { type: "image/jpeg" }), `foto-${i + 1}.jpg`));
-    // Las sugerencias van a su propio canal si hay webhook (DISCORD_WEBHOOK_SUGERENCIAS); si no, al de soporte.
-    const hook = report.kind === "sugerencia" ? env.DISCORD_WEBHOOK_SUGERENCIAS || env.DISCORD_WEBHOOK : env.DISCORD_WEBHOOK;
+    // Cada tipo a su canal (2.8 de x.1.1): #sugerencias (DISCORD_WEBHOOK_SUGERENCIAS) y #reportes
+    // (DISCORD_WEBHOOK_REPORTES); si falta alguno, al de soporte de siempre.
+    const hook = (report.kind === "sugerencia" ? env.DISCORD_WEBHOOK_SUGERENCIAS : env.DISCORD_WEBHOOK_REPORTES) || env.DISCORD_WEBHOOK;
     const res = await fetch(hook, { method: "POST", body: out });
     if (!res.ok) return json(502, { error: "El servidor de soporte no responde. Prueba más tarde." });
     await saveTicket(env, report.ticket, report);

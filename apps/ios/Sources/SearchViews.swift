@@ -105,7 +105,7 @@ struct SearchResultsView: View {
 
 /// «Álbum • Beyoncé • 2024» → «Beyoncé · 2024»; los singles y EP conservan el tipo.
 func albumLine(_ subtitle: String) -> String {
-    subtitle.components(separatedBy: " • ").filter { $0 != "Álbum" && $0 != "Album" && !$0.isEmpty }.joined(separator: " · ")
+    subtitle.components(separatedBy: " • ").filter { $0 != "Álbum" && $0 != "Album" && $0 != "Àlbum" && $0 != "Albuma" && !$0.isEmpty }.joined(separator: " · ")
 }
 
 /// Tarjeta redonda de artista (resultados de búsqueda y «Puede que también te guste»).
@@ -216,6 +216,7 @@ struct ArtistView: View {
         }
         .themed()
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(for: DiscographyRoute.self) { DiscographyView(page: $0.page, kind: $0.kind) }
         .task {
             if page == nil { page = try? await YTClient.artist(artist) }
             loading = false
@@ -226,7 +227,9 @@ struct ArtistView: View {
     private func albumRow(_ title: String, _ items: [RemoteCollection], kind: Discography.Kind, page: ArtistPage) -> some View {
         section(title, trailing: {
             // «Ver todo»: la discografía completa (YouTube Music + MusicBrainz), siempre: el carrusel nunca la trae entera.
-            NavigationLink { DiscographyView(page: page, kind: kind) } label: { Text(L("Ver todo")) }
+            // Por valor, como los álbumes: mezclar un enlace con vista de destino y enlaces por valor hacía que, al
+            // abrir un álbum desde aquí, la pila se rehiciera y «Ver todo» se volviera a abrir (1.10 de x.1.1).
+            NavigationLink(value: DiscographyRoute(page: page, kind: kind)) { Text(L("Ver todo")) }
                 .accessibilityLabel(L("Ver todos: {0}", title))
         }) {
             ScrollView(.horizontal, showsIndicators: false) {
@@ -258,6 +261,14 @@ struct ArtistView: View {
             content()
         }
     }
+}
+
+/// «Ver todo» de un artista, para empujarlo por valor en la pila.
+struct DiscographyRoute: Hashable {
+    let page: ArtistPage
+    let kind: Discography.Kind
+    static func == (a: Self, b: Self) -> Bool { a.page.name == b.page.name && a.kind == b.kind }
+    func hash(into h: inout Hasher) { h.combine(page.name); h.combine(kind) }
 }
 
 // MARK: - Discografía completa (Fase 3.1), como DiscographyScreen en Android

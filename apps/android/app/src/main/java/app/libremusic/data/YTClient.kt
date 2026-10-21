@@ -27,7 +27,11 @@ object YTClient {
     private const val ARTISTS_PARAMS = "EgWKAQIgAWoKEAkQBRAKEAMQBA=="
     private val JSON_TYPE = "application/json; charset=utf-8".toMediaType()
     private val ORIGIN = mapOf("Origin" to "https://music.youtube.com")
-    private val KINDS = setOf("Canción", "Vídeo", "Video", "Song", "Episodio", "Álbum", "Single", "EP")
+    // También en los idiomas en que se pide Inicio (1.8 de x.1.1): catalán, euskera, inglés y portugués.
+    private val KINDS = setOf(
+        "Canción", "Vídeo", "Video", "Song", "Episodio", "Álbum", "Single", "EP",
+        "Cançó", "Àlbum", "Abestia", "Bideoa", "Albuma", "Album", "Episode", "Música",
+    )
     private val DURATION = Regex("^\\d+:\\d{2}(:\\d{2})?$")
 
     val http: OkHttpClient = OkHttpClient.Builder()
@@ -67,12 +71,16 @@ object YTClient {
         prefs?.edit()?.remove("visitorData")?.remove("visitorDataAt")?.apply()
     }
 
-    private fun webContext(): JSONObject = JSONObject().put(
+    /**
+     * Siempre en «es» salvo Inicio ([home], 1.8 de x.1.1): al leer búsquedas y artistas se reconocen los tipos
+     * («Canción», «Álbum»…) en español.
+     */
+    private fun webContext(hl: String = "es"): JSONObject = JSONObject().put(
         "client",
         JSONObject()
             .put("clientName", "WEB_REMIX")
             .put("clientVersion", WEB_REMIX_VERSION)
-            .put("hl", "es"),
+            .put("hl", hl),
     )
 
     fun post(url: String, body: JSONObject, headers: Map<String, String>): JSONObject {
@@ -249,15 +257,16 @@ object YTClient {
 
     // region Inicio y colecciones (igual que Client.swift en iOS)
 
-    private fun browse(body: JSONObject): JSONObject {
+    private fun browse(body: JSONObject, hl: String = "es"): JSONObject {
         ensureVisitorData()
-        body.put("context", webContext())
+        body.put("context", webContext(hl))
         return post("$MUSIC/browse?prettyPrint=false", body, ORIGIN)
     }
 
     /** Recomendaciones de YouTube Music para la pantalla Inicio (sin sesión). */
     fun home(): List<HomeShelf> {
-        val json = browse(JSONObject().put("browseId", "FEmusic_home"))
+        // Los títulos de las estanterías («Selecciones rápidas»…) vienen de YouTube: en el idioma de la app.
+        val json = browse(JSONObject().put("browseId", "FEmusic_home"), app.libremusic.I18n.youtubeHl)
         val shelves = mutableListOf<HomeShelf>()
         collect(json, "musicCarouselShelfRenderer") { shelf ->
             val header = shelf.optJSONObject("header")?.optJSONObject("musicCarouselShelfBasicHeaderRenderer")
@@ -331,6 +340,28 @@ object YTClient {
             out += Song(vid, runsText(item.optJSONObject("title")), artist, lastUrl(thumbs))
         }
         return out
+    }
+
+    /**
+     * Título, artista y carátula de una lista de canciones por su id, en el mismo orden (0.6 de x.1.1: una playlist
+     * compartida por QR sólo lleva los ids). La cola de YouTube Music (`music/get_queue`) da hasta 50 de golpe. Las
+     * que no vengan se quedan fuera.
+     */
+    fun songs(ids: List<String>): List<Song> {
+        ensureVisitorData()
+        val found = HashMap<String, Song>()
+        ids.distinct().chunked(50).forEach { chunk ->
+            val body = JSONObject().put("context", webContext()).put("videoIds", org.json.JSONArray(chunk))
+            val json = runCatching { post("$MUSIC/music/get_queue?prettyPrint=false", body, ORIGIN) }.getOrNull() ?: return@forEach
+            collect(json, "playlistPanelVideoRenderer") { item ->
+                val vid = item.optString("videoId")
+                if (vid.isEmpty() || vid in found) return@collect
+                val thumbs = item.optJSONObject("thumbnail")?.optJSONArray("thumbnails")
+                val artist = runsText(item.optJSONObject("shortBylineText")).split(" • ").first()
+                found[vid] = Song(vid, runsText(item.optJSONObject("title")), artist, lastUrl(thumbs))
+            }
+        }
+        return ids.mapNotNull { found[it] }
     }
 
     /** Resultado de búsqueda con el álbum y la duración (s), como `Candidate` en iOS. */

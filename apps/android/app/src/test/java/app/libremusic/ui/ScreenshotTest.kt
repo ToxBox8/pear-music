@@ -80,6 +80,9 @@ class ScreenshotTest : ShotBase() {
         push(Route.Discography("Bad Bunny", "albums", albums, emptyList(), null, null))
     }
     @Test fun reproductor_air_botones() = shot("36_reproductor_air", AppTheme.Air, DeckStyle.Air) { showPlayer = true }
+    // x.1.1 (1.5 y 1.3): con Descubrir oculta y Ajustes arriba quedan dos pestañas; tienen que ir centradas.
+    @Test fun barra_dos_pestanas() = shot("37_barra_dos_pestanas", playing = false, discover = false) { tab = Tab.Home }
+    @Test fun barra_simpmusic_dos() = shot("38_barra_simpmusic_dos", playing = false, bar = "simpmusic", discover = false) { tab = Tab.Home }
     @Test fun reproduccion() = shot("25_reproduccion", playing = false) { tab = Tab.Settings; push(Route.Audio) }
     @Test fun estadisticas() {
         val now = System.currentTimeMillis() / 1000
@@ -170,9 +173,12 @@ abstract class ShotBase(private val landscape: Boolean = false) {
         terms: Boolean = true,
         intro: String = "",
         firstSteps: Boolean = false,
+        bar: String = "classic",
+        discover: Boolean = true,
         setup: AppState.() -> Unit = {},
     ) {
         PlayerViewModel.connectToService = false
+        HomeViewModel.offline = true
         Prefs.setOnboarded(!guide)
         Prefs.setTermsAccepted(terms)
         Prefs.setIntroStage(intro)
@@ -181,6 +187,8 @@ abstract class ShotBase(private val landscape: Boolean = false) {
         Prefs.setTheme(theme)
         Prefs.setDeck(deck)
         Prefs.setAppearance(appearance)
+        Prefs.setBarStyle(bar)
+        Prefs.setShowDiscover(discover)
         seed()
         val player = PlayerViewModel(app)
         if (playing) {

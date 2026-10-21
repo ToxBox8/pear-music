@@ -38,6 +38,8 @@ data class JamUiState(
     val reason: String? = null,
     /** Anfitrión: su dirección en la Wi-Fi («IP:puerto») para el QR, que así entra al momento (Fase 3.2). */
     val direct: String? = null,
+    /** Invitado en modo «todos»: si suena también en este móvil (se puede quitar, p. ej. si está al lado del altavoz). */
+    val listenHere: Boolean = true,
 )
 
 /**
@@ -77,6 +79,18 @@ object JamService {
     private val resolveQueue = ArrayDeque<NsdServiceInfo>()
     private var resolving = false
     private var joinStartedAt = 0L
+
+    // «Cada uno en su móvil» (v2.1, 2.6 de x.1.1)
+    /** Invitado: lo último que suena en el anfitrión. La raíz de la app lo sigue con el reproductor. */
+    private val _remotePlay = MutableStateFlow<JamMessage.Play?>(null)
+    val remotePlay: StateFlow<JamMessage.Play?> = _remotePlay.asStateFlow()
+    private val clockSamples = CopyOnWriteArrayList<JamSync.Sample>()
+    private var pinger: Job? = null
+    /** Diferencia de reloj con el anfitrión (su hora − la nuestra), o null si aún no se ha medido. */
+    val clockOffset: Long? get() = JamSync.offset(clockSamples.toList())
+    private fun now() = System.currentTimeMillis()
+    /** Anfitrión: lo último que mandó, para quien entra a mitad de canción. */
+    @Volatile private var lastPlay: JamMessage.Play? = null
 
     /** Recuerda la dirección directa de un enlace o QR (`libremusic://jam/CÓDIGO?h=IP:puerto`). */
     fun rememberLink(text: String?) {
@@ -161,8 +175,10 @@ object JamService {
                         peer.name = name
                         socket.soTimeout = 0
                         updateHostJam { it.copy(members = it.members + name) }
+                        if (_state.value.jam?.mode == JamSync.EVERYONE) lastPlay?.let { send(peer, it) }
                     }
                     is JamMessage.Add -> if (peer.name != null) updateHostJam { JamRules.add(it, msg.entry) }
+                    is JamMessage.Ping -> if (peer.name != null) send(peer, JamMessage.Pong(msg.t0, now()))
                     is JamMessage.Remove -> peer.name?.let { who -> updateHostJam { JamRules.remove(it, msg.songId, who) } }
                     else -> Unit
                 }
@@ -298,6 +314,13 @@ object JamService {
             val writer = BufferedWriter(OutputStreamWriter(socket.getOutputStream(), Charsets.UTF_8))
             hostWriter = writer
             sendToHost(JamMessage.Hello(myName, code))
+            // Reloj: unas medidas seguidas al entrar y luego una cada 30 s (sólo cuentan las más rápidas).
+            clockSamples.clear()
+            pinger?.cancel()
+            pinger = scope.launch {
+                repeat(JamSync.FIRST_PINGS) { sendToHost(JamMessage.Ping(now())); kotlinx.coroutines.delay(300) }
+                while (true) { kotlinx.coroutines.delay(JamSync.PING_EVERY_MS); sendToHost(JamMessage.Ping(now())) }
+            }
             val reader = BufferedReader(InputStreamReader(socket.getInputStream(), Charsets.UTF_8))
             while (true) {
                 val line = JamRules.readLine(reader) ?: break
@@ -308,6 +331,11 @@ object JamService {
                         // El anfitrión puede haber cambiado nuestro nombre si estaba repetido.
                         myName = msg.state.members.lastOrNull { it == myName || it.startsWith("$myName (") } ?: myName,
                     )
+                    is JamMessage.Play -> _remotePlay.value = msg
+                    is JamMessage.Pong -> {
+                        clockSamples += JamSync.sample(msg.t0, msg.th, now())
+                        if (clockSamples.size > 12) clockSamples.removeAt(0)
+                    }
                     JamMessage.Ended -> {
                         lose(L("El anfitrión ha terminado el Jam."))
                         return
@@ -391,8 +419,30 @@ object JamService {
         runCatching { hostSocket?.close() }
         hostSocket = null
         hostWriter = null
+        pinger?.cancel()
+        pinger = null
+        clockSamples.clear()
+        _remotePlay.value = null
         _state.value = JamUiState(myName = _state.value.myName)
     }
+
+    /** Anfitrión: un altavoz o cada uno en su móvil (2.6 de x.1.1). */
+    fun setMode(mode: String) {
+        if (_state.value.phase != JamPhase.Hosting) return
+        scope.launch { updateHostJam { it.copy(mode = if (mode == JamSync.EVERYONE) JamSync.EVERYONE else JamSync.SPEAKER) } }
+    }
+
+    /** Anfitrión en modo «todos»: lo que suena aquí, para que los demás lo sigan. Lo llama la raíz de la app. */
+    fun hostPlayback(song: app.libremusic.data.Song?, positionMs: Long, playing: Boolean) {
+        val s = _state.value
+        if (s.phase != JamPhase.Hosting || s.jam?.mode != JamSync.EVERYONE) return
+        val msg = JamMessage.Play(song, positionMs, now(), playing)
+        lastPlay = msg
+        scope.launch { broadcast(msg) }
+    }
+
+    /** Invitado: escuchar también aquí o no. */
+    fun setListenHere(on: Boolean) { _state.value = _state.value.copy(listenHere = on) }
 
     /** Cierra la conexión pero conserva la lista para poder guardarla como playlist. */
     private fun lose(reason: String) {

@@ -97,11 +97,11 @@ struct BackupSection: View {
                 }
                 .buttonStyle(.plain)
                 Button { message = backup.backup(library: library, force: true) ? L("Copia guardada") : L("No se pudo guardar la copia") } label: {
-                    Label("Hacer copia ahora", systemImage: "externaldrive.badge.checkmark")
+                    Label(L("Hacer copia ahora"), systemImage: "externaldrive.badge.checkmark")
                 }
-                Button("Desactivar", role: .destructive) { backup.disable() }
+                Button(L("Desactivar"), role: .destructive) { backup.disable() }
             } else {
-                Button { picking = true } label: { Label("Elegir carpeta", systemImage: "folder.badge.plus") }
+                Button { picking = true } label: { Label(L("Elegir carpeta"), systemImage: "folder.badge.plus") }
             }
         } header: { Text(L("Copia automática")) } footer: {
             Text(backup.error ?? message ?? (backup.enabled

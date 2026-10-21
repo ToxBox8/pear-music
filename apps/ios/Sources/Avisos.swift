@@ -136,6 +136,17 @@ final class AvisosStore: ObservableObject {
         return lista
     }
 
+    /// Título de una respuesta del soporte en el idioma de la app, por su tipo (1.12 de x.1.1): el Worker lo manda en
+    /// español. Lo que escribe Toxbox se queda como lo escribe; el texto por defecto de «abierto» llega como plantilla.
+    nonisolated static func tituloPersonal(_ tipo: String) -> String {
+        switch tipo {
+        case "abierto": return L("Abrimos tu incidencia")
+        case "fiesta": return L("¡Solucionado! Gracias")
+        case "en-ello": return L("Estamos en ello")
+        default: return L("Respuesta de Pear Music")
+        }
+    }
+
     nonisolated static func parsearPersonales(_ data: Data) throws -> [Aviso] {
         guard let raiz = try JSONSerialization.jsonObject(with: data) as? [String: Any],
               let lista = raiz["mensajes"] as? [[String: Any]] else { throw Fallo.formato }
@@ -144,10 +155,12 @@ final class AvisosStore: ObservableObject {
         let tipos: Set<String> = ["abierto", "mensaje", "fiesta", "en-ello"]
         return lista.compactMap { m in
             guard let id = m["id"] as? String, let at = m["at"] as? String, let fecha = iso.date(from: at) ?? ISO8601DateFormatter().date(from: at) else { return nil }
-            let tipo = m["tipo"] as? String ?? "mensaje"
-            return Aviso(id: "ticket-" + id, importante: false, titulo: m["title"] as? String ?? L("Respuesta de Pear Music"),
-                         texto: m["text"] as? String ?? "", enlace: nil, fecha: fecha,
-                         personal: tipos.contains(tipo) ? tipo : "mensaje", ticket: m["ticket"] as? Int)
+            let raw = m["tipo"] as? String ?? "mensaje"
+            let tipo = tipos.contains(raw) ? raw : "mensaje"
+            let texto = m["plantilla"] as? String == "abierto"
+                ? L("Hemos abierto tu incidencia y la estamos mirando. Te avisaremos aquí.") : m["text"] as? String ?? ""
+            return Aviso(id: "ticket-" + id, importante: false, titulo: tituloPersonal(tipo),
+                         texto: texto, enlace: nil, fecha: fecha, personal: tipo, ticket: m["ticket"] as? Int)
         }
     }
 
@@ -385,8 +398,8 @@ private struct AvisoRow: View {
                     Text(aviso.texto).font(.subheadline).foregroundStyle(.secondary)
                 }
                 if let enlace = aviso.enlace {
-                    Button { openURL(enlace) } label: {
-                        Label("Abrir enlace", systemImage: "arrow.up.right.square")
+                    Button { openURL(fromApp(enlace)) } label: {
+                        Label(L("Abrir enlace"), systemImage: "arrow.up.right.square")
                             .font(.subheadline.weight(.semibold))
                     }
                     .buttonStyle(.borderless)
@@ -398,3 +411,14 @@ private struct AvisoRow: View {
         .accessibilityElement(children: .combine)
     }
 }
+
+/// Enlaces a nuestra web abiertos desde la app: llevan `?desde=app` y la web esconde lo que no sirve en el móvil (el
+/// RSS, 2.4 de x.1.1). Los de otras webs no se tocan. Igual que `fromApp` en Android.
+func fromApp(_ url: URL) -> URL {
+    guard url.host == "pearmusic-by-toxbox.8toxbox8-69a.workers.dev",
+          var c = URLComponents(url: url, resolvingAgainstBaseURL: false),
+          !(c.queryItems ?? []).contains(where: { $0.name == "desde" }) else { return url }
+    c.queryItems = (c.queryItems ?? []) + [URLQueryItem(name: "desde", value: "app")]
+    return c.url ?? url
+}
+

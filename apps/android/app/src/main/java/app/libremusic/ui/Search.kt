@@ -154,7 +154,7 @@ private fun albumYear(subtitle: String): String {
 fun RemoteArtistScreen(artist: RemoteArtist) {
     val c = Libre.colors
     val env = LocalEnv.current
-    val player by env.player.state.collectAsState()
+    val player by env.player.track.collectAsState()
     var page by remember(artist.id) { mutableStateOf<ArtistPage?>(null) }
     var loading by remember(artist.id) { mutableStateOf(true) }
     LaunchedEffect(artist.id) {
@@ -237,7 +237,7 @@ private fun ArtistAlbums(title: String, list: List<RemoteCollection>, onSeeAll: 
 fun DiscographyScreen(route: Route.Discography) {
     val c = Libre.colors
     val env = LocalEnv.current
-    val player by env.player.state.collectAsState()
+    val player by env.player.track.collectAsState()
     var kind by remember { mutableStateOf(route.kind) }
     var albums by remember { mutableStateOf<List<app.libremusic.data.Discography.Item>?>(null) }
     var singles by remember { mutableStateOf<List<app.libremusic.data.Discography.Item>?>(null) }

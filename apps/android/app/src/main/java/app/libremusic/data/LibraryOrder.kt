@@ -28,4 +28,25 @@ object LibraryOrder {
         }
         return smart + sorted.map { it.id }
     }
+
+    /**
+     * Mete el orden [moved] (sólo playlists, el de la cuadrícula de Playlists) en el orden completo [full] sin mover
+     * Descargadas ni Favoritos (2.9 de x.1.1).
+     */
+    fun merge(full: List<String>, moved: List<String>): List<String> {
+        val set = moved.toSet()
+        val next = moved.iterator()
+        return full.map { if (it in set && next.hasNext()) next.next() else it }
+    }
+
+    /** «Fijados» (x.1.1): siempre en el orden propio; lo recién fijado va al final. */
+    fun pinned(pinned: List<Playlist>, order: List<String>): List<Playlist> = albums(pinned, "custom", order)
+
+    /** «Tus álbumes»: como se guardaron o, con «custom», el orden propio; lo nuevo va al final. */
+    fun albums(albums: List<Playlist>, sort: String, order: List<String>): List<Playlist> {
+        if (sort != "custom") return albums
+        val byId = albums.associateBy { it.id }
+        val kept = order.filter { it in byId }.distinct()
+        return kept.mapNotNull { byId[it] } + albums.filter { it.id !in kept }
+    }
 }

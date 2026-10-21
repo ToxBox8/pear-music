@@ -296,7 +296,7 @@ internal fun SettingsPage(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val env = LocalEnv.current
-    val player by env.player.state.collectAsState()
+    val player by env.player.track.collectAsState()
     Box(Modifier.fillMaxSize()) {
         ThemeBackdrop(player.isPlaying, player.current, grouped = true)
         Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).imePadding()) {
@@ -334,10 +334,11 @@ private val settingsIndex get() = listOf(
     SettingEntry(L("Reproductor"), L("Aspecto"), L("casete vinilo air normal"), Route.PlayerPicker),
     SettingEntry(L("Efecto en los títulos"), L("Aspecto"), L("símbolos animación scramble"), Route.PlayerPicker),
     SettingEntry(L("Colores de la portada"), L("Aspecto"), L("carátula color tinte sutil equilibrado intenso"), Route.ArtworkColors),
-    SettingEntry(L("Pestañas"), L("Aspecto"), L("orden barra descubrir inicio biblioteca"), Route.TabOrderR),
-    SettingEntry(L("Descubrir"), L("Aspecto"), L("ocultar quitar desactivar descubrir feed fragmentos reels"), Route.TabOrderR),
-    SettingEntry(L("Cristal líquido"), L("Aspecto"), L("glass transparente ios 26"), Route.Appearance),
-    SettingEntry(L("Barra inferior"), L("Aspecto"), L("barra simpmusic cápsula pestañas plegar gota"), Route.Appearance),
+    SettingEntry(L("Pestañas"), L("Barra"), L("orden barra descubrir inicio biblioteca"), Route.TabOrderR),
+    SettingEntry(L("Descubrir"), L("Barra"), L("ocultar quitar desactivar descubrir feed fragmentos reels"), Route.TabOrderR),
+    SettingEntry(L("Cristal líquido"), L("Barra"), L("glass transparente ios 26"), Route.BarR),
+    SettingEntry(L("Barra inferior"), L("Aspecto"), L("barra simpmusic cápsula pestañas plegar gota"), Route.BarR),
+    SettingEntry(L("Buscar vuelve al parar"), L("Barra"), L("barra simpmusic plegar buscar"), Route.BarR),
     SettingEntry(L("Calidad al escuchar"), L("Reproducción"), L("streaming datos ahorro máxima kbps"), Route.Audio),
     SettingEntry(L("Seguir con canciones parecidas"), L("Reproducción"), L("radio infinita autoplay automático cola acabar"), Route.Audio),
     SettingEntry(L("Copia automática"), L("Biblioteca"), L("copia seguridad backup drive nextcloud guardar exportar"), Route.LibraryOptions),
@@ -347,7 +348,7 @@ private val settingsIndex get() = listOf(
     SettingEntry(L("Canciones descargadas"), L("Descargas"), L("espacio offline sin conexión borrar"), Route.DownloadsSettings),
     SettingEntry(L("Ordenar playlists"), L("Biblioteca"), L("orden a-z recientes a mano"), Route.LibraryOptions),
     SettingEntry(L("Descargadas y Favoritos"), L("Biblioteca"), L("carrusel tu música"), Route.LibraryOptions),
-    SettingEntry(L("Dónde está Buscar"), L("Biblioteca"), L("buscar pestaña inicio barra"), Route.LibraryOptions),
+    SettingEntry(L("Dónde está Buscar"), L("Barra"), L("buscar pestaña inicio barra"), Route.BarR),
     SettingEntry(L("Eliminar playlists"), L("Biblioteca"), L("borrar quitar"), Route.ManagePlaylists),
     SettingEntry(L("Informar de un error"), L("Ayuda y soporte"), L("bug fallo problema soporte reporte escarabajo contacto"), Route.Support(null)),
     SettingEntry(L("Buzón de sugerencias"), L("Ayuda y soporte"), L("sugerencia idea propuesta mejora buzón"), Route.Suggest(null)),
@@ -526,6 +527,8 @@ fun AppearanceScreen() {
     val artworkApp by Prefs.artworkColorsApp.collectAsState()
     val level by Prefs.artworkLevel.collectAsState()
     val tabOrder by Prefs.tabOrder.collectAsState()
+    val showDiscover by Prefs.showDiscover.collectAsState()
+    val barStyle by Prefs.barStyle.collectAsState()
     SettingsPage(L("Aspecto")) {
         FormSection(null) {
             FormRow(
@@ -542,13 +545,32 @@ fun AppearanceScreen() {
                     listOfNotNull("reproductor".takeIf { artworkPlayer }, L("resto de la app").takeIf { artworkApp }).joinToString(" y "),
                 icon = Icons.Rounded.AutoAwesome, iconPalette = 5, chevron = true,
             ) { env.app.push(Route.ArtworkColors) }
+            // Barra (2.11 de x.1.1): estilo, dónde va Buscar, si vuelve al parar, cristal líquido y pestañas.
             FormRow(
-                L("Pestañas"), subtitle = tabOrder.joinToString(", ") { Tab.of(it).title },
+                L("Barra"),
+                subtitle = (if (barStyle == "simpmusic") L("Estilo SimpMusic") else L("Clásica")) + " · " +
+                    app.libremusic.data.TabOrder.visible(tabOrder, false, showDiscover).filter { it != app.libremusic.data.TabOrder.SETTINGS }.joinToString(", ") { Tab.of(it).title } +
+                    if (liquidGlass && glassSupported) L(" · cristal líquido") else "",
                 icon = Icons.Rounded.SwapHoriz, iconPalette = 7, chevron = true, last = true,
-            ) { env.app.push(Route.TabOrderR) }
+            ) { env.app.push(Route.BarR) }
         }
-        val barStyle by Prefs.barStyle.collectAsState()
-        val settingsTop = app.libremusic.ui.theme.rememberSettingsTop()
+        ResetSection(L("Aspecto"), L("Vuelven el tema Cristal, el reproductor Normal, los colores de la portada apagados y el orden de pestañas de fábrica.")) { Prefs.resetAppearance() }
+    }
+}
+
+/**
+ * Barra (2.11 de x.1.1): todo lo de la barra de abajo junto. Sólo se ven las opciones del estilo elegido. El cristal
+ * líquido y las pestañas van aquí porque son parte de la barra; en iOS no hay cristal propio (lo pone el sistema).
+ */
+@Composable
+fun BarScreen() {
+    val env = LocalEnv.current
+    val barStyle by Prefs.barStyle.collectAsState()
+    val search by Prefs.searchPlacement.collectAsState()
+    val restoreIdle by Prefs.barRestoreIdle.collectAsState()
+    val liquidGlass by Prefs.liquidGlass.collectAsState()
+    val tabOrder by Prefs.tabOrder.collectAsState()
+    SettingsPage(L("Barra")) {
         FormSection(
             L("Barra inferior"),
             footer = if (barStyle == "simpmusic") L("Cápsula con tus pestañas y Buscar aparte, como SimpMusic. Arrastra la gota para cambiar de pestaña; al bajar por una lista se pliega junto al mini reproductor.")
@@ -558,29 +580,36 @@ fun AppearanceScreen() {
                 Segmented(listOf("classic" to L("Clásica"), "simpmusic" to L("Estilo SimpMusic")), barStyle) { Prefs.setBarStyle(it) }
             }
         }
-        // Se guarda aparte para cada barra: con la clásica va en la barra y con la estilo SimpMusic arriba, salvo
-        // que se cambie aquí.
-        FormSection(
-            L("Ajustes"),
-            footer = if (settingsTop) L("Ajustes está arriba en Inicio, junto al Jam, y no ocupa sitio en la barra.")
-            else L("Ajustes es una pestaña más de la barra; su sitio se elige en Pestañas."),
-        ) {
-            Box(Modifier.padding(horizontal = 16.dp, vertical = 10.dp)) {
-                Segmented(listOf("bar" to L("En la barra"), "top" to L("Arriba en Inicio")), if (settingsTop) "top" else "bar") {
-                    Prefs.setSettingsTop(barStyle, it == "top")
-                }
+        if (barStyle == "simpmusic") {
+            FormSection(
+                L("Dónde está Buscar"),
+                footer = L("Buscar es el círculo de la derecha. Al bajar por Inicio la barra se pliega; si dejas de moverte 1,5 segundos, vuelve entera."),
+            ) {
+                FormRow(L("Buscar vuelve al parar"), last = true, trailing = { IosToggle(restoreIdle, Prefs::setBarRestoreIdle, label = L("Buscar vuelve al parar")) })
+            }
+        } else {
+            FormSection(
+                L("Dónde está Buscar"),
+                footer = if (search == "tab") L("Buscar tiene su propia pestaña en la barra de abajo, justo después de Inicio.")
+                else L("La barra de búsqueda está siempre arriba en Inicio."),
+            ) {
+                FormRow(L("Barra arriba en Inicio"), checked = search != "tab") { Prefs.setSearchPlacement("home") }
+                FormRow(L("Pestaña aparte"), checked = search == "tab", last = true) { Prefs.setSearchPlacement("tab") }
             }
         }
-        // Sólo en Android: iOS 26 ya dibuja así sus barras y menús.
+        // Sólo en Android: iOS 26 ya dibuja así sus barras y menús. Pestañas va dentro, porque es parte de la barra.
         FormSection(null) {
             FormRow(
                 L("Cristal líquido"),
                 subtitle = if (glassSupported) L("Barras, botones y menús de cristal que refractan lo de detrás, como iOS 26") else L("Necesita Android 12 o posterior"),
-                icon = Icons.Rounded.BlurOn, iconPalette = 4, last = true,
+                icon = Icons.Rounded.BlurOn, iconPalette = 4,
                 trailing = { IosToggle(liquidGlass && glassSupported, Prefs::setLiquidGlass, enabled = glassSupported, label = L("Cristal líquido")) },
             )
+            FormRow(
+                L("Pestañas"), subtitle = tabOrder.filter { it != app.libremusic.data.TabOrder.SETTINGS }.joinToString(", ") { Tab.of(it).title },
+                icon = Icons.Rounded.SwapHoriz, iconPalette = 7, chevron = true, last = true,
+            ) { env.app.push(Route.TabOrderR) }
         }
-        ResetSection(L("Aspecto"), L("Vuelven el tema Cristal, el reproductor Normal, los colores de la portada apagados y el orden de pestañas de fábrica.")) { Prefs.resetAppearance() }
     }
 }
 
@@ -686,19 +715,18 @@ fun TabOrderScreen() {
     val rowPx = with(androidx.compose.ui.platform.LocalDensity.current) { 56.dp.toPx() }
     var dragging by remember { mutableStateOf<String?>(null) }
     var dragOffset by remember { mutableStateOf(0f) }
-    val settingsTop = app.libremusic.ui.theme.rememberSettingsTop()
     val showDiscover by Prefs.showDiscover.collectAsState()
     SettingsPage(L("Pestañas")) {
         FormSection(
             L("Orden de la barra"),
             footer = L("Arrastra ≡ para cambiar el orden; deslizar a los lados sigue el mismo orden. Desliza Descubrir a la izquierda para ocultarla (y a la derecha para volver a ponerla). La app se abre en la última pestaña que usaste.") +
-                if (settingsTop) L(" Ajustes está arriba en Inicio y no entra en el orden (se cambia en Aspecto).") else "",
+                L(" Ajustes está arriba en Inicio y no entra en el orden."),
         ) {
             items.forEachIndexed { i, key -> androidx.compose.runtime.key(key) {
                 val isDragging = dragging == key
                 val tab = Tab.of(key)
-                // Ajustes arriba: se ve apagado y sin asa, porque no está en la barra.
-                val fixedTop = settingsTop && tab == Tab.Settings
+                // Ajustes está arriba en Inicio: se ve apagado y sin asa, porque no está en la barra.
+                val fixedTop = tab == Tab.Settings
                 // Descubrir se oculta deslizándola a la izquierda (lo pidió Toxbox): queda difuminada y fuera de la barra.
                 val swipeable = tab == Tab.Discover
                 val hidden = swipeable && !showDiscover
@@ -922,7 +950,7 @@ fun DeckPicker(modifier: Modifier = Modifier) {
     val c = Libre.colors
     val env = LocalEnv.current
     val deck by Prefs.deck.collectAsState()
-    val player by env.player.state.collectAsState()
+    val player by env.player.track.collectAsState()
     Row(modifier.fillMaxWidth().padding(vertical = 6.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
         DeckStyle.entries.forEach { d ->
             val on = d == deck
@@ -951,7 +979,6 @@ fun LibraryOptionsScreen() {
     val env = LocalEnv.current
     val sort by Prefs.playlistSort.collectAsState()
     val placement by Prefs.smartPlacement.collectAsState()
-    val search by Prefs.searchPlacement.collectAsState()
     SettingsPage(L("Biblioteca")) {
         FormSection(L("Ordenar playlists por")) {
             FormRow(L("Añadidas recientemente"), checked = sort == "recent") { Prefs.setPlaylistSort("recent") }
@@ -965,18 +992,23 @@ fun LibraryOptionsScreen() {
         }
         FormSection(
             L("Descargadas y Favoritos"),
-            footer = if (placement == "music") L("Aparecen como filas en «Tu música», encima de Canciones.") else L("Aparecen con su portada grande en el carrusel de Playlists."),
+            footer = if (placement == "music") L("Aparecen como filas en «Tu música», encima de Canciones.") else L("Aparecen con su portada al principio de la carpeta Playlists, en «Tu música»."),
         ) {
             FormRow(L("En Playlists (portada grande)"), checked = placement != "music") { Prefs.setSmartPlacement("playlists") }
             FormRow(L("En «Tu música» (fila)"), checked = placement == "music", last = true) { Prefs.setSmartPlacement("music") }
         }
-        FormSection(
-            L("Dónde está Buscar"),
-            footer = if (search == "tab") L("Buscar tiene su propia pestaña en la barra de abajo, justo después de Inicio.")
-            else L("La barra de búsqueda está siempre arriba en Inicio."),
-        ) {
-            FormRow(L("Barra arriba en Inicio"), checked = search != "tab") { Prefs.setSearchPlacement("home") }
-            FormRow(L("Pestaña aparte"), checked = search == "tab", last = true) { Prefs.setSearchPlacement("tab") }
+        // «No me interesa» de Descubrir (2.7 de x.1.1): cuántas hay y vaciarlas.
+        val skipped by app.libremusic.data.ReelsSkip.entries.collectAsState()
+        FormSection(L("Descubrir"), footer = L("Las canciones que marcaste con «No me interesa» no vuelven a salir, y un artista con tres en un mes deja de salir durante 30 días. Sólo se guarda en este móvil.")) {
+            FormRow(
+                L("Lo que no te interesa"), subtitle = songCount(skipped.size), last = true,
+                trailing = {
+                    if (skipped.isNotEmpty()) Text(
+                        L("Vaciar"), style = Typo.body, color = Libre.colors.accent,
+                        modifier = Modifier.tactile(label = L("Vaciar lo que no te interesa")) { app.libremusic.data.ReelsSkip.clear() }.padding(8.dp),
+                    )
+                },
+            )
         }
         BackupSection()
         FormSection(null, footer = L("Antes de borrar se pide confirmación.")) {

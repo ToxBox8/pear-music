@@ -1027,3 +1027,91 @@
 1029	Preta!
 941	Choose your language · Tria la llengua · Escolle o idioma · Aukeratu hizkuntza · Elektu vian lingvon
 956	Castellano
+1030	 Agordoj estas supre en Hejmo kaj ne eniras la ordon.
+1031	Ordigi permane
+1032	Aliĝi
+1033	Vidi miajn ludlistojn
+1034	Kontrolante…
+1035	Ĉiam
+1036	Ni malfermis vian raporton
+1037	Eniri tamen (Dev)
+1038	Ni laboras pri tio
+1039	Ni malfermis vian raporton kaj esploras ĝin. Ni sciigos vin ĉi tie.
+1040	PRIZORGADO AKTIVA
+1041	Solvita! Dankon
+1042	 · likva vitro
+1043	Breto
+1044	Serĉi estas la cirklo dekstre. Rulumante malsupren en Hejmo la breto faldiĝas; se vi haltas 1,5 sekundojn, ĝi revenas tuta.
+1045	Serĉi revenas kiam vi haltas
+1046	Kun la klasika, serĉbreto supre en Hejmo aŭ aparta langeto. Kun la SimpMusic, la cirklo dekstre, kiu revenas kiam vi ĉesas rulumi.
+1047	La malsupra breto: ĝia stilo, kie estas Serĉi kaj la ordo de la langetoj, ĉio kune.
+1048	Forigu la serĉon por ŝanĝi la ordon.
+1049	Malfari
+1050	Kantoj, kiujn vi markis per «Ne interesas min», ne revenas, kaj artisto kun tri en unu monato ne aperas dum 30 tagoj. Ĝi konserviĝas nur en ĉi tiu telefono.
+1051	Kio ne interesas vin
+1052	Tenu premita kovrilon kaj trenu ĝin por ŝanĝi la ordon.
+1053	Ne interesas min
+1054	Ĝi ne plu aperos en Malkovri.
+1055	Malplenigi
+1056	Malplenigi tion, kio ne interesas vin
+1057	{0} kantoj
+1058	Ĝisdatigi
+1059	Forigis {0} raportojn
+1060	Forigi la retan protokolon
+1061	Ĉi tiu versio estas malnova
+1062	Devigi kolekton
+1063	La aplikaĵo kredas, ke ĝi estas {0}. Eliru kaj revenu por vidi la avizon.
+1064	La muziko plu funkcias. Se estas futbalo, eble temas pri la blokoj de LaLiga: avizoj kaj subteno revenas post la matĉo.
+1065	La serviloj de Pear ne respondas
+1066	Por ripeti la bonvenigon aŭ vidi la avizojn sen reinstali. Ili ne tuŝas vian bibliotekon nek viajn elŝutojn.
+1067	Por vidi la avizon pri nova versio
+1068	Petita. La aplikaĵoj vidos ĝin en sia ĉiutaga kontrolo.
+1069	Provoj
+1070	Ĝi povas malsukcesi. Ĝisdatigu por havi la riparojn.
+1071	Rekomenci la bonvenigon
+1072	Ĉiuj konservitaj raportoj estas forigitaj. La aparatkartoj de cimraportoj ne estas tuŝitaj. Ne eblas malfari.
+1073	Dua konfirmo: la panelo restos malplena.
+1074	Simuli malnovan version
+1075	SIMULITA VERSIO: {0}
+1076	Vidi la novaĵojn denove
+1077	Ĉu forigi la tutan telemetrion en la retejo?
+1078	Ĉu vi certas?
+1079	Ĉiu per sia telefono
+1080	De {0} · {1}
+1081	Kie ĝi sonas
+1082	Aŭskulti ankaŭ ĉi tie
+1083	Kio sonas ĉi tie, sonas samtempe en ĉies telefono, per sia propra sono. Ludu ion el la listo.
+1084	Sonas la samo kiel en la telefono de {0}, samtempe.
+1085	Ĝi sonas nur en ĉi tiu telefono; la aliaj aldonas kantojn.
+1086	Unu laŭtparolilo
+1087	{0} kaj {1}
+1088	{0}, {1} kaj {2}
+1089	 La kovrila foto ne eniras la QR-kodon.
+1090	Aldonante…
+1091	Aldoni al la biblioteko
+1092	Kunhavigi per QR
+1093	Kunhavigi ligilon
+1094	QR-kodo de {0}
+1095	Skanu ĝin per la fotilo de alia telefono kun Pear Music. Iras la nomo, la {0} kantoj kaj ilia ordo.
+1096	Ĉi tiu ludlisto estas malplena.
+1097	Ne eblis ŝargi la kantojn. Kontrolu la konekton kaj reprovu.
+1098	Kunhavigita ludlisto
+1099	Sen nomo
+1100	Ĝi havas tro da kantoj por QR (maksimume {0}).
+1101	{0} kantoj ne estas en YouTube Music kaj restis ekstere.
+1102	Agordoj, supre maldekstre
+1103	Biblioteko laŭ via gusto
+1104	Kunhavigu ludlistojn per QR
+1105	Kunhavigu ludliston per la QR de ĝia ekrano, kaj en Jam elektu ke ĝi sonu en ĉies telefono.
+1106	Kun la breto laŭ stilo de SimpMusic, se vi ĉesas rulumi en Hejmo, la breto revenas tuta.
+1107	En Malkovri, sub «⋯». Tiu kanto ne revenas, kaj se artisto ne plaĉas al vi, ĝi ne aperas dum iom da tempo.
+1108	En Hejmo. Kaj en Agordoj › Aspekto › Breto estas ĉio pri la breto kune.
+1109	Jam: ĉiu per sia telefono
+1110	Kion vi markis per «Ne interesas min». Malplenigu ĝin kiam vi volas.
+1111	Nova: la stilo de la breto, kie estas Serĉi kaj la langetoj, ĉio ĉi tie.
+1112	Nova: la stilo de la breto, kie estas Serĉi, la likva vitro kaj la langetoj, ĉio ĉi tie.
+1113	Alia telefono skanas ĝin per la fotilo kaj kunportas ĝin kun ĝiaj kantoj kaj ordo.
+1114	Ludlistoj en krado, kiel Viaj albumoj. Tenu premita kovrilon kaj trenu ĝin por ordigi.
+1115	Kiu kreas la Jam elektas: ke ĝi sonu en unu laŭtparolilo aŭ en ĉies telefono samtempe, per siaj aŭdiloj.
+1116	Ili aperas kun sia kovrilo komence de la dosierujo Playlists, en «Via muziko».
+1117	Premu la pinglon en ludlisto aŭ albumo kaj vi havos ĝin ĉi tie, en la ordo kiun vi volas.

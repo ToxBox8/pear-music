@@ -29,6 +29,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material.icons.rounded.Block
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -119,7 +121,7 @@ private fun AppTheme.reelOnAccent(): Color = if (this == AppTheme.Air) Color.Bla
 fun ReelsScreen(reelsVm: ReelsViewModel, playerVm: PlayerViewModel, libraryVm: LibraryViewModel, visible: Boolean) {
     val state by reelsVm.state.collectAsState()
     val library by libraryVm.data.collectAsState()
-    val player by playerVm.state.collectAsState()
+    val player by playerVm.track.collectAsState()
     val seeds = library.favorites.take(12) + library.recents.take(12)
     val exclude = library.favorites.map { it.id }.toSet()
 
@@ -139,9 +141,29 @@ fun ReelsScreen(reelsVm: ReelsViewModel, playerVm: PlayerViewModel, libraryVm: L
             } else {
                 key(state.items.firstOrNull()?.id) { ReelsPager(state, reelsVm, playerVm) }
             }
+            // «No me interesa»: aviso de 4 s con «Deshacer».
+            val undo = state.undo
+            LaunchedEffect(undo) { if (undo != null) { kotlinx.coroutines.delay(4_000); reelsVm.clearUndo() } }
+            androidx.compose.animation.AnimatedVisibility(
+                undo != null, Modifier.align(Alignment.BottomCenter).padding(bottom = app.libremusic.ui.LocalBottomInset.current + 12.dp),
+                enter = androidx.compose.animation.fadeIn(app.libremusic.ui.uiEaseOut(200)), exit = androidx.compose.animation.fadeOut(app.libremusic.ui.uiEaseOut(200)),
+            ) {
+                Row(
+                    Modifier.padding(horizontal = 20.dp).background(Libre.colors.background.copy(alpha = 0.96f), RoundedCornerShape(18.dp))
+                        .padding(start = 16.dp, end = 6.dp, top = 6.dp, bottom = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(L("No volverá a salir en Descubrir."), style = Typo.subheadline, color = Libre.colors.label, modifier = Modifier.weight(1f, fill = false))
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        L("Deshacer"), style = Typo.subheadline.semibold, color = Libre.colors.accent,
+                        modifier = Modifier.tactile(label = L("Deshacer")) { reelsVm.undoNotInterested() }.padding(horizontal = 10.dp, vertical = 8.dp),
+                    )
+                }
+            }
             // Cabecera
             Row(Modifier.fillMaxWidth().statusBarsPadding().padding(start = 20.dp, end = 20.dp, top = 6.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text("Descubrir", style = Typo.display(Tokens.TypeSize.DisplayScreen, Libre.colors.theme), color = Color.White, modifier = Modifier.weight(1f))
+                Text(L("Descubrir"), style = Typo.display(Tokens.TypeSize.DisplayScreen, Libre.colors.theme), color = Color.White, modifier = Modifier.weight(1f))
                 Box(
                     Modifier.size(44.dp).tactile(enabled = !state.loading, label = L("Mezclar otra vez")) { reelsVm.load(seeds, exclude, force = true) },
                     contentAlignment = Alignment.Center,
@@ -165,7 +187,7 @@ private fun EmptyState(loading: Boolean, onRetry: () -> Unit) {
             Spacer(Modifier.height(6.dp))
             Text(L("Revisa la conexión y vuelve a intentarlo."), style = Typo.subheadline, color = Color.White.copy(0.72f), textAlign = TextAlign.Center)
             Spacer(Modifier.height(20.dp))
-            PillButton("Reintentar", Icons.Rounded.Refresh, prominent = true, modifier = Modifier.widthIn(max = 220.dp), onClick = onRetry)
+            PillButton(L("Reintentar"), Icons.Rounded.Refresh, prominent = true, modifier = Modifier.widthIn(max = 220.dp), onClick = onRetry)
         }
     }
 }
@@ -275,7 +297,7 @@ private fun ReelPage(song: Song, isCurrent: Boolean, state: ReelsState, reelsVm:
                         Text(L("Escuchar completa"), style = Typo.subheadline.bold, color = theme.reelOnAccent())
                     }
                 }
-                Actions(song, theme)
+                Actions(song, theme, reelsVm)
             }
             ClipProgress(if (isCurrent) state.clipProgress else 0f, theme.reelAccent(), Modifier.padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 14.dp))
             Spacer(Modifier.height(app.libremusic.ui.LocalBottomInset.current - 20.dp))
@@ -284,7 +306,7 @@ private fun ReelPage(song: Song, isCurrent: Boolean, state: ReelsState, reelsVm:
 }
 
 @Composable
-private fun Actions(song: Song, theme: AppTheme) {
+private fun Actions(song: Song, theme: AppTheme, reelsVm: ReelsViewModel) {
     val env = LocalEnv.current
     val context = LocalContext.current
     val data by env.library.data.collectAsState()
@@ -299,13 +321,13 @@ private fun Actions(song: Song, theme: AppTheme) {
         }
         Box {
             ActionLabel(Icons.Outlined.AddCircleOutline, L("Añadir")) { addMenu = true }
-            ContextMenu(addMenu, { addMenu = false }, buildList {
+            ContextMenu(addMenu, { addMenu = false }, opaque = true, entries = buildList {
                 if (jamActive) add(MenuEntry.Action(L("Añadir al Jam"), app.libremusic.ui.theme.JamIcon(), enabled = jam.jam?.entries?.none { it.song.id == song.id } != false) { JamService.add(song) })
                 data.userPlaylists.forEach { p -> add(MenuEntry.Action(p.name) { env.library.addToPlaylist(p.id, song) }) }
                 if (data.userPlaylists.isEmpty() && !jamActive) add(MenuEntry.Note(L("Crea una playlist en Biblioteca")))
             })
         }
-        ActionLabel(Icons.AutoMirrored.Rounded.Send, "Compartir") {
+        ActionLabel(Icons.AutoMirrored.Rounded.Send, L("Compartir")) {
             val url = "https://music.youtube.com/watch?v=${song.id}"
             val send = Intent(Intent.ACTION_SEND).setType("text/plain")
                 .putExtra(Intent.EXTRA_SUBJECT, song.title)
@@ -314,7 +336,11 @@ private fun Actions(song: Song, theme: AppTheme) {
         }
         Box {
             ActionLabel(Icons.Rounded.MoreHoriz, L("Más")) { moreMenu = true }
-            ContextMenu(moreMenu, { moreMenu = false }, songMenu(song))
+            // «No me interesa» (2.7 de x.1.1). Menú casi opaco: sobre el vídeo no se leía.
+            ContextMenu(
+                moreMenu, { moreMenu = false }, opaque = true,
+                entries = songMenu(song) + MenuEntry.Action(L("No me interesa"), Icons.Rounded.Block) { reelsVm.notInterested(song) },
+            )
         }
     }
 }

@@ -25,4 +25,20 @@ class LibraryOrderTest {
 
     @Test fun smartListsLeaveTheCarousel() =
         assertEquals(listOf("A", "C"), LibraryOrder.keys(all, "custom", listOf("favorites", "A", "C"), false).filter { it != "B" })
+
+    // 2.9 de x.1.1: la cuadrícula de Playlists sólo mueve playlists; Descargadas y Favoritos se quedan en su sitio.
+    @Test fun gridMoveKeepsSmartListsInPlace() =
+        assertEquals(
+            listOf("downloads", "A", "favorites", "C", "B"),
+            LibraryOrder.merge(listOf("downloads", "C", "favorites", "B", "A"), listOf("A", "C", "B")),
+        )
+
+    @Test fun albumsCustomOrderAndNewAtTheEnd() {
+        assertEquals(listOf("A", "B", "C"), LibraryOrder.albums(all, "recent", listOf("C", "A")).map { it.id })
+        assertEquals(listOf("C", "A", "B"), LibraryOrder.albums(all, "custom", listOf("C", "gone", "A")).map { it.id })
+    }
+
+    // x.1.1: Fijados va siempre en el orden arrastrado; lo recién fijado, al final.
+    @Test fun pinnedFollowsDraggedOrder() =
+        assertEquals(listOf("C", "A", "B"), LibraryOrder.pinned(all, listOf("C", "gone", "A")).map { it.id })
 }

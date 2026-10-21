@@ -49,6 +49,7 @@ libremusic/
 ├─ scripts/prepublicar.sh                  Lista de comprobación antes de publicar (versión, CHANGELOG, secretos, firma)
 ├─ scripts/activar-discord.sh              Activa las apps de Discord de soporte y pánico con ~/.config/pear-music/discord-*.env
 ├─ scripts/web-1.0.py                      Lo llama ../lanzar-1.0.sh: pone la 1.0/2.0 en downloads.ts, changelog.ts y altstore.json
+├─ scripts/web-x.1.1.py                    Lo llama ../lanzar-x.1.1.sh: pone la 1.2/2.2 (textos de la versión) en la web
 ├─ services/soporte/                       Worker de Cloudflare: reportes de errores → Discord, rechazos y apelaciones (README con el despliegue)
 ├─ services/api/                           Worker pear-music-api: cuenta opcional, biblioteca cifrada y telemetría (D1; README)
 ├─ services/web-antigua/                   Worker «libremusic-landing»: redirige la dirección antigua de la web a la nueva (301/308)
@@ -176,7 +177,8 @@ Tests en `app/src/test`: lógica (YTClient, `Matcher`, descargas, Jam, bibliotec
 - **Idiomas:** todo texto visible va dentro de `L("…")` (Kotlin y Swift; `{0}` para datos, nunca concatenar frases). Tras añadir textos: `python3 tools/i18n/extraer.py`, traducir las líneas nuevas del final de `shared/i18n/src/orden.txt` en cada `<idioma>.txt` y `python3 tools/i18n/construir.py`. No uses `L()` para claves, nombres de recursos, cabeceras HTTP ni atajos de Siri (App Intents exige literales).
 
 - Textos de la interfaz, comentarios y mensajes de commit **en español**.
-- Mismos nombres de ajustes en las dos apps (`theme`, `appearance`, `deck`, `searchPlacement`, `playlistSort`, `playlistOrder`, `smartPlacement`, `artworkColorsPlayer`, `artworkColorsApp`, `artworkIntensity`, `artworkOpacity`, `tabOrder`, `lastTab`, `onboarded`, `repeatMode`, `matchTolerance`, `crossfade`, `autoplay`, `scramble`, `quality`; `barStyle`, `settingsTop.classic`, `settingsTop.simpmusic`; `liquidGlass`, `equalizer` y, por ahora, `normalize` sólo en Android), mismo `library.json` y mismo protocolo del Jam.
+- Textos de iOS con icono (`Label(…, systemImage:)`): el extractor salta esas líneas, así que se escriben ya con `L("…")`.
+- Mismos nombres de ajustes en las dos apps (`theme`, `appearance`, `deck`, `searchPlacement`, `playlistSort`, `playlistOrder`, `smartPlacement`, `artworkColorsPlayer`, `artworkColorsApp`, `artworkIntensity`, `artworkOpacity`, `tabOrder`, `lastTab`, `onboarded`, `repeatMode`, `matchTolerance`, `crossfade`, `autoplay`, `scramble`, `quality`; `barStyle`, `barRestoreIdle`, `showDiscover`; `liquidGlass`, `equalizer` y, por ahora, `normalize` sólo en Android), mismo `library.json` y mismo protocolo del Jam.
 - Animaciones con la curva «ui ease out» `cubic-bezier(0.23, 1, 0.32, 1)` y respeto a «Reducir movimiento».
 - Botones de al menos 44 pt/dp de área táctil y textos que crecen con el tamaño de letra del sistema.
 - Los commits terminan con las líneas de coautoría de Claude cuando los hace Claude.

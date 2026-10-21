@@ -6,6 +6,182 @@ Las entradas anteriores al 2026-10-12 se han reconstruido a partir del historial
 
 ---
 
+## 2026-10-21 (27) — Clave de publicación creada (S4)
+
+- Toxbox pidió que la creara Claude. No había ningún USB conectado (sólo el móvil, por depuración), así que la privada
+  está de momento en `~/.config/pear-music/publicar/publicar-ed25519.pem` (600), fuera del repo; no se guardó en el
+  móvil (siempre conectado y no se escriben datos en él). Pendiente: copiarla a un USB y a Proton Pass y borrarla del PC.
+- La pública `8mBhBBxl…bEk=` va en `Updates.PUBLISH_KEY` / `publishKey`: la 1.2 / 2.2 ya comprueba `version.json.sig`
+  («verificar y avisar»). Cada publicación firma `version.json` y `altstore.json` con `tools/publicar/firmar.mjs`.
+
+## 2026-10-21 (26) — Fijados en lugar del carrusel de Playlists; barras sin recomponer (x.1.1)
+
+- Lo pidió Toxbox: las playlists están **sólo** en la carpeta «Playlists» de Tu música, y su hueco en Biblioteca lo
+  ocupa **Fijados**, con portadas de 176 (como el carrusel) y orden propio arrastrando (`pinnedOrder`, también en la
+  copia de la biblioteca; Inicio lo sigue). Soltar sin mover abre el menú (Reproducir, Aleatorio, Soltar). Sin nada
+  fijado, el hueco explica cómo llenarlo.
+- Descargadas y Favoritos «en Playlists» (Ajustes › Biblioteca) van ahora al principio de la cuadrícula de esa carpeta.
+  En iOS `ReorderGrid` pasa a ser genérica (ids fijos para las dos listas inteligentes).
+- Fuera del carrusel quedan la tarjeta del Jam y la de «Nueva playlist»: las dos siguen en el botón + de Biblioteca.
+- Fluidez (Android): `PlayerViewModel.track` es el estado sin la posición (que cambia cada 0,5 s). La raíz y las
+  pantallas que sólo quieren saber qué suena lo leen en vez de `state`: antes se recomponían en cada tic y, con la
+  lista de pestañas creada de nuevo, la barra clásica de cristal reiniciaba su gesto. Las pestañas se recuerdan, y la
+  barra SimpMusic 2.2.0 rehace su `ConstraintSet` al cambiar de tamaño, no en cada fotograma del plegado. iOS ya tenía
+  la posición aparte (`PlaybackClock`) y usa la barra del sistema.
+
+## 2026-10-21 (25) — Fase de seguridad S4: firma de las publicaciones (x.1.1)
+
+- `tools/publicar/firmar.mjs`: clave Ed25519 **de publicación** creada en un USB (se niega a guardarla dentro del
+  repo), firma `version.json` y `altstore.json` → `.sig` (base64 sobre los bytes exactos) y los comprueba.
+- Las apps bajan `version.json.sig` y, en x.1.1, **verifican y avisan**: sin firma siguen (y lo apuntan en el
+  registro); con firma que no cuadra **no ofrecen la descarga**. En la versión siguiente rechazarán lo no firmado.
+  `PUBLISH_KEY` / `publishKey` vacía hasta que Toxbox cree la clave: mientras, no se comprueba nada.
+- `SECURITY.md` (avisos privados por GitHub, sin correo personal) y Dependabot semanal (Gradle, npm de los Workers y
+  Actions). La web tiene su propio repo: Dependabot allí aparte.
+- La especificación con vectores (S5) espera a las decisiones de S3 (audio del 19-10, P4).
+
+---
+
+## 2026-10-21 (24) — Fase 11 de x.1.1: compartir playlists por QR
+
+- «Compartir con QR» en cada playlist: QR (siempre sobre blanco) y «Compartir enlace». Al escanearlo con la cámara del
+  sistema se abre Pear Music con «Playlist compartida · N canciones» y «Añadir a la biblioteca».
+- **Sin servidor y hasta 150 canciones:** el QR sólo lleva nombre, ids en orden, icono y color; los títulos se piden
+  a YouTube Music al importar. Más canciones o la foto propia, con el servidor tras la mudanza.
+- Esquema `libremusic://` (el que ya abre el Jam), no `pear://`: no hace falta registrar otro y las versiones
+  anteriores del Jam siguen igual. Se puede añadir `pear://` cuando se renombre todo.
+- **Feed personalizado (0.7): no se programa todavía.** El plan pide antes una sesión de diseño con Toxbox; la propuesta
+  está en `../FASES X.1.1/FASE-11-compartir-y-feed.md`.
+
+---
+
+## 2026-10-21 (23) — Fase 5 de x.1.1: Jam «cada uno en su móvil» (v2.1)
+
+- En la sala del Jam, el anfitrión elige **dónde suena**: «Un altavoz» (como siempre) o **«Cada uno en su móvil»**.
+  Con el segundo, todos oyen lo mismo a la vez con su propio audio: el anfitrión cuenta qué suena y por dónde va; cada
+  invitado sincroniza el reloj (ping/pong) y corrige solo (salto > 250 ms, velocidad ±3 % entre 60 y 250 ms). Nunca
+  se transmite audio. El invitado puede quitar «Escuchar también aquí».
+- Mismo `"v":2` con mensajes añadidos (`play`, `ping`, `pong`, `state.mode`): las versiones antiguas los ignoran y
+  siguen en «un altavoz». No se lleva a la v1 de iOS (MultipeerConnectivity): no compensa.
+- De paso: «De Ana · 3 canciones», «Ana y Luis» y «Reproducir» del Jam no se traducían.
+
+---
+
+## 2026-10-21 (22) — Fase 6 de x.1.1: Pear Dev, versión antigua, forzar telemetría y fútbol
+
+- **Pear Dev › Administración › Pruebas:** reiniciar la bienvenida, ver las novedades otra vez y **simular una versión
+  antigua** (la app se cree la 1.0.0 / 2.0.0 y enseña el aviso de versión nueva, con la cinta «VERSIÓN SIMULADA»).
+  El downgrade real no se hace (P7): con la simulada basta para probar el aviso.
+- **Versión antigua (0.5):** aviso en Inicio por debajo de `minima_recomendada` (campo opcional nuevo de
+  `version.json`), con **2 versiones menores por detrás** o con **21 días** sin instalar una nueva (P10, propuesta).
+  «Ahora no»: 24 h por debajo de la mínima, 3 días si no. iOS ahora también comprueba al volver a la app (como mucho
+  cada 6 h), como Android.
+- **Forzar extracción (2.12) y borrar el registro (2.12.1):** hechos en el servidor y en Pear Dev (Android; iOS no
+  tiene llave del panel), pero **las apps no mandan nada forzado** hasta que Toxbox apruebe el texto de
+  consentimiento nuevo (`consentText` 2). La lista de datos nuevos (2.12.1) espera a la P8.
+- **0.3 (esconder el interruptor tras aceptar):** ya está así: sólo sale en la bienvenida y en Tus datos, y tiene que
+  seguir siendo retirable (RGPD art. 7.3).
+- **Fútbol (2.5):** si el servidor de estado no responde y YouTube sí, Inicio avisa «Los servidores de Pear no
+  responden… bloqueos de LaLiga». Sin fuente externa todavía (P11); los reportes y la telemetría ya se reintentaban.
+
+---
+
+## 2026-10-21 (21) — Fase 7 de x.1.1: canales por tipo y listados en Discord
+
+- **#reportes y #sugerencias:** cada tipo a su webhook (`DISCORD_WEBHOOK_REPORTES`, `DISCORD_WEBHOOK_SUGERENCIAS`) y
+  su hilo al abrirlo (`CANAL_REPORTES`, `CANAL_SUGERENCIAS`); sin ellos, todo sigue yendo a #tickets.
+- **/sugerencias y /reportes:** efímeros, 20 por página con ◀ ▶, filtros de estado y días. **Se queda en KV** con un
+  índice de una sola clave (`tickets:index`) en vez de pasar a D1: con 1000 filas cabe de sobra y no hace falta
+  crear ni migrar una base. Si un día no basta, se pasa a D1 con la mudanza.
+- **Autor sin datos personales guardados:** «an…@gmail.com · disp. 7F3A» (correo enmascarado y 4 letras del resumen
+  del dispositivo). El correo completo sigue llegando sólo en el mensaje de Discord, como antes. Sin `.csv` adjunto
+  por ahora (con páginas basta).
+
+---
+
+## 2026-10-21 (20) — Fase 4 de x.1.1: Playlists y álbumes reordenables, «No me interesa»
+
+- **Carpeta «Playlists»** arriba en «Tu música» (`musicOrder` gana `playlists`; a quien ya tenía un orden propio le
+  entra en su sitio de fábrica, arriba). Dentro, cuadrícula como «Tus álbumes». **Manteniendo pulsada una portada se
+  arrastra** y el orden pasa a «A mano»; Descargadas y Favoritos no se mueven de donde estén. El lápiz sigue
+  llevando a «Editar playlists».
+- **Tus álbumes reordenables** igual: `albumOrder` y `albumSort` (mismos nombres en las dos apps y en
+  `library.json`, opcionales). Buscando no se reordena (se ordenaría sólo lo encontrado). iOS usa el arrastre del
+  sistema (`onDrag`/`DropDelegate`); Android, una cuadrícula propia con todas las celdas bajo el mismo padre.
+- **El carrusel de Playlists se queda** como está (P6 sin responder; la propuesta era dejarlo).
+- **«No me interesa»** en el «⋯» de Descubrir: la canción sale y no vuelve; con 3 del mismo artista en 30 días, el
+  artista sale de Descubrir 30 días. Sólo en el móvil (`reels_skip.json`), con «Deshacer» 4 s y «Vaciar» en
+  Ajustes › Biblioteca › Descubrir.
+- **Menús de Descubrir casi opacos** en Android (`ContextMenu(opaque = true)`). En iOS el menú es el del sistema y su
+  material no se puede cambiar.
+- De paso: «N canciones», «Compartir», «Reintentar» y «Desconocido» no se traducían.
+
+---
+
+## 2026-10-21 (19) — Fase 3 de x.1.1: sección Barra y «Buscar vuelve al parar»
+
+- **Aspecto › Barra** (pedido 2.11): una fila como «Reproductor» que agrupa el estilo, dónde está Buscar, «Buscar
+  vuelve al parar», el cristal líquido (Android) y Pestañas. Sólo se ven las opciones del estilo elegido; las de los
+  otros no salen ni atenuadas (menos ruido). «Dónde está Buscar» sale de Biblioteca y entra aquí. La guía y el
+  buscador de Ajustes llevan a la pantalla nueva.
+- **Buscar vuelve al parar** (`barRestoreIdle`, por defecto sí): con la barra SimpMusic, si Inicio lleva 1,5 s sin
+  desplazarse, la barra se despliega. En Android la hora del último desplazamiento no es estado, para no recomponer
+  la raíz en cada fotograma.
+- **Buscar dentro de la cápsula** (1.4) **no se hace todavía**: depende de la pregunta P5 («reubicar aspecto») y en
+  Android obliga a rehacer la cápsula. Con la barra SimpMusic, Buscar sigue en el círculo de la derecha.
+
+---
+
+## 2026-10-21 (18) — Fase 2 de x.1.1: idiomas y bugs comunes
+
+- **Inicio en el idioma de la app:** las estanterías («Selecciones rápidas»…) vienen de YouTube Music, que se pedía
+  siempre en «es». Ahora **sólo Inicio** se pide con `hl` = idioma de la app (`I18n.youtubeHl`; YouTube no tiene
+  valenciano ni esperanto: **valenciano → catalán, esperanto → inglés**) y se vuelve a pedir al cambiar de idioma.
+  Búsquedas, artistas y audio siguen en «es», porque al leerlos se reconocen los tipos («Canción», «Álbum»…) en
+  español; aun así, la lista de tipos ya incluye catalán, euskera, inglés y portugués.
+- **Textos de iOS sin traducir:** el extractor salta cualquier línea con `systemImage:`, así que 64 `Label("…")`,
+  `Button("…")` y parecidos nunca pasaron por `L()`. Convertidos todos (la mayoría ya tenía traducción por Android).
+- **Etiquetas de Android congeladas (barra en castellano en euskera):** 8 enums calculaban el texto traducido al
+  crearse y luego lo volvían a traducir; ahora guardan una función y traducen en cada lectura. Test
+  `BarLabelsTest` con los 8 idiomas.
+- **«Ver todo» → álbum → «Ver todo» otra vez (iOS):** se mezclaba un `NavigationLink` con vista de destino y enlaces
+  por valor en la misma pila; ahora «Ver todo» va por valor (`DiscographyRoute`).
+- **Mantenimiento en Pear Dev:** botón «Entrar igualmente (Dev)» y cinta «MANTENIMIENTO ACTIVO». Sólo en la variante
+  dev (`ADMIN_TOOLS` / `Channel.adminTools`, constantes de compilación); pref ve lo mismo que usr.
+- **Respuestas del soporte en su idioma:** el título sale del `tipo` y el texto predeterminado de «abierto» va como
+  `plantilla`. Falta desplegar el Worker (lo hace Toxbox); mientras, los títulos ya salen traducidos.
+
+---
+
+## 2026-10-21 (17) — Fase 1 de x.1.1: arreglos de interfaz de iOS y reproductor en horizontal
+
+- **Casete y vinilo en horizontal:** sólo el objeto, sin la cápsula de controles encima (lo pidió Toxbox: la gracia
+  es manejar las teclas y el brazo). Reproducir/Pausa, Siguiente y Anterior siguen como acciones de VoiceOver y
+  TalkBack. Los márgenes salen de la ventana (isla dinámica, recorte de la cámara) más 12 pt/dp.
+- **Air no gira:** se queda en vertical. iOS, con `OrientationLock` (delegado de la app +
+  `requestGeometryUpdate`, sólo iPhone); Android, `requestedOrientation` mientras se ve.
+- **Bienvenida sin capas encima:** el recorrido, las historias, las novedades y el aviso de versión esperan a que la
+  bienvenida termine de cerrarse (`introCoverUp`), y las novedades a que se cierre la cuenta.
+- **Recorrido:** el paso de Ajustes va justo después del Jam, con Inicio a la vista (el engranaje ya no está en la
+  barra desde la decisión 16).
+- **Capturas 07/08 de iOS:** abren la hoja de Ajustes desde Inicio. Nuevas capturas 37 y 38 (barra con dos pestañas,
+  clásica y SimpMusic) para decidir 1.3 y 1.5 con la compilación.
+- **Tema en la bienvenida:** toda la tarjeta se puede tocar; el tema y el modo se aplican dentro de la bienvenida y de
+  la hoja de Ajustes (en iOS 16 no se heredan); con Aire o Neón se dice que el modo es fijo.
+- **Teclado en Inicio:** se quita al pulsar Buscar y al bajar por los resultados.
+
+---
+
+## 2026-10-21 (16) — Ajustes deja de poder ir en la barra (x.1.1, fase 0)
+
+Lo decidió Toxbox: Ajustes vive **siempre arriba a la izquierda en Inicio** (el Jam y la campana siguen a la derecha)
+y se quita Ajustes › Aspecto › «Ajustes» (En la barra / Arriba en Inicio). Ninguna barra lleva ya la pestaña
+Ajustes; en Pestañas sale apagada. Las claves `settingsTop.classic` / `settingsTop.simpmusic` se dejan de leer pero no
+se borran de las preferencias. El título pequeño de Inicio vuelve a ir centrado. Se quita el paso «Ajustes» de la
+guía de Ajustes, que señalaba la sección eliminada. Plan completo de la versión en `../FASES X.1.1/`.
+
+---
+
 ## 2026-10-15 (15) — Android 1.1 / iOS 2.1: novedades, guía de Ajustes, portugués y web nueva
 
 Lo pidió Toxbox para la .1:

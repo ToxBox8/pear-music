@@ -20,7 +20,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -47,9 +50,19 @@ data class PlayerUiState(
 class PlayerViewModel(app: Application) : AndroidViewModel(app) {
     private val library = (app as LibreMusicApplication).library
     private var lastPlayedId: String? = null
+    /** Lo añadido a la cola que aún no ha sonado (ver [app.libremusic.data.UpNext]). */
+    private val queued = mutableSetOf<String>()
 
     private val _state = MutableStateFlow(PlayerUiState())
     val state: StateFlow<PlayerUiState> = _state.asStateFlow()
+
+    /**
+     * El mismo estado sin el progreso, que llega dos veces por segundo: lo leen las pantallas que sólo quieren saber
+     * qué suena (la raíz con las barras, Inicio, Biblioteca, Buscar…). Leyendo [state] entero se recomponían en cada
+     * tic mientras sonaba algo. Aquí `positionMs` y `durationMs` valen siempre 0.
+     */
+    val track: StateFlow<PlayerUiState> = _state.map { it.copy(positionMs = 0, durationMs = 0) }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, _state.value.copy(positionMs = 0, durationMs = 0))
 
     private var controller: MediaController? = null
 
@@ -86,6 +99,8 @@ class PlayerViewModel(app: Application) : AndroidViewModel(app) {
         val c = controller ?: return
         val queue = (0 until c.mediaItemCount).map { c.getMediaItemAt(it).toSong() }
         val current = c.currentMediaItem?.toSong()
+        // Lo de la cola deja de serlo al sonar.
+        current?.let { queued.remove(it.id) }
         // Recientes: se apunta cada canción cuando empieza a sonar.
         if (current != null && current.id != lastPlayedId && c.isPlaying) {
             lastPlayedId = current.id
@@ -108,6 +123,7 @@ class PlayerViewModel(app: Application) : AndroidViewModel(app) {
     fun play(songs: List<Song>, index: Int = 0) {
         val c = controller ?: return
         _state.value = _state.value.copy(error = null)
+        queued.clear()
         c.setMediaItems(songs.map(Song::toMediaItem), index, 0)
         c.prepare()
         c.play()
@@ -125,14 +141,24 @@ class PlayerViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /**
+     * Cola de verdad (sugerencia del ticket 7): la canción suena justo después de la actual o, si ya habías añadido
+     * otras, detrás de ellas; antes iba al final de la playlist o de la radio.
+     */
     fun addToQueue(song: Song) {
         val c = controller ?: return
-        if (c.mediaItemCount == 0) play(listOf(song)) else c.addMediaItem(song.toMediaItem())
+        if (c.mediaItemCount == 0) { play(listOf(song)); return }
+        val ids = (0 until c.mediaItemCount).map { c.getMediaItemAt(it).mediaId }
+        c.addMediaItem(app.libremusic.data.UpNext.insertAt(ids, c.currentMediaItemIndex, queued), song.toMediaItem())
+        queued += song.id
     }
 
+    /** Justo después de la actual, por delante de lo que ya estaba en la cola (y cuenta como parte de ella). */
     fun playNext(song: Song) {
         val c = controller ?: return
-        if (c.mediaItemCount == 0) play(listOf(song)) else c.addMediaItem(c.currentMediaItemIndex + 1, song.toMediaItem())
+        if (c.mediaItemCount == 0) { play(listOf(song)); return }
+        c.addMediaItem(c.currentMediaItemIndex + 1, song.toMediaItem())
+        queued += song.id
     }
 
     fun togglePlay() {
@@ -170,6 +196,8 @@ class PlayerViewModel(app: Application) : AndroidViewModel(app) {
     fun next() = controller?.seekToNextMediaItem()
     fun previous() = controller?.seekToPrevious()
     fun seekTo(ms: Long) = controller?.seekTo(ms)
+    /** Posición exacta ahora (la del estado se refresca cada medio segundo): para el Jam «todos». */
+    fun livePosition(): Long? = controller?.currentPosition
     fun skipTo(index: Int) = controller?.seekToDefaultPosition(index)
     fun removeFromQueue(index: Int) = controller?.removeMediaItem(index)
     fun dismissError() {

@@ -133,6 +133,7 @@ private var settingsIndex: [SettingEntry] { [
     SettingEntry(title: L("Pestañas"), section: L("Aspecto"), keywords: L("orden barra descubrir inicio biblioteca"), destination: .tabs),
     SettingEntry(title: L("Descubrir"), section: L("Aspecto"), keywords: L("ocultar quitar desactivar descubrir feed fragmentos reels"), destination: .tabs),
     SettingEntry(title: L("Barra inferior"), section: L("Aspecto"), keywords: L("barra simpmusic plegar buscar"), destination: .bar),
+    SettingEntry(title: L("Buscar vuelve al parar"), section: L("Barra"), keywords: L("barra simpmusic plegar buscar"), destination: .bar),
     SettingEntry(title: L("Calidad al escuchar"), section: L("Reproducción"), keywords: L("streaming datos ahorro máxima kbps"), destination: .playback),
     SettingEntry(title: L("Seguir con canciones parecidas"), section: L("Reproducción"), keywords: L("radio infinita autoplay automático cola acabar"), destination: .playback),
     SettingEntry(title: L("Fundido entre canciones"), section: L("Reproducción"), keywords: L("crossfade transición suave volumen cortes"), destination: .playback),
@@ -141,7 +142,7 @@ private var settingsIndex: [SettingEntry] { [
     SettingEntry(title: L("Canciones descargadas"), section: L("Descargas"), keywords: L("espacio offline sin conexión borrar"), destination: .downloads),
     SettingEntry(title: L("Ordenar playlists"), section: L("Biblioteca"), keywords: L("orden a-z recientes a mano"), destination: .library),
     SettingEntry(title: L("Descargadas y Favoritos"), section: L("Biblioteca"), keywords: L("carrusel tu música"), destination: .library),
-    SettingEntry(title: L("Dónde está Buscar"), section: L("Biblioteca"), keywords: L("buscar pestaña inicio barra"), destination: .library),
+    SettingEntry(title: L("Dónde está Buscar"), section: L("Barra"), keywords: L("buscar pestaña inicio barra"), destination: .bar),
     SettingEntry(title: L("Eliminar playlists"), section: L("Biblioteca"), keywords: L("borrar quitar"), destination: .manage),
     SettingEntry(title: L("Avisos"), section: L("Ayuda y soporte"), keywords: L("notificaciones campana caídas novedades discord"), destination: .avisos),
     SettingEntry(title: L("Cuenta"), section: L("Ajustes"), keywords: L("cuenta correo nube sincronizar copia cifrada clave recuperación iniciar sesión"), destination: .account),
@@ -199,6 +200,7 @@ struct SettingsView: View {
             .navigationDestination(for: SettingsRoute.self) { route in
                 switch route {
                 case .aspect: AspectSettings()
+                case .bar: BarSettings()
                 case .audio: AudioSettings()
                 case .library: LibrarySettings()
                 case .help: HelpSettings()
@@ -324,7 +326,7 @@ struct SettingsView: View {
         case .player: PlayerSettings()
         case .artwork: ArtworkColorsSettings()
         case .tabs: TabOrderSettings()
-        case .bar: AspectSettings()
+        case .bar: BarSettings()
         case .playback: AudioSettings()
         case .downloads: DownloadsSettings()
         case .library: LibrarySettings()
@@ -347,8 +349,6 @@ struct SettingsView: View {
 // MARK: Aspecto
 struct AspectSettings: View {
     @AppStorage("barStyle") private var barStyle = "classic"
-    @AppStorage("settingsTop.classic") private var settingsTopClassic = false
-    @AppStorage("settingsTop.simpmusic") private var settingsTopSimp = true
     @AppStorage("theme") private var themeID = AppTheme.glass.rawValue
     @AppStorage("appearance") private var appearance = "system"
     @AppStorage("deck") private var deckID = DeckStyle.normal.rawValue
@@ -358,6 +358,7 @@ struct AspectSettings: View {
     @AppStorage("artworkIntensity") private var intensity = ArtworkLevel.balanced.intensity
     @AppStorage("artworkOpacity") private var opacity = ArtworkLevel.balanced.opacity
     @AppStorage("tabOrder") private var tabOrderRaw = ""
+    @AppStorage("showDiscover") private var showDiscover = true
 
     var body: some View {
         let theme = AppTheme(rawValue: themeID) ?? .glass
@@ -380,13 +381,37 @@ struct AspectSettings: View {
                                 subtitle: !(artworkPlayer || artworkApp) || !level.enabled ? L("Desactivado")
                                     : level.title + " · " + [artworkPlayer ? "reproductor" : nil, artworkApp ? L("resto de la app") : nil].compactMap { $0 }.joined(separator: " y "))
                 }
-                NavigationLink { TabOrderSettings() } label: {
-                    SettingsRow(icon: "arrow.left.arrow.right", palette: 7, title: L("Pestañas"), value: nil,
-                                subtitle: TabOrder.decode(tabOrderRaw).map(TabOrder.title).joined(separator: ", "))
+                // Barra (2.11 de x.1.1): estilo, dónde va Buscar, si vuelve al parar y el orden de las pestañas.
+                NavigationLink(value: SettingsRoute.bar) {
+                    SettingsRow(icon: "dock.rectangle", palette: 7, title: L("Barra"), value: nil,
+                                subtitle: (barStyle == "simpmusic" ? L("Estilo SimpMusic") : L("Clásica")) + " · "
+                                    + TabOrder.visible(TabOrder.decode(tabOrderRaw), searchTab: false, discover: showDiscover)
+                                        .filter { $0 != TabOrder.settings }.map(TabOrder.title).joined(separator: ", "))
                 }
             }
             .glassRow()
 
+            ResetSection(section: L("Aspecto"), what: L("Vuelven el tema Cristal, el reproductor Normal, los colores de la portada apagados y el orden de pestañas de fábrica.")) {
+                SettingsReset.appearance()
+            }
+        }
+        .navigationTitle(L("Aspecto"))
+        .navigationBarTitleDisplayMode(.inline)
+        .themed()
+    }
+}
+
+// MARK: Barra (2.11 de x.1.1)
+/// Todo lo de la barra de abajo junto: el estilo, sólo las opciones del estilo elegido y el orden de las pestañas.
+/// Igual que `BarScreen` en Android, salvo el cristal líquido, que en iOS lo pone el sistema.
+struct BarSettings: View {
+    @AppStorage("barStyle") private var barStyle = "classic"
+    @AppStorage("searchPlacement") private var searchPlacement = "home"
+    @AppStorage("barRestoreIdle") private var restoreIdle = true
+    @AppStorage("tabOrder") private var tabOrderRaw = ""
+
+    var body: some View {
+        Form {
             Section {
                 Picker(L("Barra inferior"), selection: $barStyle) {
                     Text(L("Clásica")).tag("classic")
@@ -400,29 +425,39 @@ struct AspectSettings: View {
             }
             .glassRow()
 
-            // Se guarda aparte para cada barra: con la clásica va en la barra y con la estilo SimpMusic arriba.
-            let settingsTop = Binding(
-                get: { barStyle == "simpmusic" ? settingsTopSimp : settingsTopClassic },
-                set: { if barStyle == "simpmusic" { settingsTopSimp = $0 } else { settingsTopClassic = $0 } }
-            )
-            Section {
-                Picker(L("Ajustes"), selection: settingsTop) {
-                    Text(L("En la barra")).tag(false)
-                    Text(L("Arriba en Inicio")).tag(true)
+            if barStyle == "simpmusic" {
+                Section {
+                    Toggle(isOn: $restoreIdle) { Text(L("Buscar vuelve al parar")).tourTarget("row:" + L("Buscar vuelve al parar")) }
+                } header: { Text(L("Dónde está Buscar")).tourTarget("section:" + L("Dónde está Buscar")) } footer: {
+                    Text(L("Buscar es el círculo de la derecha. Al bajar por Inicio la barra se pliega; si dejas de moverte 1,5 segundos, vuelve entera."))
                 }
-                .pickerStyle(.segmented)
-            } header: { Text(L("Ajustes")).tourTarget("section:" + L("Ajustes")) } footer: {
-                Text(settingsTop.wrappedValue
-                     ? L("Ajustes está arriba en Inicio, junto al Jam, y no ocupa sitio en la barra.")
-                     : L("Ajustes es una pestaña más de la barra; su sitio se elige en Pestañas."))
+                .glassRow()
+            } else {
+                Section {
+                    Picker(L("Buscar"), selection: $searchPlacement) {
+                        Text(L("Barra arriba en Inicio")).tag("home")
+                        Text(L("Pestaña aparte")).tag("tab")
+                    }
+                    .pickerStyle(.inline)
+                    .labelsHidden()
+                } header: { Text(L("Dónde está Buscar")).tourTarget("section:" + L("Dónde está Buscar")) } footer: {
+                    Text(searchPlacement == "tab"
+                         ? L("Buscar tiene su propia pestaña en la barra de abajo, justo después de Inicio.")
+                         : L("La barra de búsqueda está siempre arriba en Inicio."))
+                }
+                .glassRow()
+            }
+
+            Section {
+                NavigationLink { TabOrderSettings() } label: {
+                    SettingsRow(icon: "arrow.left.arrow.right", palette: 7, title: L("Pestañas"), value: nil,
+                                subtitle: TabOrder.decode(tabOrderRaw).filter { $0 != TabOrder.settings }.map(TabOrder.title).joined(separator: ", "))
+                }
             }
             .glassRow()
-
-            ResetSection(section: L("Aspecto"), what: L("Vuelven el tema Cristal, el reproductor Normal, los colores de la portada apagados y el orden de pestañas de fábrica.")) {
-                SettingsReset.appearance()
-            }
         }
-        .navigationTitle(L("Aspecto"))
+        .animation(.uiEaseOut(0.25), value: barStyle)
+        .navigationTitle(L("Barra"))
         .navigationBarTitleDisplayMode(.inline)
         .themed()
     }
@@ -556,20 +591,16 @@ struct ArtworkPreview: View {
 /// Se arrastran para cambiar el orden; Ajustes se puede mover pero no quitar.
 struct TabOrderSettings: View {
     @AppStorage("tabOrder") private var tabOrderRaw = ""
-    @AppStorage("barStyle") private var barStyle = "classic"
-    @AppStorage("settingsTop.classic") private var settingsTopClassic = false
-    @AppStorage("settingsTop.simpmusic") private var settingsTopSimp = true
     @AppStorage("showDiscover") private var showDiscover = true
     @State private var swipe: CGFloat = 0
 
     var body: some View {
         let order = TabOrder.decode(tabOrderRaw)
-        // Ajustes arriba en Inicio: se ve apagado y no se mueve, porque no está en la barra.
-        let settingsTop = barStyle == "simpmusic" ? settingsTopSimp : settingsTopClassic
+        // Ajustes está arriba en Inicio: se ve apagado y no se mueve, porque no está en la barra.
         Form {
             Section {
                 ForEach(order, id: \.self) { key in
-                    let fixed = settingsTop && key == TabOrder.settings
+                    let fixed = key == TabOrder.settings
                     // Descubrir se oculta deslizándola a la izquierda (lo pidió Toxbox): queda difuminada.
                     let hidden = key == "discover" && !showDiscover
                     VStack(alignment: .leading, spacing: 2) {
@@ -603,7 +634,7 @@ struct TabOrderSettings: View {
                 }
             } header: { Text(L("Orden de la barra")).tourTarget("section:" + L("Orden de la barra")) } footer: {
                 Text(L("Arrastra ≡ para cambiar el orden; deslizar a los lados sigue el mismo orden. Desliza Descubrir a la izquierda para ocultarla (y a la derecha para volver a ponerla). La app se abre en la última pestaña que usaste.")
-                     + (settingsTop ? L(" Ajustes está arriba en Inicio y no entra en el orden (se cambia en Aspecto).") : ""))
+                     + L(" Ajustes está arriba en Inicio y no entra en el orden."))
             }
             .glassRow()
 
@@ -961,6 +992,11 @@ struct OnboardingView: View {
         .pickerStyle(.segmented)
         .disabled(theme.scheme != nil)
         .padding(.top, 18)
+        // Aire y Neón tienen el modo fijo: se dice aquí para que «Oscuro» no parezca roto (1.9.1 de x.1.1).
+        if let forced = theme.scheme {
+            Text(forced == .dark ? L("«{0}» usa siempre el modo oscuro.", theme.name) : L("«{0}» usa siempre el modo claro.", theme.name))
+                .font(.footnote).foregroundStyle(.secondary).padding(.top, 8)
+        }
     }
 
     @ViewBuilder private var colorsStep: some View {

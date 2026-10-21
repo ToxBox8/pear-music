@@ -5,7 +5,7 @@
 import {
   decryptEmail, emailMac, encryptEmail, normalizeEmail, randomCode, randomToken, sameHex, sha256,
 } from "./crypto.js";
-import { RETENTION_DAYS, panelAuthorized, panelSummary, telemetryProblem } from "./telemetry.js";
+import { FORZAR_EVERY_MS, RETENTION_DAYS, ordenVigente, panelAuthorized, panelSummary, telemetryProblem } from "./telemetry.js";
 import {
   ACTIVOS_RETENTION_DAYS, FICHA_RETENTION_DAYS, activoProblem, countActivo, countDecision, decisionProblem, dispositivos,
   fichaProblem, saveFicha, today,
@@ -210,7 +210,8 @@ export async function handle(request, env, now = Date.now()) {
     if (problem) return json(400, { error: problem });
     if (await limited(env, `act:${request.headers.get("cf-connecting-ip") ?? "?"}`, LIMITS.activosPerIpPerHour, now)) return json(429, { error: "Demasiadas peticiones." });
     await countActivo(env.DB, body, now);
-    return json(202, { ok: true });
+    // Si el panel ha pedido el resumen de esta semana, la app lo ve aquí (y sólo lo manda con consentimiento).
+    return json(202, { ok: true, orden: await ordenVigente(env.DB, now) });
   }
 
   // Decisión sobre la telemetría (sí/no): sólo contadores, sin identificadores.
@@ -222,6 +223,42 @@ export async function handle(request, env, now = Date.now()) {
     if (await limited(env, `dec:${request.headers.get("cf-connecting-ip") ?? "?"}`, LIMITS.activosPerIpPerHour, now)) return json(429, { error: "Demasiadas peticiones." });
     await countDecision(env.DB, body);
     return json(202, { ok: true });
+  }
+
+  // Órdenes del panel (2.12 y 2.12.1 de x.1.1), con la misma llave que el panel: desde la web o desde Pear Dev.
+  if (url.pathname === "/v1/telemetria/forzar" || url.pathname === "/v1/telemetria/reset") {
+    const cors = {
+      "access-control-allow-origin": env.PANEL_ORIGIN ?? "",
+      "access-control-allow-headers": "authorization, content-type",
+      "access-control-allow-methods": "POST",
+      vary: "origin",
+    };
+    const out = async () => {
+      if (request.method === "OPTIONS") return new Response(null, { status: 204 });
+      if (request.method !== "POST") return json(405, { error: "Método no permitido." });
+      if (await limited(env, `panel:${request.headers.get("cf-connecting-ip") ?? "?"}`, 60, now)) return json(429, { error: "Demasiadas peticiones." });
+      if (!(await panelAuthorized(env, request.headers.get("authorization"), now))) return json(401, { error: "Conecta el móvil por USB y abre Pear Dev." });
+      if (url.pathname.endsWith("/forzar")) {
+        const last = await env.DB.prepare("SELECT at FROM ordenes WHERE kind = 'forzar' ORDER BY at DESC LIMIT 1").first("at");
+        if (last && now - last < FORZAR_EVERY_MS) return json(429, { error: "Ya se pidió hace poco. Espera unos minutos." });
+        const id = randomToken().slice(0, 16);
+        await env.DB.prepare("INSERT INTO ordenes (id, kind, at) VALUES (?, 'forzar', ?)").bind(id, now).run();
+        return json(200, { id, at: now });
+      }
+      // Reset: doble confirmación (la web y Pear Dev preguntan dos veces y mandan la palabra). Nunca toca las fichas.
+      const { body, error } = await readJson(request);
+      if (error) return error;
+      if (body?.confirmar !== "BORRAR") return json(400, { error: "Falta confirmar." });
+      const n = (await env.DB.prepare("SELECT count(*) AS n FROM telemetry").first("n")) ?? 0;
+      await env.DB.batch([
+        env.DB.prepare("DELETE FROM telemetry"),
+        env.DB.prepare("INSERT INTO ordenes (id, kind, at, borradas) VALUES (?, 'reset', ?, ?)").bind(randomToken().slice(0, 16), now, n),
+      ]);
+      return json(200, { ok: true, borradas: n });
+    };
+    const r = await out();
+    for (const [k, v] of Object.entries(cors)) r.headers.set(k, v);
+    return r;
   }
 
   // Panel de telemetría (Fase 4b): sólo desde la web y con la llave que Pear Dev da por el cable.

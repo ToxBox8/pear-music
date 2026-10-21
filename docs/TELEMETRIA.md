@@ -28,7 +28,7 @@ manda algo con «Enviar ahora». La app pública (y Pear Pref) envía el resumen
 | `os_version` | `16` | Versión de Android o iOS |
 | `device_model` | `Nothing A065` / `iPhone16,1` | Modelo del móvil (fabricante y modelo; nunca el nombre que le has puesto) |
 | `week` | `2026-W42` | Semana ISO del resumen |
-| `kind` | `semanal` | `semanal` (automático) o `manual` (sólo Pear Dev, «Enviar ahora») |
+| `kind` | `semanal` | `semanal` (automático), `manual` (sólo Pear Dev, «Enviar ahora») o `forzado` (la semana en curso porque el panel lo pidió; ver abajo) |
 | `sessions` | `9` | Cuántas veces se abrió la app esa semana |
 | `startup_ms` | `640` | Cuánto tarda en abrir (mediana; sólo la primera vez de cada arranque) |
 | `fps_median` | `59.8` | Fotogramas por segundo, mediana de la sesión |
@@ -39,6 +39,20 @@ manda algo con «Enviar ahora». La app pública (y Pear Pref) envía el resumen
 Lo recibe el servidor junto con la hora de llegada. **No** se envían: correo, cuenta, canciones, búsquedas,
 biblioteca, ubicación, contactos, IP guardada (Cloudflare la ve para entregar la petición, pero no se guarda),
 identificadores de publicidad ni del dispositivo.
+
+## Forzar la extracción y borrar el registro (x.1.1, **apagado en las apps**)
+
+- **Forzar** (`POST /v1/telemetria/forzar`, con la llave del panel; como mucho una cada 10 minutos): el panel pide el
+  resumen de la semana en curso. Las apps lo ven en su latido diario (`/v1/activo` devuelve `orden` durante 7 días)
+  y lo mandan una vez con `kind: "forzado"`. El panel cuenta las respuestas.
+- **Sólo lo atiende quien aceptó un texto que lo dice.** El texto de ahora («un resumen a la semana») no lo dice, así
+  que las apps guardan qué versión del texto aceptó cada uno (`consentText`, hoy 1) y sólo atienden la orden desde la
+  2. **Hasta que Toxbox apruebe el texto nuevo** («Un resumen a la semana, y a veces antes si el responsable lo pide»)
+  y se suba a 2, nadie manda nada forzado. Al subirlo, quien aceptó la 1 tiene que volver a aceptar.
+- Pear Dev y Pear Pref no atienden la orden (no tienen envío automático).
+- **Borrar el registro** (`POST /v1/telemetria/reset` con `{"confirmar":"BORRAR"}`, llave del panel y doble confirmación en
+  Pear Dev): borra todos los informes de telemetría. Nunca toca las fichas de los reportes. Queda la fecha y cuántos se
+  borraron (tabla `ordenes`), para que el panel lo enseñe.
 
 ## Dónde y cuánto tiempo
 

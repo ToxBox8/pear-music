@@ -113,7 +113,7 @@ struct SleepTimerButton: View {
             }
             if timer.state != .off {
                 Divider()
-                Button(role: .destructive) { timer.cancel() } label: { Label("Desactivar temporizador", systemImage: "xmark") }
+                Button(role: .destructive) { timer.cancel() } label: { Label(L("Desactivar temporizador"), systemImage: "xmark") }
             }
         } label: {
             Image(systemName: timer.state == .off ? "moon.zzz" : "moon.zzz.fill")

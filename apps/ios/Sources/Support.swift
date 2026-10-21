@@ -417,7 +417,7 @@ struct SupportDraftsView: View {
                     }
                 }
                 .swipeActions {
-                    Button(role: .destructive) { deleting = d } label: { Label("Eliminar", systemImage: "trash") }
+                    Button(role: .destructive) { deleting = d } label: { Label(L("Eliminar"), systemImage: "trash") }
                 }
             }
             .glassRow()

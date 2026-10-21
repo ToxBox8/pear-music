@@ -49,6 +49,17 @@ enum I18n {
         lock.lock(); table = t; current = l; lock.unlock()
     }
 
+    /// Idioma que se pide a YouTube Music (`hl`): los títulos de las estanterías de Inicio vienen de allí (1.8 de
+    /// x.1.1). YouTube no tiene valenciano ni esperanto: catalán e inglés.
+    static var youtubeHl: String {
+        lock.lock(); defer { lock.unlock() }
+        switch current {
+        case "va": return "ca"
+        case "eo": return "en"
+        default: return current
+        }
+    }
+
     static func t(_ s: String) -> String {
         lock.lock(); defer { lock.unlock() }
         return table[s] ?? s

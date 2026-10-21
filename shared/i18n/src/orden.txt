@@ -1027,3 +1027,91 @@ Ya no marca Descubrir cuando estás en Ajustes.
 Ya puedes usar Pear Music en português. Y «Español» ahora se llama «Castellano».
 {0} de {1}
 ¡Listo!
+ Ajustes está arriba en Inicio y no entra en el orden.
+Ordenar a mano
+Unirme
+Ver mis playlists
+Comprobando…
+Siempre
+Abrimos tu incidencia
+Entrar igualmente (Dev)
+Estamos en ello
+Hemos abierto tu incidencia y la estamos mirando. Te avisaremos aquí.
+MANTENIMIENTO ACTIVO
+¡Solucionado! Gracias
+ · cristal líquido
+Barra
+Buscar es el círculo de la derecha. Al bajar por Inicio la barra se pliega; si dejas de moverte 1,5 segundos, vuelve entera.
+Buscar vuelve al parar
+Con la clásica, una barra arriba en Inicio o una pestaña aparte. Con la SimpMusic, el círculo de la derecha, que vuelve si dejas de bajar.
+La barra de abajo: su estilo, dónde está Buscar y el orden de las pestañas, todo junto.
+Borra la búsqueda para cambiar el orden.
+Deshacer
+Las canciones que marcaste con «No me interesa» no vuelven a salir, y un artista con tres en un mes deja de salir durante 30 días. Sólo se guarda en este móvil.
+Lo que no te interesa
+Mantén pulsada una portada y arrástrala para cambiar el orden.
+No me interesa
+No volverá a salir en Descubrir.
+Vaciar
+Vaciar lo que no te interesa
+{0} canciones
+Actualizar
+Borrados {0} informes
+Borrar el registro de la web
+Esta versión es antigua
+Forzar extracción
+La app se cree la {0}. Sal y vuelve para ver el aviso.
+La música sigue funcionando. Si hay fútbol, puede ser por los bloqueos de LaLiga: los avisos y el soporte vuelven al acabar el partido.
+Los servidores de Pear no responden
+Para repetir la bienvenida o ver los avisos sin reinstalar. No tocan tu biblioteca ni tus descargas.
+Para ver el aviso de versión nueva
+Pedido. Las apps lo verán en su latido diario.
+Pruebas
+Puede fallar. Actualiza para tener los arreglos.
+Reiniciar la bienvenida
+Se borran todos los informes guardados. Las fichas de los reportes no se tocan. No se puede deshacer.
+Segunda confirmación: el panel se queda vacío.
+Simular versión antigua
+VERSIÓN SIMULADA: {0}
+Ver las novedades otra vez
+¿Borrar toda la telemetría de la web?
+¿Seguro?
+Cada uno en su móvil
+De {0} · {1}
+Dónde suena
+Escuchar también aquí
+Lo que suena aquí suena a la vez en el móvil de cada uno, con su propio audio. Pon algo de la lista.
+Suena lo mismo que en el móvil de {0}, a la vez.
+Suena sólo en este móvil; los demás añaden canciones.
+Un altavoz
+{0} y {1}
+{0}, {1} y {2}
+ La foto de la portada no cabe en el QR.
+Añadiendo…
+Añadir a la biblioteca
+Compartir con QR
+Compartir enlace
+Código QR de {0}
+Escanéalo con la cámara de otro móvil con Pear Music. Viajan el nombre, las {0} canciones y su orden.
+Esta playlist está vacía.
+No se pudieron cargar las canciones. Revisa la conexión y vuelve a intentarlo.
+Playlist compartida
+Sin nombre
+Tiene demasiadas canciones para un QR (como mucho {0}).
+{0} canciones no están en YouTube Music y se han quedado fuera.
+Ajustes, arriba a la izquierda
+Biblioteca a tu gusto
+Comparte playlists con un QR
+Comparte una playlist con el QR de su pantalla, y en el Jam elige que suene en el móvil de cada uno.
+Con la barra estilo SimpMusic, si dejas de bajar por Inicio la barra vuelve entera.
+En Descubrir, en «⋯». Esa canción no vuelve, y si un artista no te va, deja de salir un tiempo.
+En Inicio. Y en Ajustes › Aspecto › Barra está todo lo de la barra junto.
+Jam: cada uno en su móvil
+Lo que marcaste con «No me interesa». Vacíalo cuando quieras.
+Nuevo: el estilo de la barra, dónde está Buscar y las pestañas, todo aquí.
+Nuevo: el estilo de la barra, dónde está Buscar, el cristal líquido y las pestañas, todo aquí.
+Otro móvil lo escanea con la cámara y se la lleva con sus canciones y su orden.
+Playlists en cuadrícula, como Tus álbumes. Mantén pulsada una portada y arrástrala para ordenarlas.
+Quien crea el Jam elige: que suene en un altavoz o en el móvil de cada uno a la vez, con sus cascos.
+Aparecen con su portada al principio de la carpeta Playlists, en «Tu música».
+Pulsa la chincheta en una playlist o un álbum y lo tendrás aquí, en el orden que quieras.

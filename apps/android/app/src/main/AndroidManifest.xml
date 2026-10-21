@@ -44,6 +44,13 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="libremusic" android:host="jam" />
             </intent-filter>
+            <!-- Playlists compartidas por QR: libremusic://playlist?v=1&d=… (0.6 de x.1.1) -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="libremusic" android:host="playlist" />
+            </intent-filter>
         </activity>
 
         <!-- Icono de la app. El alias se llama .MainActivity, como la actividad de antes, para que el acceso

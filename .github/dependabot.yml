@@ -1,0 +1,20 @@
+# Avisos de dependencias con fallos conocidos (fase de seguridad S4, x.1.1). Sólo actualizaciones de seguridad y una
+# revisión semanal: nada se mezcla solo, cada PR lo mira Toxbox.
+version: 2
+updates:
+  - package-ecosystem: gradle
+    directory: /apps/android
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 5
+  - package-ecosystem: npm
+    directory: /services/api
+    schedule: { interval: weekly }
+  - package-ecosystem: npm
+    directory: /services/soporte
+    schedule: { interval: weekly }
+  - package-ecosystem: npm
+    directory: /services/estado
+    schedule: { interval: weekly }
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }

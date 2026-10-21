@@ -1027,3 +1027,91 @@
 1029	Done!
 941	Choose your language · Tria la llengua · Escolle o idioma · Aukeratu hizkuntza · Elektu vian lingvon
 956	Castellano
+1030	 Settings is at the top of Home and isn't part of the order.
+1031	Sort manually
+1032	Join
+1033	See my playlists
+1034	Checking…
+1035	All time
+1036	We've opened your report
+1037	Enter anyway (Dev)
+1038	We're on it
+1039	We've opened your report and we're looking into it. We'll let you know here.
+1040	MAINTENANCE ON
+1041	Fixed! Thank you
+1042	 · liquid glass
+1043	Bar
+1044	Search is the circle on the right. Scrolling down Home folds the bar; stop for 1.5 seconds and it comes back in full.
+1045	Search comes back when you stop
+1046	With the classic bar, a search bar at the top of Home or its own tab. With the SimpMusic one, the circle on the right, which comes back when you stop scrolling.
+1047	The bottom bar: its style, where Search is and the order of the tabs, all in one place.
+1048	Clear the search to change the order.
+1049	Undo
+1050	Songs you marked «Not interested» won't come back, and an artist with three in a month stops showing up for 30 days. It's only saved on this phone.
+1051	Marked as not interested
+1052	Touch and hold a cover and drag it to change the order.
+1053	Not interested
+1054	It won't show up in Discover again.
+1055	Clear
+1056	Clear what you're not interested in
+1057	{0} songs
+1058	Update
+1059	Deleted {0} reports
+1060	Delete the web log
+1061	This version is old
+1062	Force collection
+1063	The app thinks it's {0}. Leave and come back to see the notice.
+1064	Music still works. If there's football on, it may be LaLiga's blocks: notices and support come back when the match ends.
+1065	Pear's servers aren't responding
+1066	To repeat the welcome or see the notices without reinstalling. They don't touch your library or your downloads.
+1067	To see the new version notice
+1068	Requested. Apps will see it in their daily check-in.
+1069	Tests
+1070	It may fail. Update to get the fixes.
+1071	Restart the welcome
+1072	All saved reports are deleted. Bug report device cards aren't touched. It can't be undone.
+1073	Second confirmation: the panel will be empty.
+1074	Simulate an old version
+1075	SIMULATED VERSION: {0}
+1076	See what's new again
+1077	Delete all telemetry on the web?
+1078	Are you sure?
+1079	Everyone on their phone
+1080	By {0} · {1}
+1081	Where it plays
+1082	Listen here too
+1083	What plays here plays at the same time on everyone's phone, with their own audio. Play something from the list.
+1084	The same as on {0}'s phone, at the same time.
+1085	It only plays on this phone; the others add songs.
+1086	One speaker
+1087	{0} and {1}
+1088	{0}, {1} and {2}
+1089	 The cover photo doesn't fit in the QR.
+1090	Adding…
+1091	Add to library
+1092	Share with QR
+1093	Share link
+1094	QR code for {0}
+1095	Scan it with the camera of another phone with Pear Music. The name, the {0} songs and their order go along.
+1096	This playlist is empty.
+1097	The songs couldn't be loaded. Check the connection and try again.
+1098	Shared playlist
+1099	No name
+1100	It has too many songs for a QR (at most {0}).
+1101	{0} songs aren't on YouTube Music and were left out.
+1102	Settings, top left
+1103	Your library, your way
+1104	Share playlists with a QR
+1105	Share a playlist with the QR on its screen, and in a Jam choose to play on everyone's phone.
+1106	With the SimpMusic-style bar, if you stop scrolling Home the bar comes back in full.
+1107	In Discover, under «⋯». That song won't come back, and if an artist isn't for you, they stop showing up for a while.
+1108	On Home. And Settings › Appearance › Bar has everything about the bar in one place.
+1109	Jam: everyone on their phone
+1110	What you marked as «Not interested». Clear it whenever you like.
+1111	New: the bar's style, where Search is and the tabs, all here.
+1112	New: the bar's style, where Search is, liquid glass and the tabs, all here.
+1113	Another phone scans it with the camera and takes it with its songs and their order.
+1114	Playlists in a grid, like Your albums. Touch and hold a cover and drag it to reorder.
+1115	Whoever starts the Jam chooses: play on one speaker or on everyone's phone at once, with their own headphones.
+1116	They appear with their cover at the start of the Playlists folder, in “Your music”.
+1117	Tap the pin on a playlist or an album and you'll have it here, in whatever order you like.

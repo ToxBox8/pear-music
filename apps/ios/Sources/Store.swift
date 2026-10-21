@@ -76,6 +76,28 @@ enum LibraryOrder {
     }
 
     static func decode(_ raw: String) -> [String] { raw.split(separator: "\n").map(String.init) }
+
+    /// Mete el orden `moved` (sólo playlists, el de la cuadrícula de Playlists) en el orden completo `full` sin mover
+    /// Descargadas ni Favoritos (2.9 de x.1.1).
+    static func merge(_ full: [String], _ moved: [String]) -> [String] {
+        let set = Set(moved)
+        var next = moved.makeIterator()
+        return full.map { set.contains($0) ? (next.next() ?? $0) : $0 }
+    }
+
+    /// «Tus álbumes»: como se guardaron o, con «custom», el orden propio; lo nuevo va al final.
+    static func albums(_ albums: [Playlist], sort: String, order: [String]) -> [Playlist] {
+        guard sort == "custom" else { return albums }
+        let byID = Dictionary(albums.map { ($0.id.uuidString, $0) }, uniquingKeysWith: { a, _ in a })
+        var seen = Set<String>()
+        let kept = order.filter { byID[$0] != nil && seen.insert($0).inserted }
+        return kept.compactMap { byID[$0] } + albums.filter { !seen.contains($0.id.uuidString) }
+    }
+
+    /// «Fijados» (x.1.1): siempre en el orden propio; lo recién fijado va al final.
+    static func pinned(_ pinned: [Playlist], order: [String]) -> [Playlist] {
+        albums(pinned, sort: "custom", order: order)
+    }
 }
 
 // MARK: - Fotos de portada de las playlists (Documents/covers/<id>.jpg)
@@ -170,6 +192,19 @@ final class Library: ObservableObject {
         playlists.append(p)
         return p.id
     }
+    /// Una playlist compartida por QR (0.6 de x.1.1): con su icono y color, y un nombre que no choque con otra
+    /// («Atardecer (2)»). Igual que `importShared` en Android.
+    func importShared(name: String, songs: [Song], icon: String?, tint: Int?) -> UUID {
+        let taken = Set(userPlaylists.map(\.name))
+        let base = name.trimmingCharacters(in: .whitespaces).isEmpty ? "Playlist" : name.trimmingCharacters(in: .whitespaces)
+        var unique = base, i = 2
+        while taken.contains(unique) { unique = "\(base) (\(i))"; i += 1 }
+        var p = Playlist(name: unique, songs: songs, icon: icon)
+        p.tint = tint ?? Int.random(in: 0..<PlaylistStyle.palettes.count)
+        playlists.append(p)
+        return p.id
+    }
+
     // MARK: Copia de la biblioteca (library.json, docs/LIBRARY_FORMAT.md)
     /// La biblioteca en el formato común con Android.
     /// Desde 2.0 lleva también las **portadas propias** (`covers`, JPEG en base64) y el **orden manual** de las
@@ -190,6 +225,13 @@ final class Library: ObservableObject {
         let order = LibraryOrder.decode(d.string(forKey: "playlistOrder") ?? "")
         if !order.isEmpty { dict["playlistOrder"] = order }
         dict["playlistSort"] = d.string(forKey: "playlistSort") ?? "recent"
+        // Orden de «Tus álbumes» (2.9 de x.1.1), como el de las playlists.
+        let albumOrder = LibraryOrder.decode(d.string(forKey: "albumOrder") ?? "")
+        if !albumOrder.isEmpty { dict["albumOrder"] = albumOrder }
+        dict["albumSort"] = d.string(forKey: "albumSort") ?? "recent"
+        // Orden de «Fijados» (x.1.1).
+        let pinnedOrder = LibraryOrder.decode(d.string(forKey: "pinnedOrder") ?? "")
+        if !pinnedOrder.isEmpty { dict["pinnedOrder"] = pinnedOrder }
         // Orden de las carpetas de «Tu música» (Cierre 1.0), sólo si no es el de fábrica.
         let music = MusicOrder.decode(d.string(forKey: "musicOrder"))
         if music != MusicOrder.defaults { dict["musicOrder"] = music }
@@ -228,6 +270,18 @@ final class Library: ObservableObject {
                 let merged = local.isEmpty ? incoming : local + incoming.filter { !local.contains($0) }
                 d.set(merged.joined(separator: "\n"), forKey: "playlistOrder")
                 if local.isEmpty, let sort = extra["playlistSort"] as? String { d.set(sort, forKey: "playlistSort") }
+            }
+            if let incoming = extra["albumOrder"] as? [String] {
+                let d = UserDefaults.standard
+                let local = LibraryOrder.decode(d.string(forKey: "albumOrder") ?? "")
+                let merged = local.isEmpty ? incoming : local + incoming.filter { !local.contains($0) }
+                d.set(merged.joined(separator: "\n"), forKey: "albumOrder")
+                if local.isEmpty, let sort = extra["albumSort"] as? String { d.set(sort, forKey: "albumSort") }
+            }
+            if let incoming = extra["pinnedOrder"] as? [String] {
+                let d = UserDefaults.standard
+                let local = LibraryOrder.decode(d.string(forKey: "pinnedOrder") ?? "")
+                d.set((local + incoming.filter { !local.contains($0) }).joined(separator: "\n"), forKey: "pinnedOrder")
             }
             if let music = extra["musicOrder"] as? [String] {
                 let d = UserDefaults.standard
@@ -457,11 +511,15 @@ final class DownloadStore: ObservableObject {
 
 /// Orden de las carpetas de «Tu música» (`musicOrder`, separadas por comas). Igual que `Prefs.musicOrder` en Android.
 enum MusicOrder {
-    static let defaults = ["downloads", "favorites", "albums", "songs", "artists", "recents", "stats"]
-    /// Lo guardado más lo que falte, sin repetir ni desconocidos.
+    // «playlists» (2.9 de x.1.1): la carpeta con todas las playlists, arriba del todo.
+    static let defaults = ["playlists", "downloads", "favorites", "albums", "songs", "artists", "recents", "stats"]
+    /// Lo guardado más lo que falte, sin repetir ni desconocidos. Lo que falta entra en su sitio de fábrica (así
+    /// «Playlists» sale arriba también a quien ya tenía un orden propio).
     static func decode(_ raw: String?) -> [String] {
         var seen = Set<String>()
-        let saved = (raw ?? "").split(separator: ",").map(String.init).filter { defaults.contains($0) && seen.insert($0).inserted }
-        return saved + defaults.filter { !saved.contains($0) }
+        var out = (raw ?? "").split(separator: ",").map(String.init).filter { defaults.contains($0) && seen.insert($0).inserted }
+        if out.isEmpty { return defaults }
+        for (i, k) in defaults.enumerated() where !out.contains(k) { out.insert(k, at: min(i, out.count)) }
+        return out
     }
 }

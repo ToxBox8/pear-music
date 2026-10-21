@@ -11,11 +11,10 @@ struct HomeView: View {
     @EnvironmentObject var jam: JamService
     @AppStorage("searchPlacement") private var searchPlacement = "home"
     @AppStorage("barStyle") private var barStyle = "classic"
-    @AppStorage("settingsTop.classic") private var settingsTopClassic = false
-    @AppStorage("settingsTop.simpmusic") private var settingsTopSimp = true
-    /// Ajustes arriba (Ajustes › Aspecto › Ajustes): sale de la barra y vive aquí, junto al Jam.
-    private var settingsTop: Bool { barStyle == "simpmusic" ? settingsTopSimp : settingsTopClassic }
-    @State private var showSettings = false
+    /// Al cambiar de idioma se vuelven a pedir las estanterías, que vienen de YouTube en ese idioma (1.8 de x.1.1).
+    @AppStorage("language") private var language = ""
+    // Capturas de Ajustes (07, 08): Ajustes ya no es una pestaña, así que se abre su hoja desde Inicio.
+    @State private var showSettings = Demo.current?.tab == .settings
     @State private var showAvisos = false
     @ObservedObject private var avisos = AvisosStore.shared
     @State private var query = ""
@@ -31,6 +30,7 @@ struct HomeView: View {
     @State private var seed: Song?
     @State private var loading = false
     @State private var failed = false
+    @State private var shelvesLanguage = ""
 
     private var greeting: String {
         switch Calendar.current.component(.hour, from: Date()) {
@@ -45,6 +45,8 @@ struct HomeView: View {
             ScrollView {
                 if showingSearch { searchResults } else {
                 LazyVStack(alignment: .leading, spacing: 30) {
+                    ServersBlockedBanner()
+                    OldVersionBanner()
                     FirstStepsCard()
                     PinnedRow()
                     if !library.recents.isEmpty {
@@ -87,7 +89,7 @@ struct HomeView: View {
                     } else if failed {
                         VStack(spacing: 10) {
                             Text(L("No se pudieron cargar las recomendaciones.")).foregroundStyle(.secondary)
-                            Button { Task { await load() } } label: { Label("Reintentar", systemImage: "arrow.clockwise") }
+                            Button { Task { await load() } } label: { Label(L("Reintentar"), systemImage: "arrow.clockwise") }
                                 .buttonStyle(PillButtonStyle(prominent: false))
                                 .frame(maxWidth: 220)
                         }
@@ -99,11 +101,19 @@ struct HomeView: View {
             }
             .themed()
             .navigationTitle(greeting)
+            // Al bajar por los resultados se va el teclado, como en Buscar (1.7 de x.1.1).
+            .scrollDismissesKeyboard(.interactively)
+            .modifier(HomeScroll())
             .searchBar(searchInHome, text: $query) {}
             .navigationDestination(for: RemoteCollection.self) { CollectionView(collection: $0) }
             .navigationDestination(for: RemoteArtist.self) { ArtistView(artist: $0) }
             .navigationDestination(for: UUID.self) { PlaylistV11View(playlistID: $0) }
             .toolbar {
+                // Ajustes vive siempre aquí, arriba a la izquierda; ya no puede ir en la barra (lo decidió Toxbox).
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button { showSettings = true } label: { Image(systemName: "gearshape").tourTarget("settings") }
+                        .accessibilityLabel(L("Ajustes"))
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button { jam.showSheet = true } label: {
                         Image(systemName: jam.isActive ? "person.3.fill" : "person.3")
@@ -114,26 +124,21 @@ struct HomeView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     AvisosBell { showAvisos = true }
                 }
-                if settingsTop {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button { showSettings = true } label: { Image(systemName: "gearshape").tourTarget("settings") }
-                            .accessibilityLabel(L("Ajustes"))
-                    }
-                }
             }
-            .sheet(isPresented: $showSettings) { SettingsView() }
-            // Guía de Ajustes o novedades (1.1) con Ajustes arriba: se abre su hoja.
-            .onReceive(Guide.shared.$active) { if $0 != nil && settingsTop { showSettings = true } }
+            // Ajustes siempre va en hoja (fase 0): el tema y el modo se aplican dentro, que en iOS 16 no se heredan.
+            .sheet(isPresented: $showSettings) { SettingsView().modifier(ThemeAppearance()) }
+            // Guía de Ajustes o novedades (1.1): se abre la hoja de Ajustes.
+            .onReceive(Guide.shared.$active) { if $0 != nil { showSettings = true } }
             .navigationDestination(isPresented: $showAvisos) { AvisosView() }
             .onReceive(avisos.$abrir.filter { $0 }) { _ in
                 avisos.abrir = false
                 showAvisos = true
             }
             .refreshable { await load() }
-            .task {
+            .task(id: language) {
                 // Capturas: sin red, como en ScreenshotTest de Android.
                 if Demo.isActive { failed = true; return }
-                if shelves.isEmpty { await load() }
+                if shelves.isEmpty || shelvesLanguage != I18n.youtubeHl { await load() }
             }
             .miniPlayer()
         }
@@ -157,6 +162,7 @@ struct HomeView: View {
     private func load() async {
         loading = true
         failed = false
+        shelvesLanguage = I18n.youtubeHl
         do { shelves = try await YTClient.home() } catch { failed = shelves.isEmpty }
         let homeSong = shelves.flatMap(\.items).compactMap { item -> Song? in
             if case .song(let s) = item { return s }
@@ -402,9 +408,43 @@ extension View {
     @ViewBuilder func searchBar(_ enabled: Bool, text: Binding<String>, submit: @escaping () -> Void) -> some View {
         if enabled {
             searchable(text: text, placement: .navigationBarDrawer(displayMode: .always), prompt: L("Canciones, artistas…"))
-                .onSubmit(of: .search, submit)
+                .onSubmit(of: .search) {
+                    submit()
+                    // «Buscar» en el teclado: se quita para ver los resultados enteros (1.7 de x.1.1).
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                }
         } else {
             self
         }
+    }
+}
+
+/// Avisa de cuándo se mueve Inicio y de cuándo lleva 1,5 s quieto, para «Buscar vuelve al parar» (2.10 de x.1.1).
+/// Sólo iOS 18+ (`onScrollPhaseChange`); la barra que se pliega es la de iOS 26, así que antes no hace falta.
+struct HomeScroll: ViewModifier {
+    static let idle = Notification.Name("HomeScroll.idle")
+    static let moving = Notification.Name("HomeScroll.moving")
+    @State private var wait: Task<Void, Never>?
+
+    func body(content: Content) -> some View {
+        #if compiler(>=6.0)
+        if #available(iOS 18.0, *) {
+            content.onScrollPhaseChange { _, phase in
+                wait?.cancel()
+                if phase == .idle {
+                    wait = Task {
+                        try? await Task.sleep(nanoseconds: 1_500_000_000)
+                        if !Task.isCancelled { NotificationCenter.default.post(name: Self.idle, object: nil) }
+                    }
+                } else {
+                    NotificationCenter.default.post(name: Self.moving, object: nil)
+                }
+            }
+        } else {
+            content
+        }
+        #else
+        content
+        #endif
     }
 }

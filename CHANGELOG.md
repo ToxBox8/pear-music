@@ -4,6 +4,22 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). C
 
 ## iOS
 
+### [2.2.0] — sin publicar (build 14)
+- **La cola, como una cola de verdad**: lo que añades suena justo después de la canción actual y, si añades más, detrás de lo que ya habías puesto (antes iba al final de la playlist). Sugerencia del ticket 7 (le…@gmail.com).
+- **Jam: cada uno en su móvil.** Quien crea el Jam elige si suena en un altavoz o en el móvil de cada uno a la vez, con sus cascos. Cada móvil pone su propia música y se sincroniza solo; no se manda audio. Compatible con las versiones anteriores (que siguen en «un altavoz»).
+- **Comparte playlists con un QR**: se escanea con la cámara de otro móvil y se añade con sus canciones, su orden, su icono y su color (hasta 150 canciones).
+- **Biblioteca**: arriba están ahora tus **Fijados**, con portadas grandes; mantén pulsada una y arrástrala para ordenarlos. Las playlists pasan a la carpeta «Playlists» de Tu música, en cuadrícula, y también se ordenan arrastrando, como Tus álbumes (el orden va en la copia de la biblioteca).
+- **Descubrir**: «No me interesa» en el «⋯», con «Deshacer». Esa canción no vuelve; un artista con tres en un mes deja de salir 30 días. Se vacía en Ajustes › Biblioteca. Menús más opacos sobre el vídeo.
+- **Ajustes, siempre arriba a la izquierda en Inicio** (ya no va en la barra). Ajustes › Aspecto › **Barra**: el estilo, dónde está Buscar, las pestañas y «Buscar vuelve al parar» (con la barra estilo SimpMusic, si dejas de bajar por Inicio la barra vuelve entera).
+- **Idiomas**: Inicio sale en tu idioma (valenciano en catalán y esperanto en inglés, porque YouTube Music no los tiene) y se recarga al cambiarlo. Arreglados muchos textos que no se traducían, la barra que se quedaba en castellano y las respuestas del soporte.
+- **Aviso de versión antigua** en Inicio si vas muy por detrás.
+- Si los servidores de Pear no responden pero YouTube sí (bloqueos durante el fútbol), Inicio lo explica: la música sigue funcionando.
+- Las actualizaciones comprueban la firma de Pear Music: si alguien cambiara el aviso de versión, la app no ofrecería la descarga.
+- Con el mantenimiento puesto, Pear Dev (sólo pruebas) puede entrar igualmente.
+- Casete y vinilo en horizontal: sólo el objeto, sin barra encima y respetando la isla dinámica. Air ya no gira.
+- Bienvenida: ya no salen pantallas unas encima de otras; los temas se eligen tocando cualquier punto de la tarjeta y el modo oscuro se ve al momento.
+- El teclado se quita al buscar en Inicio; «Ver todo» de un artista ya no se reabre al entrar en un álbum.
+
 ### [2.1.0] — 2026-10-15 (build 13)
 - **Novedades al actualizar**: la primera vez que abres una versión nueva te cuenta lo nuevo y, si quieres, te lo enseña con un recorrido.
 - **Guía de Ajustes**: el botón junto a la carta te lleva por todos los Ajustes explicándote cada opción y personalización.
@@ -117,6 +133,21 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/). C
 - Primera versión distribuida desde la web (compilación «air-plata»): biblioteca Nueva 1.1, tema Aire en plata, reproductor Air, Descubrir (reels), Jam con amigos, Buscar en Inicio.
 
 ## Android
+
+### [1.2.0] — sin publicar (versionCode 21)
+- **La cola, como una cola de verdad**: lo que añades suena justo después de la canción actual y, si añades más, detrás de lo que ya habías puesto (antes iba al final de la playlist). Sugerencia del ticket 7 (le…@gmail.com).
+- **Barras más fluidas**: mientras suena música, la app ya no se redibuja entera dos veces por segundo, y la barra estilo SimpMusic se pliega y despliega con un movimiento más suave, sin tirones.
+- **Jam: cada uno en su móvil.** Quien crea el Jam elige si suena en un altavoz o en el móvil de cada uno a la vez, con sus cascos. Cada móvil pone su propia música y se sincroniza solo; no se manda audio. Compatible con las versiones anteriores (que siguen en «un altavoz»).
+- **Comparte playlists con un QR**: se escanea con la cámara de otro móvil y se añade con sus canciones, su orden, su icono y su color (hasta 150 canciones).
+- **Biblioteca**: arriba están ahora tus **Fijados**, con portadas grandes; mantén pulsada una y arrástrala para ordenarlos. Las playlists pasan a la carpeta «Playlists» de Tu música, en cuadrícula, y también se ordenan arrastrando, como Tus álbumes (el orden va en la copia de la biblioteca).
+- **Descubrir**: «No me interesa» en el «⋯», con «Deshacer». Esa canción no vuelve; un artista con tres en un mes deja de salir 30 días. Se vacía en Ajustes › Biblioteca. Menús más opacos sobre el vídeo.
+- **Ajustes, siempre arriba a la izquierda en Inicio** (ya no va en la barra). Ajustes › Aspecto › **Barra**: el estilo, dónde está Buscar, las pestañas y «Buscar vuelve al parar» (con la barra estilo SimpMusic, si dejas de bajar por Inicio la barra vuelve entera).
+- **Idiomas**: Inicio sale en tu idioma (valenciano en catalán y esperanto en inglés, porque YouTube Music no los tiene) y se recarga al cambiarlo. Arreglados muchos textos que no se traducían, la barra que se quedaba en castellano y las respuestas del soporte.
+- **Aviso de versión antigua** en Inicio si vas muy por detrás.
+- Si los servidores de Pear no responden pero YouTube sí (bloqueos durante el fútbol), Inicio lo explica: la música sigue funcionando.
+- Las actualizaciones comprueban la firma de Pear Music: si alguien cambiara el aviso de versión, la app no ofrecería la descarga.
+- Con el mantenimiento puesto, Pear Dev (sólo pruebas) puede entrar igualmente.
+- Casete y vinilo en horizontal: sólo el objeto, sin barra encima y respetando el recorte de la cámara. Air ya no gira.
 
 ### [1.1.0] — 2026-10-15 (versionCode 20)
 - **Novedades al actualizar**: la primera vez que abres una versión nueva te cuenta lo nuevo y, si quieres, te lo enseña con un recorrido.

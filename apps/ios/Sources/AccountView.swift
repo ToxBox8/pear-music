@@ -74,7 +74,7 @@ private struct AccountSignIn: View {
             Section { AccountPitch().listRowInsets(EdgeInsets()).listRowBackground(Color.clear) }
             Section {
                 switch available {
-                case nil: Text("Comprobando…").foregroundStyle(.secondary)
+                case nil: Text(L("Comprobando…")).foregroundStyle(.secondary)
                 case false?:
                     VStack(alignment: .leading, spacing: 2) {
                         Text(L("Las cuentas estarán disponibles muy pronto"))
@@ -142,7 +142,7 @@ private struct AccountKeyStep: View {
             if !typing {
                 Section {
                     Text(fresh).font(.title3.monospaced()).frame(maxWidth: .infinity).padding(.vertical, 8).textSelection(.enabled)
-                    Button { UIPasteboard.general.string = fresh; notice = "Clave copiada" } label: { Label("Copiar", systemImage: "doc.on.doc") }
+                    Button { UIPasteboard.general.string = fresh; notice = "Clave copiada" } label: { Label(L("Copiar"), systemImage: "doc.on.doc") }
                     Toggle(L("La he guardado"), isOn: $saved)
                 } header: {
                     Text(L("Tu clave de recuperación"))
@@ -225,7 +225,7 @@ private struct AccountSignedIn: View {
             .glassRow()
             Section {
                 Button { run { try await Account.shared.upload(library); return L("Biblioteca guardada") } } label: {
-                    Label("Guardar ahora en la nube", systemImage: "icloud.and.arrow.up")
+                    Label(L("Guardar ahora en la nube"), systemImage: "icloud.and.arrow.up")
                 }
                 Button {
                     run {
@@ -234,19 +234,19 @@ private struct AccountSignedIn: View {
                     }
                 } label: {
                     VStack(alignment: .leading) {
-                        Label("Traer de la nube", systemImage: "icloud.and.arrow.down")
+                        Label(L("Traer de la nube"), systemImage: "icloud.and.arrow.down")
                         Text(L("Une la copia con lo de este móvil, sin borrar nada")).font(.footnote).foregroundStyle(.secondary)
                     }
                 }
-                Button { showKey = true } label: { Label("Ver clave de recuperación", systemImage: "key.fill") }
+                Button { showKey = true } label: { Label(L("Ver clave de recuperación"), systemImage: "key.fill") }
             }
             .disabled(busy)
             .glassRow()
             Section {
                 Button { Task { await Account.shared.signOut(); notice = L("Sesión cerrada") } } label: {
-                    Label("Cerrar sesión", systemImage: "rectangle.portrait.and.arrow.right")
+                    Label(L("Cerrar sesión"), systemImage: "rectangle.portrait.and.arrow.right")
                 }
-                Button(role: .destructive) { confirmDelete = true } label: { Label("Borrar la cuenta", systemImage: "person.crop.circle.badge.minus") }
+                Button(role: .destructive) { confirmDelete = true } label: { Label(L("Borrar la cuenta"), systemImage: "person.crop.circle.badge.minus") }
             } footer: { Text(L("Borrar la cuenta elimina al momento tu correo y la copia de la nube. La biblioteca de este móvil se queda.")) }
             .disabled(busy)
             .glassRow()

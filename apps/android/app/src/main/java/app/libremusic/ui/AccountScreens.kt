@@ -81,7 +81,7 @@ private fun AccountSignIn() {
     AccountPitch(Modifier.padding(top = 18.dp))
     FormSection(null) {
         when (available) {
-            null -> FormRow("Comprobando…", tint = c.secondaryLabel, last = true)
+            null -> FormRow(L("Comprobando…"), tint = c.secondaryLabel, last = true)
             false -> FormRow(L("Las cuentas estarán disponibles muy pronto"), subtitle = L("Mientras tanto, todo funciona sin cuenta."), tint = c.secondaryLabel, last = true)
             true -> if (step == Step.Email) {
                 FormTextField(email, { email = it; error = null }, "tu@correo.com", KeyboardOptions(keyboardType = KeyboardType.Email))

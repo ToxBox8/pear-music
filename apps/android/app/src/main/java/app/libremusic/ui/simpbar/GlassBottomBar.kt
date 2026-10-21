@@ -7,7 +7,12 @@ package app.libremusic.ui.simpbar
 
 
 import app.libremusic.L
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -52,7 +57,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
@@ -279,8 +284,9 @@ private fun BottomBarV220(
     LaunchedEffect(inSearch) { isExpanded = !inSearch }
     LaunchedEffect(isScrolledToTop) { if (!inSearch) isExpanded = isScrolledToTop }
 
-    // Como en 2.2.0: el ConstraintSet se rehace cada vez que la barra cambia de posición, para que
-    // la animación de ConstraintLayout parta del tamaño real del contenido recién cambiado.
+    // Como en 2.2.0: el ConstraintSet se rehace cuando la barra cambia de tamaño (tras pasar de pestañas a círculo o
+    // al revés), para que la animación de ConstraintLayout parta del tamaño real del contenido recién cambiado. Antes
+    // se rehacía con cada cambio de posición, es decir, en cada fotograma del plegado, y la barra iba a tirones.
     var updateConstraints by remember { mutableStateOf(true) }
     var constraintSet by remember { mutableStateOf(constraintsV220(isExpanded)) }
     LaunchedEffect(isExpanded) {
@@ -293,6 +299,16 @@ private fun BottomBarV220(
             updateConstraints = false
         }
     }
+    // Lo que entra (la cápsula o el círculo) no aparece de golpe: crece y se funde en ~250 ms mientras ConstraintLayout
+    // lo lleva a su sitio. Sólo toca graphicsLayer, así que no vuelve a medir nada.
+    val reduce = app.libremusic.ui.theme.LocalReduceMotion.current
+    val reveal = remember { Animatable(1f) }
+    var firstFold by remember { mutableStateOf(true) }
+    LaunchedEffect(isExpanded) {
+        if (firstFold || reduce) { firstFold = false; reveal.snapTo(1f); return@LaunchedEffect }
+        reveal.snapTo(0f)
+        reveal.animateTo(1f, spring(dampingRatio = 0.82f, stiffness = 420f))
+    }
 
     ConstraintLayout(
         constraintSet = constraintSet,
@@ -301,7 +317,9 @@ private fun BottomBarV220(
                 .fillMaxWidth()
                 .padding(WindowInsets.navigationBars.asPaddingValues())
                 .padding(bottom = 8.dp),
-        animateChangesSpec = tween(BAR_MORPH_MS),
+        // Muelle sin rebote (amortiguamiento 1): arranca rápido y frena sin el corte final del tween, y si se
+        // interrumpe a medias (bajar y subir enseguida) sigue desde donde está.
+        animateChangesSpec = spring(dampingRatio = 1f, stiffness = Spring.StiffnessMediumLow),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -315,10 +333,17 @@ private fun BottomBarV220(
                             Modifier.padding(start = BarEdgePadding).wrapContentSize()
                         },
                     ).layoutId("toolbar")
-                    .onGloballyPositioned { updateConstraints = true },
+                    .onSizeChanged { updateConstraints = true },
         ) {
             if (isExpanded) {
-                BoxWithConstraints(Modifier.weight(1f, fill = false)) {
+                BoxWithConstraints(
+                    Modifier.weight(1f, fill = false).graphicsLayer {
+                        alpha = reveal.value
+                        scaleX = 0.92f + 0.08f * reveal.value
+                        scaleY = scaleX
+                        transformOrigin = TransformOrigin(0f, 0.5f)
+                    },
+                ) {
                     LiquidGlassTabBar(
                         tabs = barTabs,
                         selectedTab = barTabs.indexOf(selected),
@@ -336,6 +361,11 @@ private fun BottomBarV220(
                 Box(
                     modifier =
                         Modifier
+                            .graphicsLayer {
+                                alpha = reveal.value
+                                scaleX = 0.7f + 0.3f * reveal.value
+                                scaleY = scaleX
+                            }
                             .size(SearchSize)
                             .then(
                                 if (glass) {
@@ -353,6 +383,11 @@ private fun BottomBarV220(
                 Box(
                     modifier =
                         Modifier
+                            .graphicsLayer {
+                                alpha = reveal.value
+                                scaleX = 0.7f + 0.3f * reveal.value
+                                scaleY = scaleX
+                            }
                             .size(CollapsedBarSize)
                             .then(
                                 if (glass) {

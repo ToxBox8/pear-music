@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Registra /msg y /rp (tickets de soporte, Cierre 1.0) en la aplicación de Discord «Pear Music · soporte». Lo
+// Registra /msg y /rp (tickets de soporte, Cierre 1.0) y /sugerencias y /reportes (listados, x.1.1) en la aplicación de Discord «Pear Music · soporte». Lo
 // ejecuta Toxbox; el token del bot sólo vive en su terminal.
 //
 //   DISCORD_APP_ID=… DISCORD_GUILD_ID=… DISCORD_BOT_TOKEN=… node scripts/registrar-discord.mjs
@@ -37,9 +37,19 @@ export const COMMANDS = [
       { type: 3, name: "texto", description: "Mensaje al abrir (opcional)", required: false, max_length: 2000 },
     ],
   },
+  // Listados (2.1 de x.1.1): sólo los ve quien los pide, 20 por página con ◀ ▶.
+  ...[["sugerencias", "Listar sugerencias (sólo lo ves tú)"], ["reportes", "Listar reportes de errores (sólo lo ves tú)"]].map(([name, description]) => ({
+    name, description, type: 1, default_member_permissions: "0", contexts: [0],
+    options: [
+      { type: 3, name: "estado", description: "Abiertas (por defecto), cerradas o todas", required: false, choices: [
+        { name: "abiertas", value: "abiertas" }, { name: "cerradas", value: "cerradas" }, { name: "todas", value: "todas" },
+      ] },
+      { type: 4, name: "desde", description: "Sólo los de los últimos N días", required: false, min_value: 1, max_value: 365 },
+    ],
+  })),
 ];
 const r = await fetch(`https://discord.com/api/v10/applications/${app}/guilds/${guild}/commands`, {
   method: "PUT", headers: { authorization: `Bot ${token}`, "content-type": "application/json" }, body: JSON.stringify(COMMANDS),
 });
-console.log(r.ok ? "Comandos /msg y /rp registrados." : `Discord respondió ${r.status}: ${await r.text()}`);
+console.log(r.ok ? "Comandos /msg, /rp, /sugerencias y /reportes registrados." : `Discord respondió ${r.status}: ${await r.text()}`);
 process.exit(r.ok ? 0 : 1);

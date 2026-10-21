@@ -34,9 +34,101 @@ object Updates {
     data class Release(
         val version: String, val title: String, val highlights: List<String>, val apk: String, val sha256: String,
         val fix: Boolean = false,
+        /** «minima_recomendada» (0.5 de x.1.1): por debajo, el aviso de versión antigua no se puede quitar más de 24 h. */
+        val minimum: String? = null,
     )
 
     private fun prefs(context: Context) = context.getSharedPreferences("updates", Context.MODE_PRIVATE)
+
+    // MARK: Firma de publicación (fase de seguridad S4, x.1.1)
+
+    /**
+     * Clave pública Ed25519 de publicación (32 bytes en base64). La privada vive fuera de línea (USB de Toxbox,
+     * `tools/publicar/firmar.mjs`). Creada el 21-10-2026; vacía, no se comprobaría nada.
+     */
+    const val PUBLISH_KEY = "8mBhBBxlDG8xNXRUxUuOEqFd4nSnCQtj7UFB8z6bbEk="
+
+    enum class Signature { Good, Missing, Bad, NoKey }
+
+    /**
+     * x.1.1 «verificar y avisar»: sin firma se sigue (y se apunta); con firma que no cuadra **no se ofrece descargar**.
+     * En la versión siguiente, sin firma tampoco.
+     */
+    fun signature(body: ByteArray, sigB64: String?, publicKeyB64: String = PUBLISH_KEY): Signature = when {
+        publicKeyB64.isEmpty() -> Signature.NoKey
+        sigB64.isNullOrBlank() -> Signature.Missing
+        runCatching {
+            val v = org.bouncycastle.crypto.signers.Ed25519Signer()
+            v.init(false, org.bouncycastle.crypto.params.Ed25519PublicKeyParameters(java.util.Base64.getDecoder().decode(publicKeyB64), 0))
+            v.update(body, 0, body.size)
+            v.verifySignature(java.util.Base64.getDecoder().decode(sigB64.trim()))
+        }.getOrDefault(false) -> Signature.Good
+        else -> Signature.Bad
+    }
+
+    // MARK: Versión simulada (2.2 de x.1.1, sólo Pear Dev): la app se cree otra versión para ver el aviso sin instalar.
+
+    private val _simulated = kotlinx.coroutines.flow.MutableStateFlow<String?>(null)
+    val simulated: kotlinx.coroutines.flow.StateFlow<String?> = _simulated
+
+    fun loadSimulated(context: Context) {
+        _simulated.value = if (BuildConfig.ADMIN_TOOLS) prefs(context).getString("fakeVersion", null) else null
+    }
+
+    /** Pone (o quita, con null) la versión simulada y olvida la última comprobación para que se vea al volver. */
+    fun simulate(context: Context, version: String?) {
+        if (!BuildConfig.ADMIN_TOOLS) return
+        prefs(context).edit().putString("fakeVersion", version).remove("checked").remove("snoozeVersion").remove("staleUntil").apply()
+        _simulated.value = version
+    }
+
+    private fun installed(): String = _simulated.value ?: BuildConfig.VERSION_NAME
+
+    // MARK: Versión antigua (0.5 de x.1.1)
+
+    /** Días con una versión nueva sin actualizar a partir de los que se avisa. */
+    const val STALE_DAYS = 21
+    private const val STALE_MS = STALE_DAYS * 86_400_000L
+    /** Menores por detrás (1.1 → 1.3) a partir de las que se avisa. */
+    const val STALE_MINORS = 2
+
+    /** Cuántas versiones menores va por detrás; otra mayor cuenta como muchas. */
+    fun minorsBehind(installed: String, latest: String): Int {
+        fun core(v: String) = v.trim().removePrefix("v").substringBefore('-').split('.').map { it.toIntOrNull() ?: 0 } + listOf(0, 0)
+        val (ia, ib) = core(installed); val (la, lb) = core(latest)
+        return when { la > ia -> 99; la < ia -> 0; else -> (lb - ib).coerceAtLeast(0) }
+    }
+
+    /** ¿Es antigua? Por debajo de la mínima recomendada, 2 menores por detrás o 21 días sin actualizar. */
+    fun isStale(installed: String, latest: String?, minimum: String?, pendingSince: Long, now: Long): Boolean {
+        if (latest == null || compare(latest, installed) <= 0) return false
+        return (minimum != null && compare(installed, minimum) < 0) || minorsBehind(installed, latest) >= STALE_MINORS ||
+            (pendingSince > 0 && now - pendingSince >= STALE_MS)
+    }
+
+    /** Si hay que enseñar el aviso de versión antigua (en Inicio): `true` = no se puede quitar más de 24 h. */
+    private val _stale = kotlinx.coroutines.flow.MutableStateFlow<Boolean?>(null)
+    val stale: kotlinx.coroutines.flow.StateFlow<Boolean?> = _stale
+
+    private fun refreshStale(context: Context, now: Long) {
+        val p = prefs(context)
+        val latest = p.getString("latest", null)
+        val minimum = p.getString("minimum", null)
+        val old = isStale(installed(), latest, minimum, p.getLong("pendingSince", 0), now)
+        _stale.value = if (old && now >= p.getLong("staleUntil", 0)) minimum != null && compare(installed(), minimum) < 0 else null
+    }
+
+    /** «Actualizar» desde el aviso de versión antigua: se vuelve a mirar ya, aunque se hubiera aplazado. */
+    fun forceRecheck(context: Context) {
+        prefs(context).edit().remove("checked").remove("snoozeVersion").remove("snoozeUntil").apply()
+    }
+
+    /** «Ahora no»: 24 h si está por debajo de la mínima, 3 días si no. */
+    fun dismissStale(context: Context, now: Long = System.currentTimeMillis()) {
+        val hard = _stale.value == true
+        prefs(context).edit().putLong("staleUntil", now + if (hard) SNOOZE_MS else 3 * SNOOZE_MS).apply()
+        _stale.value = null
+    }
 
     /** -1, 0 o 1. Semver con pre-releases: 1.0.0-pre1 < 1.0.0-pre2 < 1.0.0. Ignora sufijos de variante. */
     fun compare(a: String, b: String): Int {
@@ -68,6 +160,7 @@ object Updates {
             a.getString("version"), a.optString("title"),
             (0 until (hl?.length() ?: 0)).map { hl!!.getString(it) },
             a.getString("apk"), a.getString("sha256").lowercase(), a.optBoolean("fix"),
+            a.optString("minima_recomendada").ifEmpty { null },
         ).takeIf { it.apk.startsWith("https://") && it.sha256.matches(Regex("[a-f0-9]{64}")) }
     }.getOrNull()
 
@@ -77,16 +170,33 @@ object Updates {
 
     /** La versión nueva que hay que enseñar, o null. Nunca lanza: sin red no pasa nada. */
     suspend fun check(context: Context, now: Long = System.currentTimeMillis()): Release? = withContext(Dispatchers.IO) {
-        if (BuildConfig.CHANNEL != "usr") return@withContext null
+        loadSimulated(context)
+        // Pear Dev sólo comprueba con una versión simulada (2.2 de x.1.1): así se ve el aviso sin instalar nada.
+        if (BuildConfig.CHANNEL != "usr" && _simulated.value == null) return@withContext null
         val p = prefs(context)
+        refreshStale(context, now)
         if (now - p.getLong("checked", 0) < CHECK_EVERY_MS && p.getString("pending", null) == null) return@withContext null
-        val release = runCatching {
-            YTClient.http.newCall(Request.Builder().url(URL).build()).execute().use { if (it.isSuccessful) parse(it.body!!.string()) else null }
+        val body = runCatching {
+            YTClient.http.newCall(Request.Builder().url(URL).build()).execute().use { if (it.isSuccessful) it.body!!.bytes() else null }
         }.getOrNull() ?: return@withContext null
-        p.edit().putLong("checked", now).putString("pending", release.version.takeIf { compare(it, BuildConfig.VERSION_NAME) > 0 }).apply()
+        val sig = runCatching {
+            YTClient.http.newCall(Request.Builder().url("$URL.sig").build()).execute().use { if (it.isSuccessful) it.body!!.string() else null }
+        }.getOrNull()
+        when (signature(body, sig)) {
+            Signature.Bad -> { Logs.w("Updates", "version.json con firma que no cuadra: no se ofrece"); return@withContext null }
+            Signature.Missing -> Logs.i("Updates", "version.json sin firma (x.1.1 aún lo acepta)")
+            else -> Unit
+        }
+        val release = parse(String(body, Charsets.UTF_8)) ?: return@withContext null
+        val newer = compare(release.version, installed()) > 0
+        p.edit().putLong("checked", now).putString("pending", release.version.takeIf { newer })
+            .putString("latest", release.version).putString("minimum", release.minimum)
+            // Desde cuándo hay una versión nueva sin instalar (para los 21 días).
+            .putLong("pendingSince", if (!newer) 0 else p.getLong("pendingSince", 0).takeIf { it > 0 } ?: now).apply()
+        refreshStale(context, now)
         release.takeIf {
             allowed(it, Incident.restricted) &&
-                shouldShow(it, BuildConfig.VERSION_NAME, p.getString("snoozeVersion", null), p.getLong("snoozeUntil", 0), now)
+                shouldShow(it, installed(), p.getString("snoozeVersion", null), p.getLong("snoozeUntil", 0), now)
         }
     }
 

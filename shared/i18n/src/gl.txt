@@ -1027,3 +1027,91 @@
 1029	Listo!
 941	Choose your language · Tria la llengua · Escolle o idioma · Aukeratu hizkuntza · Elektu vian lingvon
 956	Castellano
+1030	 Axustes está arriba en Inicio e non entra na orde.
+1031	Ordenar á man
+1032	Unirme
+1033	Ver as miñas listas
+1034	Comprobando…
+1035	Sempre
+1036	Abrimos a túa incidencia
+1037	Entrar igualmente (Dev)
+1038	Estamos niso
+1039	Abrimos a túa incidencia e estámola mirando. Avisarémoste aquí.
+1040	MANTEMENTO ACTIVO
+1041	Solucionado! Grazas
+1042	 · cristal líquido
+1043	Barra
+1044	Buscar é o círculo da dereita. Ao baixar por Inicio a barra prégase; se deixas de moverte 1,5 segundos, volve enteira.
+1045	Buscar volve ao parar
+1046	Coa clásica, unha barra arriba en Inicio ou unha lapela á parte. Coa SimpMusic, o círculo da dereita, que volve se deixas de baixar.
+1047	A barra de abaixo: o seu estilo, onde está Buscar e a orde das lapelas, todo xunto.
+1048	Borra a busca para cambiar a orde.
+1049	Desfacer
+1050	As cancións que marcaches con «Non me interesa» non volven saír, e un artista con tres nun mes deixa de saír durante 30 días. Só se garda neste móbil.
+1051	O que non che interesa
+1052	Mantén premida unha portada e arrástraa para cambiar a orde.
+1053	Non me interesa
+1054	Non volverá saír en Descubrir.
+1055	Baleirar
+1056	Baleirar o que non che interesa
+1057	{0} cancións
+1058	Actualizar
+1059	Borráronse {0} informes
+1060	Borrar o rexistro da web
+1061	Esta versión é antiga
+1062	Forzar extracción
+1063	A app cre que é a {0}. Sae e volve para ver o aviso.
+1064	A música segue funcionando. Se hai fútbol, pode ser polos bloqueos de LaLiga: os avisos e o soporte volven ao acabar o partido.
+1065	Os servidores de Pear non responden
+1066	Para repetir a benvida ou ver os avisos sen reinstalar. Non tocan a túa biblioteca nin as túas descargas.
+1067	Para ver o aviso de versión nova
+1068	Pedido. As apps verano no seu latexo diario.
+1069	Probas
+1070	Pode fallar. Actualiza para ter os arranxos.
+1071	Reiniciar a benvida
+1072	Bórranse todos os informes gardados. As fichas dos informes de erros non se tocan. Non se pode desfacer.
+1073	Segunda confirmación: o panel queda baleiro.
+1074	Simular versión antiga
+1075	VERSIÓN SIMULADA: {0}
+1076	Ver as novidades outra vez
+1077	Borrar toda a telemetría da web?
+1078	Seguro?
+1079	Cadaquén no seu móbil
+1080	De {0} · {1}
+1081	Onde soa
+1082	Escoitar tamén aquí
+1083	O que soa aquí soa á vez no móbil de cadaquén, co seu propio audio. Pon algo da lista.
+1084	Soa o mesmo que no móbil de {0}, á vez.
+1085	Só soa neste móbil; os demais engaden cancións.
+1086	Un altofalante
+1087	{0} e {1}
+1088	{0}, {1} e {2}
+1089	 A foto da portada non cabe no QR.
+1090	Engadindo…
+1091	Engadir á biblioteca
+1092	Compartir con QR
+1093	Compartir ligazón
+1094	Código QR de {0}
+1095	Escanéao coa cámara doutro móbil con Pear Music. Viaxan o nome, as {0} cancións e a súa orde.
+1096	Esta lista está baleira.
+1097	Non se puideron cargar as cancións. Revisa a conexión e téntao de novo.
+1098	Lista compartida
+1099	Sen nome
+1100	Ten demasiadas cancións para un QR (como moito {0}).
+1101	{0} cancións non están en YouTube Music e quedaron fóra.
+1102	Axustes, arriba á esquerda
+1103	Biblioteca ao teu gusto
+1104	Comparte listas cun QR
+1105	Comparte unha lista co QR da súa pantalla, e no Jam escolle que soe no móbil de cadaquén.
+1106	Coa barra estilo SimpMusic, se deixas de baixar por Inicio a barra volve enteira.
+1107	En Descubrir, en «⋯». Esa canción non volve, e se un artista non che vai, deixa de saír un tempo.
+1108	En Inicio. E en Axustes › Aparencia › Barra está todo o da barra xunto.
+1109	Jam: cadaquén no seu móbil
+1110	O que marcaches con «Non me interesa». Baléirao cando queiras.
+1111	Novo: o estilo da barra, onde está Buscar e as lapelas, todo aquí.
+1112	Novo: o estilo da barra, onde está Buscar, o cristal líquido e as lapelas, todo aquí.
+1113	Outro móbil escanéao coa cámara e lévaa coas súas cancións e a súa orde.
+1114	Listas en cuadrícula, coma Os teus álbums. Mantén premida unha portada e arrástraa para ordenalas.
+1115	Quen crea o Jam escolle: que soe nun altofalante ou no móbil de cadaquén á vez, cos seus auriculares.
+1116	Aparecen coa súa portada ao principio do cartafol Playlists, en «A túa música».
+1117	Preme a chincheta nunha playlist ou nun álbum e terálo aquí, na orde que queiras.

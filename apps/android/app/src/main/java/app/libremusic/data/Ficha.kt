@@ -56,7 +56,10 @@ object Ficha {
         val prefs = context.getSharedPreferences("ficha", Context.MODE_PRIVATE)
         if (prefs.getString("activeDay", null) == today.toString()) return@withContext
         val body = JSONObject().put("platform", "android").put("channel", BuildConfig.CHANNEL).put("app_version", BuildConfig.VERSION_NAME)
-        if (runCatching { post("/activo", body) }.getOrDefault(false)) prefs.edit().putString("activeDay", today.toString()).apply()
+        val answer = runCatching { postForJson("/activo", body) }.getOrNull() ?: return@withContext
+        prefs.edit().putString("activeDay", today.toString()).apply()
+        // «Forzar extracción» del panel (2.12 de x.1.1): Telemetry decide si se atiende (consentimiento y texto).
+        answer.optString("orden").takeIf { it.isNotEmpty() && it != "null" }?.let { Telemetry.sendForced(context, it) }
     }
 
     /** Manda la decisión sobre la telemetría si aún no se ha mandado o ha cambiado. */
@@ -71,6 +74,12 @@ object Ficha {
             .put("app_version", BuildConfig.VERSION_NAME).put("decision", now).apply { sent?.let { put("antes", it) } }
         if (runCatching { post("/consentimiento", body) }.getOrDefault(false)) prefs.edit().putString("decision", now).apply()
     }
+
+    /** El cuerpo de la respuesta si fue bien (vacío = `{}`), o null. */
+    private fun postForJson(path: String, body: JSONObject): JSONObject? =
+        YTClient.http.newCall(
+            Request.Builder().url(BASE + path).post(body.toString().toRequestBody("application/json".toMediaType())).build(),
+        ).execute().use { r -> if (!r.isSuccessful) null else runCatching { JSONObject(r.body?.string().orEmpty()) }.getOrDefault(JSONObject()) }
 
     private fun post(path: String, body: JSONObject): Boolean =
         YTClient.http.newCall(

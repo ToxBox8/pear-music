@@ -34,7 +34,11 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.input.pointer.pointerInput
 import kotlin.math.roundToInt
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.ui.zIndex
+import androidx.compose.material.icons.automirrored.rounded.QueueMusic
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.material.icons.rounded.DragHandle
 import app.libremusic.data.LibraryOrder
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -105,6 +109,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.material.icons.rounded.QrCode2
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -146,7 +151,7 @@ private val INSET = 20.dp
 
 /** Artista principal: «Clarent y Quevedo» → «Clarent» (primaryArtist en iOS). */
 fun primaryArtist(s: String): String =
-    s.replace(Regex("\\s*(,| y | & | x | feat\\.? | ft\\.? | · ).*$", RegexOption.IGNORE_CASE), "").ifEmpty { "Desconocido" }
+    s.replace(Regex("\\s*(,| y | & | x | feat\\.? | ft\\.? | · ).*$", RegexOption.IGNORE_CASE), "").ifEmpty { L("Desconocido") }
 
 /** Canciones únicas de favoritos, playlists y descargas. */
 fun allSongs(favorites: List<Song>, playlists: List<Playlist>, downloads: List<Song>): List<Song> {
@@ -187,19 +192,13 @@ fun LibraryScreen() {
     val data by env.library.data.collectAsState()
     val downloaded by env.library.downloadedSongs.collectAsState()
     val ver by env.library.coverVersion.collectAsState()
-    val player by env.player.state.collectAsState()
-    val sort by Prefs.playlistSort.collectAsState()
-    val jam by JamService.state.collectAsState()
+    val player by env.player.track.collectAsState()
     var addMenu by remember { mutableStateOf(false) }
-    var sortMenu by remember { mutableStateOf(false) }
     val songs = remember(data, downloaded) { allSongs(data.favorites, data.playlists, downloaded) }
     val stats by app.libremusic.data.PlayStats.data.collectAsState()
     val monthPlays = remember(stats) { stats.plays.count { it.at >= app.libremusic.data.PlayStats.since(app.libremusic.data.PlayStats.Period.Month) } }
-    val order by Prefs.playlistOrder.collectAsState()
     val placement by Prefs.smartPlacement.collectAsState()
     val smartInPlaylists = placement != "music"
-    val byId = data.playlists.associateBy { it.id }
-    val keys = LibraryOrder.keys(data.userPlaylists, sort, order, smartInPlaylists)
     val newPlaylist = { env.app.askNewPlaylist { env.library.createPlaylist(it) } }
 
     Box(Modifier.fillMaxSize()) {
@@ -230,90 +229,9 @@ fun LibraryScreen() {
             }
             Spacer(Modifier.height(34.dp))
 
-            // Fijados (Fase 3.3): álbumes y playlists a un toque, arriba del todo.
-            PinnedRow(Modifier.padding(bottom = 30.dp))
-
-            // Playlists
-            Row(Modifier.fillMaxWidth().padding(horizontal = INSET), verticalAlignment = Alignment.CenterVertically) {
-                Text(L("Playlists"), style = Typo.display(Tokens.TypeSize.DisplaySection, c.theme), color = c.label, modifier = Modifier.weight(1f).alignByBaseline())
-                if (data.userPlaylists.size > 1) {
-                    Box {
-                        Box(Modifier.size(36.dp).tactile(label = L("Ordenar playlists")) { sortMenu = true }, contentAlignment = Alignment.Center) {
-                            Icon(Icons.Rounded.SwapVert, null, tint = c.accent, modifier = Modifier.size(24.dp))
-                        }
-                        ContextMenu(sortMenu, { sortMenu = false }, listOf(
-                            MenuEntry.Action(L("Añadidas recientemente"), Icons.Rounded.Schedule, checked = sort == "recent") { Prefs.setPlaylistSort("recent") },
-                            MenuEntry.Action(L("Nombre (A-Z)"), null, checked = sort == "name") { Prefs.setPlaylistSort("name") },
-                            MenuEntry.Action(L("Nombre (Z-A)"), null, checked = sort == "nameDesc") { Prefs.setPlaylistSort("nameDesc") },
-                            MenuEntry.Action(L("Nº de canciones"), null, checked = sort == "count") { Prefs.setPlaylistSort("count") },
-                            MenuEntry.Divider,
-                            MenuEntry.Action(L("A mano…"), Icons.Rounded.DragHandle, checked = sort == "custom") { env.app.push(Route.ReorderPlaylists) },
-                        ))
-                    }
-                }
-                Text(L("Ver todas"), style = Typo.subheadline.semibold, color = c.accent, modifier = Modifier.alignByBaseline().tactile(label = L("Ver todas")) { env.app.push(Route.Playlists) }.padding(start = 8.dp))
-            }
-            Spacer(Modifier.height(14.dp))
-            val listState = rememberLazyListState()
-            LazyRow(
-                state = listState,
-                flingBehavior = rememberSnapFlingBehavior(listState),
-                contentPadding = PaddingValues(horizontal = INSET),
-                horizontalArrangement = Arrangement.spacedBy(18.dp),
-            ) {
-                jam.jam?.let { state ->
-                    item("jam") {
-                        val active = jam.phase == JamPhase.Hosting || jam.phase == JamPhase.Joined
-                        CarouselTile(
-                            title = state.name,
-                            subtitle = if (active) L("Jam en directo · {0}", state.members.size) else L("Jam sin conexión"),
-                            onClick = { env.app.showJam = true },
-                        ) {
-                            Box(Modifier.size(CARD.dp).clip(RoundedCornerShape(Tokens.Radius.PlaylistCard.dp)).background(playlistGradient(1)), contentAlignment = Alignment.Center) {
-                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                    Icon(app.libremusic.ui.theme.JamIcon(filled = true), null, tint = Color.White, modifier = Modifier.size(48.dp))
-                                    Spacer(Modifier.height(12.dp))
-                                    Text(state.code, style = Typo.mono(20f).copy(letterSpacing = androidx.compose.ui.unit.TextUnit(0.15f, androidx.compose.ui.unit.TextUnitType.Em)), color = Color.White)
-                                }
-                            }
-                        }
-                    }
-                }
-                items(keys, key = { it }) { key ->
-                    when (key) {
-                        LibraryOrder.DOWNLOADS -> CarouselTile(SmartList.Downloads.title, songCount(downloaded.size), onClick = { env.app.push(Route.Smart(SmartList.Downloads)) }) {
-                            SmartCover(SmartList.Downloads, CARD.dp, Tokens.Radius.PlaylistCard.dp)
-                        }
-                        LibraryOrder.FAVORITES -> CarouselTile(SmartList.Favorites.title, songCount(data.favorites.size), onClick = { env.app.push(Route.Smart(SmartList.Favorites)) }) {
-                            SmartCover(SmartList.Favorites, CARD.dp, Tokens.Radius.PlaylistCard.dp)
-                        }
-                        else -> byId[key]?.let { p -> PlaylistTile(p, ver) }
-                    }
-                }
-                item("new") {
-                    var menu by remember { mutableStateOf(false) }
-                    Box {
-                        CarouselTile(L("Nueva playlist"), L("Vacía o importada"), onLongClick = { menu = true }, onClick = newPlaylist) {
-                            val stroke = c.label.copy(alpha = 0.22f)
-                            Box(
-                                Modifier.size(CARD.dp).drawDashedBorder(stroke, Tokens.Radius.PlaylistCard.dp),
-                                contentAlignment = Alignment.Center,
-                            ) { Icon(Icons.Rounded.Add, null, tint = c.secondaryLabel, modifier = Modifier.size(32.dp)) }
-                        }
-                        ContextMenu(menu, { menu = false }, listOf(
-                            MenuEntry.Action(L("Nueva playlist"), Icons.AutoMirrored.Rounded.PlaylistAdd) { newPlaylist() },
-                            MenuEntry.Action(L("Importar de Apple Music"), Icons.Rounded.Download) { env.app.showImport = true },
-                            MenuEntry.Action(L("Jam con amigos"), app.libremusic.ui.theme.JamIcon()) { env.app.showJam = true },
-                        ))
-                    }
-                }
-            }
-            if (data.userPlaylists.isEmpty()) {
-                Text(
-                    L("Crea una playlist con + o tráete las tuyas desde Apple Music."),
-                    style = Typo.subheadline, color = c.secondaryLabel, modifier = Modifier.padding(horizontal = INSET, vertical = 14.dp),
-                )
-            }
+            // Fijados (x.1.1): en el sitio del antiguo carrusel de Playlists, con portadas igual de grandes y en el orden
+            // que les dé uno arrastrando. Las playlists están ya sólo en la carpeta de «Tu música».
+            PinnedCarousel(ver)
             Spacer(Modifier.height(34.dp))
 
             // El resto de la música
@@ -324,6 +242,7 @@ fun LibraryScreen() {
                         put("downloads", MusicFolder(SmartList.Downloads.title, downloaded.size, Icons.Rounded.DownloadForOffline) { env.app.push(Route.Smart(SmartList.Downloads)) })
                         put("favorites", MusicFolder(SmartList.Favorites.title, data.favorites.size, Icons.Rounded.Favorite) { env.app.push(Route.Smart(SmartList.Favorites)) })
                     }
+                    put("playlists", MusicFolder(L("Playlists"), data.userPlaylists.size, Icons.AutoMirrored.Rounded.QueueMusic) { env.app.push(Route.Playlists) })
                     put("albums", MusicFolder(L("Tus álbumes"), data.albums.size, Icons.Rounded.LibraryMusic) { env.app.push(Route.Albums) })
                     put("songs", MusicFolder(L("Canciones"), songs.size, Icons.Rounded.MusicNote) { env.app.push(Route.AllSongs) })
                     put("artists", MusicFolder(L("Artistas"), songs.map { primaryArtist(it.artist) }.toSet().size, Icons.Rounded.Mic) { env.app.push(Route.Artists) })
@@ -420,29 +339,172 @@ private fun MusicFolders(folders: Map<String, MusicFolder>) {
     }
 }
 
-/** Tarjeta de una playlist en el carrusel, con su menú (Reproducir, Aleatorio, Editar). */
+/**
+ * «Fijados» en Biblioteca (x.1.1): ocupa el sitio del antiguo carrusel de Playlists, con portadas igual de grandes.
+ * Manteniendo pulsada una portada se levanta y se arrastra a otro sitio; si se suelta sin moverla, sale su menú. El
+ * orden se guarda en [Prefs.pinnedOrder] y lo sigue también la fila de Inicio. Igual que `PinnedCarousel` en iOS.
+ */
 @Composable
-private fun PlaylistTile(p: app.libremusic.data.Playlist, ver: Int) {
+private fun PinnedCarousel(ver: Int) {
+    val c = Libre.colors
     val env = LocalEnv.current
-    var menu by remember { mutableStateOf(false) }
+    val data by env.library.data.collectAsState()
+    val order by Prefs.pinnedOrder.collectAsState()
     val dl by env.library.downloads.collectAsState()
-    val offline = p.songs.count { dl[it.id]?.isDone == true }
-    Box {
-        CarouselTile(
-            p.name, songCount(p.songs.size), offlineAll = offline > 0 && offline == p.songs.size,
-            onLongClick = { menu = true }, onClick = { env.app.push(Route.PlaylistR(p.id)) },
-        ) {
-            PlaylistCover(p, CARD.dp, Tokens.Radius.PlaylistCard.dp, env.library.coverFile(p.id), ver)
+    val pinned = LibraryOrder.pinned(data.playlists.filter { it.pinned }, order)
+    val byId = pinned.associateBy { it.id }
+    Text(L("Fijados"), style = Typo.display(Tokens.TypeSize.DisplaySection, c.theme), color = c.label, modifier = Modifier.padding(horizontal = INSET))
+    Spacer(Modifier.height(14.dp))
+    if (pinned.isEmpty()) {
+        // Vacío: el hueco se queda, con lo que hay que hacer para llenarlo.
+        Row(Modifier.fillMaxWidth().padding(horizontal = INSET), verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                Modifier.size(CARD.dp).drawDashedBorder(c.label.copy(alpha = 0.22f), Tokens.Radius.PlaylistCard.dp),
+                contentAlignment = Alignment.Center,
+            ) { Icon(Icons.Outlined.PushPin, null, tint = c.secondaryLabel, modifier = Modifier.size(32.dp)) }
+            Spacer(Modifier.width(18.dp))
+            Text(
+                L("Pulsa la chincheta en una playlist o un álbum y lo tendrás aquí, en el orden que quieras."),
+                style = Typo.subheadline, color = c.secondaryLabel, modifier = Modifier.weight(1f),
+            )
         }
-        ContextMenu(menu, { menu = false }, listOf(
-            MenuEntry.Action(L("Reproducir"), Icons.Rounded.PlayArrow) { if (p.songs.isNotEmpty()) env.player.play(p.songs, 0) },
-            MenuEntry.Action(L("Aleatorio"), Icons.Rounded.Shuffle) { if (p.songs.isNotEmpty()) env.player.play(p.songs.shuffled(), 0) },
-            MenuEntry.Action(L("Editar"), Icons.Rounded.Edit) { env.app.editing = p.id },
-        ))
+        return
+    }
+    ReorderRow(
+        pinned.map { it.id }, CARD.dp, 18.dp, INSET,
+        onMoved = { Prefs.setPinnedOrder(it) },
+        onOpen = { env.app.push(Route.PlaylistR(it)) },
+        label = { id -> byId[id]?.name.orEmpty() },
+    ) { id, menu, closeMenu ->
+        val p = byId[id] ?: return@ReorderRow
+        val offline = p.songs.count { dl[it.id]?.isDone == true }
+        Box {
+            CoverTile(p.name, p.album?.line?.ifEmpty { null } ?: songCount(p.songs.size), offlineAll = offline > 0 && offline == p.songs.size) {
+                PlaylistCover(p, CARD.dp, Tokens.Radius.PlaylistCard.dp, env.library.coverFile(p.id), ver)
+            }
+            ContextMenu(menu, closeMenu, listOf(
+                MenuEntry.Action(L("Reproducir"), Icons.Rounded.PlayArrow) { if (p.songs.isNotEmpty()) env.player.play(p.songs, 0) },
+                MenuEntry.Action(L("Aleatorio"), Icons.Rounded.Shuffle) { if (p.songs.isNotEmpty()) env.player.play(p.songs.shuffled(), 0) },
+                MenuEntry.Action(L("Soltar de arriba"), Icons.Outlined.PushPin) { env.library.setPinned(p.id, false) },
+            ))
+        }
     }
 }
 
-/** Borde discontinuo de la tarjeta «Nueva playlist». */
+/**
+ * Fila horizontal que se reordena manteniendo pulsado y arrastrando, como [ReorderGrid] pero en una sola fila: la
+ * portada se levanta, las demás se apartan y, al acercarla a un borde, la fila se desplaza sola. Soltar sin haberla
+ * movido abre su menú ([cell] recibe `menu` y cómo cerrarlo). Las celdas miden [side] de ancho.
+ */
+@Composable
+private fun ReorderRow(
+    keys: List<String>,
+    side: Dp,
+    gap: Dp,
+    inset: Dp,
+    onMoved: (List<String>) -> Unit,
+    onOpen: (String) -> Unit,
+    label: (String) -> String,
+    cell: @Composable (key: String, menu: Boolean, closeMenu: () -> Unit) -> Unit,
+) {
+    val density = androidx.compose.ui.platform.LocalDensity.current
+    val haptics = androidx.compose.ui.platform.LocalHapticFeedback.current
+    val reduceMotion = app.libremusic.ui.theme.LocalReduceMotion.current
+    val scroll = rememberScrollState()
+    val items = remember { androidx.compose.runtime.mutableStateListOf<String>() }
+    var dragging by remember { mutableStateOf<String?>(null) }
+    var drag by remember { mutableStateOf(0f) }
+    var moved by remember { mutableStateOf(false) }
+    var menuKey by remember { mutableStateOf<String?>(null) }
+    var viewport by remember { mutableStateOf(0) }
+    LaunchedEffect(keys) { if (dragging == null) { items.clear(); items.addAll(keys) } }
+    val step = with(density) { (side + gap).roundToPx() }
+    val insetPx = with(density) { inset.roundToPx() }
+    val sidePx = with(density) { side.roundToPx() }
+
+    // La celda arrastrada pasa a la posición que tiene debajo; el desplazamiento se cuenta desde la nueva.
+    fun follow(key: String) {
+        val from = items.indexOf(key)
+        if (from < 0) return
+        val to = (from + (drag / step).roundToInt()).coerceIn(0, items.lastIndex)
+        if (to != from) {
+            items.add(to, items.removeAt(from))
+            drag -= (to - from) * step
+        }
+    }
+    // Cerca de un borde, la fila avanza sola en cada fotograma mientras se arrastra.
+    LaunchedEffect(dragging) {
+        val key = dragging ?: return@LaunchedEffect
+        val edge = with(density) { 56.dp.toPx() }
+        val max = with(density) { 14.dp.toPx() }
+        while (dragging == key) {
+            androidx.compose.runtime.withFrameNanos { }
+            val i = items.indexOf(key)
+            if (i < 0) break
+            val left = insetPx + i * step + drag - scroll.value
+            val right = left + sidePx
+            val speed = when {
+                left < edge -> -((edge - left) / edge * max)
+                right > viewport - edge -> (right - (viewport - edge)) / edge * max
+                else -> 0f
+            }.coerceIn(-max, max)
+            if (speed != 0f) {
+                drag += scroll.dispatchRawDelta(speed)
+                follow(key)
+            }
+        }
+    }
+
+    val width = inset * 2 + side * items.size + gap * (items.size - 1).coerceAtLeast(0)
+    Box(Modifier.fillMaxWidth().onSizeChanged { viewport = it.width }.horizontalScroll(scroll)) {
+        Box(Modifier.width(width)) {
+            items.forEachIndexed { index, key -> androidx.compose.runtime.key(key) {
+                val isDragging = dragging == key
+                val target = androidx.compose.ui.unit.IntOffset(insetPx + index * step, 0)
+                val placed by androidx.compose.animation.core.animateIntOffsetAsState(
+                    target, if (reduceMotion) androidx.compose.animation.core.snap<androidx.compose.ui.unit.IntOffset>() else uiEaseOut<androidx.compose.ui.unit.IntOffset>(220), label = "pinned",
+                )
+                val lift by androidx.compose.animation.core.animateFloatAsState(if (isDragging) 1f else 0f, if (reduceMotion) androidx.compose.animation.core.snap() else uiEaseOut(160), label = "lift")
+                Box(
+                    Modifier
+                        .offset { if (isDragging) target else placed }
+                        .width(side)
+                        .zIndex(if (isDragging) 1f else 0f)
+                        .graphicsLayer {
+                            if (isDragging) translationX = drag
+                            scaleX = 1f + 0.05f * lift; scaleY = scaleX
+                            shadowElevation = 16.dp.toPx() * lift
+                        }
+                        .tactile(label = label(key)) { onOpen(key) }
+                        .pointerInput(key) {
+                            detectDragGesturesAfterLongPress(
+                                onDragStart = {
+                                    dragging = key; drag = 0f; moved = false
+                                    haptics.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                                },
+                                onDragEnd = {
+                                    dragging = null; drag = 0f
+                                    if (moved) {
+                                        haptics.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                                        onMoved(items.toList())
+                                    } else menuKey = key
+                                },
+                                onDragCancel = { dragging = null; drag = 0f },
+                                onDrag = { change, amount ->
+                                    change.consume()
+                                    drag += amount.x
+                                    if (kotlin.math.abs(drag) > viewConfiguration.touchSlop) moved = true
+                                    follow(key)
+                                },
+                            )
+                        },
+                ) { cell(key, menuKey == key) { menuKey = null } }
+            } }
+        }
+    }
+}
+
+/** Borde discontinuo del hueco de Fijados cuando no hay nada fijado. */
 private fun Modifier.drawDashedBorder(color: Color, radius: Dp) = this.drawBehind {
     val w = 1.5.dp.toPx()
     drawRoundRect(
@@ -454,23 +516,17 @@ private fun Modifier.drawDashedBorder(color: Color, radius: Dp) = this.drawBehin
     )
 }
 
+/** Portada grande con título y una línea (Fijados en Biblioteca). Sólo dibuja: el toque lo lleva quien la usa. */
 @Composable
-private fun CarouselTile(
-    title: String,
-    subtitle: String,
-    offlineAll: Boolean = false,
-    onLongClick: (() -> Unit)? = null,
-    onClick: () -> Unit,
-    cover: @Composable () -> Unit,
-) {
+private fun CoverTile(title: String, subtitle: String, offlineAll: Boolean = false, cover: @Composable () -> Unit) {
     val c = Libre.colors
-    Column(Modifier.width(CARD.dp).tactile(label = title, onLongClick = onLongClick, onClick = onClick)) {
+    Column(Modifier.width(CARD.dp)) {
         Box(Modifier.shadowSoft(16.dp, RoundedCornerShape(Tokens.Radius.PlaylistCard.dp), 0.14f)) { cover() }
         Spacer(Modifier.height(10.dp))
         Text(title, style = Typo.callout.bold, color = c.label, maxLines = 1, overflow = TextOverflow.Ellipsis)
         Spacer(Modifier.height(2.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(subtitle, style = Typo.caption, color = c.secondaryLabel, maxLines = 1)
+            Text(subtitle, style = Typo.caption, color = c.secondaryLabel, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f, fill = false))
             if (offlineAll) {
                 Spacer(Modifier.width(4.dp))
                 Icon(Icons.Rounded.DownloadForOffline, L("Descargada"), tint = c.secondaryLabel, modifier = Modifier.size(13.dp))
@@ -505,8 +561,8 @@ private fun LibraryLinkRow(
 
 // MARK: Detalle común (playlists, listas inteligentes, canciones) --------------------------------------
 
-private enum class SongFilter(private val titleEs: String) { All(L("Todas")), Downloaded(L("Descargadas")), Favorites(L("Favoritas")) ;
-    val title: String get() = L(titleEs)
+private enum class SongFilter(private val titleText: () -> String) { All({ L("Todas") }), Downloaded({ L("Descargadas") }), Favorites({ L("Favoritas") }) ;
+    val title: String get() = titleText()
 }
 
 @Composable
@@ -519,6 +575,8 @@ private fun CollectionDetail(
     emptyText: String = L("Todavía no hay nada aquí"),
     onRemove: ((Song) -> Unit)? = null,
     onEdit: (() -> Unit)? = null,
+    /** «Compartir con QR» (0.6 de x.1.1; null = sin el botón). */
+    onShare: (() -> Unit)? = null,
     /** Fijar arriba en Biblioteca e Inicio (null = sin el botón). */
     pinned: Boolean? = null,
     onPin: (() -> Unit)? = null,
@@ -530,7 +588,7 @@ private fun CollectionDetail(
     val env = LocalEnv.current
     val data by env.library.data.collectAsState()
     val dl by env.library.downloads.collectAsState()
-    val player by env.player.state.collectAsState()
+    val player by env.player.track.collectAsState()
     var filter by remember { mutableStateOf(SongFilter.All) }
     val offline = songs.count { dl[it.id]?.isDone == true }
     val favCount = songs.count { s -> data.favorites.any { it.id == s.id } }
@@ -551,6 +609,7 @@ private fun CollectionDetail(
                             tint = if (pinned) c.accent else c.label, onClick = onPin,
                         )
                     }
+                    if (onShare != null) ToolbarButton(Icons.Rounded.QrCode2, L("Compartir con QR"), tint = c.label, onClick = onShare)
                     if (onEdit != null) ToolbarButton(Icons.Rounded.Edit, L("Editar playlist"), onClick = onEdit)
                 }
             }
@@ -685,6 +744,7 @@ fun PlaylistDetailScreen(id: String) {
     val pending = pendingAll[p.id].orEmpty()
     CollectionDetail(
         p.name, p.songs, bulkOwner = p.id,
+        onShare = { env.app.sharing = p.id },
         emptyText = L("Mantén pulsada una canción en Buscar o Inicio para añadirla."),
         onRemove = { env.library.removeFromPlaylist(p.id, it.id) },
         onEdit = { env.app.editing = p.id },
@@ -769,7 +829,7 @@ private fun PlainListScreen(
     content: androidx.compose.foundation.lazy.LazyListScope.() -> Unit,
 ) {
     val env = LocalEnv.current
-    val player by env.player.state.collectAsState()
+    val player by env.player.track.collectAsState()
     val keyboard = androidx.compose.ui.platform.LocalSoftwareKeyboardController.current
     Box(Modifier.fillMaxSize()) {
         ThemeBackdrop(player.isPlaying, player.current)
@@ -853,35 +913,88 @@ fun ArtistsScreen() {
     }
 }
 
+/**
+ * Playlists (2.9 de x.1.1): la carpeta de «Tu música», en cuadrícula como «Tus álbumes». Es el único sitio de las
+ * playlists: el carrusel de Biblioteca lo ocupa ahora Fijados. Con Descargadas y Favoritos «en Playlists» (Ajustes ›
+ * Biblioteca), van aquí con su portada. Manteniendo pulsada una portada se arrastra y el orden pasa a «A mano». El
+ * lápiz lleva a «Editar playlists» (ordenar por…).
+ */
 @Composable
 fun PlaylistsListScreen() {
     val c = Libre.colors
     val env = LocalEnv.current
     val data by env.library.data.collectAsState()
+    val downloaded by env.library.downloadedSongs.collectAsState()
     val ver by env.library.coverVersion.collectAsState()
     val sort by Prefs.playlistSort.collectAsState()
     val order by Prefs.playlistOrder.collectAsState()
+    val placement by Prefs.smartPlacement.collectAsState()
     val byId = data.playlists.associateBy { it.id }
-    val ordered = LibraryOrder.keys(data.userPlaylists, sort, order, smartInPlaylists = false).mapNotNull { byId[it] }
+    val smartIn = placement != "music"
+    val keys = LibraryOrder.keys(data.userPlaylists, sort, order, smartIn)
+    val title = { key: String ->
+        when (key) {
+            LibraryOrder.DOWNLOADS -> SmartList.Downloads.title
+            LibraryOrder.FAVORITES -> SmartList.Favorites.title
+            else -> byId[key]?.name.orEmpty()
+        }
+    }
+    val subtitle = { key: String ->
+        when (key) {
+            LibraryOrder.DOWNLOADS -> songCount(downloaded.size)
+            LibraryOrder.FAVORITES -> songCount(data.favorites.size)
+            else -> songCount(byId[key]?.songs?.size ?: 0)
+        }
+    }
     var query by rememberSaveable { mutableStateOf("") }
-    val shown = remember(ordered, query) { app.libremusic.data.LocalSearch.filter(ordered, query) { it.name } }
-    // Lápiz arriba a la derecha (lo pidió Toxbox): editar el orden aquí mismo, sin ir a Ajustes.
+    val shown = remember(keys, query, data) { app.libremusic.data.LocalSearch.filter(keys, query) { title(it) } }
     PlainListScreen(
-        L("Playlists"), if (data.userPlaylists.isEmpty()) L("Todavía no hay playlists") else null, query to { q: String -> query = q }, noMatches = shown.isEmpty(),
+        L("Playlists"), if (keys.isEmpty()) L("Todavía no hay playlists") else null, query to { q: String -> query = q }, noMatches = shown.isEmpty(),
         navTrailing = { ToolbarButton(Icons.Rounded.Edit, L("Editar el orden de las playlists"), tint = c.label) { env.app.push(Route.ReorderPlaylists) } },
     ) {
-        items(shown, key = { it.id }) { p ->
-            GlassRowItem({ env.app.push(Route.PlaylistR(p.id)) }) {
-                PlaylistCover(p, 56.dp, coverFile = env.library.coverFile(p.id), coverVersion = ver)
-                Spacer(Modifier.width(14.dp))
-                Column(Modifier.weight(1f)) {
-                    Text(p.name, style = Typo.body.copy(fontWeight = FontWeight.Medium), color = c.label, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    Text(songCount(p.songs.size), style = Typo.caption, color = c.secondaryLabel)
+        if (shown.isNotEmpty()) {
+            item { ReorderHint(query.isBlank()) }
+            item {
+                ReorderGrid(
+                    shown, enabled = query.isBlank(),
+                    onMoved = { moved ->
+                        Prefs.setPlaylistOrder(LibraryOrder.merge(keys, moved))
+                        Prefs.setPlaylistSort("custom")
+                    },
+                    onOpen = { key ->
+                        env.app.push(when (key) {
+                            LibraryOrder.DOWNLOADS -> Route.Smart(SmartList.Downloads)
+                            LibraryOrder.FAVORITES -> Route.Smart(SmartList.Favorites)
+                            else -> Route.PlaylistR(key)
+                        })
+                    },
+                    label = { "${title(it)}, ${subtitle(it)}" },
+                ) { key, side ->
+                    Column {
+                        Box(Modifier.dropShadow(RoundedCornerShape(14.dp), Color.Black.copy(alpha = 0.14f), blur = 12.dp, offsetY = 6.dp)) {
+                            when (key) {
+                                LibraryOrder.DOWNLOADS -> SmartCover(SmartList.Downloads, side, 14.dp)
+                                LibraryOrder.FAVORITES -> SmartCover(SmartList.Favorites, side, 14.dp)
+                                else -> byId[key]?.let { PlaylistCover(it, side, radius = 14.dp, coverFile = env.library.coverFile(it.id), coverVersion = ver) }
+                            }
+                        }
+                        Spacer(Modifier.height(6.dp))
+                        Text(title(key), style = Typo.subheadline.semibold, color = c.label, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        Text(subtitle(key), style = Typo.caption, color = c.secondaryLabel, maxLines = 1)
+                    }
                 }
-                Icon(Icons.AutoMirrored.Rounded.KeyboardArrowRight, null, tint = c.tertiaryLabel, modifier = Modifier.size(20.dp))
             }
         }
     }
+}
+
+/** Cómo se reordena la cuadrícula; buscando no se puede (se ordenaría sólo lo encontrado). */
+@Composable
+private fun ReorderHint(enabled: Boolean) {
+    Text(
+        if (enabled) L("Mantén pulsada una portada y arrástrala para cambiar el orden.") else L("Borra la búsqueda para cambiar el orden."),
+        style = Typo.footnote, color = Libre.colors.secondaryLabel, modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 4.dp, bottom = 12.dp),
+    )
 }
 
 /** «Tus álbumes»: los álbumes guardados o descargados desde su página, en cuadrícula y con buscador. */
@@ -891,16 +1004,25 @@ fun AlbumsScreen() {
     val env = LocalEnv.current
     val data by env.library.data.collectAsState()
     val ver by env.library.coverVersion.collectAsState()
-    val albums = data.albums
+    val albumSort by Prefs.albumSort.collectAsState()
+    val albumOrder by Prefs.albumOrder.collectAsState()
+    // Orden propio arrastrando (2.9 de x.1.1), como Playlists.
+    val albums = LibraryOrder.albums(data.albums, albumSort, albumOrder)
+    val byId = albums.associateBy { it.id }
     var query by rememberSaveable { mutableStateOf("") }
     val shown = remember(albums, query) { app.libremusic.data.LocalSearch.filter(albums, query) { "${it.name} ${it.album?.artist.orEmpty()}" } }
-    val side = ((androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp - 16 * 2 - 16) / 2).dp
     PlainListScreen(L("Tus álbumes"), null, if (albums.isEmpty()) null else query to { q: String -> query = q }, noMatches = albums.isNotEmpty() && shown.isEmpty()) {
-        if (albums.isEmpty()) item { AlbumsEmpty() } else item { Spacer(Modifier.height(8.dp)) }
-        items(shown.chunked(2), key = { row -> row.first().id }) { row ->
-            Row(Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 22.dp), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                row.forEach { p ->
-                    Column(Modifier.width(side).tactile(label = "${p.name}, ${p.album?.line.orEmpty()}") { env.app.push(Route.PlaylistR(p.id)) }) {
+        if (albums.isEmpty()) item { AlbumsEmpty() } else if (shown.isNotEmpty()) {
+            item { ReorderHint(query.isBlank()) }
+            item {
+                ReorderGrid(
+                    shown.map { it.id }, enabled = query.isBlank(),
+                    onMoved = { Prefs.setAlbumOrder(it); Prefs.setAlbumSort("custom") },
+                    onOpen = { env.app.push(Route.PlaylistR(it)) },
+                    label = { id -> byId[id]?.let { "${it.name}, ${it.album?.line.orEmpty()}" }.orEmpty() },
+                ) { id, side ->
+                    val p = byId[id] ?: return@ReorderGrid
+                    Column {
                         Box(Modifier.dropShadow(RoundedCornerShape(14.dp), Color.Black.copy(alpha = 0.14f), blur = 12.dp, offsetY = 6.dp)) {
                             PlaylistCover(p, side, radius = 14.dp, coverFile = env.library.coverFile(p.id), coverVersion = ver)
                         }
@@ -911,6 +1033,86 @@ fun AlbumsScreen() {
                 }
             }
         }
+    }
+}
+
+/**
+ * Cuadrícula de dos columnas que se reordena manteniendo pulsado y arrastrando (2.9 de x.1.1): la portada se levanta
+ * (escala 1,05 y sombra), las demás se apartan con suavidad y al soltar llega el orden nuevo a [onMoved]. Todas las
+ * celdas cuelgan del mismo padre y se colocan por su índice, para que el gesto no se corte al cambiar de fila. Con
+ * [enabled] = false (buscando) sólo se tocan. Igual que `ReorderGrid` en iOS.
+ */
+@Composable
+fun ReorderGrid(
+    keys: List<String>,
+    enabled: Boolean,
+    onMoved: (List<String>) -> Unit,
+    onOpen: (String) -> Unit,
+    label: (String) -> String,
+    cell: @Composable (key: String, side: androidx.compose.ui.unit.Dp) -> Unit,
+) {
+    val density = androidx.compose.ui.platform.LocalDensity.current
+    val haptics = androidx.compose.ui.platform.LocalHapticFeedback.current
+    val reduceMotion = app.libremusic.ui.theme.LocalReduceMotion.current
+    val items = remember { androidx.compose.runtime.mutableStateListOf<String>() }
+    var dragging by remember { mutableStateOf<String?>(null) }
+    var drag by remember { mutableStateOf(androidx.compose.ui.geometry.Offset.Zero) }
+    LaunchedEffect(keys) { if (dragging == null) { items.clear(); items.addAll(keys) } }
+    val side = ((androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp - 16 * 2 - 16) / 2).dp
+    // Alto de una celda (portada y dos líneas): se mide la primera; hasta entonces, una estimación.
+    var cellH by remember { mutableStateOf(with(density) { (side + 46.dp).roundToPx() }) }
+    val stepX = with(density) { (side + 16.dp).roundToPx() }
+    val stepY = cellH + with(density) { 22.dp.roundToPx() }
+    val rows = (items.size + 1) / 2
+    Box(Modifier.fillMaxWidth().padding(horizontal = 16.dp).height(with(density) { (rows * stepY).toDp() })) {
+        items.forEachIndexed { index, key -> androidx.compose.runtime.key(key) {
+            val isDragging = dragging == key
+            val target = androidx.compose.ui.unit.IntOffset((index % 2) * stepX, (index / 2) * stepY)
+            val moved by androidx.compose.animation.core.animateIntOffsetAsState(
+                target, if (reduceMotion) androidx.compose.animation.core.snap<androidx.compose.ui.unit.IntOffset>() else uiEaseOut<androidx.compose.ui.unit.IntOffset>(220), label = "cell",
+            )
+            Box(
+                Modifier
+                    .offset { if (isDragging) target else moved }
+                    .width(side)
+                    .onSizeChanged { if (index == 0 && it.height > 0) cellH = it.height }
+                    .zIndex(if (isDragging) 1f else 0f)
+                    .graphicsLayer {
+                        if (isDragging) {
+                            translationX = drag.x; translationY = drag.y
+                            scaleX = 1.05f; scaleY = 1.05f; shadowElevation = 16.dp.toPx()
+                        }
+                    }
+                    .tactile(label = label(key)) { onOpen(key) }
+                    .then(if (!enabled) Modifier else Modifier.pointerInput(key) {
+                        detectDragGesturesAfterLongPress(
+                            onDragStart = {
+                                dragging = key; drag = androidx.compose.ui.geometry.Offset.Zero
+                                haptics.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress)
+                            },
+                            onDragEnd = {
+                                dragging = null; drag = androidx.compose.ui.geometry.Offset.Zero
+                                haptics.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)
+                                onMoved(items.toList())
+                            },
+                            onDragCancel = { dragging = null; drag = androidx.compose.ui.geometry.Offset.Zero },
+                            onDrag = { change, amount ->
+                                change.consume()
+                                drag += amount
+                                val from = items.indexOf(key)
+                                val col = (from % 2 + (drag.x / stepX).roundToInt()).coerceIn(0, 1)
+                                val row = (from / 2 + (drag.y / stepY).roundToInt()).coerceAtLeast(0)
+                                val to = (row * 2 + col).coerceIn(0, items.lastIndex)
+                                if (to != from) {
+                                    items.add(to, items.removeAt(from))
+                                    // La celda cambia de sitio: el desplazamiento se cuenta desde el nuevo, y sigue al dedo.
+                                    drag -= androidx.compose.ui.geometry.Offset(((to % 2) - (from % 2)) * stepX.toFloat(), ((to / 2) - (from / 2)) * stepY.toFloat())
+                                }
+                            },
+                        )
+                    }),
+            ) { cell(key, side) }
+        } }
     }
 }
 
@@ -1458,7 +1660,7 @@ fun openArtistProfile(env: ScreenEnv, scope: kotlinx.coroutines.CoroutineScope, 
 }
 
 /**
- * «Fijados» (Fase 3.3): los álbumes y playlists con la chincheta, arriba en Biblioteca e Inicio. Mantener pulsado
+ * «Fijados» (Fase 3.3) en Inicio: los álbumes y playlists con la chincheta, en el orden de Biblioteca. Mantener pulsado
  * suelta. Igual que `PinnedRow` en iOS.
  */
 @Composable
@@ -1467,7 +1669,8 @@ fun PinnedRow(modifier: Modifier = Modifier) {
     val env = LocalEnv.current
     val data by env.library.data.collectAsState()
     val ver by env.library.coverVersion.collectAsState()
-    val pinned = data.playlists.filter { it.pinned }
+    val order by Prefs.pinnedOrder.collectAsState()
+    val pinned = LibraryOrder.pinned(data.playlists.filter { it.pinned }, order)
     if (pinned.isEmpty()) return
     Column(modifier, verticalArrangement = Arrangement.spacedBy(10.dp)) {
         Text(L("Fijados"), style = Typo.display(Tokens.TypeSize.DisplaySection, c.theme), color = c.label, modifier = Modifier.padding(horizontal = 16.dp))

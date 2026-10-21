@@ -69,17 +69,20 @@ import app.libremusic.ui.theme.semibold
 
 // Navegación con pestañas y una pila por pestaña, como TabView + NavigationStack en iOS.
 
-/** [key]: la clave de `TabOrder` (igual que en iOS). */
-enum class Tab(private val titleEs: String, val key: String) {
-    Home(L("Inicio"), "home"), Discover(L("Descubrir"), "discover"), Search(L("Buscar"), "search"), Library(L("Biblioteca"), "library"), Settings(L("Ajustes"), "settings");
-    val title: String get() = L(titleEs)
+/**
+ * [key]: la clave de `TabOrder` (igual que en iOS). El título se traduce en cada lectura (1.13 de x.1.1): calculado al
+ * crear el enum se quedaba en el idioma de arranque.
+ */
+enum class Tab(private val titleText: () -> String, val key: String) {
+    Home({ L("Inicio") }, "home"), Discover({ L("Descubrir") }, "discover"), Search({ L("Buscar") }, "search"), Library({ L("Biblioteca") }, "library"), Settings({ L("Ajustes") }, "settings");
+    val title: String get() = titleText()
 
     companion object {
         fun of(key: String): Tab = entries.firstOrNull { it.key == key } ?: Home
     }
 }
 
-enum class SmartList(private val titleEs: String) { Downloads(L("Descargadas")), Favorites(L("Favoritos")); val title: String get() = L(titleEs) }
+enum class SmartList(private val titleText: () -> String) { Downloads({ L("Descargadas") }), Favorites({ L("Favoritos") }); val title: String get() = titleText() }
 
 /** Pantallas que se apilan dentro de una pestaña. */
 sealed interface Route {
@@ -109,6 +112,8 @@ sealed interface Route {
     data object Albums : Route
     data object ArtworkColors : Route
     data object TabOrderR : Route
+    /** Ajustes › Aspecto › Barra (2.11 de x.1.1). */
+    data object BarR : Route
     data object DownloadsSettings : Route
     data object Help : Route
     /** Ajustes › Ayuda y soporte › Tus datos (exportar y borrar). */
@@ -158,6 +163,10 @@ class AppState {
     var showJam by mutableStateOf(false)
     var alert by mutableStateOf<AlertSpec?>(null)
     var toast by mutableStateOf<String?>(null)
+    /** Se sube para volver a comprobar la versión y enseñar el aviso (desde «versión antigua» en Inicio, 0.5 de x.1.1). */
+    var updateTick by mutableStateOf(0)
+    /** Playlist cuyo QR se enseña (0.6 de x.1.1), o null. */
+    var sharing by mutableStateOf<String?>(null)
     /** Editor de playlist abierto como hoja (id). */
     var editing by mutableStateOf<String?>(null)
     var showImport by mutableStateOf(false)

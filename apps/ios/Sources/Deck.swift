@@ -80,11 +80,11 @@ struct PlayShuffleBar: View {
     var body: some View {
         HStack(spacing: 12) {
             Button { if let f = songs.first { player.play(f, in: songs) } } label: {
-                Label("Reproducir", systemImage: "play.fill")
+                Label(L("Reproducir"), systemImage: "play.fill")
             }
             .buttonStyle(PillButtonStyle(prominent: true))
             Button { let s = songs.shuffled(); if let f = s.first { player.play(f, in: s) } } label: {
-                Label("Aleatorio", systemImage: "shuffle")
+                Label(L("Aleatorio"), systemImage: "shuffle")
             }
             .buttonStyle(PillButtonStyle(prominent: false))
         }
@@ -392,6 +392,9 @@ struct MiniVinyl: View {
 }
 
 // MARK: - Horizontal: el casete o el vinilo a pantalla completa
+/// Sólo el objeto, sin barra de acciones encima: la gracia es manejar las teclas del casete o el brazo del vinilo
+/// (lo pidió Toxbox, x.1.1). Las acciones básicas siguen en VoiceOver como acciones del objeto. Se sale girando el
+/// móvil.
 struct ImmersiveDeck: View {
     let style: DeckStyle
     @EnvironmentObject var player: Player
@@ -401,31 +404,39 @@ struct ImmersiveDeck: View {
             Color.black.ignoresSafeArea()
             ThemeBackdrop().opacity(0.55)
             if let song = player.current {
-                switch style {
-                case .vinyl:
-                    HStack(spacing: 28) {
-                        VinylView(song: song, clock: player.clock)
-                        VStack(alignment: .leading, spacing: 12) {
-                            DeckInfo(song: song, clock: player.clock)
-                            ImmersiveControls()
+                // La isla dinámica y las esquinas: márgenes de la ventana (en horizontal, a los dos lados) y un poco
+                // más, para que las bobinas y el brazo no rocen el borde.
+                let inset = Self.windowInsets
+                Group {
+                    switch style {
+                    case .vinyl:
+                        HStack(spacing: 28) {
+                            VinylView(song: song, clock: player.clock)
+                            DeckInfo(song: song, clock: player.clock).frame(maxWidth: 300, alignment: .leading)
                         }
-                        .frame(maxWidth: 300)
+                    case .cassette, .normal, .air:
+                        CassetteView(song: song, clock: player.clock)
                     }
-                    .padding(.vertical, 12)
-                case .cassette, .normal, .air:
-                    CassetteView(song: song, clock: player.clock)
-                        .padding(.vertical, 12)
-                        // El casete ocupa todo el ancho: los controles van en una cápsula abajo, sin tapar las bobinas.
-                        .overlay(alignment: .bottom) {
-                            ImmersiveControls().padding(.horizontal, 10).background(Capsule().fill(.black.opacity(0.45)))
-                        }
                 }
+                .padding(.leading, inset.left + 12)
+                .padding(.trailing, inset.right + 12)
+                .padding(.vertical, max(inset.top, inset.bottom, 12))
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .ignoresSafeArea()
+                .accessibilityAction(named: player.isPlaying ? L("Pausa") : L("Reproducir")) { player.toggle() }
+                .accessibilityAction(named: L("Siguiente")) { player.next() }
+                .accessibilityAction(named: L("Anterior")) { player.previous() }
             }
         }
-        .padding(.horizontal, 8)
         .statusBarHidden()
         .persistentSystemOverlays(.hidden)
         .transition(.opacity)
+    }
+
+    private static var windowInsets: UIEdgeInsets {
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        let window = scenes.flatMap(\.windows).first { $0.isKeyWindow } ?? scenes.first?.windows.first
+        return window?.safeAreaInsets ?? .zero
     }
 }
 
@@ -527,25 +538,5 @@ struct ManagePlaylistsView: View {
         } message: {
             Text(L("Se borrará la playlist y su portada. No se puede deshacer."))
         }
-    }
-}
-
-/// Controles de casete y vinilo a pantalla completa en horizontal (Fase 3.4), como `ImmersiveControls` en Android:
-/// anterior, reproducir, siguiente, bucle y temporizador. El «⋯» con la letra se queda en vertical.
-private struct ImmersiveControls: View {
-    @EnvironmentObject var player: Player
-    var body: some View {
-        HStack(spacing: 6) {
-            Button { player.previous() } label: { Image(systemName: "backward.fill").font(.title3).frame(width: 44, height: 44) }
-                .accessibilityLabel(L("Anterior"))
-            Button { player.toggle() } label: { Image(systemName: player.isPlaying ? "pause.fill" : "play.fill").font(.title).frame(width: 48, height: 48) }
-                .accessibilityLabel(player.isPlaying ? L("Pausa") : L("Reproducir"))
-            Button { player.next() } label: { Image(systemName: "forward.fill").font(.title3).frame(width: 44, height: 44) }
-                .accessibilityLabel(L("Siguiente"))
-            RepeatButton()
-            SleepTimerButton()
-        }
-        .foregroundStyle(.white)
-        .environment(\.colorScheme, .dark)
     }
 }

@@ -1027,3 +1027,91 @@
 1029	Prest!
 941	Choose your language · Tria la llengua · Escolle o idioma · Aukeratu hizkuntza · Elektu vian lingvon
 956	Castellano
+1030	 Ezarpenak goian dago Hasieran eta ez da ordenan sartzen.
+1031	Eskuz ordenatu
+1032	Batu
+1033	Ikusi nire zerrendak
+1034	Egiaztatzen…
+1035	Beti
+1036	Zure intzidentzia ireki dugu
+1037	Sartu hala ere (Dev)
+1038	Lanean ari gara
+1039	Zure intzidentzia ireki dugu eta aztertzen ari gara. Hemen abisatuko dizugu.
+1040	MANTENTZE-LANAK AKTIBO
+1041	Konponduta! Eskerrik asko
+1042	 · kristal likidoa
+1043	Barra
+1044	Bilatu eskuineko zirkulua da. Hasieran behera egitean barra tolestu egiten da; 1,5 segundoz geldirik egonez gero, osorik itzultzen da.
+1045	Bilatu itzultzen da gelditzean
+1046	Klasikoarekin, barra bat Hasieraren goialdean edo fitxa bereizi bat. SimpMusic-ekin, eskuineko zirkulua, behera egiteari uzten badiozu itzultzen dena.
+1047	Beheko barra: bere estiloa, Bilatu non dagoen eta fitxen ordena, dena batera.
+1048	Ezabatu bilaketa ordena aldatzeko.
+1049	Desegin
+1050	«Ez zait interesatzen» markatu dituzun abestiak ez dira berriro agertzen, eta hilabetean hiru dituen artista bat 30 egunez ez da agertzen. Mugikor honetan bakarrik gordetzen da.
+1051	Interesatzen ez zaizuna
+1052	Eduki sakatuta azal bat eta arrastatu ordena aldatzeko.
+1053	Ez zait interesatzen
+1054	Ez da berriro agertuko Aurkitu atalean.
+1055	Hustu
+1056	Hustu interesatzen ez zaizuna
+1057	{0} abesti
+1058	Eguneratu
+1059	{0} txosten ezabatu dira
+1060	Ezabatu webeko erregistroa
+1061	Bertsio hau zaharra da
+1062	Behartu erauzketa
+1063	Aplikazioak {0} dela uste du. Irten eta itzuli abisua ikusteko.
+1064	Musikak funtzionatzen jarraitzen du. Futbola badago, LaLigaren blokeoengatik izan daiteke: abisuak eta laguntza partida amaitzean itzultzen dira.
+1065	Pear-en zerbitzariek ez dute erantzuten
+1066	Ongietorria errepikatzeko edo abisuak berriro instalatu gabe ikusteko. Ez dute zure liburutegia ez deskargak ukitzen.
+1067	Bertsio berriaren abisua ikusteko
+1068	Eskatuta. Aplikazioek eguneroko taupadan ikusiko dute.
+1069	Probak
+1070	Huts egin dezake. Eguneratu konponketak izateko.
+1071	Berrabiarazi ongietorria
+1072	Gordetako txosten guztiak ezabatzen dira. Akats-txostenen fitxak ez dira ukitzen. Ezin da desegin.
+1073	Bigarren berrespena: panela hutsik geratzen da.
+1074	Simulatu bertsio zahar bat
+1075	BERTSIO SIMULATUA: {0}
+1076	Ikusi berritasunak berriro
+1077	Webeko telemetria guztia ezabatu?
+1078	Ziur zaude?
+1079	Bakoitza bere mugikorrean
+1080	{0}(r)ena · {1}
+1081	Non entzuten da
+1082	Entzun hemen ere
+1083	Hemen entzuten dena aldi berean entzuten da bakoitzaren mugikorrean, bere audioarekin. Jarri zerbait zerrendatik.
+1084	{0}(r)en mugikorrean entzuten den gauza bera, aldi berean.
+1085	Mugikor honetan bakarrik entzuten da; besteek abestiak gehitzen dituzte.
+1086	Bozgorailu bat
+1087	{0} eta {1}
+1088	{0}, {1} eta {2}
+1089	 Azaleko argazkiak ez du lekurik QRan.
+1090	Gehitzen…
+1091	Gehitu liburutegira
+1092	Partekatu QR bidez
+1093	Partekatu esteka
+1094	{0}(r)en QR kodea
+1095	Eskaneatu Pear Music duen beste mugikor baten kamerarekin. Izena, {0} abestiak eta haien ordena bidaltzen dira.
+1096	Zerrenda hau hutsik dago.
+1097	Ezin izan dira abestiak kargatu. Begiratu konexioa eta saiatu berriro.
+1098	Partekatutako zerrenda
+1099	Izenik gabe
+1100	Abesti gehiegi ditu QR baterako (gehienez {0}).
+1101	{0} abesti ez daude YouTube Music-en eta kanpoan geratu dira.
+1102	Ezarpenak, goian ezkerrean
+1103	Liburutegia zure gustura
+1104	Partekatu zerrendak QR batekin
+1105	Partekatu zerrenda bat bere pantailako QRarekin, eta Jamean aukeratu bakoitzaren mugikorrean entzutea.
+1106	SimpMusic estiloko barrarekin, Hasieran behera egiteari uzten badiozu barra osorik itzultzen da.
+1107	Aurkitu atalean, «⋯»-n. Abesti hori ez da itzultzen, eta artista bat gustatzen ez bazaizu, denbora batez ez da agertzen.
+1108	Hasieran. Eta Ezarpenak › Itxura › Barra atalean dago barrari buruzko guztia.
+1109	Jam: bakoitza bere mugikorrean
+1110	«Ez zait interesatzen» markatu duzuna. Hustu nahi duzunean.
+1111	Berria: barraren estiloa, Bilatu non dagoen eta fitxak, dena hemen.
+1112	Berria: barraren estiloa, Bilatu non dagoen, kristal likidoa eta fitxak, dena hemen.
+1113	Beste mugikor batek kamerarekin eskaneatzen du eta abestiekin eta ordenarekin eramaten du.
+1114	Zerrendak saretan, Zure albumak bezala. Eduki sakatuta azal bat eta arrastatu ordenatzeko.
+1115	Jama sortzen duenak aukeratzen du: bozgorailu batean edo bakoitzaren mugikorrean aldi berean, bere entzungailuekin.
+1116	Azalarekin agertzen dira Playlists karpetaren hasieran, «Zure musika» atalean.
+1117	Sakatu txintxeta playlist edo album batean eta hemen izango duzu, nahi duzun ordenan.

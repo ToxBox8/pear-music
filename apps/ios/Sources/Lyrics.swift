@@ -155,7 +155,7 @@ struct LyricsView: View {
                 VStack(spacing: 12) {
                     Text(L("No se pudo cargar la letra")).font(.headline)
                     Text(L("Revisa la conexión e inténtalo otra vez.")).font(.subheadline).foregroundStyle(.secondary)
-                    Button { attempt += 1 } label: { Label("Reintentar", systemImage: "arrow.clockwise") }
+                    Button { attempt += 1 } label: { Label(L("Reintentar"), systemImage: "arrow.clockwise") }
                         .buttonStyle(.bordered)
                 }
             case .ready(let lyrics):

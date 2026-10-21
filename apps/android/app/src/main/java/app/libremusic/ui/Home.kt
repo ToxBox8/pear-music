@@ -110,9 +110,23 @@ class HomeViewModel(app: Application) : AndroidViewModel(app) {
     private val _state = MutableStateFlow(HomeUiState())
     val state: StateFlow<HomeUiState> = _state.asStateFlow()
 
-    fun loadIfNeeded() { if (_state.value.shelves.isEmpty() && !_state.value.loading) load() }
+    companion object {
+        /** Sólo las capturas lo ponen a true. */
+        @Volatile var offline = false
+    }
+
+    /** Idioma en que se pidieron las estanterías: vienen de YouTube y se vuelven a pedir al cambiarlo (1.8 de x.1.1). */
+    private var shelvesLang: String? = null
+
+    fun loadIfNeeded() {
+        if ((_state.value.shelves.isEmpty() || shelvesLang != app.libremusic.I18n.youtubeHl) && !_state.value.loading) load()
+    }
 
     fun load() {
+        shelvesLang = app.libremusic.I18n.youtubeHl
+        // Capturas (`ScreenshotTest`): sin red, como `Demo` en iOS. Si no, la rueda de carga gira mientras la petición
+        // espera y la captura no llega a estar quieta.
+        if (offline) { _state.value = _state.value.copy(loading = false, failed = true); return }
         _state.value = _state.value.copy(loading = true, failed = false)
         viewModelScope.launch {
             val shelves = withContext(Dispatchers.IO) { runCatching { YTClient.home() } }
@@ -197,13 +211,13 @@ fun HomeScreen() {
     val env = LocalEnv.current
     val st by env.home.state.collectAsState()
     val lib by env.library.data.collectAsState()
-    val player by env.player.state.collectAsState()
+    val player by env.player.track.collectAsState()
     val searchPlacement by Prefs.searchPlacement.collectAsState()
     val jam by JamService.state.collectAsState()
     val jamActive = jam.phase == JamPhase.Hosting || jam.phase == JamPhase.Joined
     val barStyle by app.libremusic.ui.theme.Prefs.barStyle.collectAsState()
-    val settingsTop = app.libremusic.ui.theme.rememberSettingsTop()
-    LaunchedEffect(Unit) { env.home.loadIfNeeded() }
+    val language by app.libremusic.I18n.lang.collectAsState()
+    LaunchedEffect(language) { env.home.loadIfNeeded() }
     // Con la barra estilo SimpMusic, Buscar es el círculo de la barra: Inicio no lleva buscador.
     val hasSearch = searchPlacement != "tab" && barStyle != "simpmusic"
     val showingSearch = hasSearch && st.query.isNotEmpty()
@@ -234,6 +248,8 @@ fun HomeScreen() {
             if (showingSearch) {
                 searchResultItems(st)
             } else {
+                item { ServersBlockedBanner() }
+                item { OldVersionBanner() }
                 item { FirstStepsCard() }
                 item { PinnedRow() }
                 if (lib.recents.isNotEmpty()) item { HomeSection(L("Escuchado recientemente")) { SongCardsRow(lib.recents.take(15)) } }
@@ -284,18 +300,19 @@ fun HomeScreen() {
         ) {
             Box(Modifier.fillMaxWidth().height(48.dp).padding(start = 16.dp, end = 12.dp, top = 4.dp)) {
                 // Título pequeño de la barra: aparece cuando el grande ya se ha escondido.
-                // Centrado, pero dejando a los dos lados el ancho de los botones: con «Buenas tardes» y Ajustes arriba se solapaba con el Jam.
+                // Centrado, dejando a los dos lados el ancho de los botones de la derecha (los más anchos), para no
+                // pisar Ajustes ni el Jam.
                 Text(
                     greeting(), style = Typo.headline, color = c.label, maxLines = 1, overflow = TextOverflow.Ellipsis,
-                    // Con tres botones (Ajustes arriba) no cabe centrado: va a la izquierda, en el hueco libre.
-                    textAlign = if (settingsTop) TextAlign.Start else TextAlign.Center,
+                    textAlign = TextAlign.Center,
                     modifier = Modifier.align(Alignment.Center).fillMaxWidth()
-                        .padding(
-                            start = if (settingsTop) 0.dp else with(density) { toolbarWidth.toDp() } + 8.dp,
-                            end = with(density) { toolbarWidth.toDp() } + 8.dp,
-                        )
+                        .padding(horizontal = with(density) { toolbarWidth.toDp() } + 8.dp)
                         .graphicsLayer { alpha = ((collapse - 0.6f) / 0.4f).coerceIn(0f, 1f) },
                 )
+                // Ajustes vive siempre aquí, arriba a la izquierda; ya no puede ir en la barra (lo decidió Toxbox).
+                Box(Modifier.align(Alignment.CenterStart).tourTarget("tab:settings")) {
+                    ToolbarButton(Icons.Rounded.Settings, L("Ajustes"), tint = c.label) { env.app.select(Tab.Settings) }
+                }
                 Row(
                     Modifier.align(Alignment.CenterEnd).onSizeChanged { toolbarWidth = it.width },
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -307,12 +324,6 @@ fun HomeScreen() {
                         ) { env.app.showJam = true }
                     }
                     AvisosBell()
-                    // Ajustes arriba (Ajustes › Aspecto): sale de la barra y vive aquí, junto al Jam.
-                    if (settingsTop) {
-                        Box(Modifier.tourTarget("tab:settings")) {
-                            ToolbarButton(Icons.Rounded.Settings, L("Ajustes"), tint = c.label) { env.app.select(Tab.Settings) }
-                        }
-                    }
                 }
             }
             // La altura se calcula al medir (no al componer): el desplazamiento no recompone la cabecera.
@@ -409,7 +420,7 @@ private fun ShelfContent(all: List<HomeItem>) {
 fun CollectionScreen(collection: RemoteCollection) {
     val c = Libre.colors
     val env = LocalEnv.current
-    val player by env.player.state.collectAsState()
+    val player by env.player.track.collectAsState()
     var songs by remember(collection.id) { mutableStateOf<List<Song>>(emptyList()) }
     var loading by remember(collection.id) { mutableStateOf(true) }
     val data by env.library.data.collectAsState()
@@ -513,7 +524,7 @@ fun RowSeparator(start: androidx.compose.ui.unit.Dp = 80.dp) {
 fun SearchTabScreen() {
     val env = LocalEnv.current
     val st by env.home.state.collectAsState()
-    val player by env.player.state.collectAsState()
+    val player by env.player.track.collectAsState()
     Box(Modifier.fillMaxSize()) {
         ThemeBackdrop(player.isPlaying, player.current)
         LazyColumn(Modifier.fillMaxSize()) {

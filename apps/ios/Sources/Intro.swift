@@ -37,8 +37,9 @@ struct TourOverlay: View {
         Step(key: "tab", tab: "discover", title: L("Descubrir"), text: L("Fragmentos de canciones que te pueden gustar, a pantalla completa. Desliza para la siguiente y toca dos veces para «Me gusta». Si no lo usas, deslízalo a la izquierda en Ajustes › Aspecto › Pestañas. Toca la pestaña Descubrir.")),
         Step(key: "tab", tab: "home", title: L("Inicio"), text: L("Lo último que has escuchado, radios hechas para ti, lo nuevo de tus artistas y lo que fijes arriba. La campana trae los avisos de Pear Music. Toca la pestaña Inicio.")),
         Step(key: "jam", tab: nil, title: L("Jam"), text: L("Una playlist compartida con quien esté contigo, aunque tenga un Android. Escanea el QR para entrar al momento, o escribe el código.")),
+        // Ajustes es el engranaje de arriba a la izquierda en Inicio (fase 0 de x.1.1): va mientras Inicio está a la vista.
+        Step(key: "settings", tab: nil, title: L("Ajustes"), text: L("Tema, reproductor (casete, vinilo, Air), tu cuenta opcional, tus datos y ayuda.")),
         Step(key: "tab", tab: "library", title: L("Biblioteca"), text: L("Tus playlists, favoritos y descargas, también sin conexión. Fija arriba lo que más escuches con la chincheta y toca un artista para ver toda su discografía. Toca la pestaña Biblioteca.")),
-        Step(key: "tab", tab: "settings", title: L("Ajustes"), text: L("Tema, reproductor (casete, vinilo, Air), tu cuenta opcional, tus datos y ayuda.")),
     ]
 
     var body: some View {
@@ -49,9 +50,7 @@ struct TourOverlay: View {
                 let step = visible[index]
                 // La barra de pestañas: franja inferior (49 pt + zona segura) con margen.
                 let barRect = CGRect(x: 8, y: g.size.height - 62, width: g.size.width - 16, height: 58)
-                // Ajustes arriba (junto al Jam) en vez de en la barra: se resalta ese botón.
-                let key = step.tab == "settings" && targets.rects["settings"] != nil ? "settings" : step.key
-                let raw = key == "tab" ? barRect : (targets.rects[key] ?? barRect).offsetBy(dx: -origin.x, dy: -origin.y).insetBy(dx: -8, dy: -8)
+                let raw = step.key == "tab" ? barRect : (targets.rects[step.key] ?? barRect).offsetBy(dx: -origin.x, dy: -origin.y).insetBy(dx: -8, dy: -8)
                 ZStack(alignment: .topLeading) {
                     Color.black.opacity(0.62)
                         .mask {
@@ -116,7 +115,7 @@ struct TourOverlay: View {
 /// que se pinte lo que resalta y se avanza con «Siguiente». Un paso sin elemento enseña sólo la tarjeta; uno cuyo
 /// elemento no existe en este iPhone se salta. Diferencia aceptada: el buscador de Ajustes es del sistema
 /// (`.searchable`) y no se puede medir, así que su paso se salta en iOS.
-enum SettingsRoute: Hashable { case aspect, audio, library, help }
+enum SettingsRoute: Hashable { case aspect, bar, audio, library, help }
 
 @MainActor
 final class Guide: ObservableObject {
@@ -136,7 +135,10 @@ struct GuideStep {
 
 enum GuideSteps {
     private static func row(_ title: String, _ text: String, _ route: SettingsRoute? = nil) -> GuideStep {
-        GuideStep(keys: ["row:\(title)", "section:\(title)"], title: title, text: text, route: route.map { [$0] } ?? [])
+        row(title, text, route.map { [$0] } ?? [])
+    }
+    private static func row(_ title: String, _ text: String, _ route: [SettingsRoute]) -> GuideStep {
+        GuideStep(keys: ["row:\(title)", "section:\(title)"], title: title, text: text, route: route)
     }
 
     static var settings: [GuideStep] { [
@@ -146,9 +148,11 @@ enum GuideSteps {
         row(L("Tema"), L("Cristal (luz con los colores de la carátula), Aire (plata), Neón (synthwave) o Sistema. Y claro, oscuro o según el móvil."), .aspect),
         row(L("Reproductor"), L("Normal, Casete, Vinilo o Air. También se cambia manteniendo pulsado el mini reproductor."), .aspect),
         row(L("Colores de la portada"), L("La app y el reproductor toman los colores de la canción que suena. Elige dónde y cuánto, con presets o a tu gusto."), .aspect),
-        row(L("Pestañas"), L("Ordena las pestañas arrastrándolas. Desliza Descubrir a la izquierda para quitarla de la barra."), .aspect),
-        row(L("Barra inferior"), L("La clásica o la estilo SimpMusic: cápsula de cristal con una gota que arrastras, Buscar aparte y plegado al bajar."), .aspect),
-        row(L("Ajustes"), L("Ajustes puede ir en la barra o arriba en Inicio, junto al Jam."), .aspect),
+        // Sección Barra (2.11 de x.1.1): estilo, dónde está Buscar y pestañas, todo dentro.
+        row(L("Barra"), L("La barra de abajo: su estilo, dónde está Buscar y el orden de las pestañas, todo junto."), .aspect),
+        row(L("Barra inferior"), L("La clásica o la estilo SimpMusic: cápsula de cristal con una gota que arrastras, Buscar aparte y plegado al bajar."), [.aspect, .bar]),
+        row(L("Dónde está Buscar"), L("Con la clásica, una barra arriba en Inicio o una pestaña aparte. Con la SimpMusic, el círculo de la derecha, que vuelve si dejas de bajar."), [.aspect, .bar]),
+        row(L("Pestañas"), L("Ordena las pestañas arrastrándolas. Desliza Descubrir a la izquierda para quitarla de la barra."), [.aspect, .bar]),
         row(L("Idioma"), L("Castellano, català, valencià, galego, euskara, English, Esperanto y português. Cambia al momento.")),
         row(L("Calidad al escuchar"), L("Máxima, o ahorro de datos cuando no tienes wifi. Las descargas siempre van a la máxima."), .audio),
         row(L("Seguir con canciones parecidas"), L("Cuando se acaba la cola, sigue con una radio de canciones parecidas a la última."), .audio),
@@ -156,7 +160,6 @@ enum GuideSteps {
         row(L("Descargas"), L("Cuánto ocupan tus canciones descargadas y borrarlas.")),
         row(L("Ordenar playlists por"), L("Recientes, A-Z, Z-A, por tamaño o a mano. Con «Editar playlists» las ordenas arrastrando."), .library),
         row(L("Descargadas y Favoritos"), L("Como portada grande en Playlists o como fila en «Tu música»."), .library),
-        row(L("Dónde está Buscar"), L("Una barra arriba en Inicio o una pestaña aparte."), .library),
         row(L("Avisos"), L("Las caídas y novedades de Pear Music, también como notificación si quieres."), .help),
         row(L("Guía inicial"), L("Vuelve a ver la bienvenida, el recorrido y las historias."), .help),
         row(L("Tus datos"), L("Exporta todo lo que la app guarda de ti en un archivo o bórralo. Aquí también se activa o se quita la telemetría."), .help),
@@ -165,10 +168,11 @@ enum GuideSteps {
     ] }
 
     static var whatsNew: [GuideStep] { [
-        GuideStep(keys: ["settings:guide"], title: L("Guía de Ajustes"), text: L("Nueva: te lleva por todos los Ajustes y te explica cada opción. Está junto a la carta.")),
-        row(L("Idioma"), L("Ya puedes usar Pear Music en português. Y «Español» ahora se llama «Castellano».")),
-        GuideStep(keys: ["settings:mail"], title: L("Buzón y errores"), text: L("Con cada reporte o sugerencia va la ficha de tu móvil (modelo y versiones), para ayudarte antes.")),
-        GuideStep(keys: [], title: L("Y además"), text: L("Al descargar una versión nueva ves el progreso, y la barra clásica ya no marca Descubrir cuando estás en Ajustes.")),
+        // 2.2 (x.1.1)
+        row(L("Barra"), L("Nuevo: el estilo de la barra, dónde está Buscar y las pestañas, todo aquí."), .aspect),
+        row(L("Buscar vuelve al parar"), L("Con la barra estilo SimpMusic, si dejas de bajar por Inicio la barra vuelve entera."), [.aspect, .bar]),
+        row(L("Descubrir"), L("Lo que marcaste con «No me interesa». Vacíalo cuando quieras."), .library),
+        GuideStep(keys: [], title: L("Y además"), text: L("Comparte una playlist con el QR de su pantalla, y en el Jam elige que suene en el móvil de cada uno.")),
     ] }
 }
 
@@ -281,10 +285,12 @@ enum WhatsNew {
     struct Item: Identifiable { let id = UUID(); let icon: String; let palette: Int; let title: String; let text: String }
 
     static var items: [Item] { [
-        Item(icon: "graduationcap.fill", palette: 4, title: L("Guía de Ajustes"), text: L("Un recorrido por todos los Ajustes que te explica cada opción. Está junto a la carta.")),
-        Item(icon: "globe", palette: 3, title: L("Português"), text: L("Pear Music ya está en portugués. Y «Español» ahora se llama «Castellano».")),
-        Item(icon: "envelope.fill", palette: 1, title: L("Soporte más rápido"), text: L("Con cada reporte o sugerencia va la ficha de tu móvil (modelo y versiones), para ayudarte antes.")),
-        Item(icon: "arrow.down.circle.fill", palette: 2, title: L("Actualizaciones"), text: L("Al descargar una versión nueva ves el progreso, y si hay que dar permiso para instalar no se vuelve a descargar.")),
+        // 2.2 (x.1.1). Texto público: lo aprueba Toxbox antes de publicar.
+        Item(icon: "person.3.fill", palette: 4, title: L("Jam: cada uno en su móvil"), text: L("Quien crea el Jam elige: que suene en un altavoz o en el móvil de cada uno a la vez, con sus cascos.")),
+        Item(icon: "qrcode", palette: 3, title: L("Comparte playlists con un QR"), text: L("Otro móvil lo escanea con la cámara y se la lleva con sus canciones y su orden.")),
+        Item(icon: "square.grid.2x2.fill", palette: 1, title: L("Biblioteca a tu gusto"), text: L("Playlists en cuadrícula, como Tus álbumes. Mantén pulsada una portada y arrástrala para ordenarlas.")),
+        Item(icon: "hand.thumbsdown.fill", palette: 2, title: L("No me interesa"), text: L("En Descubrir, en «⋯». Esa canción no vuelve, y si un artista no te va, deja de salir un tiempo.")),
+        Item(icon: "gearshape.fill", palette: 0, title: L("Ajustes, arriba a la izquierda"), text: L("En Inicio. Y en Ajustes › Aspecto › Barra está todo lo de la barra junto.")),
     ] }
 }
 

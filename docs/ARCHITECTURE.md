@@ -69,6 +69,9 @@ Lo único que puede ser distinto entre las dos apps, porque no se puede igualar 
 | Deslizar entre pestañas | Cambia al soltar | La pestaña vecina asoma mientras se arrastra | `TabView` de SwiftUI no deja dibujar la vecina |
 | Ecualizador (**propuesta**, falta que Toxbox la acepte) | No hay | Ajustes › Reproducción › Ecualizador (5 ajustes hechos) | iOS reproduce HLS con AVPlayer y no deja procesar su audio |
 | Widget «Ahora suena» (**pendiente en iOS**) | Aún no (necesita una extensión de WidgetKit y un App Group) | Widget 4×1 (`NowPlayingWidget`) | Se hará en iOS cuando se pueda compilar y probar |
+| Barra SimpMusic plegada (**por confirmar** con las capturas 37/38, x.1.1) | Al plegarse quedan la pestaña actual **y la lupa** | Sólo la pestaña actual | iOS 26 deja siempre visible la pestaña con `role: .search` al minimizar; sin ese rol, Buscar dejaría de ser un círculo aparte |
+| Aspecto › Barra (x.1.1) | Estilo, Buscar y Pestañas | También «Cristal líquido» | En iOS 26 el cristal lo pone el sistema |
+| «Buscar vuelve al parar» (**por confirmar**, x.1.1) | La barra del sistema no se despliega a mano: se cambia a `.never` tras 1,5 s quieta (iOS 18+) | Se despliega la barra propia | `tabBarMinimizeBehavior` no tiene «desplegar ahora» |
 | Barras del sistema | Barra de estado de iOS | La de Android (`ScreenshotTest` sólo reserva su hueco) | Las dibuja cada sistema |
 
 ### Capturas y comparación

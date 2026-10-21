@@ -20,14 +20,14 @@ object AppShortcuts {
     const val ACTION = "app.libremusic.action.SHORTCUT"
     const val EXTRA = "shortcut"
 
-    enum class Kind(val key: String, private val shortEs: String, private val longEs: String, val icon: Int) {
-        Favorites("favorites", L("Mezclar favoritas"), L("Mezclar mis favoritas"), R.drawable.ic_shortcut_shuffle),
-        Downloads("downloads", "Descargadas", L("Mezclar lo descargado"), R.drawable.ic_shortcut_download),
-        Discover("discover", "Descubrir", L("Abrir Descubrir"), R.drawable.ic_shortcut_discover),
-        Search("search", "Buscar", L("Buscar música"), R.drawable.ic_shortcut_search),
+    enum class Kind(val key: String, private val shortText: () -> String, private val longText: () -> String, val icon: Int) {
+        Favorites("favorites", { L("Mezclar favoritas") }, { L("Mezclar mis favoritas") }, R.drawable.ic_shortcut_shuffle),
+        Downloads("downloads", { L("Descargadas") }, { L("Mezclar lo descargado") }, R.drawable.ic_shortcut_download),
+        Discover("discover", { L("Descubrir") }, { L("Abrir Descubrir") }, R.drawable.ic_shortcut_discover),
+        Search("search", { L("Buscar") }, { L("Buscar música") }, R.drawable.ic_shortcut_search),
         ;
-    val short: String get() = L(shortEs)
-    val long: String get() = L(longEs)
+    val short: String get() = shortText()
+    val long: String get() = longText()
 
         companion object { fun of(key: String?) = entries.firstOrNull { it.key == key } }
     }

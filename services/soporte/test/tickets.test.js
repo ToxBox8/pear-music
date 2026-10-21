@@ -70,6 +70,11 @@ test("autocompletar, abrir, mensajes por tipo y sólo para esa persona", async (
   const ana = await mensajes("instalacion-ana-1234");
   assert.deepEqual(ana.map((m) => m.tipo), ["fiesta", "en-ello", "mensaje", "abierto"]);
   assert.ok(ana.every((m) => m.ticket === 1));
+  // 1.12 de x.1.1: el aviso de «abierto» sin texto va como plantilla (la app lo traduce); con texto, no.
+  const abierto = ana.find((m) => m.tipo === "abierto");
+  assert.equal(abierto.plantilla, "abierto");
+  assert.match(abierto.text, /Hemos abierto tu incidencia/);
+  assert.ok(ana.filter((m) => m.tipo !== "abierto").every((m) => m.plantilla === undefined));
   assert.deepEqual(await mensajes("instalacion-otro-5678"), [], "a la otra persona no le llega nada");
   assert.ok(![...kv.values()].some((v) => String(v).includes("instalacion-ana-1234")), "no se guarda el id en claro");
   assert.ok(![...kv.values()].some((v) => String(v).includes("ana@gmail.com")), "ni el correo");
@@ -91,4 +96,46 @@ test("sin el rol o con firma falsa, nada", async () => {
   const bad = await worker.fetch(new Request("https://w.example/discord", { method: "POST", body: "{}", headers: { "x-signature-ed25519": "00", "x-signature-timestamp": "1" } }), env);
   assert.equal(bad.status, 401);
   assert.deepEqual(await mensajes("instalacion-ana-1234"), []);
+});
+
+// 2.1 y 2.8 de x.1.1: listados con autor (sin correo ni id en claro), filtros, páginas y canal propio de reportes.
+test("/reportes y /sugerencias: autor enmascarado, filtros y páginas", async () => {
+  for (let k = 0; k < 23; k++) await worker.fetch(report({ email: `ana${k}@gmail.com`, deviceId: `instalacion-${k}-abcd`, text: `Fallo número ${k} al abrir la cola` }), env);
+  await worker.fetch(report({ kind: "sugerencia", email: "luis@gmail.com", deviceId: "instalacion-sug-9999", text: "Modo karaoke con la letra grande" }), env);
+
+  const rep = await (await slash({ type: 2, data: { name: "reportes", options: [] } })).json();
+  assert.equal(rep.data.flags, 64, "sólo lo ve quien lo pide");
+  assert.match(rep.data.content, /🐞 Reportes abiertas · 23 · página 1\/2/);
+  assert.match(rep.data.content, /an…@gmail\.com · disp\. [0-9A-F]{4}/);
+  assert.match(rep.data.content, /android 1\.0\.0/);
+  assert.ok(!rep.data.content.includes("ana@gmail.com"));
+  assert.equal(rep.data.content.split("\n").length, 21, "título y 20 filas");
+
+  const next = rep.data.components[0].components[1];
+  const p2 = await (await slash({ type: 3, data: { custom_id: next.custom_id } })).json();
+  assert.equal(p2.type, 7, "cambia el mismo mensaje");
+  assert.match(p2.data.content, /página 2\/2/);
+
+  const sug = await (await slash({ type: 2, data: { name: "sugerencias", options: [] } })).json();
+  assert.match(sug.data.content, /💡 Sugerencias abiertas · 1/);
+  assert.match(sug.data.content, /karaoke/);
+
+  await slash({ type: 2, data: { name: "rp", options: [{ name: "ticket", value: 24 }, { name: "accion", value: "c" }] } });
+  const closed = await (await slash({ type: 2, data: { name: "sugerencias", options: [{ name: "estado", value: "cerradas" }] } })).json();
+  assert.match(closed.data.content, /cerradas · 1/);
+  const open = await (await slash({ type: 2, data: { name: "sugerencias", options: [] } })).json();
+  assert.match(open.data.content, /abiertas · 0/);
+});
+
+test("los reportes van a #reportes si hay webhook", async () => {
+  const withReports = { ...env, DISCORD_WEBHOOK_REPORTES: "https://discord.example/reportes" };
+  await worker.fetch(report(), withReports);
+  assert.equal(sent.at(-1).url, "https://discord.example/reportes");
+});
+
+test("los tickets de antes del índice también salen (anónimos)", async () => {
+  kv.set("ticket:seq", "1");
+  kv.set("t:1", JSON.stringify({ n: 1, kind: "error", device: "ab12cd", summary: "Ticket viejo", platform: "ios", status: "abierto", at: "2026-10-15T10:00:00.000Z" }));
+  const r = await (await slash({ type: 2, data: { name: "reportes", options: [] } })).json();
+  assert.match(r.data.content, /#1\*\* · 2026-10-15 · anónimo · disp\. AB12 · Ticket viejo · ios/);
 });

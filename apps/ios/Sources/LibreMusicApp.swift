@@ -5,6 +5,8 @@ import UIKit
 
 @main
 struct LibreMusicApp: App {
+    /// Sólo para bloquear la orientación mientras está Air (ver `OrientationLock`).
+    @UIApplicationDelegateAdaptor(OrientationLock.self) private var orientation
     @StateObject private var player = Player()
     @StateObject private var library = Library()
     @StateObject private var downloads = DownloadStore.shared
@@ -77,10 +79,6 @@ struct RootView: View {
     @AppStorage("tabOrder") private var tabOrderRaw = ""
     /// Barra inferior: «classic» o «simpmusic» (Ajustes › Aspecto › Barra inferior; mismo ajuste que Android).
     @AppStorage("barStyle") private var barStyle = "classic"
-    /// Ajustes arriba en Inicio (junto al Jam) o en la barra, aparte para cada barra (Ajustes › Aspecto › Ajustes):
-    /// por defecto en la barra con la clásica y arriba con la estilo SimpMusic. Mismo ajuste que Android.
-    @AppStorage("settingsTop.classic") private var settingsTopClassic = false
-    @AppStorage("settingsTop.simpmusic") private var settingsTopSimp = true
     @AppStorage("lastTab") private var lastTab = ""
     @AppStorage("onboarded") private var onboarded = true
     @AppStorage("termsAcceptedAt") private var termsAcceptedAt = 0.0
@@ -89,18 +87,22 @@ struct RootView: View {
     @AppStorage("openAccountAfterIntro") private var openAccountAfterIntro = false
     /// Última versión («2.1») cuyas novedades se han visto (1.1).
     @AppStorage("whatsNewSeen") private var whatsNewSeen = ""
+    /// La bienvenida sigue en pantalla (también mientras se cierra): el recorrido, las historias y las novedades
+    /// esperan a que acabe de irse, para no salir una encima de otra (1.2 de x.1.1).
+    @State private var introCoverUp = false
     @ObservedObject private var guide = Guide.shared
     @State private var showAccount = false
+    @ObservedObject private var inbox = PlaylistInbox.shared
     @State private var tab = RootView.startTab()
     @State private var demoImport = Demo.current?.showImport ?? false
 
     /// La app vuelve a abrirse en la última pestaña usada (la primera vez, Inicio).
     private static func startTab() -> String {
-        if let demo = Demo.current { return demo.tab.rawValue }
+        if let demo = Demo.current { return demo.tab == .settings ? TabOrder.home : demo.tab.rawValue }
         let d = UserDefaults.standard
         let visible = TabOrder.visible(TabOrder.decode(d.string(forKey: "tabOrder") ?? ""), searchTab: d.string(forKey: "searchPlacement") == "tab",
                                        discover: d.object(forKey: "showDiscover") as? Bool ?? true)
-        return TabOrder.tag(TabOrder.start(last: d.string(forKey: "lastTab") ?? "", visible: visible))
+        return TabOrder.tag(TabOrder.start(last: d.string(forKey: "lastTab") ?? "", visible: visible.filter { $0 != TabOrder.settings }))
     }
 
     /// iPhone en horizontal con casete o vinilo elegido: el objeto ocupa toda la pantalla.
@@ -111,15 +113,15 @@ struct RootView: View {
     /// Orden de las pestañas (Ajustes › Aspecto › Pestañas), también para deslizar a la anterior o la siguiente.
     private var tabOrder: [String] {
         simpBar ? barTabs : TabOrder.visible(TabOrder.decode(tabOrderRaw), searchTab: searchPlacement == "tab", discover: showDiscover)
-            .filter { !(settingsTop && $0 == TabOrder.settings) }.map(TabOrder.tag)
+            .filter { $0 != TabOrder.settings }.map(TabOrder.tag)
     }
 
-    /// Barra estilo SimpMusic: en la barra van tus pestañas y Buscar va aparte. Ajustes, en la barra o arriba en Inicio.
+    /// Barra estilo SimpMusic: en la barra van tus pestañas y Buscar va aparte. Ajustes nunca va en la barra: está
+    /// arriba a la izquierda en Inicio (lo decidió Toxbox, 21-10-2026).
     private var simpBar: Bool { barStyle == "simpmusic" }
-    private var settingsTop: Bool { simpBar ? settingsTopSimp : settingsTopClassic }
     private var barTabs: [String] {
         TabOrder.visible(TabOrder.decode(tabOrderRaw), searchTab: false, discover: showDiscover)
-            .filter { !(settingsTop && $0 == TabOrder.settings) }.map(TabOrder.tag)
+            .filter { $0 != TabOrder.settings }.map(TabOrder.tag)
     }
 
     @ViewBuilder private var tabView: some View {
@@ -149,23 +151,26 @@ struct RootView: View {
     var body: some View {
         tabView
         .onChange(of: tab) { lastTab = TabOrder.key($0) }
-        .onChange(of: barStyle) { _ in if settingsTop && TabOrder.key(tab) == TabOrder.settings { tab = TabOrder.tag(TabOrder.home) } }
-        .onChange(of: settingsTop) { top in if top && TabOrder.key(tab) == TabOrder.settings { tab = TabOrder.tag(TabOrder.home) } }
         .onChange(of: searchPlacement) { if !simpBar && $0 != "tab" && tab == TabOrder.search { tab = TabOrder.home } }
         // Bienvenida (también desde Ajustes › Ayuda y soporte). Quien ya usaba la app antes de la 2.0 sólo ve la
         // pantalla de privacidad, una vez. Después: recorrido sobre la app → historias → (cuenta, si la pidió).
         .fullScreenCover(isPresented: Binding(get: { (!onboarded || termsAcceptedAt == 0) && Demo.current == nil },
                                               set: { if !$0 { onboarded = true } }),
-                         onDismiss: { if introStage.isEmpty, openAccountAfterIntro { openAccountAfterIntro = false; showAccount = true } }) {
-            OnboardingView(privacyOnly: onboarded)
+                         onDismiss: {
+                             introCoverUp = false
+                             if introStage.isEmpty, openAccountAfterIntro { openAccountAfterIntro = false; showAccount = true }
+                         }) {
+            // El tema y el modo se aplican también dentro de la bienvenida: en iOS 16 las hojas no heredan
+            // `preferredColorScheme`, y al elegir «Oscuro» no cambiaba nada (1.9.1 de x.1.1).
+            OnboardingView(privacyOnly: onboarded).modifier(ThemeAppearance()).onAppear { introCoverUp = true }
         }
         .overlay {
-            if onboarded && termsAcceptedAt > 0 && introStage == "tour" && Demo.current == nil {
+            if onboarded && termsAcceptedAt > 0 && introStage == "tour" && !introCoverUp && Demo.current == nil {
                 TourOverlay(select: { tab = TabOrder.tag($0) }, onDone: { withAnimation(.uiEaseOut(0.3)) { introStage = "stories" } })
             }
         }
         .overlay {
-            if onboarded && termsAcceptedAt > 0 && introStage == "stories" && Demo.current == nil {
+            if onboarded && termsAcceptedAt > 0 && introStage == "stories" && !introCoverUp && Demo.current == nil {
                 StoriesView(onDone: {
                     withAnimation(.uiEaseOut(0.3)) { introStage = "" }
                     if openAccountAfterIntro { openAccountAfterIntro = false; showAccount = true }
@@ -176,7 +181,8 @@ struct RootView: View {
         .sheet(isPresented: $showAccount) { NavigationStack { AccountView() }.environmentObject(library) }
         // Novedades tras actualizar (1.1): una vez por versión; no se cierra deslizando, hay que elegir.
         .background(EmptyView().fullScreenCover(isPresented: Binding(
-            get: { onboarded && termsAcceptedAt > 0 && introStage.isEmpty && whatsNewSeen != WhatsNew.current && guide.active == nil && Demo.current == nil },
+            get: { onboarded && termsAcceptedAt > 0 && introStage.isEmpty && !introCoverUp && !showAccount && whatsNewSeen != WhatsNew.current
+                   && guide.active == nil && Demo.current == nil },
             set: { _ in }
         )) {
             WhatsNewView(onTour: { whatsNewSeen = WhatsNew.current; guide.active = "whatsnew" },
@@ -184,10 +190,10 @@ struct RootView: View {
         })
         // Instalación nueva: ya está la bienvenida, así que estas novedades no salen.
         .onAppear { if !onboarded && whatsNewSeen.isEmpty { whatsNewSeen = WhatsNew.current } }
-        // La guía y el recorrido de novedades empiezan en Ajustes: en su pestaña o, si está arriba, en Inicio.
+        // La guía y el recorrido de novedades empiezan en Ajustes, que se abre desde Inicio.
         .onChange(of: guide.active) { g in
             guard g != nil else { return }
-            tab = TabOrder.tag(settingsTop ? TabOrder.home : TabOrder.settings)
+            tab = TabOrder.tag(TabOrder.home)
         }
         // Primeros pasos: se marcan solos (Intro.swift).
         .onChange(of: tab) { if $0 == TabOrder.tag("discover") { FirstSteps.mark("discover") } }
@@ -213,10 +219,21 @@ struct RootView: View {
             if UIApplication.shared.alternateIconName != nil { try? await UIApplication.shared.setAlternateIconName(nil) }
         }
         // libremusic://jam/CÓDIGO: el QR del Jam escaneado con la cámara del iPhone.
-        .onOpenURL { jam.handle(url: $0) }
+        // Playlist compartida por QR (0.6 de x.1.1); si no, el Jam.
+        .onOpenURL { if !PlaylistInbox.shared.receive($0) { jam.handle(url: $0) } }
+        .sheet(item: $inbox.incoming) { payload in
+            SharedPlaylistSheet(payload: payload) { id in
+                inbox.incoming = nil
+                if id != nil { tab = TabOrder.tag(TabOrder.library) }
+            }
+            .environmentObject(library)
+        }
         .modifier(UpdateAlert())
         .overlay { IncidentOverlay() }
+        .overlay { SimulatedVersionRibbon() }
         .modifier(NowPlayingAccessory())
+        // Jam «cada uno en su móvil» (2.6 de x.1.1): sigue al anfitrión con el reproductor de aquí.
+        .modifier(JamPlaybackSync())
         .sheet(isPresented: $player.showFullPlayer) {
             PlayerView()
                 .overlay { if immersive { ImmersiveDeck(style: DeckStyle(rawValue: deckID) ?? .normal) } }
@@ -249,6 +266,8 @@ struct RootView: View {
             if phase == .active { Task { await Incident.shared.refresh() } }
             // Instalaciones activas: un contador por versión, una vez al día y sin identificadores.
             if phase == .active { Task { await Ficha.pingActive(); await Ficha.reportDecision() } }
+            // Versión nueva también al volver a la app (como mucho cada 6 h), como `ON_START` en Android (x.1.1).
+            if phase == .active { Task { await Updates.shared.check() } }
             // Telemetría, sólo con consentimiento: mide mientras la app está a la vista y manda un resumen a la semana (Fase 4b).
             if phase == .active { Telemetry.shared.foreground() }
             if phase == .background { Telemetry.shared.background() }
@@ -268,6 +287,10 @@ private struct SimpTabView<Content: View>: View {
     @Binding var tab: String
     let tabs: [String]
     @ViewBuilder let content: (String) -> Content
+    /// «Buscar vuelve al parar» (2.10 de x.1.1): tras 1,5 s quieto en Inicio la barra deja de estar plegada. El sistema
+    /// no deja desplegarla a mano, así que se cambia a `.never` hasta que se vuelve a desplazar.
+    @AppStorage("barRestoreIdle") private var restoreIdle = true
+    @State private var held = false
 
     var body: some View {
         TabView(selection: $tab) {
@@ -276,7 +299,9 @@ private struct SimpTabView<Content: View>: View {
             }
             Tab(value: TabOrder.tag(TabOrder.search), role: .search) { content(TabOrder.tag(TabOrder.search)) }
         }
-        .tabBarMinimizeBehavior(.onScrollDown)
+        .tabBarMinimizeBehavior(held ? .never : .onScrollDown)
+        .onReceive(NotificationCenter.default.publisher(for: HomeScroll.idle)) { _ in if restoreIdle { held = true } }
+        .onReceive(NotificationCenter.default.publisher(for: HomeScroll.moving)) { _ in held = false }
     }
 }
 #endif
@@ -345,7 +370,7 @@ enum TabSwipe {
 }
 
 /// «1 canción», «12 canciones».
-func songCount(_ n: Int) -> String { n == 1 ? L("1 canción") : "\(n) canciones" }
+func songCount(_ n: Int) -> String { n == 1 ? L("1 canción") : L("{0} canciones", n) }
 
 func timeString(_ s: Double) -> String {
     guard s.isFinite, s >= 0 else { return "0:00" }
@@ -385,8 +410,8 @@ struct SongMenuItems: View {
             }
             .disabled(jam.contains(song))
         }
-        Button { player.playNext(song) } label: { Label("Reproducir a continuación", systemImage: "text.insert") }
-        Button { player.enqueue(song) } label: { Label("Añadir a la cola", systemImage: "text.append") }
+        Button { player.playNext(song) } label: { Label(L("Reproducir a continuación"), systemImage: "text.insert") }
+        Button { player.enqueue(song) } label: { Label(L("Añadir a la cola"), systemImage: "text.append") }
         Button { library.toggleFavorite(song) } label: {
             Label(library.isFavorite(song) ? L("Quitar de favoritos") : L("Añadir a favoritos"),
                   systemImage: library.isFavorite(song) ? "heart.slash" : "heart")
@@ -399,12 +424,12 @@ struct SongMenuItems: View {
                         Label { Text(p.name) } icon: { Image(uiImage: PlaylistMenuIcon.image(for: p)) }
                     }
                 }
-            } label: { Label("Añadir a playlist", systemImage: "plus.rectangle.on.rectangle") }
+            } label: { Label(L("Añadir a playlist"), systemImage: "plus.rectangle.on.rectangle") }
         }
         if downloads.isDownloaded(song) {
-            Button(role: .destructive) { downloads.remove(song) } label: { Label("Eliminar descarga", systemImage: "trash") }
+            Button(role: .destructive) { downloads.remove(song) } label: { Label(L("Eliminar descarga"), systemImage: "trash") }
         } else {
-            Button { Task { await downloads.download(song) } } label: { Label("Descargar", systemImage: "arrow.down.circle") }
+            Button { Task { await downloads.download(song) } } label: { Label(L("Descargar"), systemImage: "arrow.down.circle") }
         }
     }
 }
@@ -509,7 +534,7 @@ struct MiniPlayerBar: View {
                     ForEach(DeckStyle.allCases) { d in Label(d.name, systemImage: d.symbol).tag(d.rawValue) }
                 }
                 Button { player.showFullPlayer = true } label: {
-                    Label("Abrir reproductor", systemImage: "arrow.up.left.and.arrow.down.right")
+                    Label(L("Abrir reproductor"), systemImage: "arrow.up.left.and.arrow.down.right")
                 }
             }
         }
@@ -570,6 +595,8 @@ struct PlayerView: View {
             AirPlayerView(song: song, showQueue: $showQueue, onLyrics: { panel = .lyrics; withAnimation(.uiEaseOut(0.25)) { showQueue = true } })
                 .background { AirPaper() }
                 .transition(.opacity)
+                .onAppear { OrientationLock.portrait(true) }
+                .onDisappear { OrientationLock.portrait(false) }
         } else {
             classic
         }
@@ -647,7 +674,7 @@ struct PlayerView: View {
     private func songMoreButton(_ song: Song) -> some View {
         Menu {
             Button { panel = .lyrics; withAnimation(.uiEaseOut(0.25)) { showQueue = true } } label: {
-                Label("Ver letra", systemImage: "quote.bubble")
+                Label(L("Ver letra"), systemImage: "quote.bubble")
             }
             Divider()
             SongMenuItems(song: song)

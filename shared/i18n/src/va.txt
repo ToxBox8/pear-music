@@ -1027,3 +1027,91 @@
 1029	Fet!
 941	Choose your language · Tria la llengua · Escolle o idioma · Aukeratu hizkuntza · Elektu vian lingvon
 956	Castellano
+1030	 Configuració és a dalt a Inici i no entra en l'ordre.
+1031	Ordena a mà
+1032	Uneix-me
+1033	Mostra les meues llistes
+1034	S'està comprovant…
+1035	Sempre
+1036	Hem obert la teua incidència
+1037	Entra igualment (Dev)
+1038	Hi estem treballant
+1039	Hem obert la teua incidència i l'estem mirant. T'avisarem ací.
+1040	MANTENIMENT ACTIU
+1041	Solucionat! Gràcies
+1042	 · vidre líquid
+1043	Barra
+1044	Cerca és el cercle de la dreta. En baixar per Inici la barra es plega; si deixes de moure't 1,5 segons, torna sencera.
+1045	Cerca torna en parar
+1046	Amb la clàssica, una barra dalt a Inici o una pestanya a banda. Amb la SimpMusic, el cercle de la dreta, que torna si deixes de baixar.
+1047	La barra de baix: el seu estil, on és Cerca i l'orde de les pestanyes, tot junt.
+1048	Esborra la busca per a canviar l'orde.
+1049	Desfés
+1050	Les cançons que has marcat amb «No m'interessa» no tornen a eixir, i un artista amb tres en un mes deixa d'eixir durant 30 dies. Només es guarda en este mòbil.
+1051	El que no t'interessa
+1052	Mantín premuda una portada i arrossega-la per a canviar l'orde.
+1053	No m'interessa
+1054	No tornarà a eixir en Descobrix.
+1055	Buida
+1056	Buida el que no t'interessa
+1057	{0} cançons
+1058	Actualitza
+1059	S'han esborrat {0} informes
+1060	Esborra el registre de la web
+1061	Esta versió és antiga
+1062	Força l'extracció
+1063	L'app es creu que és la {0}. Ix i torna per a vore l'avís.
+1064	La música continua funcionant. Si hi ha futbol, pot ser pels bloquejos de LaLiga: els avisos i el suport tornen en acabar el partit.
+1065	Els servidors de Pear no responen
+1066	Per a repetir la benvinguda o vore els avisos sense reinstal·lar. No toquen la teua biblioteca ni les teues baixades.
+1067	Per a vore l'avís de versió nova
+1068	Demanat. Les apps ho voran en el seu batec diari.
+1069	Proves
+1070	Pot fallar. Actualitza-la per a tindre les correccions.
+1071	Reinicia la benvinguda
+1072	S'esborren tots els informes guardats. Les fitxes dels informes d'errors no es toquen. No es pot desfer.
+1073	Segona confirmació: el tauler es queda buit.
+1074	Simula una versió antiga
+1075	VERSIÓ SIMULADA: {0}
+1076	Torna a vore les novetats
+1077	Vols esborrar tota la telemetria de la web?
+1078	N'estàs segur?
+1079	Cadascú en el seu mòbil
+1080	De {0} · {1}
+1081	On sona
+1082	Escolta també ací
+1083	El que sona ací sona alhora en el mòbil de cadascú, amb el seu propi àudio. Posa alguna cosa de la llista.
+1084	Sona el mateix que en el mòbil de {0}, alhora.
+1085	Només sona en este mòbil; els altres hi afigen cançons.
+1086	Un altaveu
+1087	{0} i {1}
+1088	{0}, {1} i {2}
+1089	 La foto de la portada no cap en el QR.
+1090	S'està afegint…
+1091	Afig a la biblioteca
+1092	Comparteix amb QR
+1093	Comparteix l'enllaç
+1094	Codi QR de {0}
+1095	Escaneja'l amb la càmera d'un altre mòbil amb Pear Music. Hi viatgen el nom, les {0} cançons i el seu orde.
+1096	Esta llista està buida.
+1097	No s'han pogut carregar les cançons. Revisa la connexió i torna-ho a provar.
+1098	Llista compartida
+1099	Sense nom
+1100	Té massa cançons per a un QR (com a màxim {0}).
+1101	{0} cançons no estan en YouTube Music i s'han quedat fora.
+1102	Configuració, dalt a l'esquerra
+1103	Biblioteca al teu gust
+1104	Comparteix llistes amb un QR
+1105	Comparteix una llista amb el QR de la seua pantalla, i en el Jam tria que sone en el mòbil de cadascú.
+1106	Amb la barra estil SimpMusic, si deixes de baixar per Inici la barra torna sencera.
+1107	En Descobrix, en «⋯». Eixa cançó no torna, i si un artista no t'agrada, deixa d'eixir un temps.
+1108	En Inici. I en Configuració › Aspecte › Barra hi ha tot el de la barra junt.
+1109	Jam: cadascú en el seu mòbil
+1110	El que has marcat amb «No m'interessa». Buida-ho quan vulgues.
+1111	Nou: l'estil de la barra, on és Cerca i les pestanyes, tot ací.
+1112	Nou: l'estil de la barra, on és Cerca, el vidre líquid i les pestanyes, tot ací.
+1113	Un altre mòbil l'escaneja amb la càmera i se l'enduu amb les cançons i l'orde.
+1114	Llistes en quadrícula, com Els teus àlbums. Mantín premuda una portada i arrossega-la per a ordenar-les.
+1115	Qui crea el Jam tria: que sone en un altaveu o en el mòbil de cadascú alhora, amb els seus auriculars.
+1116	Apareixen amb la seua portada al principi de la carpeta Playlists, en «La teua música».
+1117	Polsa la xinxeta en una playlist o un àlbum i el tindràs ací, en l'orde que vulgues.

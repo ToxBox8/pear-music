@@ -55,7 +55,23 @@ fun IncidentOverlay() {
     AnimatedVisibility(st.level in 1..2 && dismissed != st.counter, enter = fadeIn(uiEaseOut(250)), exit = fadeOut(uiEaseOut(200))) {
         IncidentBanner(st, onClose = if (st.level == 1) ({ dismissed = st.counter }) else null)
     }
-    AnimatedVisibility(st.level == 3, enter = fadeIn(uiEaseOut(300)), exit = fadeOut(uiEaseOut(250))) { MaintenanceScreen(st) }
+    // Pear Dev puede entrar igualmente (1.11 de x.1.1): si no, el mantenimiento la bloquea y no se puede usar para
+    // volver al nivel 0. Sólo existe en la variante dev (`ADMIN_TOOLS` es una constante: en usr y pref no se compila).
+    var devInside by rememberSaveable { mutableLongStateOf(-1L) }
+    val bypass = app.libremusic.BuildConfig.ADMIN_TOOLS && devInside == st.counter
+    AnimatedVisibility(st.level == 3 && !bypass, enter = fadeIn(uiEaseOut(300)), exit = fadeOut(uiEaseOut(250))) {
+        MaintenanceScreen(st, onDevEnter = if (app.libremusic.BuildConfig.ADMIN_TOOLS) ({ devInside = st.counter }) else null)
+    }
+    if (st.level == 3 && bypass) MaintenanceRibbon()
+}
+
+/** Pear Dev dentro con el mantenimiento puesto: cinta fija arriba para no olvidarlo. */
+@Composable
+private fun MaintenanceRibbon() {
+    val c = Libre.colors
+    Box(Modifier.fillMaxWidth().background(c.orange).statusBarsPadding().padding(vertical = 4.dp), contentAlignment = Alignment.Center) {
+        Text(L("MANTENIMIENTO ACTIVO"), style = Typo.footnote.copy(fontWeight = FontWeight.SemiBold), color = androidx.compose.ui.graphics.Color.White)
+    }
 }
 
 @Composable
@@ -82,7 +98,7 @@ private fun IncidentBanner(st: Incident.State, onClose: (() -> Unit)?) {
 }
 
 @Composable
-private fun MaintenanceScreen(st: Incident.State) {
+private fun MaintenanceScreen(st: Incident.State, onDevEnter: (() -> Unit)? = null) {
     val c = Libre.colors
     val env = LocalEnv.current
     val downloaded by env.library.downloadedSongs.collectAsState()
@@ -107,6 +123,10 @@ private fun MaintenanceScreen(st: Incident.State) {
                 PillButton(L("Escuchar mis descargas"), null, prominent = true, modifier = Modifier.fillMaxWidth()) {
                     env.player.play(downloaded.shuffled(), 0)
                 }
+            }
+            if (onDevEnter != null) {
+                Spacer(Modifier.height(12.dp))
+                PillButton(L("Entrar igualmente (Dev)"), null, prominent = false, modifier = Modifier.fillMaxWidth(), onClick = onDevEnter)
             }
         }
     }

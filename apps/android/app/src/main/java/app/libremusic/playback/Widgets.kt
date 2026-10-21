@@ -35,15 +35,15 @@ object Widgets {
     private const val PREFS = "widgets"
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
-    enum class Kind(val provider: Class<*>, private val titleEs: String, private val textEs: String) {
-        NowPlaying(NowPlayingWidget::class.java, L("Ahora suena"), L("Carátula, título y controles en una fila (4×1).")),
-        NowPlayingLarge(NowPlayingLargeWidget::class.java, L("Ahora suena grande"), L("Carátula grande y controles (4×2).")),
-        Quick(QuickWidget::class.java, L("Accesos rápidos"), L("Mezclar favoritas o descargadas, Descubrir y Buscar (4×1).")),
-        Playlist(PlaylistWidget::class.java, L("Playlist fijada"), L("La playlist que elijas abajo, para ponerla a sonar de un toque (2×2).")),
-        Recents(RecentsWidget::class.java, "Recientes", L("Las cuatro últimas canciones que escuchaste (4×2).")),
+    enum class Kind(val provider: Class<*>, private val titleText: () -> String, private val textText: () -> String) {
+        NowPlaying(NowPlayingWidget::class.java, { L("Ahora suena") }, { L("Carátula, título y controles en una fila (4×1).") }),
+        NowPlayingLarge(NowPlayingLargeWidget::class.java, { L("Ahora suena grande") }, { L("Carátula grande y controles (4×2).") }),
+        Quick(QuickWidget::class.java, { L("Accesos rápidos") }, { L("Mezclar favoritas o descargadas, Descubrir y Buscar (4×1).") }),
+        Playlist(PlaylistWidget::class.java, { L("Playlist fijada") }, { L("La playlist que elijas abajo, para ponerla a sonar de un toque (2×2).") }),
+        Recents(RecentsWidget::class.java, { L("Recientes") }, { L("Las cuatro últimas canciones que escuchaste (4×2).") }),
     ;
-    val title: String get() = L(titleEs)
-    val text: String get() = L(textEs)
+    val title: String get() = titleText()
+    val text: String get() = textText()
 }
 
     private fun prefs(c: Context) = c.getSharedPreferences(PREFS, Context.MODE_PRIVATE)

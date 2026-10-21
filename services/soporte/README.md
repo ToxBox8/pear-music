@@ -59,6 +59,19 @@ URL de interacciones):
 - `/rp ticket:<n> accion:o` abre el ticket: hilo propio en `DISCORD_TICKETS_CHANNEL` y aviso «Abrimos tu
   incidencia» con un check. `accion:c` lo cierra (archiva el hilo y ya no admite mensajes).
 
+**Canales y listados (x.1.1):** los reportes van a `DISCORD_WEBHOOK_REPORTES` (#reportes) y las sugerencias a
+`DISCORD_WEBHOOK_SUGERENCIAS` (#sugerencias); si falta alguno, a `DISCORD_WEBHOOK`. `/rp … accion:o` abre el hilo en
+`CANAL_REPORTES` o `CANAL_SUGERENCIAS` (vars de `wrangler.toml`, no son secretos) o, si no están, en
+`DISCORD_TICKETS_CHANNEL`. `/sugerencias` y `/reportes [estado] [desde]` listan `#número · fecha · autor · primera
+línea` (los reportes, también plataforma y versión), efímeros y 20 por página con ◀ ▶. El autor es
+`an…@gmail.com · disp. 7F3A`: el correo enmascarado y 4 letras del resumen del dispositivo; ni el correo ni el id se
+guardan en claro. El índice (`tickets:index`, 1000 como mucho) se rellena solo la primera vez con los tickets de
+antes, que salen como «anónimo».
+
+**Idiomas (x.1.1):** la app pone el título en su idioma según `tipo` (el `title` en español se queda para las
+versiones anteriores). Si `/rp … accion:o` va sin texto, el aviso lleva `plantilla: "abierto"` y la app también
+traduce el texto predeterminado. Lo que escribe Toxbox en `texto` llega tal cual.
+
 La app pide sus avisos con `GET /mensajes?device=<id anónimo>` sólo si ya envió algo desde ese móvil. Aquí se guarda
 el resumen SHA-256 del id, nunca el id ni el correo (6 meses).
 

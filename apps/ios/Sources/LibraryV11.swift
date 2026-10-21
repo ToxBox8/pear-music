@@ -1,9 +1,9 @@
 import SwiftUI
 
 // MARK: - Biblioteca «Nueva 1.1»
-// Las playlists son lo primero que se ve: un carrusel de portadas grandes con las listas
-// inteligentes (Descargadas, Favoritos) por delante. Debajo, el resto de la música en filas
-// sobrias. Dentro de una playlist cada canción lleva sus propios botones de favorito y
+// Lo primero que se ve son los Fijados: un carrusel de portadas grandes que se ordena arrastrando
+// (x.1.1; antes eran las playlists, que ahora están sólo en la carpeta de «Tu música»). Debajo, el
+// resto de la música en filas sobrias. Dentro de una playlist cada canción lleva sus propios botones de favorito y
 // descarga, y un anillo de puntos muestra cuánta de la lista está disponible sin conexión.
 
 // MARK: Helpers de plataforma
@@ -68,7 +68,7 @@ enum SmartList: String, Identifiable {
 }
 
 /// Portada de una lista inteligente: degradado de color con el glifo grande.
-private struct SmartCover: View {
+struct SmartCover: View {
     let kind: SmartList
     var size: CGFloat?
 
@@ -115,7 +115,6 @@ struct LibraryV11View: View {
     @EnvironmentObject var downloads: DownloadStore
     @EnvironmentObject var player: Player
     @EnvironmentObject var jam: JamService
-    @AppStorage("playlistSort") private var sort = "recent"
     @State private var showNew = false
     @State private var newName = ""
     @State private var showImport = false
@@ -129,17 +128,10 @@ struct LibraryV11View: View {
             .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
     }
 
-    @AppStorage("playlistOrder") private var orderRaw = ""
     @AppStorage("smartPlacement") private var placement = "playlists"
     @AppStorage("musicOrder") private var musicRaw = ""
     @State private var editingMusic = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var showReorder = false
-
-    /// Claves del carrusel en orden (playlists y, si van ahí, Descargadas y Favoritos).
-    private var orderedKeys: [String] {
-        LibraryOrder.keys(library.userPlaylists, sort: sort, order: LibraryOrder.decode(orderRaw), smartInPlaylists: placement != "music")
-    }
 
     var body: some View {
         // Una sola pasada por redibujado: la lista completa se reutiliza en cabecera y filas.
@@ -148,8 +140,9 @@ struct LibraryV11View: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 34) {
                     header(songs)
-                    PinnedRow()
-                    playlistsSection
+                    // Fijados (x.1.1): en el sitio del antiguo carrusel de Playlists, con portadas igual de grandes.
+                    // Las playlists están ya sólo en la carpeta de «Tu música».
+                    PinnedCarousel()
                     musicSection(songs)
                 }
                 .padding(.top, 6)
@@ -178,10 +171,10 @@ struct LibraryV11View: View {
             }
             Spacer(minLength: 12)
             Menu {
-                Button { showNew = true } label: { Label("Nueva playlist", systemImage: "plus.rectangle.on.rectangle") }
-                Button { showImport = true } label: { Label("Importar de Apple Music", systemImage: "square.and.arrow.down") }
+                Button { showNew = true } label: { Label(L("Nueva playlist"), systemImage: "plus.rectangle.on.rectangle") }
+                Button { showImport = true } label: { Label(L("Importar de Apple Music"), systemImage: "square.and.arrow.down") }
                 Divider()
-                Button { jam.showSheet = true } label: { Label("Jam con amigos", systemImage: "person.3") }
+                Button { jam.showSheet = true } label: { Label(L("Jam con amigos"), systemImage: "person.3") }
             } label: {
                 Image(systemName: "plus")
                     .font(.system(size: 17, weight: .semibold))
@@ -201,157 +194,6 @@ struct LibraryV11View: View {
         if n == 0 { return L("Aún no has guardado nada") }
         let base = songCount(n)
         return off > 0 ? L("{0} · {1} sin conexión", base, off) : base
-    }
-
-    // MARK: Playlists
-    private var playlistsSection: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .firstTextBaseline) {
-                Text(L("Playlists")).displayTitle(24)
-                Spacer()
-                if library.userPlaylists.count > 1 {
-                    Menu {
-                        Picker(L("Ordenar por"), selection: $sort) {
-                            Label("Añadidas recientemente", systemImage: "clock").tag("recent")
-                            Label("Nombre (A-Z)", systemImage: "textformat").tag("name")
-                            Label("Nombre (Z-A)", systemImage: "textformat").tag("nameDesc")
-                            Label("Nº de canciones", systemImage: "number").tag("count")
-                        }
-                        Divider()
-                        Button { showReorder = true } label: {
-                            Label(L("A mano…"), systemImage: sort == "custom" ? "checkmark" : "line.3.horizontal")
-                        }
-                    } label: {
-                        Image(systemName: "arrow.up.arrow.down")
-                            .font(.system(size: 15, weight: .semibold))
-                            .frame(width: 36, height: 36)
-                            .contentShape(Rectangle())
-                    }
-                    .accessibilityLabel(L("Ordenar playlists"))
-                }
-                NavigationLink { PlaylistsListView() } label: {
-                    Text(L("Ver todas")).font(.subheadline.weight(.semibold))
-                }
-            }
-            .padding(.horizontal, inset)
-
-            ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(alignment: .top, spacing: 18) {
-                    if let state = jam.jam { jamTile(state) }
-                    let byID = Dictionary(library.playlists.map { ($0.id.uuidString, $0) }, uniquingKeysWith: { a, _ in a })
-                    ForEach(orderedKeys, id: \.self) { key in
-                        switch key {
-                        case LibraryOrder.downloads: smartTile(.downloads, count: downloads.songs.count)
-                        case LibraryOrder.favorites: smartTile(.favorites, count: library.favorites.count)
-                        default: if let p = byID[key] { playlistCard(p) }
-                        }
-                    }
-
-                    newTile
-                }
-                .carouselLayout()
-                .padding(.horizontal, carouselUsesMargins ? 0 : inset)
-            }
-            .carouselScroll(inset: inset)
-
-            if library.userPlaylists.isEmpty {
-                Text(L("Crea una playlist con + o tráete las tuyas desde Apple Music."))
-                    .font(.subheadline).foregroundStyle(.secondary)
-                    .padding(.horizontal, inset)
-            }
-        }
-        .sheet(isPresented: $showReorder) { ReorderPlaylistsView() }
-    }
-
-    private func playlistCard(_ p: Playlist) -> some View {
-                        NavigationLink { PlaylistV11View(playlistID: p.id) } label: {
-                            PlaylistCardV11(playlist: p)
-                        }
-                        .buttonStyle(TactileButtonStyle())
-                        .carouselFade()
-                        .contextMenu {
-                            Button { if let f = p.songs.first { player.play(f, in: p.songs) } } label: {
-                                Label("Reproducir", systemImage: "play.fill")
-                            }
-                            Button { let s = p.songs.shuffled(); if let f = s.first { player.play(f, in: s) } } label: {
-                                Label("Aleatorio", systemImage: "shuffle")
-                            }
-                            Button { editing = p } label: { Label("Editar", systemImage: "pencil") }
-                        }
-    }
-
-    private func smartTile(_ kind: SmartList, count: Int) -> some View {
-        NavigationLink { SmartListV11View(kind: kind) } label: {
-            VStack(alignment: .leading, spacing: 10) {
-                SmartCover(kind: kind, size: PlaylistCardV11.side)
-                    .frame(width: PlaylistCardV11.side, height: PlaylistCardV11.side)
-                    .clipShape(RoundedRectangle(cornerRadius: PlaylistCardV11.corner, style: .continuous))
-                    .shadow(color: .black.opacity(0.14), radius: 16, y: 9)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(kind.title).font(.callout.bold()).lineLimit(1)
-                    Text(songCount(count))
-                        .font(.caption).foregroundStyle(.secondary)
-                }
-            }
-            .frame(width: PlaylistCardV11.side, alignment: .leading)
-            .foregroundStyle(.primary)
-        }
-        .buttonStyle(TactileButtonStyle())
-        .carouselFade()
-    }
-
-    /// El Jam en curso, primero del carrusel mientras dure.
-    private func jamTile(_ state: JamState) -> some View {
-        Button { jam.showSheet = true } label: {
-            VStack(alignment: .leading, spacing: 10) {
-                RoundedRectangle(cornerRadius: PlaylistCardV11.corner, style: .continuous)
-                    .fill(PlaylistStyle.gradient(1))
-                    .frame(width: PlaylistCardV11.side, height: PlaylistCardV11.side)
-                    .overlay {
-                        VStack(spacing: 12) {
-                            Image(systemName: "person.3.fill").font(.system(size: 48, weight: .bold))
-                            Text(state.code).font(.system(size: 20, weight: .bold, design: .monospaced)).tracking(3)
-                        }
-                        .foregroundStyle(.white)
-                        .shadow(color: .black.opacity(0.18), radius: 6, y: 3)
-                    }
-                    .shadow(color: .black.opacity(0.14), radius: 16, y: 9)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(state.name).font(.callout.bold()).lineLimit(1)
-                    Text(jam.isActive ? L("Jam en directo · {0}", state.members.count) : L("Jam sin conexión"))
-                        .font(.caption).foregroundStyle(.secondary).lineLimit(1)
-                }
-            }
-            .frame(width: PlaylistCardV11.side, alignment: .leading)
-            .foregroundStyle(.primary)
-        }
-        .buttonStyle(TactileButtonStyle())
-        .carouselFade()
-        .accessibilityLabel(L("Jam {0}, código {1}", state.name, state.code))
-    }
-
-    private var newTile: some View {
-        Button { showNew = true } label: {
-            VStack(alignment: .leading, spacing: 10) {
-                RoundedRectangle(cornerRadius: PlaylistCardV11.corner, style: .continuous)
-                    .strokeBorder(Color.primary.opacity(0.22), style: StrokeStyle(lineWidth: 1.5, dash: [5, 6]))
-                    .frame(width: PlaylistCardV11.side, height: PlaylistCardV11.side)
-                    .overlay(Image(systemName: "plus").font(.system(size: 30, weight: .medium)).foregroundStyle(.secondary))
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(L("Nueva playlist")).font(.callout.bold())
-                    Text(L("Vacía o importada")).font(.caption).foregroundStyle(.secondary)
-                }
-            }
-            .frame(width: PlaylistCardV11.side, alignment: .leading)
-            .foregroundStyle(.primary)
-        }
-        .buttonStyle(TactileButtonStyle())
-        .carouselFade()
-        .contextMenu {
-            Button { showNew = true } label: { Label("Nueva playlist", systemImage: "plus.rectangle.on.rectangle") }
-            Button { showImport = true } label: { Label("Importar de Apple Music", systemImage: "square.and.arrow.down") }
-            Button { jam.showSheet = true } label: { Label("Jam con amigos", systemImage: "person.3") }
-        }
     }
 
     // MARK: El resto de la música
@@ -404,6 +246,8 @@ struct LibraryV11View: View {
             LibraryLinkRow(title: SmartList.favorites.title, count: library.favorites.count, symbol: "heart", last: last, editing: editingMusic) {
                 SmartListV11View(kind: .favorites)
             }
+        case "playlists":
+            LibraryLinkRow(title: L("Playlists"), count: library.userPlaylists.count, symbol: "music.note.list", last: last, editing: editingMusic) { PlaylistsListView() }
         case "albums":
             LibraryLinkRow(title: L("Tus álbumes"), count: library.albums.count, symbol: "square.stack", last: last, editing: editingMusic) { AlbumsListView() }
         case "songs":
@@ -479,6 +323,8 @@ struct PlaylistCardV11: View {
     static let side: CGFloat = 176
     static let corner: CGFloat = Tokens.Radius.playlistCard
     let playlist: Playlist
+    /// Si no se da, el número de canciones.
+    var subtitle: String? = nil
     @EnvironmentObject var downloads: DownloadStore
 
     var body: some View {
@@ -489,7 +335,7 @@ struct PlaylistCardV11: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(playlist.name).font(.callout.bold()).lineLimit(1)
                 HStack(spacing: 4) {
-                    Text(songCount(playlist.songs.count))
+                    Text(subtitle ?? songCount(playlist.songs.count))
                     if offline > 0 && offline == playlist.songs.count {
                         Image(systemName: "arrow.down.circle.fill").imageScale(.small)
                             .accessibilityLabel(L("Descargada"))
@@ -716,6 +562,8 @@ private struct CollectionDetailV11<Cover: View>: View {
     var emptyText = L("Todavía no hay nada aquí")
     var onRemove: ((Song) -> Void)? = nil
     var onEdit: (() -> Void)? = nil
+    /// «Compartir con QR» (0.6 de x.1.1; nil = sin el botón).
+    var onShare: (() -> Void)? = nil
     /// Fijar arriba en Biblioteca e Inicio (nil = sin el botón).
     var pinned: Bool? = nil
     var onPin: (() -> Void)? = nil
@@ -771,7 +619,7 @@ private struct CollectionDetailV11<Cover: View>: View {
                         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                             if let onRemove {
                                 Button(role: .destructive) { onRemove(song) } label: {
-                                    Label("Quitar", systemImage: "minus.circle")
+                                    Label(L("Quitar"), systemImage: "minus.circle")
                                 }
                             }
                         }
@@ -790,6 +638,10 @@ private struct CollectionDetailV11<Cover: View>: View {
             if let onPin, let pinned {
                 Button(action: onPin) { Image(systemName: pinned ? "pin.fill" : "pin") }
                     .accessibilityLabel(pinned ? L("Soltar de arriba") : L("Fijar arriba"))
+            }
+            if let onShare {
+                Button(action: onShare) { Image(systemName: "qrcode") }
+                    .accessibilityLabel(L("Compartir con QR"))
             }
             if let onEdit {
                 Button(action: onEdit) { Image(systemName: "pencil.circle") }
@@ -890,6 +742,7 @@ struct PlaylistV11View: View {
     let playlistID: UUID
     @EnvironmentObject var library: Library
     @State private var editing = false
+    @State private var sharing = false
 
     var body: some View {
         if let p = library.playlists.first(where: { $0.id == playlistID }) {
@@ -900,6 +753,7 @@ struct PlaylistV11View: View {
                 emptyText: L("Mantén pulsada una canción en Buscar o Inicio para añadirla."),
                 onRemove: { library.remove(songID: $0.id, from: p.id) },
                 onEdit: { editing = true },
+                onShare: { sharing = true },
                 pinned: p.pinned ?? false,
                 onPin: {
                     if let i = library.playlists.firstIndex(where: { $0.id == p.id }) {
@@ -910,6 +764,7 @@ struct PlaylistV11View: View {
                 cover: { side in PlaylistCover(playlist: p, size: side, radius: 0) }
             )
             .sheet(isPresented: $editing) { PlaylistEditor(playlistID: p.id) }
+            .sheet(isPresented: $sharing) { SharePlaylistSheet(playlist: p) }
         }
     }
 }
@@ -1042,13 +897,14 @@ struct ReorderPlaylistsView: View {
 }
 
 // MARK: - Fijados (Fase 3.3)
-/// Los álbumes y playlists con la chincheta, arriba en Biblioteca e Inicio; mantener pulsado suelta. Igual que
+/// Los álbumes y playlists con la chincheta en Inicio, en el orden de Biblioteca; mantener pulsado suelta. Igual que
 /// `PinnedRow` en Android.
 struct PinnedRow: View {
     @EnvironmentObject var library: Library
+    @AppStorage("pinnedOrder") private var orderRaw = ""
 
     var body: some View {
-        let pinned = library.playlists.filter { $0.pinned == true }
+        let pinned = LibraryOrder.pinned(library.playlists.filter { $0.pinned == true }, order: LibraryOrder.decode(orderRaw))
         if !pinned.isEmpty {
             VStack(alignment: .leading, spacing: 10) {
                 Text(L("Fijados")).font(.title2.bold()).padding(.horizontal)
@@ -1068,7 +924,7 @@ struct PinnedRow: View {
                             .buttonStyle(TactileButtonStyle())
                             .contextMenu {
                                 Button { library.playlists.firstIndex(where: { $0.id == p.id }).map { library.playlists[$0].pinned = nil } } label: {
-                                    Label("Soltar de arriba", systemImage: "pin.slash")
+                                    Label(L("Soltar de arriba"), systemImage: "pin.slash")
                                 }
                             }
                         }
@@ -1077,5 +933,80 @@ struct PinnedRow: View {
                 }
             }
         }
+    }
+}
+
+/// «Fijados» en Biblioteca (x.1.1): ocupa el sitio del antiguo carrusel de Playlists, con portadas igual de grandes.
+/// Manteniendo pulsada una portada sale su menú y, si se arrastra, se lleva a otro sitio; el orden se guarda en
+/// `pinnedOrder` y lo sigue también la fila de Inicio. Igual que `PinnedCarousel` en Android.
+struct PinnedCarousel: View {
+    @EnvironmentObject var library: Library
+    @EnvironmentObject var player: Player
+    @AppStorage("pinnedOrder") private var orderRaw = ""
+    @State private var order: [UUID] = []
+    @State private var dragging: UUID?
+    private let inset: CGFloat = 20
+
+    var body: some View {
+        let pinned = LibraryOrder.pinned(library.playlists.filter { $0.pinned == true }, order: LibraryOrder.decode(orderRaw))
+        let byID = Dictionary(pinned.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+        let shown = order.count == pinned.count ? order.compactMap { byID[$0] } : pinned
+        VStack(alignment: .leading, spacing: 14) {
+            Text(L("Fijados")).displayTitle(24).padding(.horizontal, inset)
+            if pinned.isEmpty {
+                // Vacío: el hueco se queda, con lo que hay que hacer para llenarlo.
+                HStack(spacing: 18) {
+                    RoundedRectangle(cornerRadius: PlaylistCardV11.corner, style: .continuous)
+                        .strokeBorder(Color.primary.opacity(0.22), style: StrokeStyle(lineWidth: 1.5, dash: [5, 6]))
+                        .frame(width: PlaylistCardV11.side, height: PlaylistCardV11.side)
+                        .overlay(Image(systemName: "pin").font(.system(size: 30, weight: .medium)).foregroundStyle(.secondary))
+                    Text(L("Pulsa la chincheta en una playlist o un álbum y lo tendrás aquí, en el orden que quieras."))
+                        .font(.subheadline).foregroundStyle(.secondary)
+                }
+                .padding(.horizontal, inset)
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(alignment: .top, spacing: 18) {
+                        ForEach(shown) { p in card(p) }
+                    }
+                    .carouselLayout()
+                    .padding(.horizontal, carouselUsesMargins ? 0 : inset)
+                    // Soltar entre portadas también termina el arrastre.
+                    .onDrop(of: [.text], delegate: GridDrop(dragging: $dragging, finish: finish))
+                }
+                .carouselScroll(inset: inset)
+            }
+        }
+        .onAppear { order = pinned.map(\.id) }
+        .onChange(of: pinned.map(\.id)) { ids in if dragging == nil { order = ids } }
+    }
+
+    private func card(_ p: Playlist) -> some View {
+        NavigationLink { PlaylistV11View(playlistID: p.id) } label: {
+            PlaylistCardV11(playlist: p, subtitle: p.album.map { [$0.artist, $0.year].compactMap { $0 }.joined(separator: " · ") })
+        }
+        .buttonStyle(TactileButtonStyle())
+        .carouselFade()
+        .opacity(dragging == p.id ? 0.35 : 1)
+        .contextMenu {
+            Button { if let f = p.songs.first { player.play(f, in: p.songs) } } label: {
+                Label(L("Reproducir"), systemImage: "play.fill")
+            }
+            Button { let s = p.songs.shuffled(); if let f = s.first { player.play(f, in: s) } } label: {
+                Label(L("Aleatorio"), systemImage: "shuffle")
+            }
+            Button { library.playlists.firstIndex(where: { $0.id == p.id }).map { library.playlists[$0].pinned = nil } } label: {
+                Label(L("Soltar de arriba"), systemImage: "pin.slash")
+            }
+        }
+        .modifier(Lift(enabled: true, id: p.id, dragging: $dragging))
+        .onDrop(of: [.text], delegate: CellDrop(target: p.id, order: $order, dragging: $dragging, finish: finish))
+    }
+
+    private func finish() {
+        guard dragging != nil else { return }
+        dragging = nil
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        orderRaw = order.map(\.uuidString).joined(separator: "\n")
     }
 }

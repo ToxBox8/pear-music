@@ -19,8 +19,8 @@ import java.util.concurrent.Executors
  * `{"version":1,"songs":{"<videoId>":{"title","artist","thumbnail"}},"plays":[["<videoId>",<segundos epoch>],…]}`.
  */
 object PlayStats {
-    enum class Period(val key: String, private val titleEs: String) { Month("month", L("Este mes")), Year("year", L("Este año")), All("all", "Siempre") ;
-    val title: String get() = L(titleEs)
+    enum class Period(val key: String, private val titleText: () -> String) { Month("month", { L("Este mes") }), Year("year", { L("Este año") }), All("all", { L("Siempre") }) ;
+    val title: String get() = titleText()
 }
 
     data class Play(val id: String, val at: Long)

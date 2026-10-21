@@ -23,6 +23,8 @@ data class JamState(
     val host: String,
     val members: List<String>,
     val entries: List<JamEntry>,
+    /** v2.1 (x.1.1): «altavoz» (suena sólo en el anfitrión) o «todos» (cada uno en su móvil, a la vez). */
+    val mode: String = JamSync.SPEAKER,
 ) {
     fun toJson(): JSONObject = JSONObject()
         .put("name", name)
@@ -30,6 +32,7 @@ data class JamState(
         .put("host", host)
         .put("members", JSONArray(members))
         .put("entries", JSONArray().apply { entries.forEach { put(it.toJson()) } })
+        .put("mode", mode)
 
     companion object {
         fun fromJson(o: JSONObject): JamState {
@@ -43,6 +46,8 @@ data class JamState(
                 entries = (0 until (entries?.length() ?: 0)).mapNotNull { i ->
                     entries!!.optJSONObject(i)?.let { runCatching { JamEntry.fromJson(it) }.getOrNull() }
                 },
+                // Un anfitrión antiguo no lo manda: un altavoz, como siempre.
+                mode = o.optString("mode").takeIf { it == JamSync.EVERYONE } ?: JamSync.SPEAKER,
             )
         }
     }
@@ -55,6 +60,14 @@ sealed class JamMessage {
     data class Remove(val songId: String) : JamMessage()
     data object Ended : JamMessage()
     data class Error(val reason: String) : JamMessage()
+    /**
+     * v2.1: lo que suena en el anfitrión, con su hora ([atMs], su reloj). Sólo en modo «todos». [song] null = nada.
+     * Cada móvil resuelve su propio audio: nunca se transmite sonido.
+     */
+    data class Play(val song: Song?, val positionMs: Long, val atMs: Long, val playing: Boolean) : JamMessage()
+    /** v2.1: medir la diferencia de reloj con el anfitrión (como NTP): el invitado manda su hora y el anfitrión la suya. */
+    data class Ping(val t0: Long) : JamMessage()
+    data class Pong(val t0: Long, val th: Long) : JamMessage()
 
     /** Una línea JSON lista para enviar (sin el salto de línea). */
     fun encode(): String {
@@ -66,6 +79,10 @@ sealed class JamMessage {
             is Remove -> o.put("type", "remove").put("songID", songId)
             Ended -> o.put("type", "ended")
             is Error -> o.put("type", "error").put("reason", reason)
+            is Play -> o.put("type", "play").put("positionMs", positionMs).put("atMs", atMs).put("playing", playing)
+                .apply { song?.let { put("song", it.toJson()) } }
+            is Ping -> o.put("type", "ping").put("t0", t0)
+            is Pong -> o.put("type", "pong").put("t0", t0).put("th", th)
         }
         return o.toString()
     }
@@ -81,9 +98,58 @@ sealed class JamMessage {
                 "remove" -> Remove(o.getString("songID"))
                 "ended" -> Ended
                 "error" -> Error(o.optString("reason"))
+                "play" -> Play(o.optJSONObject("song")?.let { Song.fromJson(it) }, o.getLong("positionMs"), o.getLong("atMs"), o.optBoolean("playing"))
+                "ping" -> Ping(o.getLong("t0"))
+                "pong" -> Pong(o.getLong("t0"), o.getLong("th"))
                 else -> null
             }
         }.getOrNull()
+    }
+}
+
+/**
+ * «Cada uno en su móvil» (v2.1, 2.6 de x.1.1): reloj y correcciones, sin red para poder probarlo. Igual que
+ * `JamSync` en iOS.
+ */
+object JamSync {
+    const val SPEAKER = "altavoz"
+    const val EVERYONE = "todos"
+    /** Más de esto, salto; entre [NUDGE_MS] y esto, se ajusta la velocidad unos segundos (sin saltos audibles). */
+    const val SEEK_MS = 250L
+    const val NUDGE_MS = 60L
+    const val FASTER = 1.03f
+    const val SLOWER = 0.97f
+    /** Pings al entrar y luego cada tanto. */
+    const val FIRST_PINGS = 4
+    const val PING_EVERY_MS = 30_000L
+
+    /** Una medida: ida y vuelta y diferencia de reloj (hora del anfitrión − la nuestra). */
+    data class Sample(val rtt: Long, val offset: Long)
+
+    fun sample(t0: Long, th: Long, t1: Long) = Sample(rtt = t1 - t0, offset = th - (t0 + t1) / 2)
+
+    /** Diferencia de reloj: la media de las dos medidas más rápidas (las más fiables). null sin medidas. */
+    fun offset(samples: List<Sample>): Long? =
+        samples.sortedBy { it.rtt }.take(2).takeIf { it.isNotEmpty() }?.let { best -> best.sumOf { it.offset } / best.size }
+
+    /** Dónde debería ir la canción ahora en este móvil. */
+    fun expected(play: JamMessage.Play, localNow: Long, offset: Long): Long =
+        if (play.playing) play.positionMs + (localNow + offset - play.atMs) else play.positionMs
+
+    sealed class Correction {
+        data object None : Correction()
+        data class Seek(val toMs: Long) : Correction()
+        data class Speed(val rate: Float) : Correction()
+    }
+
+    /** Qué hacer con un desfase: saltar, acelerar o frenar un poco, o nada (y velocidad normal). */
+    fun correct(expectedMs: Long, actualMs: Long): Correction {
+        val drift = expectedMs - actualMs
+        return when {
+            kotlin.math.abs(drift) > SEEK_MS -> Correction.Seek(expectedMs)
+            kotlin.math.abs(drift) >= NUDGE_MS -> Correction.Speed(if (drift > 0) FASTER else SLOWER)
+            else -> Correction.None
+        }
     }
 }
 

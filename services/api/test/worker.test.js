@@ -264,3 +264,37 @@ test("perfil: el historial de telemetría va con la ficha, sin el identificador"
   assert.ok(!JSON.stringify(data).includes(report.install));
   assert.ok(Array.isArray(data.dispositivos.decisiones));
 });
+
+// 2.12 y 2.12.1 de x.1.1: forzar la extracción y borrar el registro, con la llave del panel.
+test("órdenes: forzar llega en el latido, cuenta respuestas; reset borra la telemetría y no las fichas", async () => {
+  const env = fakeEnv();
+  const { publicKey, privateKey } = await crypto.subtle.generateKey({ name: "Ed25519" }, true, ["sign", "verify"]);
+  env.PANEL_PUBLIC_KEY = btoa(String.fromCharCode(...new Uint8Array(await crypto.subtle.exportKey("raw", publicKey))));
+  env.PANEL_ORIGIN = "https://web.test";
+  const b64u = (u) => btoa(String.fromCharCode(...u)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  const now = Date.now();
+  const payload = new TextEncoder().encode(JSON.stringify({ exp: now + 5 * 60_000, n: "x" }));
+  const auth = { authorization: `Panel ${b64u(payload)}.${b64u(new Uint8Array(await crypto.subtle.sign({ name: "Ed25519" }, privateKey, payload)))}` };
+  const activo = async (t = now) => (await handle(req("POST", "/v1/activo", { platform: "android", channel: "usr", app_version: "1.1.1" }), env, t)).json();
+
+  assert.equal((await activo()).orden, null);
+  assert.equal((await handle(req("POST", "/v1/telemetria/forzar"), env, now)).status, 401, "sin llave");
+  const f = await handle(req("POST", "/v1/telemetria/forzar", undefined, auth), env, now);
+  assert.equal(f.status, 200);
+  assert.equal(f.headers.get("access-control-allow-origin"), "https://web.test");
+  const { id } = await f.json();
+  assert.equal((await activo(now + 1000)).orden, id);
+  assert.equal((await handle(req("POST", "/v1/telemetria/forzar", undefined, auth), env, now + 60_000)).status, 429, "una cada pocos minutos");
+  assert.equal((await activo(now + 8 * 86_400_000)).orden, null, "caduca a la semana");
+
+  assert.equal((await handle(req("POST", "/v1/telemetria", { ...report, kind: "forzado" }), env, now + 2000)).status, 202);
+  const panel = await (await handle(req("GET", "/v1/telemetria/panel", undefined, auth), env, now + 3000)).json();
+  assert.equal(panel.ordenes[0].respuestas, 1);
+
+  assert.equal((await handle(req("POST", "/v1/telemetria/reset", {}, auth), env, now + 4000)).status, 400, "sin confirmar");
+  const r = await (await handle(req("POST", "/v1/telemetria/reset", { confirmar: "BORRAR" }, auth), env, now + 5000)).json();
+  assert.equal(r.borradas, 1);
+  assert.equal(env.DB.raw.prepare("SELECT count(*) AS n FROM telemetry").get().n, 0);
+  assert.equal(env.DB.raw.prepare("SELECT kind FROM ordenes ORDER BY at DESC").get().kind, "reset");
+});
+

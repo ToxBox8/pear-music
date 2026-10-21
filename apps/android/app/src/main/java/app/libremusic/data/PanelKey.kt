@@ -6,6 +6,8 @@ import org.bouncycastle.crypto.generators.Ed25519KeyPairGenerator
 import org.bouncycastle.crypto.params.Ed25519KeyGenerationParameters
 import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters
 import org.bouncycastle.crypto.signers.Ed25519Signer
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.net.InetAddress
 import java.net.ServerSocket
@@ -55,6 +57,22 @@ object PanelKey {
         val sig = Ed25519Signer().run { init(true, key); update(payload, 0, payload.size); generateSignature() }
         val b64u = Base64.getUrlEncoder().withoutPadding()
         return "Panel ${b64u.encodeToString(payload)}.${b64u.encodeToString(sig)}"
+    }
+
+    /**
+     * Órdenes del panel desde el propio Pear Dev (2.12 y 2.12.1 de x.1.1): `forzar` o `reset`, firmadas con la misma
+     * llave. Devuelve el código HTTP y el JSON de la respuesta (0 y `{}` sin red).
+     */
+    fun order(c: Context, path: String, body: JSONObject = JSONObject()): Pair<Int, JSONObject> {
+        if (!BuildConfig.ADMIN_TOOLS) return 0 to JSONObject()
+        return runCatching {
+            YTClient.http.newCall(
+                okhttp3.Request.Builder().url("https://pear-music-api.8toxbox8-69a.workers.dev/v1/telemetria/$path")
+                    .header("authorization", token(privateKey(c)))
+                    .post(body.toString().toRequestBody("application/json".toMediaType()))
+                    .build(),
+            ).execute().use { r -> r.code to runCatching { JSONObject(r.body?.string().orEmpty()) }.getOrDefault(JSONObject()) }
+        }.getOrDefault(0 to JSONObject())
     }
 
     fun start(c: Context) {

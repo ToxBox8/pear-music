@@ -17,6 +17,10 @@ import androidx.compose.material.icons.rounded.Report
 import androidx.compose.material.icons.automirrored.rounded.Send
 import androidx.compose.material.icons.rounded.Speed
 import androidx.compose.material.icons.rounded.Usb
+import androidx.compose.material.icons.rounded.RestartAlt
+import androidx.compose.material.icons.rounded.AutoAwesome
+import androidx.compose.runtime.collectAsState
+import app.libremusic.ui.theme.Prefs
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -131,8 +135,45 @@ fun AdminScreen() {
                 lines = Logs.recent()
             }
         }
+        AdminTests()
         TelemetryAdmin()
         PanicPanel()
+    }
+}
+
+/**
+ * Pruebas (2.2 de x.1.1): repetir la bienvenida o las novedades y ver el aviso de versión nueva sin instalar nada.
+ * Ninguna toca la biblioteca ni las descargas. El «downgrade» de verdad no está (P7): con la versión simulada basta
+ * para probar el aviso.
+ */
+@Composable
+private fun AdminTests() {
+    val c = Libre.colors
+    val env = LocalEnv.current
+    val context = LocalContext.current
+    val simulated by app.libremusic.data.Updates.simulated.collectAsState()
+    FormSection(L("Pruebas"), footer = L("Para repetir la bienvenida o ver los avisos sin reinstalar. No tocan tu biblioteca ni tus descargas.")) {
+        FormRow(L("Reiniciar la bienvenida"), icon = Icons.Rounded.RestartAlt, tint = c.accent) {
+            Prefs.setWhatsNewSeen(WhatsNew.current)
+            Prefs.resetFirstSteps(hidden = false)
+            Prefs.setIntroStage("")
+            Prefs.setOnboarded(false)
+            env.app.select(Tab.Home)
+        }
+        FormRow(L("Ver las novedades otra vez"), icon = Icons.Rounded.AutoAwesome, tint = c.accent) {
+            Prefs.setWhatsNewSeen("")
+            env.app.select(Tab.Home)
+        }
+        FormRow(
+            L("Simular versión antigua"),
+            subtitle = simulated?.let { L("La app se cree la {0}. Sal y vuelve para ver el aviso.", it) } ?: L("Para ver el aviso de versión nueva"),
+            last = true,
+            trailing = {
+                IosToggle(simulated != null, { on ->
+                    app.libremusic.data.Updates.simulate(context.applicationContext, if (on) "1.0.0" else null)
+                }, label = L("Simular versión antigua"))
+            },
+        )
     }
 }
 
@@ -180,12 +221,48 @@ private fun TelemetryAdmin() {
                 }
             }, label = L("Llave del panel por USB"))
         })
-        FormRow(L("Copiar clave pública"), icon = Icons.Rounded.ContentCopy, tint = c.accent, last = true) {
+        FormRow(L("Copiar clave pública"), icon = Icons.Rounded.ContentCopy, tint = c.accent) {
             scope.launch {
                 val key = withContext(Dispatchers.IO) { app.libremusic.data.PanelKey.publicKey(context) }
                 clipboard.setText(AnnotatedString(key))
                 env.app.toast = L("Clave pública copiada")
             }
+        }
+        // 2.12 de x.1.1: pide a las apps con consentimiento el resumen de esta semana (lo ven en su latido diario).
+        FormRow(L("Forzar extracción"), icon = Icons.Rounded.Speed, tint = c.accent, enabled = !busy) {
+            busy = true
+            scope.launch {
+                val (status, json) = withContext(Dispatchers.IO) { app.libremusic.data.PanelKey.order(context, "forzar") }
+                busy = false
+                env.app.toast = if (status == 200) L("Pedido. Las apps lo verán en su latido diario.") else json.optString("error").ifEmpty { L("No se pudo enviar") }
+            }
+        }
+        // 2.12.1 de x.1.1: borra la telemetría guardada en la web (nunca las fichas). Se confirma dos veces.
+        FormRow(L("Borrar el registro de la web"), icon = Icons.Rounded.DeleteForever, tint = c.destructive, enabled = !busy, last = true) {
+            env.app.alert = AlertSpec(
+                L("¿Borrar toda la telemetría de la web?"), L("Se borran todos los informes guardados. Las fichas de los reportes no se tocan. No se puede deshacer."),
+                buttons = listOf(
+                    AlertButton(L("Cancelar"), AlertButton.Role.Cancel) {},
+                    AlertButton(L("Borrar"), AlertButton.Role.Destructive) {
+                        env.app.alert = AlertSpec(
+                            L("¿Seguro?"), L("Segunda confirmación: el panel se queda vacío."),
+                            buttons = listOf(
+                                AlertButton(L("Cancelar"), AlertButton.Role.Cancel) {},
+                                AlertButton(L("Borrar todo"), AlertButton.Role.Destructive) {
+                                    busy = true
+                                    scope.launch {
+                                        val (status, json) = withContext(Dispatchers.IO) {
+                                            app.libremusic.data.PanelKey.order(context, "reset", org.json.JSONObject().put("confirmar", "BORRAR"))
+                                        }
+                                        busy = false
+                                        env.app.toast = if (status == 200) L("Borrados {0} informes", json.optInt("borradas")) else json.optString("error").ifEmpty { L("No se pudo enviar") }
+                                    }
+                                },
+                            ),
+                        )
+                    },
+                ),
+            )
         }
     }
 }

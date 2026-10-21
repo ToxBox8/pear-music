@@ -142,8 +142,12 @@ enum YTClient {
         if let vd = (json?["responseContext"] as? [String: Any])?["visitorData"] as? String { visitorData = vd }
     }
 
-    static let webContext: [String: Any] =
-        ["client": ["clientName": "WEB_REMIX", "clientVersion": "1.20240918.01.00", "hl": "es"]]
+    /// Siempre en «es»: al leer búsquedas y artistas se reconocen los tipos («Canción», «Álbum»…) en español. Sólo
+    /// Inicio se pide en el idioma de la app (`webContext(hl:)`, 1.8 de x.1.1).
+    static var webContext: [String: Any] { webContext(hl: "es") }
+    static func webContext(hl: String) -> [String: Any] {
+        ["client": ["clientName": "WEB_REMIX", "clientVersion": "1.20240918.01.00", "hl": hl]]
+    }
 
     /// Sesión propia con tiempos límite: sin esto una conexión colgada deja la búsqueda
     /// o la descarga esperando 60 s (el valor por defecto) o más.
@@ -341,7 +345,9 @@ enum YTClient {
             let title = runs(0).first ?? "Sin título"
             // "Artista y Otro • Álbum • 3:08": el primer segmento son los artistas completos
             // (los conectores " y " / ", " vienen como runs sueltos).
-            let kinds: Set<String> = ["Canción", "Vídeo", "Video", "Song", "Episodio", "Álbum", "Single", "EP"]
+            // También en los idiomas en que se pide Inicio (1.8 de x.1.1): catalán, euskera, inglés y portugués.
+            let kinds: Set<String> = ["Canción", "Vídeo", "Video", "Song", "Episodio", "Álbum", "Single", "EP",
+                                      "Cançó", "Àlbum", "Abestia", "Bideoa", "Albuma", "Album", "Episode", "Música"]
             let raw = runs(1).joined().components(separatedBy: " • ").map { $0.trimmingCharacters(in: .whitespaces) }
             let duration = raw.lazy.compactMap(Self.seconds).first
             let segments = raw.filter { !$0.isEmpty && !kinds.contains($0) && Self.seconds($0) == nil }
@@ -365,16 +371,17 @@ enum YTClient {
     }
 
     private static let origin = ["Origin": "https://music.youtube.com"]
-    private static func browse(_ body: [String: Any]) async throws -> [String: Any] {
+    private static func browse(_ body: [String: Any], hl: String = "es") async throws -> [String: Any] {
         await ensureVisitorData()
         var b = body
-        b["context"] = webContext
+        b["context"] = webContext(hl: hl)
         return try await post("https://music.youtube.com/youtubei/v1/browse?prettyPrint=false", body: b, headers: origin)
     }
 
     // MARK: Inicio (recomendaciones de YouTube Music, sin sesión)
     static func home() async throws -> [HomeShelf] {
-        let json = try await browse(["browseId": "FEmusic_home"])
+        // Los títulos de las estanterías («Selecciones rápidas»…) vienen de YouTube: en el idioma de la app.
+        let json = try await browse(["browseId": "FEmusic_home"], hl: I18n.youtubeHl)
         var shelves: [HomeShelf] = []
         collect(json, key: "musicCarouselShelfRenderer") { shelf in
             let header = (shelf["header"] as? [String: Any])?["musicCarouselShelfBasicHeaderRenderer"] as? [String: Any]
@@ -438,6 +445,29 @@ enum YTClient {
                             thumbnail: (thumbs?.last?["url"] as? String).flatMap(URL.init)))
         }
         return out
+    }
+
+    /// Título, artista y carátula de una lista de canciones por su id, en el mismo orden (0.6 de x.1.1: una playlist
+    /// compartida por QR sólo lleva los ids). La cola de YouTube Music (`music/get_queue`) da hasta 50 de golpe. Las
+    /// que no vengan se quedan fuera. Igual que `YTClient.songs` en Android.
+    static func songs(ids: [String]) async -> [Song] {
+        await ensureVisitorData()
+        var found: [String: Song] = [:]
+        var unique: [String] = []
+        for id in ids where !unique.contains(id) { unique.append(id) }
+        for start in stride(from: 0, to: unique.count, by: 50) {
+            let chunk = Array(unique[start..<min(start + 50, unique.count)])
+            guard let json = try? await post("https://music.youtube.com/youtubei/v1/music/get_queue?prettyPrint=false",
+                                             body: ["context": webContext, "videoIds": chunk], headers: origin) else { continue }
+            collect(json, key: "playlistPanelVideoRenderer") { item in
+                guard let vid = item["videoId"] as? String, found[vid] == nil else { return }
+                let thumbs = (item["thumbnail"] as? [String: Any])?["thumbnails"] as? [[String: Any]]
+                let artist = runsText(item["shortBylineText"]).components(separatedBy: " • ").first ?? ""
+                found[vid] = Song(id: vid, title: runsText(item["title"]), artist: artist,
+                                  thumbnail: (thumbs?.last?["url"] as? String).flatMap(URL.init))
+            }
+        }
+        return ids.compactMap { found[$0] }
     }
 
     /// La canción de YouTube Music que corresponde a una pista de Apple Music. Puntúa título,

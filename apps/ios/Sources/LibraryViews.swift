@@ -70,37 +70,84 @@ struct NoMatchesView: View {
     }
 }
 
+/// Playlists (2.9 de x.1.1): la carpeta de «Tu música», en cuadrícula como «Tus álbumes». Es el único sitio de las
+/// playlists: el carrusel de Biblioteca lo ocupa ahora Fijados. Con Descargadas y Favoritos «en Playlists» (Ajustes ›
+/// Biblioteca), van aquí con su portada. Manteniendo pulsada una portada se arrastra y el orden pasa a «A mano». El
+/// lápiz lleva a «Editar playlists» (ordenar por…).
 struct PlaylistsListView: View {
     @EnvironmentObject var library: Library
+    @EnvironmentObject var downloads: DownloadStore
     @AppStorage("playlistSort") private var sort = "recent"
     @AppStorage("playlistOrder") private var orderRaw = ""
+    @AppStorage("smartPlacement") private var placement = "playlists"
     @State private var query = ""
     @State private var editing = false
 
-    /// En el mismo orden que el carrusel.
-    private var ordered: [Playlist] {
+    /// Una casilla de la cuadrícula: una playlist o una lista inteligente (con un id fijo para poder arrastrarla).
+    struct Entry: Identifiable {
+        let key: String
+        let id: UUID
+        let title: String
+        let subtitle: String
+        let playlist: Playlist?
+        let smart: SmartList?
+    }
+
+    private static let downloadsID = UUID(uuidString: "00000000-0000-0000-0000-00000000D0D0")!
+    private static let favoritesID = UUID(uuidString: "00000000-0000-0000-0000-00000000FA00")!
+
+    private var keys: [String] {
+        LibraryOrder.keys(library.userPlaylists, sort: sort, order: LibraryOrder.decode(orderRaw), smartInPlaylists: placement != "music")
+    }
+
+    private var entries: [Entry] {
         let byID = Dictionary(library.userPlaylists.map { ($0.id.uuidString, $0) }, uniquingKeysWith: { a, _ in a })
-        return LibraryOrder.keys(library.userPlaylists, sort: sort, order: LibraryOrder.decode(orderRaw), smartInPlaylists: false).compactMap { byID[$0] }
+        return keys.compactMap { key in
+            switch key {
+            case LibraryOrder.downloads:
+                return Entry(key: key, id: Self.downloadsID, title: SmartList.downloads.title, subtitle: songCount(downloads.songs.count), playlist: nil, smart: .downloads)
+            case LibraryOrder.favorites:
+                return Entry(key: key, id: Self.favoritesID, title: SmartList.favorites.title, subtitle: songCount(library.favorites.count), playlist: nil, smart: .favorites)
+            default:
+                guard let p = byID[key] else { return nil }
+                return Entry(key: key, id: p.id, title: p.name, subtitle: songCount(p.songs.count), playlist: p, smart: nil)
+            }
+        }
     }
 
     var body: some View {
-        let shown = LocalSearch.filter(ordered, query) { $0.name }
-        List {
-            ForEach(shown) { p in
-                NavigationLink { PlaylistV11View(playlistID: p.id) } label: {
-                    HStack(spacing: 14) {
-                        PlaylistCover(playlist: p, size: 56)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(p.name).font(.body.weight(.medium)).lineLimit(1)
-                            Text(songCount(p.songs.count)).font(.caption).foregroundStyle(.secondary)
+        let all = entries
+        let shown = LocalSearch.filter(all, query) { $0.title }
+        ScrollView {
+            if !shown.isEmpty {
+                ReorderHint(enabled: query.isEmpty)
+                ReorderGrid(items: shown, enabled: query.isEmpty, onMoved: { moved in
+                    let byID = Dictionary(all.map { ($0.id, $0.key) }, uniquingKeysWith: { a, _ in a })
+                    orderRaw = LibraryOrder.merge(keys, moved.compactMap { byID[$0] }).joined(separator: "\n")
+                    sort = "custom"
+                }, destination: { e in
+                    if let p = e.playlist { PlaylistV11View(playlistID: p.id) } else if let k = e.smart { SmartListV11View(kind: k) }
+                }) { e in
+                    VStack(alignment: .leading, spacing: 6) {
+                        Group {
+                            if let p = e.playlist { PlaylistCover(playlist: p, size: nil) }
+                            else if let k = e.smart {
+                                SmartCover(kind: k, size: nil)
+                                    .aspectRatio(1, contentMode: .fit)
+                                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                            }
                         }
+                        .shadow(color: .black.opacity(0.14), radius: 12, y: 6)
+                        Text(e.title).font(.subheadline.weight(.semibold)).lineLimit(1)
+                        Text(e.subtitle).font(.caption).foregroundStyle(.secondary).lineLimit(1)
                     }
+                    .foregroundStyle(.primary)
+                    .accessibilityElement(children: .combine)
                 }
             }
-            .glassRow()
         }
         .overlay {
-            if library.userPlaylists.isEmpty { Text(L("Todavía no hay playlists")).foregroundStyle(.secondary) }
+            if all.isEmpty { Text(L("Todavía no hay playlists")).foregroundStyle(.secondary) }
             else if shown.isEmpty { NoMatchesView(query: query) }
         }
         .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: L("Buscar en playlists"))
@@ -119,34 +166,27 @@ struct PlaylistsListView: View {
     }
 }
 
-/// «Tus álbumes»: los álbumes guardados o descargados desde su página, en cuadrícula y con buscador.
+/// «Tus álbumes»: los álbumes guardados o descargados desde su página, en cuadrícula y con buscador. Se reordenan
+/// arrastrando, como Playlists (2.9 de x.1.1).
 struct AlbumsListView: View {
     @EnvironmentObject var library: Library
+    @AppStorage("albumSort") private var albumSort = "recent"
+    @AppStorage("albumOrder") private var albumOrder = ""
     @State private var query = ""
-    private let columns = [GridItem(.flexible(), spacing: 16, alignment: .top), GridItem(.flexible(), spacing: 16, alignment: .top)]
 
     var body: some View {
-        let albums = library.albums
+        let albums = LibraryOrder.albums(library.albums, sort: albumSort, order: LibraryOrder.decode(albumOrder))
         let shown = LocalSearch.filter(albums, query) { "\($0.name) \($0.album?.artist ?? "")" }
         ScrollView {
-            LazyVGrid(columns: columns, spacing: 22) {
-                ForEach(shown) { p in
-                    NavigationLink { PlaylistV11View(playlistID: p.id) } label: {
-                        VStack(alignment: .leading, spacing: 6) {
-                            PlaylistCover(playlist: p, size: nil)
-                                .shadow(color: .black.opacity(0.14), radius: 12, y: 6)
-                            Text(p.name).font(.subheadline.weight(.semibold)).lineLimit(1)
-                            Text(p.album?.line ?? songCount(p.songs.count))
-                                .font(.caption).foregroundStyle(.secondary).lineLimit(1)
-                        }
-                        .foregroundStyle(.primary)
-                        .accessibilityElement(children: .combine)
-                    }
-                    .buttonStyle(TactileButtonStyle())
+            if !shown.isEmpty {
+                ReorderHint(enabled: query.isEmpty)
+                ReorderGrid(items: shown, enabled: query.isEmpty, onMoved: { moved in
+                    albumOrder = moved.map(\.uuidString).joined(separator: "\n")
+                    albumSort = "custom"
+                }, destination: { p in PlaylistV11View(playlistID: p.id) }) { p in
+                    GridCover(playlist: p, subtitle: p.album?.line ?? songCount(p.songs.count))
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 8)
         }
         .overlay {
             if albums.isEmpty { AlbumsEmptyView() }
@@ -158,6 +198,113 @@ struct AlbumsListView: View {
         .navigationTitle(L("Tus álbumes"))
         .miniPlayer()
     }
+}
+
+/// Portada grande con nombre y una línea, para las cuadrículas de Playlists y Tus álbumes.
+private struct GridCover: View {
+    let playlist: Playlist
+    let subtitle: String
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            PlaylistCover(playlist: playlist, size: nil)
+                .shadow(color: .black.opacity(0.14), radius: 12, y: 6)
+            Text(playlist.name).font(.subheadline.weight(.semibold)).lineLimit(1)
+            Text(subtitle).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+        }
+        .foregroundStyle(.primary)
+        .accessibilityElement(children: .combine)
+    }
+}
+
+/// Cómo se reordena la cuadrícula; buscando no se puede (se ordenaría sólo lo encontrado).
+private struct ReorderHint: View {
+    let enabled: Bool
+    var body: some View {
+        Text(enabled ? L("Mantén pulsada una portada y arrástrala para cambiar el orden.") : L("Borra la búsqueda para cambiar el orden."))
+            .font(.footnote).foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 20).padding(.top, 4).padding(.bottom, 4)
+    }
+}
+
+/// Cuadrícula de dos columnas que se reordena manteniendo pulsado y arrastrando (2.9 de x.1.1). El sistema levanta
+/// la portada; al pasar por encima de otra, se apartan, y al soltar llega el orden nuevo a `onMoved`. Con
+/// `enabled = false` (buscando) sólo se tocan. Igual que `ReorderGrid` en Android.
+struct ReorderGrid<Item: Identifiable, Destination: View, Cell: View>: View where Item.ID == UUID {
+    let items: [Item]
+    let enabled: Bool
+    let onMoved: ([UUID]) -> Void
+    @ViewBuilder let destination: (Item) -> Destination
+    @ViewBuilder let cell: (Item) -> Cell
+    @State private var order: [UUID] = []
+    @State private var dragging: UUID?
+    private let columns = [GridItem(.flexible(), spacing: 16, alignment: .top), GridItem(.flexible(), spacing: 16, alignment: .top)]
+
+    var body: some View {
+        let byID = Dictionary(items.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+        let shown = order.compactMap { byID[$0] }
+        LazyVGrid(columns: columns, spacing: 22) {
+            ForEach(shown.count == items.count ? shown : items) { p in
+                NavigationLink { destination(p) } label: { cell(p) }
+                    .buttonStyle(TactileButtonStyle())
+                    .opacity(dragging == p.id ? 0.35 : 1)
+                    .modifier(Lift(enabled: enabled, id: p.id, dragging: $dragging))
+                    .onDrop(of: [.text], delegate: CellDrop(target: p.id, order: $order, dragging: $dragging, finish: finish))
+            }
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 8)
+        // Soltar entre celdas también termina el arrastre.
+        .onDrop(of: [.text], delegate: GridDrop(dragging: $dragging, finish: finish))
+        .onAppear { order = items.map(\.id) }
+        .onChange(of: items.map(\.id)) { ids in if dragging == nil { order = ids } }
+    }
+
+    private func finish() {
+        guard dragging != nil else { return }
+        dragging = nil
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        onMoved(order)
+    }
+}
+
+/// Mantener pulsado levanta la celda (sólo si se puede reordenar; buscando, no).
+struct Lift: ViewModifier {
+    let enabled: Bool
+    let id: UUID
+    @Binding var dragging: UUID?
+    @ViewBuilder func body(content: Content) -> some View {
+        if enabled {
+            content.onDrag {
+                dragging = id
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                return NSItemProvider(object: id.uuidString as NSString)
+            }
+        } else {
+            content
+        }
+    }
+}
+
+struct CellDrop: DropDelegate {
+    let target: UUID
+    @Binding var order: [UUID]
+    @Binding var dragging: UUID?
+    let finish: () -> Void
+
+    func dropEntered(info: DropInfo) {
+        guard let d = dragging, d != target, let from = order.firstIndex(of: d), let to = order.firstIndex(of: target) else { return }
+        withAnimation(.uiEaseOut(0.22)) { order.move(fromOffsets: IndexSet(integer: from), toOffset: to > from ? to + 1 : to) }
+    }
+    func dropUpdated(info: DropInfo) -> DropProposal? { DropProposal(operation: .move) }
+    func performDrop(info: DropInfo) -> Bool { finish(); return true }
+}
+
+struct GridDrop: DropDelegate {
+    @Binding var dragging: UUID?
+    let finish: () -> Void
+    func dropUpdated(info: DropInfo) -> DropProposal? { DropProposal(operation: .move) }
+    func performDrop(info: DropInfo) -> Bool { finish(); return true }
 }
 
 /// Sin álbumes todavía: qué es esto y cómo se llena.
@@ -270,7 +417,7 @@ struct PlaylistEditor: View {
                         }
                         if PlaylistArt.exists(p.id) {
                             Button(role: .destructive) { library.setCover(nil, for: p.id) } label: {
-                                Label("Quitar foto", systemImage: "trash")
+                                Label(L("Quitar foto"), systemImage: "trash")
                             }
                         }
                     } header: { Text(L("Foto")) } footer: {
@@ -432,10 +579,10 @@ struct ImportView: View {
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()
                     HStack {
-                        Button { link = UIPasteboard.general.string ?? link } label: { Label("Pegar", systemImage: "doc.on.clipboard") }
+                        Button { link = UIPasteboard.general.string ?? link } label: { Label(L("Pegar"), systemImage: "doc.on.clipboard") }
                             .buttonStyle(.bordered)
                         Spacer()
-                        Button { Task { await importLink() } } label: { Label("Importar", systemImage: "square.and.arrow.down") }
+                        Button { Task { await importLink() } } label: { Label(L("Importar"), systemImage: "square.and.arrow.down") }
                             .buttonStyle(.borderedProminent)
                             .disabled(link.isEmpty)
                     }
@@ -445,8 +592,8 @@ struct ImportView: View {
                 .disabled(busy)
 
                 Section {
-                    Button { fileMode = .csv; importingBackup = true } label: { Label("CSV de Exportify (Spotify)", systemImage: "doc.text") }
-                    Button { fileMode = .simpMusic; importingBackup = true } label: { Label("Copia de SimpMusic (.backup)", systemImage: "clock.arrow.circlepath") }
+                    Button { fileMode = .csv; importingBackup = true } label: { Label(L("CSV de Exportify (Spotify)"), systemImage: "doc.text") }
+                    Button { fileMode = .simpMusic; importingBackup = true } label: { Label(L("Copia de SimpMusic (.backup)"), systemImage: "clock.arrow.circlepath") }
                 } header: { Text(L("Desde un archivo")) } footer: {
                     Text(L("Spotify: exporta la playlist en exportify.app (gratis, entra con tu cuenta de Spotify) y elige el .csv; trae todas las canciones y su ISRC, que empareja mejor. SimpMusic: Ajustes › Copia de seguridad, y elige el archivo .backup; sus canciones ya son de YouTube Music, así que llegan exactas."))
                 }
@@ -469,7 +616,7 @@ struct ImportView: View {
                             }
                         }
                     } else {
-                        Button { Task { await loadLocal() } } label: { Label("Ver mis playlists", systemImage: "music.note.house") }
+                        Button { Task { await loadLocal() } } label: { Label(L("Ver mis playlists"), systemImage: "music.note.house") }
                     }
                 } header: { Text(L("Desde la app Música de este iPhone")) } footer: {
                     Text(L("Lee las playlists de tu biblioteca (necesita «Sincronizar biblioteca» activado en Ajustes → Música)."))
@@ -478,11 +625,11 @@ struct ImportView: View {
 
                 // Lo mismo que Android: la biblioteca entera en un archivo, para pasarla de un móvil a otro.
                 Section {
-                    Button { fileMode = .library; importingBackup = true } label: { Label("Importar copia", systemImage: "square.and.arrow.down") }
+                    Button { fileMode = .library; importingBackup = true } label: { Label(L("Importar copia"), systemImage: "square.and.arrow.down") }
                     Button {
                         backup = LibraryBackup(data: library.exportData())
                         exportingBackup = true
-                    } label: { Label("Exportar copia", systemImage: "square.and.arrow.up") }
+                    } label: { Label(L("Exportar copia"), systemImage: "square.and.arrow.up") }
                 } header: { Text(L("Copia de la biblioteca")) } footer: {
                     Text(L("Archivo library.json de Pear Music (también el de Android). Se añade lo que no tengas, sin borrar nada."))
                 }

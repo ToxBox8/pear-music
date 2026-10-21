@@ -22,6 +22,7 @@ class LibreMusicApplication : Application() {
         YTClient.init(this)
         library = Library(this)
         app.libremusic.data.PlayStats.init(this)
+        app.libremusic.data.ReelsSkip.init(this)
         app.libremusic.data.AutoBackup.init(this)
         app.libremusic.data.PendingImports.init(this)
         Downloads.init(this)

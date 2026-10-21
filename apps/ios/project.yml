@@ -24,8 +24,8 @@ targets:
       properties:
         CFBundleDisplayName: $(APP_DISPLAY_NAME)
         # Versión de la app (ver docs/RELEASING.md). Súbela en cada versión publicada.
-        CFBundleShortVersionString: "2.1.0"
-        CFBundleVersion: "13"
+        CFBundleShortVersionString: "2.2.0"
+        CFBundleVersion: "14"
         UILaunchScreen: {}
         # fetch: comprobar los avisos en segundo plano (BGAppRefreshTask, ver Avisos.swift).
         UIBackgroundModes: [audio, fetch]

@@ -235,7 +235,7 @@ private fun AvisoRow(aviso: Aviso, last: Boolean) {
                     }
                     aviso.enlace?.let { enlace ->
                         Row(
-                            Modifier.padding(top = 8.dp).tactile(label = L("Abrir enlace")) { runCatching { uri.openUri(enlace) } },
+                            Modifier.padding(top = 8.dp).tactile(label = L("Abrir enlace")) { runCatching { uri.openUri(fromApp(enlace)) } },
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(4.dp),
                         ) {
@@ -280,3 +280,15 @@ fun haceCuanto(fecha: Instant, ahora: Instant = Instant.now()): String {
     if (d < 7) return if (d == 1L) L("ayer") else L("hace {0} días", d)
     return formatoFecha.format(fecha.atZone(ZoneId.systemDefault()))
 }
+
+/**
+ * Enlaces a nuestra web abiertos desde la app: llevan `?desde=app` y la web esconde lo que no sirve en el móvil
+ * (el RSS, 2.4 de x.1.1). Los de otras webs no se tocan. Igual que `fromApp` en iOS.
+ */
+fun fromApp(url: String): String {
+    val host = runCatching { java.net.URI(url).host }.getOrNull() ?: return url
+    if (host != "pearmusic-by-toxbox.8toxbox8-69a.workers.dev" || url.contains("desde=")) return url
+    val (base, frag) = url.substringBefore('#') to url.substringAfter('#', "").let { if (it.isEmpty()) "" else "#$it" }
+    return base + (if ('?' in base) "&" else "?") + "desde=app" + frag
+}
+

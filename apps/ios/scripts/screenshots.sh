@@ -11,7 +11,7 @@ SCENARIOS=(
   01_biblioteca_cristal 02_biblioteca_cristal_oscuro 03_biblioteca_aire 04_biblioteca_neon
   05_biblioteca_sistema 06_playlist 07_ajustes 08_temas 09_reproductor_normal
   10_reproductor_casete 11_reproductor_vinilo 12_reproductor_air 13_reproductor_neon
-  14_jam 15_importar
+  14_jam 15_importar 37_barra_dos_pestanas 38_barra_simpmusic_dos
 )
 
 # iPhone 16 (393×852 pt a 3x = 1179×2556, el tamaño de ScreenshotTest) con el iOS más reciente instalado.

@@ -144,7 +144,7 @@ private enum class JamPane { Main, Add, Qr }
 @Composable
 fun JamScreen(playerVm: PlayerViewModel, libraryVm: LibraryViewModel, initialCode: String?, onClose: () -> Unit) {
     val state by JamService.state.collectAsState()
-    val player by playerVm.state.collectAsState()
+    val player by playerVm.track.collectAsState()
     var pane by remember { mutableStateOf(JamPane.Main) }
     Box(Modifier.fillMaxSize()) {
         ThemeBackdrop(player.isPlaying, player.current)
@@ -319,7 +319,7 @@ private fun JamRoom(state: JamUiState, playerVm: PlayerViewModel, libraryVm: Lib
     val c = Libre.colors
     val env = LocalEnv.current
     val jam = state.jam ?: return
-    val player by playerVm.state.collectAsState()
+    val player by playerVm.track.collectAsState()
     val live = state.phase == JamPhase.Hosting || state.phase == JamPhase.Joined
     var savedName by remember { mutableStateOf<String?>(null) }
     var savedId by remember { mutableStateOf<String?>(null) }
@@ -372,9 +372,10 @@ private fun JamRoom(state: JamUiState, playerVm: PlayerViewModel, libraryVm: Lib
                     LiveBadge(live, c.accent)
                     Text(jam.name, style = Typo.display(34f, c.theme), color = c.label, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     val n = songCount(jam.entries.size)
-                    Text(if (state.isHost) L("Lo has creado tú · {0}", n) else "De ${jam.host} · $n", style = Typo.subheadline, color = c.secondaryLabel)
+                    Text(if (state.isHost) L("Lo has creado tú · {0}", n) else L("De {0} · {1}", jam.host, n), style = Typo.subheadline, color = c.secondaryLabel)
                 }
                 Members(jam.members)
+                if (live) ListenMode(state)
                 if (state.phase == JamPhase.Lost) {
                     Row(Modifier.fillMaxWidth().themeSurface(16.dp, c).padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Rounded.WifiOff, null, tint = c.label, modifier = Modifier.size(18.dp))
@@ -400,7 +401,7 @@ private fun JamRoom(state: JamUiState, playerVm: PlayerViewModel, libraryVm: Lib
                     } else if (savedName == null) {
                         PillButton(L("Guardar lista"), Icons.Rounded.Download, prominent = true, modifier = Modifier.weight(1f), enabled = jam.entries.isNotEmpty()) { save() }
                     }
-                    PillButton("Reproducir", Icons.Rounded.PlayArrow, prominent = false, modifier = Modifier.weight(1f), enabled = jam.entries.isNotEmpty()) {
+                    PillButton(L("Reproducir"), Icons.Rounded.PlayArrow, prominent = false, modifier = Modifier.weight(1f), enabled = jam.entries.isNotEmpty()) {
                         playerVm.play(jam.entries.map { it.song }, 0)
                     }
                 }
@@ -430,6 +431,36 @@ private fun JamRoom(state: JamUiState, playerVm: PlayerViewModel, libraryVm: Lib
     }
 }
 
+/**
+ * Dónde suena (2.6 de x.1.1): el anfitrión elige un altavoz (el suyo) o cada uno en su móvil, a la vez. El invitado,
+ * con «cada uno en su móvil», puede quitarlo en el suyo (p. ej. si está al lado del altavoz).
+ */
+@Composable
+private fun ListenMode(state: JamUiState) {
+    val c = Libre.colors
+    val jam = state.jam ?: return
+    val everyone = jam.mode == JamSync.EVERYONE
+    if (state.isHost) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(L("Dónde suena"), style = Typo.caption.semibold, color = c.secondaryLabel)
+            app.libremusic.ui.Segmented(listOf(JamSync.SPEAKER to L("Un altavoz"), JamSync.EVERYONE to L("Cada uno en su móvil")), jam.mode) { JamService.setMode(it) }
+            Text(
+                if (everyone) L("Lo que suena aquí suena a la vez en el móvil de cada uno, con su propio audio. Pon algo de la lista.")
+                else L("Suena sólo en este móvil; los demás añaden canciones."),
+                style = Typo.footnote, color = c.secondaryLabel,
+            )
+        }
+    } else if (everyone) {
+        Row(Modifier.fillMaxWidth().themeSurface(16.dp, c).padding(start = 14.dp, end = 8.dp, top = 8.dp, bottom = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text(L("Escuchar también aquí"), style = Typo.subheadline.semibold, color = c.label)
+                Text(L("Suena lo mismo que en el móvil de {0}, a la vez.", jam.host), style = Typo.footnote, color = c.secondaryLabel)
+            }
+            app.libremusic.ui.IosToggle(state.listenHere, { JamService.setListenHere(it) }, label = L("Escuchar también aquí"))
+        }
+    }
+}
+
 @Composable
 private fun LiveBadge(live: Boolean, tint: Color) {
     val c = Libre.colors
@@ -454,8 +485,8 @@ private fun Members(members: List<String>) {
         val names = when (members.size) {
             0 -> ""
             1 -> L("Sólo {0} por ahora", members[0])
-            2 -> "${members[0]} y ${members[1]}"
-            3 -> "${members[0]}, ${members[1]} y ${members[2]}"
+            2 -> L("{0} y {1}", members[0], members[1])
+            3 -> L("{0}, {1} y {2}", members[0], members[1], members[2])
             else -> L("{0}, {1} y {2} más", members[0], members[1], members.size - 2)
         }
         Text(names, style = Typo.subheadline.medium, color = c.label, maxLines = 2)

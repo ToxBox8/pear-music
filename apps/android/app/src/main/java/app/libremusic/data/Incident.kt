@@ -67,12 +67,26 @@ object Incident {
     }
 
     /** Pide el estado al Worker (al abrir la app). Cualquier fallo deja el estado como estaba. */
+    /**
+     * Los servidores de Pear (Cloudflare) no responden pero YouTube sí (2.5 de x.1.1): casi siempre, los bloqueos de
+     * LaLiga a Cloudflare durante el fútbol. La música sigue; Inicio lo dice para que no parezca que la app falla.
+     */
+    private val _unreachable = MutableStateFlow(false)
+    val unreachable: StateFlow<Boolean> = _unreachable.asStateFlow()
+
     suspend fun refresh(c: Context, nowMs: Long = System.currentTimeMillis()) = withContext(Dispatchers.IO) {
-        val body = runCatching {
+        val answer = runCatching {
             YTClient.http.newCall(Request.Builder().url(URL).build()).execute().use { if (it.code == 200) it.body?.string() else null }
-        }.getOrNull() ?: return@withContext
+        }
+        // Sin respuesta (no un error del servidor): ¿llega YouTube? Entonces es un bloqueo, no falta de red.
+        _unreachable.value = answer.isFailure && youtubeAnswers()
+        val body = answer.getOrNull() ?: return@withContext
         accept(c, body, nowMs)
     }
+
+    private fun youtubeAnswers(): Boolean = runCatching {
+        YTClient.http.newCall(Request.Builder().url("https://www.youtube.com/generate_204").build()).execute().use { it.code == 204 }
+    }.getOrDefault(false)
 
     /** Acepta un sobre { payload, sig } si está bien firmado y su contador no es viejo. */
     fun accept(c: Context, envelope: String, nowMs: Long, publicKeyB64: String = PUBLIC_KEY): Boolean {

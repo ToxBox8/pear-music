@@ -7,10 +7,11 @@ import app.libremusic.data.Incident
 import app.libremusic.playback.PlaylistWidget
 import app.libremusic.playback.RecentsWidget
 import app.libremusic.data.Telemetry
+import app.libremusic.jam.JamPlaybackSync
+import app.libremusic.data.PlaylistShare
 import app.libremusic.data.Updates
 import app.libremusic.avisos.AvisosRepo
 import androidx.compose.runtime.snapshotFlow
-import app.libremusic.ui.theme.rememberSettingsTop
 import app.libremusic.data.AppShortcuts
 import app.libremusic.data.TabOrder
 import android.provider.Settings
@@ -134,7 +135,7 @@ import kotlin.math.roundToInt
 @Composable
 fun LibreMusicApp(jamCode: String?, onDismissJam: () -> Unit, onBarsDark: (Boolean) -> Unit = {}) {
     val start = remember {
-        TabOrder.run { start(Prefs.lastTab, visible(Prefs.tabOrder.value, Prefs.searchPlacement.value == "tab")) }
+        TabOrder.run { start(Prefs.lastTab, visible(Prefs.tabOrder.value, Prefs.searchPlacement.value == "tab") - SETTINGS) }
     }
     LibreMusicRoot(remember { AppState().apply { tab = Tab.of(start) } }, viewModel(), viewModel(), viewModel(), viewModel(), jamCode, onDismissJam, onBarsDark)
 }
@@ -153,7 +154,7 @@ fun LibreMusicRoot(
     forceReduceMotion: Boolean? = null,
 ) {
     val context = LocalContext.current
-    val player by playerVm.state.collectAsState()
+    val player by playerVm.track.collectAsState()
     val searchPlacement by Prefs.searchPlacement.collectAsState()
     val deck by Prefs.deck.collectAsState()
     val liquidGlass by Prefs.liquidGlass.collectAsState()
@@ -171,17 +172,19 @@ fun LibreMusicRoot(
 
     val tabOrder by Prefs.tabOrder.collectAsState()
     val barStyle by Prefs.barStyle.collectAsState()
-    // Barra estilo SimpMusic: en la cápsula van tus pestañas sin Buscar (es un círculo aparte). Ajustes puede ir en
-    // la barra o arriba en Inicio, junto al Jam (Ajustes › Aspecto; por defecto arriba con esta barra y en la barra
-    // con la clásica). Lo que no está en la barra sigue montado para conservar su pila.
+    // Barra estilo SimpMusic: en la cápsula van tus pestañas sin Buscar (es un círculo aparte). Ajustes nunca va en
+    // la barra: está arriba a la izquierda en Inicio (lo decidió Toxbox, 21-10-2026). Lo que no está en la barra
+    // sigue montado para conservar su pila.
     val simpBar = barStyle == "simpmusic"
-    val settingsTop = rememberSettingsTop()
     val showDiscover by Prefs.showDiscover.collectAsState()
-    val tabs = TabOrder.visible(tabOrder, !simpBar && searchPlacement == "tab", showDiscover).map(Tab::of)
-        .filter { !(settingsTop && it == Tab.Settings) }
+    // Recordadas: una lista nueva en cada recomposición reiniciaba el gesto de la barra (pointerInput(tabs)) y
+    // obligaba a recomponerla entera.
+    val tabs = remember(tabOrder, simpBar, searchPlacement, showDiscover) {
+        TabOrder.visible(tabOrder, !simpBar && searchPlacement == "tab", showDiscover).map(Tab::of).filter { it != Tab.Settings }
+    }
     // Descubrir apagado mientras se estaba en ella: a Inicio.
     LaunchedEffect(showDiscover) { if (!showDiscover && app.tab == Tab.Discover) app.tab = Tab.Home }
-    val shownTabs = (tabs + listOfNotNull(Tab.Search.takeIf { simpBar }, Tab.Settings.takeIf { settingsTop })).distinct()
+    val shownTabs = remember(tabs, simpBar) { (tabs + listOfNotNull(Tab.Search.takeIf { simpBar }, Tab.Settings)).distinct() }
     LaunchedEffect(searchPlacement, simpBar) { if (!simpBar && app.tab == Tab.Search && searchPlacement != "tab") app.tab = Tab.Home }
     // Deslizar entre pestañas: estado compartido entre el contenido y las barras (ver TabPager).
     val pager = remember { TabPager() }
@@ -193,6 +196,18 @@ fun LibreMusicRoot(
     val bgColor = Libre.colors.background
     val simpBackdrop = rememberLayerBackdrop { drawRect(bgColor); drawContent() }
     LaunchedEffect(app.tab, simpBar) { barCollapsed = false }
+    // «Buscar vuelve al parar» (2.10 de x.1.1): 1,5 s sin desplazar en Inicio y la barra se despliega otra vez. La hora
+    // del último desplazamiento no es estado: así desplazar no recompone la raíz en cada fotograma.
+    val lastScroll = remember { longArrayOf(0L) }
+    val restoreIdle by Prefs.barRestoreIdle.collectAsState()
+    LaunchedEffect(barCollapsed, restoreIdle, app.tab) {
+        if (!BarIdle.restores(restoreIdle, barCollapsed, app.tab == Tab.Home)) return@LaunchedEffect
+        while (true) {
+            val wait = BarIdle.DELAY_MS - (android.os.SystemClock.uptimeMillis() - lastScroll[0])
+            if (wait <= 0) { barCollapsed = false; break }
+            kotlinx.coroutines.delay(wait)
+        }
+    }
     val collapseOnScroll = remember {
         object : androidx.compose.ui.input.nestedscroll.NestedScrollConnection {
             override fun onPostScroll(consumed: Offset, available: Offset, source: androidx.compose.ui.input.nestedscroll.NestedScrollSource): Offset {
@@ -200,6 +215,7 @@ fun LibreMusicRoot(
                 // si al subir sobra recorrido, la lista ha llegado arriba.
                 if (consumed.y < 0f) barCollapsed = true
                 if (available.y > 0f) barCollapsed = false
+                if (consumed.y != 0f) lastScroll[0] = android.os.SystemClock.uptimeMillis()
                 return Offset.Zero
             }
         }
@@ -250,16 +266,9 @@ fun LibreMusicRoot(
     // Telemetría: sólo con consentimiento (Telemetry.kt); mide mientras la app está a la vista.
     LifecycleEventEffect(Lifecycle.Event.ON_RESUME) { Telemetry.onForeground(context.applicationContext) }
     LifecycleEventEffect(Lifecycle.Event.ON_STOP) { avisosScope.launch { Telemetry.onBackground(context.applicationContext) } }
-    LifecycleEventEffect(Lifecycle.Event.ON_START) {
-        // Estado de incidencias firmado (Fase 4): al abrir; sin red, se queda el último válido.
-        avisosScope.launch { Incident.refresh(context.applicationContext) }
-        avisosScope.launch { AvisosRepo.refrescarAlAbrir(context.applicationContext) }
-        // Instalaciones activas: un contador por versión, una vez al día y sin identificadores.
-        avisosScope.launch {
-            Ficha.pingActive(context.applicationContext)
-            Ficha.reportDecision(context.applicationContext)
-        }
-        // Versión nueva (sólo la variante pública, como mucho cada 6 h): novedades, «Descargar» o «Recordarme mañana».
+    // Comprueba la versión y, si hay una nueva, enseña el aviso. También desde el aviso de «versión antigua» de Inicio
+    // (0.5 de x.1.1), que sube `app.updateTick`.
+    fun checkUpdates() {
         avisosScope.launch {
             val release = Updates.check(context.applicationContext) ?: return@launch
             app.alert = AlertSpec(
@@ -292,6 +301,19 @@ fun LibreMusicRoot(
             )
         }
     }
+    LaunchedEffect(app.updateTick) { if (app.updateTick > 0) { Updates.forceRecheck(context.applicationContext); checkUpdates() } }
+    LifecycleEventEffect(Lifecycle.Event.ON_START) {
+        // Estado de incidencias firmado (Fase 4): al abrir; sin red, se queda el último válido.
+        avisosScope.launch { Incident.refresh(context.applicationContext) }
+        avisosScope.launch { AvisosRepo.refrescarAlAbrir(context.applicationContext) }
+        // Instalaciones activas: un contador por versión, una vez al día y sin identificadores.
+        avisosScope.launch {
+            Ficha.pingActive(context.applicationContext)
+            Ficha.reportDecision(context.applicationContext)
+        }
+        // Versión nueva (sólo la variante pública, como mucho cada 6 h): novedades, «Descargar» o «Recordarme mañana».
+        checkUpdates()
+    }
 
     // Pulsar una notificación de aviso abre Avisos (también con la app ya abierta).
     val abrirAvisos by AvisosRepo.abrir.collectAsState()
@@ -312,6 +334,8 @@ fun LibreMusicRoot(
         ProvideApp(app) {
             val env = ScreenEnv(app, playerVm, libraryVm, homeVm)
             FirstStepsWatcher(env)
+            // Jam «cada uno en su móvil» (2.6 de x.1.1): sigue al anfitrión con el reproductor de aquí.
+            JamPlaybackSync(playerVm)
             CompositionLocalProvider(LocalEnv provides env) {
                 Box(Modifier.fillMaxSize().background(Libre.colors.background)) {
                     // Atrás dentro de una pestaña: lo gestiona TabStack (gesto del sistema con vista previa).
@@ -442,6 +466,21 @@ fun LibreMusicRoot(
                     Sheet(visible = app.showJam, onDismiss = { app.showJam = false; onDismissJam() }) {
                         JamScreen(playerVm, libraryVm, initialCode = jamCode, onClose = { app.showJam = false; onDismissJam() })
                     }
+                    // Compartir una playlist con un QR (0.6 de x.1.1).
+                    Sheet(app.sharing != null, { app.sharing = null }) {
+                        val libNow by libraryVm.data.collectAsState()
+                        libNow.playlists.firstOrNull { it.id == app.sharing }?.let { SharePlaylistContent(it, hasPhoto = libraryVm.coverFile(it.id).exists()) }
+                    }
+                    // Playlist recibida por QR o enlace (0.6 de x.1.1): vista previa y «Añadir a la biblioteca».
+                    val shared by PlaylistShare.incoming.collectAsState()
+                    Sheet(shared != null, { PlaylistShare.incoming.value = null }) {
+                        shared?.let { payload ->
+                            SharedPlaylistContent(payload) { p ->
+                                PlaylistShare.incoming.value = null
+                                if (p != null) { app.select(Tab.Library); app.push(Route.PlaylistR(p.id)) }
+                            }
+                        }
+                    }
                     Sheet(visible = app.editing != null, onDismiss = { app.editing = null }) {
                         app.editing?.let { PlaylistEditor(it, onDone = { app.editing = null }) }
                     }
@@ -503,6 +542,7 @@ fun LibreMusicRoot(
 
                     // Estado de incidencias (Fase 4): aviso o modo seguro arriba; bloqueo total a pantalla completa.
                     IncidentOverlay()
+                    SimulatedVersionRibbon()
 
                     app.alert?.let { AlertHost(it, onDismiss = { app.alert = null }) }
                     Toast(app.toast)
@@ -537,6 +577,7 @@ fun RouteScreen(route: Route) {
         Route.Albums -> AlbumsScreen()
         Route.ArtworkColors -> ArtworkColorsScreen()
         Route.TabOrderR -> TabOrderScreen()
+        Route.BarR -> BarScreen()
         Route.DownloadsSettings -> DownloadsSettingsScreen()
         Route.Help -> HelpScreen()
         Route.MyData -> MyDataScreen()
@@ -901,4 +942,10 @@ private fun Toast(text: String?) {
             )
         }
     }
+}
+
+/** «Buscar vuelve al parar» (2.10 de x.1.1): cuándo se despliega sola la barra SimpMusic. Igual que `HomeScroll` en iOS. */
+object BarIdle {
+    const val DELAY_MS = 1_500L
+    fun restores(enabled: Boolean, collapsed: Boolean, onHome: Boolean) = enabled && collapsed && onHome
 }

@@ -105,8 +105,9 @@ private val introSteps get() = listOf(
     TourStep(listOf("tab:discover"), L("Descubrir"), L("Fragmentos de canciones que te pueden gustar, a pantalla completa. Desliza para la siguiente y toca dos veces para «Me gusta». Si no lo usas, deslízalo a la izquierda en Ajustes › Aspecto › Pestañas."), Tab.Discover),
     TourStep(listOf("tab:home"), L("Inicio"), L("Lo último que has escuchado, radios hechas para ti, lo nuevo de tus artistas y lo que fijes arriba. La campana trae los avisos de Pear Music."), Tab.Home),
     TourStep(listOf("jam"), L("Jam"), L("Una playlist compartida con quien esté contigo, aunque tenga un iPhone. Escanea el QR para entrar al momento, o escribe el código."), null),
+    // Ajustes es el engranaje de arriba a la izquierda en Inicio (fase 0 de x.1.1): va mientras Inicio está a la vista.
+    TourStep(listOf("tab:settings"), L("Ajustes"), L("Tema, reproductor (casete, vinilo, Air), widgets, tu cuenta opcional, tus datos y ayuda."), null),
     TourStep(listOf("tab:library"), L("Biblioteca"), L("Tus playlists, favoritos y descargas, también sin conexión. Fija arriba lo que más escuches con la chincheta y toca un artista para ver toda su discografía."), Tab.Library),
-    TourStep(listOf("tab:settings"), L("Ajustes"), L("Tema, reproductor (casete, vinilo, Air), widgets, tu cuenta opcional, tus datos y ayuda."), Tab.Settings),
 )
 
 /** Abre Ajustes con esta pila (vacía = la pantalla principal). */
@@ -126,10 +127,12 @@ val settingsGuideSteps get() = listOf(
     row(L("Tema"), L("Cristal (luz con los colores de la carátula), Aire (plata), Neón (synthwave) o Sistema. Y claro, oscuro o según el móvil."), Route.Appearance),
     row(L("Reproductor"), L("Normal, Casete, Vinilo o Air. También se cambia manteniendo pulsado el mini reproductor."), Route.Appearance),
     row(L("Colores de la portada"), L("La app y el reproductor toman los colores de la canción que suena. Elige dónde y cuánto, con presets o a tu gusto."), Route.Appearance),
-    row(L("Pestañas"), L("Ordena las pestañas arrastrándolas. Desliza Descubrir a la izquierda para quitarla de la barra."), Route.Appearance),
-    row(L("Barra inferior"), L("La clásica o la estilo SimpMusic: cápsula de cristal con una gota que arrastras, Buscar aparte y plegado al bajar."), Route.Appearance),
-    row(L("Ajustes"), L("Ajustes puede ir en la barra o arriba en Inicio, junto al Jam."), Route.Appearance),
-    row(L("Cristal líquido"), L("Barras, botones y menús de cristal que refractan lo que hay detrás, como en iOS 26."), Route.Appearance),
+    // Sección Barra (2.11 de x.1.1): estilo, dónde está Buscar, cristal líquido y pestañas, todo dentro.
+    row(L("Barra"), L("La barra de abajo: su estilo, dónde está Buscar y el orden de las pestañas, todo junto."), Route.Appearance),
+    row(L("Barra inferior"), L("La clásica o la estilo SimpMusic: cápsula de cristal con una gota que arrastras, Buscar aparte y plegado al bajar."), Route.Appearance, Route.BarR),
+    row(L("Dónde está Buscar"), L("Con la clásica, una barra arriba en Inicio o una pestaña aparte. Con la SimpMusic, el círculo de la derecha, que vuelve si dejas de bajar."), Route.Appearance, Route.BarR),
+    row(L("Cristal líquido"), L("Barras, botones y menús de cristal que refractan lo que hay detrás, como en iOS 26."), Route.Appearance, Route.BarR),
+    row(L("Pestañas"), L("Ordena las pestañas arrastrándolas. Desliza Descubrir a la izquierda para quitarla de la barra."), Route.Appearance, Route.BarR),
     row(L("Idioma"), L("Castellano, català, valencià, galego, euskara, English, Esperanto y português. Cambia al momento.")),
     row(L("Widgets"), L("Cinco widgets para la pantalla de inicio: Ahora suena (pequeño y grande), accesos rápidos, una playlist fijada y recientes.")),
     row(L("Calidad al escuchar"), L("Máxima, o ahorro de datos cuando no tienes wifi. Las descargas siempre van a la máxima."), Route.Audio),
@@ -140,7 +143,6 @@ val settingsGuideSteps get() = listOf(
     row(L("Descargas"), L("Cuánto ocupan tus canciones descargadas y borrarlas.")),
     row(L("Ordenar playlists por"), L("Recientes, A-Z, Z-A, por tamaño o a mano. Con «Editar playlists» las ordenas arrastrando."), Route.LibraryOptions),
     row(L("Descargadas y Favoritos"), L("Como portada grande en Playlists o como fila en «Tu música»."), Route.LibraryOptions),
-    row(L("Dónde está Buscar"), L("Una barra arriba en Inicio o una pestaña aparte."), Route.LibraryOptions),
     row(L("Avisos"), L("Las caídas y novedades de Pear Music, también como notificación si quieres."), Route.Help),
     row(L("Guía inicial"), L("Vuelve a ver la bienvenida, el recorrido y las historias."), Route.Help),
     row(L("Tus datos"), L("Exporta todo lo que la app guarda de ti en un archivo o bórralo. Aquí también se activa o se quita la telemetría."), Route.Help),
@@ -150,10 +152,11 @@ val settingsGuideSteps get() = listOf(
 
 /** Recorrido de lo nuevo de la 1.1 (lo abre el panel de novedades). Igual que en iOS. */
 val whatsNewSteps get() = listOf(
-    TourStep(listOf("settings:guide"), L("Guía de Ajustes"), L("Nueva: te lleva por todos los Ajustes y te explica cada opción. Está junto a la carta."), enter = { openSettings() }),
-    row(L("Idioma"), L("Ya puedes usar Pear Music en português. Y «Español» ahora se llama «Castellano».")),
-    TourStep(listOf("settings:mail"), L("Buzón y errores"), L("Con cada reporte o sugerencia va la ficha de tu móvil (modelo y versiones), para ayudarte antes."), enter = { openSettings() }),
-    TourStep(emptyList(), L("Y además"), L("Al descargar una versión nueva ves el progreso, y la barra clásica ya no marca Descubrir cuando estás en Ajustes."), enter = { openSettings() }),
+    // 1.2 (x.1.1)
+    row(L("Barra"), L("Nuevo: el estilo de la barra, dónde está Buscar, el cristal líquido y las pestañas, todo aquí."), Route.Appearance),
+    row(L("Buscar vuelve al parar"), L("Con la barra estilo SimpMusic, si dejas de bajar por Inicio la barra vuelve entera."), Route.Appearance, Route.BarR),
+    row(L("Descubrir"), L("Lo que marcaste con «No me interesa». Vacíalo cuando quieras."), Route.LibraryOptions),
+    TourStep(emptyList(), L("Y además"), L("Comparte una playlist con el QR de su pantalla, y en el Jam elige que suene en el móvil de cada uno."), enter = { openSettings() }),
 )
 
 /**

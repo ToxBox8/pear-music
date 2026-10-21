@@ -1027,3 +1027,91 @@
 1027	Já podes usar o Pear Music em português. E «Español» agora chama-se «Castellano».
 1028	{0} de {1}
 1029	Pronto!
+1030	 As Definições estão em cima, no Início, e não entram na ordem.
+1031	Ordenar à mão
+1032	Entrar
+1033	Ver as minhas playlists
+1034	A verificar…
+1035	Sempre
+1036	Abrimos o teu pedido
+1037	Entrar mesmo assim (Dev)
+1038	Estamos a tratar disso
+1039	Abrimos o teu pedido e estamos a analisá-lo. Vamos avisar-te aqui.
+1040	MANUTENÇÃO ATIVA
+1041	Resolvido! Obrigado
+1042	 · vidro líquido
+1043	Barra
+1044	Pesquisar é o círculo da direita. Ao descer no Início a barra recolhe; se parares 1,5 segundos, volta inteira.
+1045	Pesquisar volta ao parar
+1046	Com a clássica, uma barra no topo do Início ou um separador à parte. Com a SimpMusic, o círculo da direita, que volta quando paras de descer.
+1047	A barra de baixo: o estilo, onde está Pesquisar e a ordem dos separadores, tudo junto.
+1048	Apaga a pesquisa para mudar a ordem.
+1049	Anular
+1050	As músicas que marcaste com «Não me interessa» não voltam a aparecer, e um artista com três num mês deixa de aparecer durante 30 dias. Só fica guardado neste telemóvel.
+1051	O que não te interessa
+1052	Mantém premida uma capa e arrasta-a para mudar a ordem.
+1053	Não me interessa
+1054	Não voltará a aparecer em Descobrir.
+1055	Esvaziar
+1056	Esvaziar o que não te interessa
+1057	{0} músicas
+1058	Atualizar
+1059	{0} relatórios apagados
+1060	Apagar o registo da web
+1061	Esta versão é antiga
+1062	Forçar recolha
+1063	A app pensa que é a {0}. Sai e volta para ver o aviso.
+1064	A música continua a funcionar. Se houver futebol, pode ser pelos bloqueios da LaLiga: os avisos e o suporte voltam quando o jogo acabar.
+1065	Os servidores do Pear não respondem
+1066	Para repetir as boas-vindas ou ver os avisos sem reinstalar. Não tocam na tua biblioteca nem nas tuas transferências.
+1067	Para ver o aviso de versão nova
+1068	Pedido. As apps vão vê-lo no seu sinal diário.
+1069	Testes
+1070	Pode falhar. Atualiza para teres as correções.
+1071	Reiniciar as boas-vindas
+1072	Todos os relatórios guardados são apagados. As fichas dos relatórios de erros não são tocadas. Não se pode desfazer.
+1073	Segunda confirmação: o painel fica vazio.
+1074	Simular versão antiga
+1075	VERSÃO SIMULADA: {0}
+1076	Ver as novidades outra vez
+1077	Apagar toda a telemetria da web?
+1078	Tens a certeza?
+1079	Cada um no seu telemóvel
+1080	De {0} · {1}
+1081	Onde toca
+1082	Ouvir também aqui
+1083	O que toca aqui toca ao mesmo tempo no telemóvel de cada um, com o seu próprio áudio. Põe algo da lista.
+1084	Toca o mesmo que no telemóvel de {0}, ao mesmo tempo.
+1085	Só toca neste telemóvel; os outros juntam músicas.
+1086	Um altifalante
+1087	{0} e {1}
+1088	{0}, {1} e {2}
+1089	 A foto da capa não cabe no QR.
+1090	A adicionar…
+1091	Adicionar à biblioteca
+1092	Partilhar com QR
+1093	Partilhar ligação
+1094	Código QR de {0}
+1095	Lê-o com a câmara de outro telemóvel com o Pear Music. Vão o nome, as {0} músicas e a sua ordem.
+1096	Esta playlist está vazia.
+1097	Não foi possível carregar as músicas. Verifica a ligação e tenta outra vez.
+1098	Playlist partilhada
+1099	Sem nome
+1100	Tem demasiadas músicas para um QR (no máximo {0}).
+1101	{0} músicas não estão no YouTube Music e ficaram de fora.
+1102	Definições, em cima à esquerda
+1103	Biblioteca ao teu gosto
+1104	Partilha playlists com um QR
+1105	Partilha uma playlist com o QR do seu ecrã e, no Jam, escolhe que toque no telemóvel de cada um.
+1106	Com a barra estilo SimpMusic, se parares de descer no Início a barra volta inteira.
+1107	Em Descobrir, em «⋯». Essa música não volta e, se um artista não é para ti, deixa de aparecer durante um tempo.
+1108	No Início. E em Definições › Aspeto › Barra está tudo o que é da barra junto.
+1109	Jam: cada um no seu telemóvel
+1110	O que marcaste com «Não me interessa». Esvazia quando quiseres.
+1111	Novo: o estilo da barra, onde está Pesquisar e os separadores, tudo aqui.
+1112	Novo: o estilo da barra, onde está Pesquisar, o vidro líquido e os separadores, tudo aqui.
+1113	Outro telemóvel lê-o com a câmara e leva-a com as músicas e a ordem.
+1114	Playlists em grelha, como Os teus álbuns. Mantém premida uma capa e arrasta-a para as ordenar.
+1115	Quem cria o Jam escolhe: tocar num altifalante ou no telemóvel de cada um ao mesmo tempo, com os seus auscultadores.
+1116	Aparecem com a sua capa no início da pasta Playlists, em «A tua música».
+1117	Toca no pionés numa playlist ou num álbum e tê-lo-ás aqui, pela ordem que quiseres.

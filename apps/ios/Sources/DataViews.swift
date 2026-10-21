@@ -48,7 +48,7 @@ struct MyDataView: View {
 
             Section {
                 Button(role: .destructive) { confirmErase = true } label: {
-                    Label("Borrar todos mis datos", systemImage: "trash.fill")
+                    Label(L("Borrar todos mis datos"), systemImage: "trash.fill")
                 }
             } footer: {
                 Text(L("Borra la biblioteca, las descargas, las estadísticas y los ajustes, y cierra la app. No se puede deshacer."))
@@ -104,12 +104,44 @@ struct AdminView: View {
             }
             .glassRow()
 
+            AdminTests()
             TelemetryAdmin()
             PanicPanel()
         }
         .navigationTitle(L("Administración"))
         .navigationBarTitleDisplayMode(.inline)
         .themed()
+    }
+}
+
+/// Pruebas (2.2 de x.1.1): repetir la bienvenida o las novedades y ver el aviso de versión nueva sin instalar nada.
+/// Ninguna toca la biblioteca ni las descargas. Igual que `AdminTests` en Android.
+private struct AdminTests: View {
+    @ObservedObject private var updates = Updates.shared
+
+    var body: some View {
+        Section {
+            Button(L("Reiniciar la bienvenida")) {
+                let d = UserDefaults.standard
+                d.set(WhatsNew.current, forKey: "whatsNewSeen")
+                d.set("", forKey: "firstSteps")
+                d.set("", forKey: "introStage")
+                d.set(false, forKey: "onboarded")
+            }
+            Button(L("Ver las novedades otra vez")) { UserDefaults.standard.set("", forKey: "whatsNewSeen") }
+            Toggle(isOn: Binding(get: { updates.simulated != nil }, set: { updates.simulate($0 ? "2.0.0" : nil) })) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(L("Simular versión antigua"))
+                    Text(updates.simulated.map { L("La app se cree la {0}. Sal y vuelve para ver el aviso.", $0) } ?? L("Para ver el aviso de versión nueva"))
+                        .font(.footnote).foregroundStyle(.secondary)
+                }
+            }
+        } header: {
+            Text(L("Pruebas"))
+        } footer: {
+            Text(L("Para repetir la bienvenida o ver los avisos sin reinstalar. No tocan tu biblioteca ni tus descargas."))
+        }
+        .glassRow()
     }
 }
 
@@ -204,7 +236,7 @@ struct TelemetryAdmin: View {
                     result = n.map { L("Enviado ({0} campos)", $0) } ?? L("No se pudo enviar")
                     busy = false
                 }
-            } label: { Label("Enviar ahora", systemImage: "paperplane") }
+            } label: { Label(L("Enviar ahora"), systemImage: "paperplane") }
             .disabled(busy)
             if let result { Text(result).font(.footnote).foregroundStyle(.secondary) }
         } header: {

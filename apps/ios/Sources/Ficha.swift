@@ -45,9 +45,10 @@ enum Ficha {
         f.dateFormat = "yyyy-MM-dd"
         let today = f.string(from: now)
         guard UserDefaults.standard.string(forKey: "ficha.activeDay") != today else { return }
-        if await post("/activo", ["platform": "ios", "channel": Channel.current, "app_version": AboutView.version]) {
-            UserDefaults.standard.set(today, forKey: "ficha.activeDay")
-        }
+        guard let answer = await postForJSON("/activo", ["platform": "ios", "channel": Channel.current, "app_version": AboutView.version]) else { return }
+        UserDefaults.standard.set(today, forKey: "ficha.activeDay")
+        // «Forzar extracción» del panel (2.12 de x.1.1): Telemetry decide si se atiende (consentimiento y texto).
+        if let orden = answer["orden"] as? String, !orden.isEmpty { await Telemetry.shared.sendForced(orden) }
     }
 
     /// Manda la decisión sobre la telemetría si aún no se ha mandado o ha cambiado.
@@ -60,6 +61,17 @@ enum Ficha {
         var body: [String: Any] = ["platform": "ios", "channel": Channel.current, "app_version": AboutView.version, "decision": now]
         if let sent { body["antes"] = sent }
         if await post("/consentimiento", body) { d.set(now, forKey: "ficha.decision") }
+    }
+
+    /// El cuerpo de la respuesta si fue bien (vacío = `[:]`), o nil.
+    private static func postForJSON(_ path: String, _ body: [String: Any]) async -> [String: Any]? {
+        guard let url = URL(string: base + path), let data = try? JSONSerialization.data(withJSONObject: body) else { return nil }
+        var r = URLRequest(url: url)
+        r.httpMethod = "POST"
+        r.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        r.httpBody = data
+        guard let (out, resp) = try? await URLSession.shared.data(for: r), (200..<300).contains((resp as? HTTPURLResponse)?.statusCode ?? 0) else { return nil }
+        return (try? JSONSerialization.jsonObject(with: out)) as? [String: Any] ?? [:]
     }
 
     private static func post(_ path: String, _ body: [String: Any]) async -> Bool {

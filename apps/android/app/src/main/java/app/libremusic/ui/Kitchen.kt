@@ -145,7 +145,7 @@ val UiEaseOut = CubicBezierEasing(Tokens.Motion.EaseOut[0], Tokens.Motion.EaseOu
 fun <T> uiEaseOut(ms: Int = 180) = tween<T>(ms, easing = UiEaseOut)
 
 /** «1 canción», «12 canciones». */
-fun songCount(n: Int): String = if (n == 1) L("1 canción") else "$n canciones"
+fun songCount(n: Int): String = if (n == 1) L("1 canción") else L("{0} canciones", n)
 
 /** "3:08" a partir de segundos. */
 fun timeString(seconds: Double): String {
@@ -658,6 +658,8 @@ fun ContextMenu(
     onDismiss: () -> Unit,
     entries: List<MenuEntry>,
     preview: (@Composable () -> Unit)? = null,
+    /** Sobre vídeo o carátulas (Descubrir): fondo casi opaco para que se lea bien (2.7 de x.1.1). */
+    opaque: Boolean = false,
 ) {
     if (!expanded) return
     val c = Libre.colors
@@ -747,7 +749,10 @@ fun ContextMenu(
                             }
                             .widthIn(min = 250.dp, max = 280.dp)
                             .then(
-                                if (glass) Modifier.liquidGlass(menuShape, c.dark, GlassStyle.Menu).clip(menuShape)
+                                if (glass && opaque) Modifier.liquidGlass(menuShape, c.dark, GlassStyle.Menu).clip(menuShape).background(c.background.copy(alpha = 0.92f))
+                                else if (glass) Modifier.liquidGlass(menuShape, c.dark, GlassStyle.Menu).clip(menuShape)
+                                else if (opaque) Modifier.shadow(24.dp, menuShape, ambientColor = Color.Black.copy(0.25f), spotColor = Color.Black.copy(0.25f))
+                                    .clip(menuShape).background(c.background.copy(alpha = 0.96f))
                                 else Modifier.shadow(24.dp, menuShape, ambientColor = Color.Black.copy(0.25f), spotColor = Color.Black.copy(0.25f))
                                     .clip(menuShape).background(material(c.dark, thick = true))
                                     // «Colores de la carátula»: el menú toma un toque del color de la canción.

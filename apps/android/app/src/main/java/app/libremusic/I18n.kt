@@ -61,6 +61,12 @@ object I18n {
         _lang.value = l
     }
 
+    /**
+     * Idioma que se pide a YouTube Music (`hl`): los títulos de las estanterías de Inicio vienen de allí (1.8 de
+     * x.1.1). YouTube no tiene valenciano ni esperanto: catalán e inglés.
+     */
+    val youtubeHl: String get() = when (val l = _lang.value) { "va" -> "ca"; "eo" -> "en"; else -> l }
+
     fun t(s: String): String = table[s] ?: s
 }
 

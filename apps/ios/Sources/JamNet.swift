@@ -16,6 +16,53 @@ struct JamWire: Codable {
     var entry: JamEntry? = nil
     var songID: String? = nil
     var reason: String? = nil
+    // v2.1 «cada uno en su móvil» (2.6 de x.1.1): `play` (song, positionMs, atMs, playing), `ping` (t0), `pong` (t0, th).
+    var song: Song? = nil
+    var positionMs: Int64? = nil
+    var atMs: Int64? = nil
+    var playing: Bool? = nil
+    var t0: Int64? = nil
+    var th: Int64? = nil
+}
+
+/// «Cada uno en su móvil» (v2.1, 2.6 de x.1.1): reloj y correcciones, sin red para poder probarlo. Igual que
+/// `JamSync` en Android.
+enum JamSync {
+    static let speaker = "altavoz"
+    static let everyone = "todos"
+    /// Más de esto, salto; entre `nudgeMs` y esto, se ajusta la velocidad unos segundos (sin saltos audibles).
+    static let seekMs: Int64 = 250
+    static let nudgeMs: Int64 = 60
+    static let faster: Float = 1.03
+    static let slower: Float = 0.97
+    static let firstPings = 4
+    static let pingEvery: TimeInterval = 30
+
+    struct Sample: Equatable { let rtt: Int64; let offset: Int64 }
+
+    static func now() -> Int64 { Int64(Date().timeIntervalSince1970 * 1000) }
+
+    static func sample(t0: Int64, th: Int64, t1: Int64) -> Sample { Sample(rtt: t1 - t0, offset: th - (t0 + t1) / 2) }
+
+    /// Diferencia de reloj (hora del anfitrión − la nuestra): la media de las dos medidas más rápidas.
+    static func offset(_ samples: [Sample]) -> Int64? {
+        let best = samples.sorted { $0.rtt < $1.rtt }.prefix(2)
+        return best.isEmpty ? nil : best.map(\.offset).reduce(0, +) / Int64(best.count)
+    }
+
+    /// Dónde debería ir la canción ahora en este móvil.
+    static func expected(positionMs: Int64, atMs: Int64, playing: Bool, localNow: Int64, offset: Int64) -> Int64 {
+        playing ? positionMs + (localNow + offset - atMs) : positionMs
+    }
+
+    enum Correction: Equatable { case none, seek(Int64), speed(Float) }
+
+    static func correct(expected: Int64, actual: Int64) -> Correction {
+        let drift = expected - actual
+        if abs(drift) > seekMs { return .seek(expected) }
+        if abs(drift) >= nudgeMs { return .speed(drift > 0 ? faster : slower) }
+        return .none
+    }
 }
 
 enum JamV2 {

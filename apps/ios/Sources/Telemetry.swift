@@ -28,10 +28,17 @@ final class Telemetry: NSObject {
     /// El identificador de la telemetría, sólo si está activada (para unirla a la ficha del soporte).
     var installIfEnabled: String? { enabled ? install : nil }
 
+    /// Versión del texto de consentimiento que se enseña. La 2 añadirá «y a veces antes, si el responsable lo pide»
+    /// (2.12 de x.1.1): **hasta que Toxbox apruebe ese texto, sigue en 1** y nadie recibe el resumen «forzado».
+    static let consentText = 1
+    /// Desde qué texto aceptado se atiende «forzar».
+    private static let forcedFromText = 2
+
     func setConsent(_ on: Bool) {
         let was = enabled
         defaults.set(on, forKey: "telemetry.consent")
         defaults.set(Date(), forKey: "telemetry.consentAt")
+        defaults.set(on ? Self.consentText : 0, forKey: "telemetry.consentText")
         if was && !on, let old = defaults.string(forKey: "telemetry.install") {
             for k in ["telemetry.install", "telemetry.week", "telemetry.pending"] { defaults.removeObject(forKey: k) }
             Task.detached { await Self.deleteRemote(old) }
@@ -165,6 +172,17 @@ final class Telemetry: NSObject {
         }
         guard let pending = load("telemetry.pending") else { return }
         if await Self.post(summarize(pending, kind: "semanal")) { save(nil, "telemetry.pending") }
+    }
+
+    /// «Forzar extracción» del panel (2.12 de x.1.1): la orden llega en el latido diario (`/v1/activo`). Sólo la atiende
+    /// quien aceptó un texto que lo dice, en la variante pública; Pear Dev y pref no tienen envío automático. Manda la
+    /// semana en curso una vez por orden. Igual que Android.
+    func sendForced(_ orden: String) async {
+        guard Channel.current == "usr", defaults.bool(forKey: "telemetry.consent"), !Incident.restricted,
+              defaults.integer(forKey: "telemetry.consentText") >= Self.forcedFromText,
+              defaults.string(forKey: "telemetry.lastOrden") != orden else { return }
+        let body = summarize(load("telemetry.week") ?? Bucket(week: Self.isoWeek(), sessions: []), kind: "forzado")
+        if await Self.post(body) { defaults.set(orden, forKey: "telemetry.lastOrden") }
     }
 
     /// Pear Dev: manda ya la semana en curso con los campos elegidos. Devuelve cuántos campos se enviaron, o nil.
