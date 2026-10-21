@@ -110,7 +110,7 @@ jobs:
           cp app/build/outputs/apk/usr/release/app-usr-release.apk "dist/LibreMusic-android-$VERSION.apk"
           (cd dist && sha256sum *.apk > SHA256SUMS.txt && cat SHA256SUMS.txt)
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: LibreMusic-android
           path: apps/android/dist/
