@@ -13,7 +13,7 @@ coroutines = "1.9.0"
 orgJson = "20240303"
 zxing = "3.5.3"
 zxingEmbedded = "4.3.0"
-robolectric = "4.14.1"
+robolectric = "4.17"
 # Vidrio de la barra estilo SimpMusic (Kyant, Apache-2.0); exige Compose 1.12 y Kotlin 2.4.
 backdrop = "2.0.1"
 constraintlayoutCompose = "1.1.1"
