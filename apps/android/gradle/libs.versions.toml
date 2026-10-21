@@ -16,7 +16,7 @@ zxingEmbedded = "4.3.0"
 robolectric = "4.14.1"
 # Vidrio de la barra estilo SimpMusic (Kyant, Apache-2.0); exige Compose 1.12 y Kotlin 2.4.
 backdrop = "2.0.1"
-constraintlayoutCompose = "1.1.1"
+constraintlayoutCompose = "1.1.2"
 materialIcons = "1.7.8"
 roborazzi = "1.39.0"
 # Avisos en segundo plano (comprobar cada 15 min).
