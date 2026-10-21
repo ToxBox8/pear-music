@@ -18,7 +18,7 @@ robolectric = "4.14.1"
 backdrop = "2.0.1"
 constraintlayoutCompose = "1.1.1"
 materialIcons = "1.7.8"
-roborazzi = "1.39.0"
+roborazzi = "1.76.0"
 # Avisos en segundo plano (comprobar cada 15 min).
 work = "2.11.2"
 # Verificar la firma Ed25519 del estado de incidencias en Android 8–12 (Fase 4). Sin vulnerabilidades conocidas (OSV).
