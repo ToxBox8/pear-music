@@ -64,7 +64,7 @@ jobs:
           zip -qr "dist/LibreMusic-ios-$VERSION.ipa" Payload
           (cd dist && shasum -a 256 *.ipa > SHA256SUMS.txt && cat SHA256SUMS.txt)
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: LibreMusic-ios
           path: apps/ios/dist/
@@ -103,7 +103,7 @@ jobs:
       - name: Capturas
         run: scripts/screenshots.sh build/Build/Products/Debug-iphonesimulator/LibreMusic.app shots
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: LibreMusic-ios-screenshots
           path: apps/ios/shots/
