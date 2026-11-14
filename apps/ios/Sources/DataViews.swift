@@ -42,13 +42,13 @@ struct MyDataView: View {
                 .foregroundStyle(.primary)
                 .disabled(busy)
             } footer: {
-                Text(L("Pear Music no tiene cuentas ni servidor con tus datos: todo está en este móvil. El archivo lleva tu biblioteca, estadísticas, letras, borradores de soporte y ajustes; no las canciones descargadas."))
+                Text(L("Jiyu Pulse no tiene cuentas ni servidor con tus datos: todo está en este móvil. El archivo lleva tu biblioteca, estadísticas, letras, borradores de soporte y ajustes; no las canciones descargadas."))
             }
             .glassRow()
 
             Section {
                 Button(role: .destructive) { confirmErase = true } label: {
-                    Label("Borrar todos mis datos", systemImage: "trash.fill")
+                    Label(L("Borrar todos mis datos"), systemImage: "trash.fill")
                 }
             } footer: {
                 Text(L("Borra la biblioteca, las descargas, las estadísticas y los ajustes, y cierra la app. No se puede deshacer."))
@@ -73,6 +73,8 @@ struct MyDataView: View {
 /// Canal, registro reciente y botón de pánico. Sólo existe con `Channel.adminTools` (variante dev).
 struct AdminView: View {
     @State private var lines = Logs.recent
+    /// Modo demo con el catálogo del patrocinador (DemoCatalog.swift): se aplica al volver a abrir la app.
+    @AppStorage("demoCatalog") private var demoCatalog = false
 
     var body: some View {
         Form {
@@ -104,12 +106,51 @@ struct AdminView: View {
             }
             .glassRow()
 
+            Section {
+                Toggle(L("Catálogo del patrocinador"), isOn: $demoCatalog)
+            } footer: {
+                Text(L("Modo demo para grabar el tráiler: Inicio, búsqueda, artista, Biblioteca y descargas sólo con canciones de Michael Bennet, sin red. Se aplica al volver a abrir la app y no toca tu biblioteca."))
+            }
+            .glassRow()
+
+            AdminTests()
             TelemetryAdmin()
             PanicPanel()
         }
         .navigationTitle(L("Administración"))
         .navigationBarTitleDisplayMode(.inline)
         .themed()
+    }
+}
+
+/// Pruebas (2.2 de x.1.1): repetir la bienvenida o las novedades y ver el aviso de versión nueva sin instalar nada.
+/// Ninguna toca la biblioteca ni las descargas. Igual que `AdminTests` en Android.
+private struct AdminTests: View {
+    @ObservedObject private var updates = Updates.shared
+
+    var body: some View {
+        Section {
+            Button(L("Reiniciar la bienvenida")) {
+                let d = UserDefaults.standard
+                d.set(WhatsNew.current, forKey: "whatsNewSeen")
+                d.set("", forKey: "firstSteps")
+                d.set("", forKey: "introStage")
+                d.set(false, forKey: "onboarded")
+            }
+            Button(L("Ver las novedades otra vez")) { UserDefaults.standard.set("", forKey: "whatsNewSeen") }
+            Toggle(isOn: Binding(get: { updates.simulated != nil }, set: { updates.simulate($0 ? "2.0.0" : nil) })) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(L("Simular versión antigua"))
+                    Text(updates.simulated.map { L("La app se cree la {0}. Sal y vuelve para ver el aviso.", $0) } ?? L("Para ver el aviso de versión nueva"))
+                        .font(.footnote).foregroundStyle(.secondary)
+                }
+            }
+        } header: {
+            Text(L("Pruebas"))
+        } footer: {
+            Text(L("Para repetir la bienvenida o ver los avisos sin reinstalar. No tocan tu biblioteca ni tus descargas."))
+        }
+        .glassRow()
     }
 }
 
@@ -163,7 +204,7 @@ private struct PanicPanel: View {
         .alert("¿Publicar el nivel \(names[level] ?? "")?", isPresented: $confirm) {
             Button(L("Publicar"), role: .destructive) { send("", level: level) }
             Button(L("Cancelar"), role: .cancel) {}
-        } message: { Text(L("Afecta a todas las personas que usan Pear Music en cuanto abran la app.")) }
+        } message: { Text(L("Afecta a todas las personas que usan Jiyu Pulse en cuanto abran la app.")) }
     }
 
     private func send(_ path: String, level: Int? = nil) {
@@ -204,7 +245,7 @@ struct TelemetryAdmin: View {
                     result = n.map { L("Enviado ({0} campos)", $0) } ?? L("No se pudo enviar")
                     busy = false
                 }
-            } label: { Label("Enviar ahora", systemImage: "paperplane") }
+            } label: { Label(L("Enviar ahora"), systemImage: "paperplane") }
             .disabled(busy)
             if let result { Text(result).font(.footnote).foregroundStyle(.secondary) }
         } header: {

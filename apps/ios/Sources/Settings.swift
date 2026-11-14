@@ -8,7 +8,7 @@ struct RoutePicker: UIViewRepresentable {
         let v = AVRoutePickerView()
         v.prioritizesVideoDevices = false
         v.tintColor = .label
-        v.activeTintColor = UIColor(Tokens.Brand.violet)
+        v.activeTintColor = UIColor(Tokens.Brand.shu)
         return v
     }
     func updateUIView(_ uiView: AVRoutePickerView, context: Context) {}
@@ -104,32 +104,6 @@ struct SettingsRow: View {
     }
 }
 
-// MARK: Buscar
-struct SearchSettings: View {
-    @AppStorage("searchPlacement") private var searchPlacement = "home"
-
-    var body: some View {
-        Form {
-            Section {
-                Picker(L("Buscar"), selection: $searchPlacement) {
-                    Label("Barra arriba en Inicio", systemImage: "house").tag("home")
-                    Label("Pestaña aparte", systemImage: "magnifyingglass").tag("tab")
-                }
-                .pickerStyle(.inline)
-                .labelsHidden()
-            } header: { Text(L("Dónde buscar")).tourTarget("section:" + L("Dónde buscar")) } footer: {
-                Text(searchPlacement == "tab"
-                     ? L("Buscar tiene su propia pestaña en la barra de abajo.")
-                     : L("La barra de búsqueda está siempre arriba en Inicio y la pestaña Buscar desaparece."))
-            }
-            .glassRow()
-        }
-        .navigationTitle(L("Buscar"))
-        .navigationBarTitleDisplayMode(.inline)
-        .themed()
-    }
-}
-
 // MARK: Tema
 struct AppearanceSettings: View {
     @AppStorage("theme") private var themeID = AppTheme.glass.rawValue
@@ -204,7 +178,7 @@ struct ThemeCard: View {
                 if selected {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.title3).symbolRenderingMode(.palette)
-                        .foregroundStyle(.white, theme.accent)
+                        .foregroundStyle(theme.onAccent, theme.accent)
                         .padding(8)
                 }
             }
@@ -216,6 +190,9 @@ struct ThemeCard: View {
             }
         }
         .foregroundStyle(.primary)
+        // La vista previa no recibe toques (`BackdropPreview`): sin esto sólo respondía el texto de debajo y costaba
+        // elegir el tema (1.9 de x.1.1). Toda la tarjeta cuenta.
+        .contentShape(Rectangle())
     }
 }
 
@@ -254,7 +231,7 @@ struct PlayerSettings: View {
 struct LibrarySettings: View {
     @AppStorage("playlistSort") private var sort = "recent"
     @AppStorage("smartPlacement") private var placement = "playlists"
-    @AppStorage("searchPlacement") private var searchPlacement = "home"
+    @ObservedObject private var skip = ReelsSkip.shared
     @State private var showReorder = false
 
     var body: some View {
@@ -273,7 +250,7 @@ struct LibrarySettings: View {
             .glassRow()
 
             Section {
-                Button { showReorder = true } label: { Label("Ordenar a mano", systemImage: "line.3.horizontal") }
+                Button { showReorder = true } label: { Label(L("Ordenar a mano"), systemImage: "line.3.horizontal") }
             } footer: {
                 Text(L("Arrastra las playlists, Descargadas y Favoritos para colocarlas donde quieras."))
             }
@@ -287,21 +264,24 @@ struct LibrarySettings: View {
                 .pickerStyle(.inline)
                 .labelsHidden()
             } header: { Text(L("Descargadas y Favoritos")).tourTarget("section:" + L("Descargadas y Favoritos")) } footer: {
-                Text(placement == "music" ? L("Aparecen como filas en «Tu música», encima de Canciones.") : L("Aparecen con su portada grande en el carrusel de Playlists."))
+                Text(placement == "music" ? L("Aparecen como filas en «Tu música», encima de Canciones.") : L("Aparecen con su portada al principio de la carpeta Playlists, en «Tu música»."))
             }
             .glassRow()
 
+            // «No me interesa» de Descubrir (2.7 de x.1.1): cuántas hay y vaciarlas.
             Section {
-                Picker(L("Buscar"), selection: $searchPlacement) {
-                    Text(L("Barra arriba en Inicio")).tag("home")
-                    Text(L("Pestaña aparte")).tag("tab")
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(L("Lo que no te interesa"))
+                        Text(songCount(skip.entries.count)).font(.footnote).foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    if !skip.entries.isEmpty {
+                        Button(L("Vaciar")) { skip.clear() }.accessibilityLabel(L("Vaciar lo que no te interesa"))
+                    }
                 }
-                .pickerStyle(.inline)
-                .labelsHidden()
-            } header: { Text(L("Dónde está Buscar")).tourTarget("section:" + L("Dónde está Buscar")) } footer: {
-                Text(searchPlacement == "tab"
-                     ? L("Buscar tiene su propia pestaña en la barra de abajo, justo después de Inicio.")
-                     : L("La barra de búsqueda está siempre arriba en Inicio."))
+            } header: { Text(L("Descubrir")).tourTarget("section:" + L("Descubrir")) } footer: {
+                Text(L("Las canciones que marcaste con «No me interesa» no vuelven a salir, y un artista con tres en un mes deja de salir durante 30 días. Sólo se guarda en este móvil."))
             }
             .glassRow()
 
@@ -310,7 +290,7 @@ struct LibrarySettings: View {
             // Al final y en otra pantalla, para no borrar nada sin querer.
             Section {
                 NavigationLink { ManagePlaylistsView() } label: {
-                    Label("Eliminar playlists", systemImage: "trash").foregroundStyle(.red)
+                    Label(L("Eliminar playlists"), systemImage: "trash").foregroundStyle(.red)
                 }
             } footer: {
                 Text(L("Antes de borrar se pide confirmación."))
@@ -331,9 +311,8 @@ struct LibrarySettings: View {
 // MARK: Acerca de
 struct AboutView: View {
 
-    static var version: String {
-        (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "1.0"
-    }
+    /// Versión completa, con la beta si la hay (`AppVersion`, clave `JiyuVersion`).
+    static var version: String { AppVersion.current }
 
     var body: some View {
         Form {
@@ -344,7 +323,7 @@ struct AboutView: View {
                         .frame(width: 96, height: 96)
                         .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
                         .shadow(color: .black.opacity(0.2), radius: 10, y: 5)
-                    Text(L("Pear Music")).font(.title2.bold())
+                    Text(L("Jiyu Pulse")).font(.title2.bold())
                     Text(L("Versión {0}", Self.version)).font(.subheadline).foregroundStyle(.secondary)
                 }
                 .frame(maxWidth: .infinity)

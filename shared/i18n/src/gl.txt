@@ -30,7 +30,7 @@
 30	Actualizar a lista gardada
 31	Actívao en Axustes ou escribe o código á man.
 32	Administración
-33	Afecta a todas as persoas que usan Pear Music en canto abran a app.
+33	Afecta a todas as persoas que usan Jiyu Pulse en canto abran a app.
 34	Agora non, seguir
 35	Agora soa
 36	Agora soa grande
@@ -63,8 +63,8 @@
 63	Apelar
 64	Apple Music ou Spotify: abre a lista → Compartir → Copiar ligazón. Ten que ser pública. De Spotify chegan ata unhas 100 cancións; para listas máis longas, usa o CSV de Exportify.
 65	Apunta ao QR do Jam
-66	Ficheiro library.json de Pear Music (tamén o de Android). Engádese o que non teñas, sen borrar nada.
-67	Ficheiro library.json de Pear Music (tamén o de iOS). Engádese o que non teñas, sen borrar nada.
+66	Ficheiro library.json de Jiyu Pulse (tamén o de Android). Engádese o que non teñas, sen borrar nada.
+67	Ficheiro library.json de Jiyu Pulse (tamén o de iOS). Engádese o que non teñas, sen borrar nada.
 68	Arrastra os cartafoles para cambiar a orde.
 69	Arrastra as listas, Descargadas e Favoritos para colocalas onde queiras.
 70	Arrastra para cambiar a orde
@@ -86,11 +86,11 @@
 86	Avanzado
 87	Aviso
 88	Avisos
-89	Avisos de Pear Music publicados na web
+89	Avisos de Jiyu Pulse publicados na web
 90	Avisos importantes
 91	Avisos, {0} sen ler
 92	Axuda e soporte
-93	Axudas a mellorar Pear Music
+93	Axudas a mellorar Jiyu Pulse
 94	Engadida á lista
 95	Engadidas recentemente
 96	Engadir
@@ -191,7 +191,7 @@
 191	Casete: xira unha bobina ou arrastra a cinta para avanzar ou rebobinar. Vinilo: xira o disco co dedo ou move o brazo. Co móbil en horizontal, o casete ou o vinilo ocupan toda a pantalla. Tamén podes cambialo mantendo premido o minirreprodutor.
 192	Cast
 193	Caídas e versións urxentes
-194	Caídas, versións novas e novidades de Pear Music
+194	Caídas, versións novas e novidades de Jiyu Pulse
 195	Pechar
 196	Pechar o aviso
 197	Pechar as historias
@@ -253,7 +253,7 @@
 253	Canto se parecen os botóns á cor da portada
 254	Canto se tinguen os fondos e os menús
 255	Cóntanos que fallou; podes engadir capturas
-256	Cóntanos que che gustaría que fixese Pear Music
+256	Cóntanos que che gustaría que fixese Jiyu Pulse
 257	Cápsula coas túas lapelas e Buscar á parte, como SimpMusic. Arrastra a pinga para cambiar de lapela; ao baixar por unha lista plégase xunto ao minirreprodutor.
 258	Código QR do Jam
 259	Código de 6 cifras
@@ -278,7 +278,7 @@
 278	Descargadas e Favoritos
 279	Descargado
 280	Descargando
-281	Descargando Pear Music {0}…
+281	Descargando Jiyu Pulse {0}…
 282	Descargando {0} %
 283	Descargar
 284	Descargar as {0} que faltan
@@ -410,7 +410,7 @@
 410	Gardar a lista
 411	Gardar e saír
 412	Gárdaa no teu xestor de contrasinais ou apúntaa. É o que cifra a túa biblioteca: sen ela non se pode 
-413	Gárdaa no teu xestor de contrasinais ou apúntaa. É o que cifra a túa biblioteca: sen ela non se pode recuperar a copia da nube noutro móbil. Pear Music non a garda e non a pode recuperar.
+413	Gárdaa no teu xestor de contrasinais ou apúntaa. É o que cifra a túa biblioteca: sen ela non se pode recuperar a copia da nube noutro móbil. Jiyu Pulse non a garda e non a pode recuperar.
 414	Guía inicial
 415	Xírao para avanzar ou retroceder
 416	Facer copia agora
@@ -486,13 +486,13 @@
 486	Creáchelo ti · {0}
 487	O que sacaron este ano
 488	O que máis escoitas
-489	O último que escoitaches, radios feitas para ti, o novo dos teus artistas e o que fixes arriba. A campá trae os avisos de Pear Music.
-490	O último que escoitaches, radios feitas para ti, o novo dos teus artistas e o que fixes arriba. A campá trae os avisos de Pear Music. Toca a lapela Inicio.
+489	O último que escoitaches, radios feitas para ti, o novo dos teus artistas e o que fixes arriba. A campá trae os avisos de Jiyu Pulse.
+490	O último que escoitaches, radios feitas para ti, o novo dos teus artistas e o que fixes arriba. A campá trae os avisos de Jiyu Pulse. Toca a lapela Inicio.
 491	Logo
 492	Liña demasiado longa
 493	Envía xa o resumo desta semana cos campos marcados (os obrigatorios van sempre: identificador, plataforma, variante, versión e semana). O resumo semanal segue saíndo só se a telemetría está activada.
 494	Mandarme un código
-495	Mantén Pear Music aberta. Adoita tardar uns segundos.
+495	Mantén Jiyu Pulse aberta. Adoita tardar uns segundos.
 496	Mantén premido para borrar as descargas
 497	Mantén premido para borrar as estatísticas
 498	Mantén premido para baleirar a cola
@@ -551,7 +551,7 @@
 551	Non hai resultados para «{0}»
 552	Non hai sinxelos nin EP.
 553	Non hai álbums.
-554	Non a precisas para nada: Pear Music funciona igual sen ela. Pero se te creas unha axúdasnos moitísimo a mellorar a app, e ti levas a túa música alá onde vaias.
+554	Non a precisas para nada: Jiyu Pulse funciona igual sen ela. Pero se te creas unha axúdasnos moitísimo a mellorar a app, e ti levas a túa música alá onde vaias.
 555	Non parece un CSV de Exportify (falta a columna «Track URI»).
 556	Non queda ningunha canción por engadir
 557	Non se atoparon cancións. A lista é pública?
@@ -624,18 +624,18 @@
 624	Pausa
 625	Pausa a descarga da lista
 626	Pausar
-627	Pear Dev
-628	Pear Music
-629	Pear Music é un proxecto persoal e gratuíto, sen relación con YouTube nin Google. É necesario para usar a app.
-630	Pear Music non ten contas nin servidor cos teus datos: todo está neste móbil. 
-631	Pear Music non ten contas nin servidor cos teus datos: todo está neste móbil. O ficheiro leva a túa biblioteca, estatísticas, letras, borradores de soporte e axustes; non as cancións descargadas.
-632	Pear Music non ten permiso para usar a cámara
-633	Pear Music {0}
+627	Jiyu Dev
+628	Jiyu Pulse
+629	Jiyu Pulse é un proxecto persoal e gratuíto, sen relación con YouTube nin Google. É necesario para usar a app.
+630	Jiyu Pulse non ten contas nin servidor cos teus datos: todo está neste móbil. 
+631	Jiyu Pulse non ten contas nin servidor cos teus datos: todo está neste móbil. O ficheiro leva a túa biblioteca, estatísticas, letras, borradores de soporte e axustes; non as cancións descargadas.
+632	Jiyu Pulse non ten permiso para usar a cámara
+633	Jiyu Pulse {0}
 634	Pedir o bloqueo total
 635	Pega a ligazón dunha lista de Spotify (Compartir → Copiar ligazón).
 636	Pega unha ligazón de music.apple.com (Compartir → Copiar ligazón).
 637	Pegar
-638	Permite instalar apps de Pear Music e volve premer Descargar.
+638	Permite instalar apps de Jiyu Pulse e volve premer Descargar.
 639	Personalizado
 640	Lapela á parte
 641	Lapelas
@@ -671,7 +671,7 @@
 671	Quitar {0}
 672	Que pasou
 673	Que se envía exactamente
-674	Que che gustaría que fixese Pear Music e para que che serviría (mínimo {0} caracteres).
+674	Que che gustaría que fixese Jiyu Pulse e para que che serviría (mínimo {0} caracteres).
 675	Retomar · {0} de {1}
 676	Recentes
 677	Lembrarmo mañá
@@ -691,7 +691,7 @@
 691	Reprodutor
 692	Reprodutor multimedia
 693	Reprodutores con personalidade
-694	Resposta de Pear Music
+694	Resposta de Jiyu Pulse
 695	Resposta inesperada do servidor.
 696	Restablecer
 697	Restablecer {0}
@@ -747,7 +747,7 @@
 747	Sen icona
 748	Aínda sen liñas
 749	Sen marcar
-750	Sen permiso para ler a app Música. Actívao en Axustes → Pear Music.
+750	Sen permiso para ler a app Música. Actívao en Axustes → Jiyu Pulse.
 751	Sen rastrexo nin publicidade. Ti decides que compartes.
 752	Sen resultados
 753	Sen rematar
@@ -760,8 +760,8 @@
 760	Só para ti
 761	Só ti tes a chave. Nin sequera nós podemos lela.
 762	Só {0} polo de agora
-763	Tamén podes manter premida a pantalla de inicio › Widgets › Pear Music. Pódeselles cambiar o tamaño.
-764	Dámosche a benvida a Pear Music
+763	Tamén podes manter premida a pantalla de inicio › Widgets › Jiyu Pulse. Pódeselles cambiar o tamaño.
+764	Dámosche a benvida a Jiyu Pulse
 765	Mandámoscho a {0}. Caduca en 10 minutos.
 766	Telemetría
 767	Telemetría de rendemento
@@ -782,8 +782,8 @@
 782	Toda a música de YouTube Music, de balde e sen anuncios. Coa pantalla apagada, sen conexión e cun Jam para escoitar cos teus amigos.
 783	Todas
 784	Todas encaixan coa súa versión en YouTube Music.
-785	Aínda non aparece. Comprobade que o código é correcto, que estades na mesma wifi ou co Bluetooth activado e que quen o creou ten Pear Music aberta.
-786	Aínda non aparece. Comprobade que o código é correcto, que estades na mesma wifi e que quen o creou ten Pear Music aberta.
+785	Aínda non aparece. Comprobade que o código é correcto, que estades na mesma wifi ou co Bluetooth activado e que quen o creou ten Jiyu Pulse aberta.
+786	Aínda non aparece. Comprobade que o código é correcto, que estades na mesma wifi e que quen o creou ten Jiyu Pulse aberta.
 787	Aínda non hai nada aquí
 788	Aínda non hai listas
 789	Aínda non tes álbums
@@ -797,7 +797,7 @@
 797	A túa biblioteca, cifrada na nube
 798	A túa chave de recuperación
 799	O teu correo
-800	A túa conta de Pear Music
+800	A túa conta de Jiyu Pulse
 801	A túa idea
 802	O teu lanzador non deixa engadilo desde aquí: mantén premida a pantalla de inicio › Widgets
 803	A túa música
@@ -890,7 +890,7 @@
 890	orde barra descubrir inicio biblioteca
 891	privacidade rgpd exportar borrar datos eliminar zip
 892	radio infinita reprodución automática cola rematar
-893	recuperar a copia da nube noutro móbil. Pear Music non a garda e non a pode recuperar.
+893	recuperar a copia da nube noutro móbil. Jiyu Pulse non a garda e non a pode recuperar.
 894	resto da app
 895	saída audio altofalante homepod apple tv bluetooth
 896	streaming datos aforro máxima kbps
@@ -955,10 +955,10 @@
 957	Código {0}
 958	Persoas: {0}
 959	Listas: 
-960	Enviaranse o teu correo, o texto e datos do iPhone (modelo, versión de iOS e da app) á canle privada de soporte de Pear Music.
-961	Enviaranse o teu correo, o texto e datos do móbil (modelo, versión de Android e da app) á canle privada de soporte de Pear Music.
-962	Enviaranse o teu correo, o texto, {0} foto(s) e datos do iPhone (modelo, versión de iOS e da app) á canle privada de soporte de Pear Music.
-963	Enviaranse o teu correo, o texto, {0} foto(s) e datos do móbil (modelo, versión de Android e da app) á canle privada de soporte de Pear Music.
+960	Enviaranse o teu correo, o texto e datos do iPhone (modelo, versión de iOS e da app) á canle privada de soporte de Jiyu Pulse.
+961	Enviaranse o teu correo, o texto e datos do móbil (modelo, versión de Android e da app) á canle privada de soporte de Jiyu Pulse.
+962	Enviaranse o teu correo, o texto, {0} foto(s) e datos do iPhone (modelo, versión de iOS e da app) á canle privada de soporte de Jiyu Pulse.
+963	Enviaranse o teu correo, o texto, {0} foto(s) e datos do móbil (modelo, versión de Android e da app) á canle privada de soporte de Jiyu Pulse.
 964	Grazas! É o ticket #{0}. Respondémosche en Avisos (só a ti) e ao correo que puxeches.
 965	Grazas! Respondémosche en Avisos (só a ti) e ao correo que puxeches.
 966	«{0}» usa sempre o modo claro.
@@ -968,11 +968,11 @@
 970	Barra inferior de SimpMusic, de maxrave-dev (GPL-3.0)
 971	Barra inferior inspirada en SimpMusic, de maxrave-dev (GPL-3.0)
 972	onte
-973	Descargando Pear Music {0}… {1} %
-974	Enviaranse o teu correo, o texto e a ficha deste iPhone (modelo, versión de iOS e da app e, se tes a telemetría activada, o seu rendemento) ao soporte privado de Pear Music.
-975	Enviaranse o teu correo, o texto e a ficha deste móbil (modelo, versión de Android e da app e, se tes a telemetría activada, o seu rendemento) ao soporte privado de Pear Music.
-976	Enviaranse o teu correo, o texto, {0} foto(s) e a ficha deste iPhone (modelo, versión de iOS e da app e, se tes a telemetría activada, o seu rendemento) ao soporte privado de Pear Music.
-977	Enviaranse o teu correo, o texto, {0} foto(s) e a ficha deste móbil (modelo, versión de Android e da app e, se tes a telemetría activada, o seu rendemento) ao soporte privado de Pear Music.
+973	Descargando Jiyu Pulse {0}… {1} %
+974	Enviaranse o teu correo, o texto e a ficha deste iPhone (modelo, versión de iOS e da app e, se tes a telemetría activada, o seu rendemento) ao soporte privado de Jiyu Pulse.
+975	Enviaranse o teu correo, o texto e a ficha deste móbil (modelo, versión de Android e da app e, se tes a telemetría activada, o seu rendemento) ao soporte privado de Jiyu Pulse.
+976	Enviaranse o teu correo, o texto, {0} foto(s) e a ficha deste iPhone (modelo, versión de iOS e da app e, se tes a telemetría activada, o seu rendemento) ao soporte privado de Jiyu Pulse.
+977	Enviaranse o teu correo, o texto, {0} foto(s) e a ficha deste móbil (modelo, versión de Android e da app e, se tes a telemetría activada, o seu rendemento) ao soporte privado de Jiyu Pulse.
 978	Actualizacións
 979	Agora non
 980	Axustes pode ir na barra ou arriba en Inicio, xunto ao Jam.
@@ -999,8 +999,8 @@
 1001	A canción baixa ao final e a seguinte entra suave: 3, 6 ou 10 segundos.
 1002	A carta abre o buzón de suxestións e o escaravello, «Informar dun erro». Cada envío ten número de tíquet e a resposta chégache só a ti, á campá.
 1003	A clásica ou a estilo SimpMusic: cápsula de cristal cunha pinga que arrastras, Buscar á parte e pregada ao baixar.
-1004	As caídas e novidades de Pear Music, tamén como notificación se queres.
-1005	O novo de Pear Music {0}
+1004	As caídas e novidades de Jiyu Pulse, tamén como notificación se queres.
+1005	O novo de Jiyu Pulse {0}
 1006	O técnico, pregado: calidade de descarga, tolerancia ao importar playlists e caché de portadas.
 1007	Máxima, ou aforro de datos cando non tes wifi. As descargas sempre van á máxima.
 1008	Normal, Casete, Vinilo ou Air. Tamén se cambia mantendo premido o minirreprodutor.
@@ -1008,7 +1008,7 @@
 1010	Nova: lévate por todos os Axustes e explícache cada opción. Está xunto á carta.
 1011	Opcional. Garda a túa biblioteca na nube, cifrada cunha chave que só tes ti, e pásaa a outro móbil.
 1012	Ordena as lapelas arrastrándoas. Despraza Descubrir á esquerda para quitala da barra.
-1013	Pear Music xa está en portugués. E «Español» agora chámase «Castellano».
+1013	Jiyu Pulse xa está en portugués. E «Español» agora chámase «Castellano».
 1014	Português
 1015	Que todas as cancións soen igual de forte, sen subir e baixar o volume a man.
 1016	Recentes, A-Z, Z-A, por tamaño ou a man. Con «Editar playlists» ordénalas arrastrando.
@@ -1022,8 +1022,108 @@
 1024	E ademais
 1025	Xa coñeces todos os Axustes. Volve a esta guía cando queiras co botón xunto á carta.
 1026	Xa non marca Descubrir cando estás en Axustes.
-1027	Xa podes usar Pear Music en português. E «Español» agora chámase «Castellano».
+1027	Xa podes usar Jiyu Pulse en português. E «Español» agora chámase «Castellano».
 1028	{0} de {1}
 1029	Listo!
 941	Choose your language · Tria la llengua · Escolle o idioma · Aukeratu hizkuntza · Elektu vian lingvon
 956	Castellano
+1030	 Axustes está arriba en Inicio e non entra na orde.
+1031	Ordenar á man
+1032	Unirme
+1033	Ver as miñas listas
+1034	Comprobando…
+1035	Sempre
+1036	Abrimos a túa incidencia
+1037	Entrar igualmente (Dev)
+1038	Estamos niso
+1039	Abrimos a túa incidencia e estámola mirando. Avisarémoste aquí.
+1040	MANTEMENTO ACTIVO
+1041	Solucionado! Grazas
+1042	 · cristal líquido
+1043	Barra
+1044	Buscar é o círculo da dereita. Ao baixar por Inicio a barra prégase; se deixas de moverte 1,5 segundos, volve enteira.
+1045	Buscar volve ao parar
+1046	Coa clásica, unha barra arriba en Inicio ou unha lapela á parte. Coa SimpMusic, o círculo da dereita, que volve se deixas de baixar.
+1047	A barra de abaixo: o seu estilo, onde está Buscar e a orde das lapelas, todo xunto.
+1048	Borra a busca para cambiar a orde.
+1049	Desfacer
+1050	As cancións que marcaches con «Non me interesa» non volven saír, e un artista con tres nun mes deixa de saír durante 30 días. Só se garda neste móbil.
+1051	O que non che interesa
+1052	Mantén premida unha portada e arrástraa para cambiar a orde.
+1053	Non me interesa
+1054	Non volverá saír en Descubrir.
+1055	Baleirar
+1056	Baleirar o que non che interesa
+1057	{0} cancións
+1058	Actualizar
+1059	Borráronse {0} informes
+1060	Borrar o rexistro da web
+1061	Esta versión é antiga
+1062	Forzar extracción
+1063	A app cre que é a {0}. Sae e volve para ver o aviso.
+1064	A música segue funcionando. Se hai fútbol, pode ser polos bloqueos de LaLiga: os avisos e o soporte volven ao acabar o partido.
+1065	Os servidores de Jiyu Pulse non responden
+1066	Para repetir a benvida ou ver os avisos sen reinstalar. Non tocan a túa biblioteca nin as túas descargas.
+1067	Para ver o aviso de versión nova
+1068	Pedido. As apps verano no seu latexo diario.
+1069	Probas
+1070	Pode fallar. Actualiza para ter os arranxos.
+1071	Reiniciar a benvida
+1072	Bórranse todos os informes gardados. As fichas dos informes de erros non se tocan. Non se pode desfacer.
+1073	Segunda confirmación: o panel queda baleiro.
+1074	Simular versión antiga
+1075	VERSIÓN SIMULADA: {0}
+1076	Ver as novidades outra vez
+1077	Borrar toda a telemetría da web?
+1078	Seguro?
+1079	Cadaquén no seu móbil
+1080	De {0} · {1}
+1081	Onde soa
+1082	Escoitar tamén aquí
+1083	O que soa aquí soa á vez no móbil de cadaquén, co seu propio audio. Pon algo da lista.
+1084	Soa o mesmo que no móbil de {0}, á vez.
+1085	Só soa neste móbil; os demais engaden cancións.
+1086	Un altofalante
+1087	{0} e {1}
+1088	{0}, {1} e {2}
+1089	 A foto da portada non cabe no QR.
+1090	Engadindo…
+1091	Engadir á biblioteca
+1092	Compartir con QR
+1093	Compartir ligazón
+1094	Código QR de {0}
+1095	Escanéao coa cámara doutro móbil con Jiyu Pulse. Viaxan o nome, as {0} cancións e a súa orde.
+1096	Esta lista está baleira.
+1097	Non se puideron cargar as cancións. Revisa a conexión e téntao de novo.
+1098	Lista compartida
+1099	Sen nome
+1100	Ten demasiadas cancións para un QR (como moito {0}).
+1101	{0} cancións non están en YouTube Music e quedaron fóra.
+1102	Axustes, arriba á esquerda
+1103	Biblioteca ao teu gusto
+1104	Comparte listas cun QR
+1105	Comparte unha lista co QR da súa pantalla, e no Jam escolle que soe no móbil de cadaquén.
+1106	Coa barra estilo SimpMusic, se deixas de baixar por Inicio a barra volve enteira.
+1107	En Descubrir, en «⋯». Esa canción non volve, e se un artista non che vai, deixa de saír un tempo.
+1108	En Inicio. E en Axustes › Aparencia › Barra está todo o da barra xunto.
+1109	Jam: cadaquén no seu móbil
+1110	O que marcaches con «Non me interesa». Baléirao cando queiras.
+1111	Novo: o estilo da barra, onde está Buscar e as lapelas, todo aquí.
+1112	Novo: o estilo da barra, onde está Buscar, o cristal líquido e as lapelas, todo aquí.
+1113	Outro móbil escanéao coa cámara e lévaa coas súas cancións e a súa orde.
+1114	Listas en cuadrícula, coma Os teus álbums. Mantén premida unha portada e arrástraa para ordenalas.
+1115	Quen crea o Jam escolle: que soe nun altofalante ou no móbil de cadaquén á vez, cos seus auriculares.
+1116	Aparecen coa súa portada ao principio do cartafol Playlists, en «A túa música».
+1117	Preme a chincheta nunha playlist ou nun álbum e terálo aquí, na orde que queiras.
+1118	Agora chámase Jiyu Pulse
+1119	Cores da portada, máis lexibles
+1120	Coas cores da canción, o texto dos botóns escolle só se vai claro ou escuro.
+1121	Cristal e Sistema estrean a cor shu, o vermellón de Jiyu Pulse. Os textos en cor e os botóns lense mellor.
+1122	O vermellón dos selos xaponeses, en botóns, progreso e favoritas. Os textos en cor lense mellor, en claro e en escuro.
+1123	O botón de acendido de sempre, simétrico, máis grande e en shu sobre negro.
+1124	Icona nova
+1125	A app chámase Jiyu Pulse e ten icona nova. A túa biblioteca, as túas descargas e os teus axustes seguen igual.
+1126	Unha cor nova: shu
+1127	«Jiyu» é «liberdade» en xaponés. É a mesma app: conservas a biblioteca, as descargas e os axustes.
+1128	Catálogo do patrocinador
+1129	Modo demo para gravar o tráiler: Inicio, busca, artista, Biblioteca e descargas só con cancións de Michael Bennet, sen rede. Aplícase ao volver abrir a app e non toca a túa biblioteca.

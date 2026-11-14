@@ -51,6 +51,7 @@ enum Releases {
     }
 
     static func load(artists: [String]) async -> [RemoteCollection] {
+        if DemoCatalog.isActive { return DemoCatalog.singles }
         guard !artists.isEmpty else { return [] }
         let url = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("releases.json")
         let key = artists.joined(separator: "|")

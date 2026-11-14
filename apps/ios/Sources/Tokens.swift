@@ -3,28 +3,33 @@ import SwiftUI
 
 enum Tokens {
     enum Brand {
-        static let violet = Color(hex: 0x8B5CF6)
-        static let violetDeep = Color(hex: 0x5B21B6)
-        static let magenta = Color(hex: 0xEC4899)
-        static let amber = Color(hex: 0xF59E0B)
-        static let night = Color(hex: 0x07070A)
+        static let shu = Color(hex: 0xF4511E)
+        static let shuDeep = Color(hex: 0xA3300E)
+        static let shuTextLight = Color(hex: 0xB5330F)
+        static let shuTextDark = Color(hex: 0xFF6B3D)
+        static let kincha = Color(hex: 0xE3A93B)
+        static let sumi = Color(hex: 0x0E0E10)
+        static let washi = Color(hex: 0xF3EFE6)
     }
-    static let artworkFallback: [Color] = [Color(hex: 0x8B5CF6), Color(hex: 0xEC4899), Color(hex: 0xF59E0B)]
+    static let artworkFallback: [Color] = [Color(hex: 0xF4511E), Color(hex: 0xE3A93B), Color(hex: 0xA3300E)]
 
     struct ThemeSpec {
         let name: String
         let blurb: String
         let accent: Color
+        /// Acento para texto e iconos sueltos (4,5:1 sobre el fondo), en claro y en oscuro.
+        let accentTextLight: Color
+        let accentTextDark: Color
         let onAccent: Color
         let scheme: ColorScheme?
         let rounded: Bool
         let maxRadius: CGFloat
     }
     static let themes: [String: ThemeSpec] = [
-        "air": ThemeSpec(name: "Aire", blurb: "Plata con Helvetica negra y un anillo de puntos.", accent: Color(hex: 0x111111), onAccent: Color(hex: 0xFFFFFF), scheme: .light, rounded: false, maxRadius: 40),
-        "glass": ThemeSpec(name: "Cristal", blurb: "Luz difusa con los colores de la carátula.", accent: Color(hex: 0x8B5CF6), onAccent: Color(hex: 0xFFFFFF), scheme: nil, rounded: false, maxRadius: 40),
-        "neon": ThemeSpec(name: "Neón", blurb: "Rejilla synthwave que avanza mientras suena.", accent: Color(hex: 0xFF2BD6), onAccent: Color(hex: 0xFFFFFF), scheme: .dark, rounded: true, maxRadius: 40),
-        "plain": ThemeSpec(name: "Sistema", blurb: "Sin efectos ni fondos animados.", accent: Color(hex: 0x8B5CF6), onAccent: Color(hex: 0xFFFFFF), scheme: nil, rounded: false, maxRadius: 40),
+        "air": ThemeSpec(name: "Aire", blurb: "Plata con Helvetica negra y un anillo de puntos.", accent: Color(hex: 0x111111), accentTextLight: Color(hex: 0x111111), accentTextDark: Color(hex: 0x111111), onAccent: Color(hex: 0xFFFFFF), scheme: .light, rounded: false, maxRadius: 40),
+        "glass": ThemeSpec(name: "Cristal", blurb: "Luz difusa con los colores de la carátula.", accent: Color(hex: 0xF4511E), accentTextLight: Color(hex: 0xB5330F), accentTextDark: Color(hex: 0xFF6B3D), onAccent: Color(hex: 0x0E0E10), scheme: nil, rounded: false, maxRadius: 40),
+        "neon": ThemeSpec(name: "Neón", blurb: "Rejilla synthwave que avanza mientras suena.", accent: Color(hex: 0xFF2BD6), accentTextLight: Color(hex: 0xFF2BD6), accentTextDark: Color(hex: 0xFF2BD6), onAccent: Color(hex: 0xFFFFFF), scheme: .dark, rounded: true, maxRadius: 40),
+        "plain": ThemeSpec(name: "Sistema", blurb: "Sin efectos ni fondos animados.", accent: Color(hex: 0xF4511E), accentTextLight: Color(hex: 0xB5330F), accentTextDark: Color(hex: 0xFF6B3D), onAccent: Color(hex: 0x0E0E10), scheme: nil, rounded: false, maxRadius: 40),
     ]
     static let themeOrder = ["glass", "air", "neon", "plain"]
     static let defaultTheme = "glass"

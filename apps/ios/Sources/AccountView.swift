@@ -5,24 +5,25 @@ import UIKit
 /// Opcional, ayuda a mejorar la app y pronto tendrá ventajas (lo pidió Toxbox). En Ajustes › Cuenta y en la guía
 /// inicial. Mismo texto que `AccountPitch` en Android.
 struct AccountPitch: View {
+    @Environment(\.accentFill) private var accentFill
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(spacing: 14) {
                 Image("Logo").resizable().scaledToFit().frame(width: 52, height: 52)
                     .clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(L("Tu cuenta de Pear Music")).font(.title3.bold())
+                    Text(L("Tu cuenta de Jiyu Pulse")).font(.title3.bold())
                     Text(L("Opcional · gratis")).font(.caption.weight(.semibold)).foregroundStyle(.tint)
                         .padding(.horizontal, 10).padding(.vertical, 3)
-                        .background(Capsule().fill(Color.accentColor.opacity(0.12)))
+                        .background(Capsule().fill(accentFill.opacity(0.12)))
                 }
             }
-            Text(L("No la necesitas para nada: Pear Music funciona igual sin ella. Pero si te la creas nos ayudas muchísimo a mejorar la app, y tú te llevas tu música allá donde vayas."))
+            Text(L("No la necesitas para nada: Jiyu Pulse funciona igual sin ella. Pero si te la creas nos ayudas muchísimo a mejorar la app, y tú te llevas tu música allá donde vayas."))
                 .font(.callout).foregroundStyle(.secondary).padding(.top, 14).padding(.bottom, 6)
                 .fixedSize(horizontal: false, vertical: true)
             point("lock.fill", 5, L("Tu biblioteca, cifrada en la nube"), L("Sólo tú tienes la clave. Ni siquiera nosotros podemos leerla."))
             point("iphone.gen3", 2, L("Pásala a otro móvil"), L("Playlists y favoritos en un minuto, también entre iPhone y Android."))
-            point("heart.fill", 0, L("Ayudas a mejorar Pear Music"), L("Saber cuántos sois nos dice dónde poner el esfuerzo."))
+            point("heart.fill", 0, L("Ayudas a mejorar Jiyu Pulse"), L("Saber cuántos sois nos dice dónde poner el esfuerzo."))
             point("sparkles", 4, L("Muy pronto, ventajas"), L("Estamos preparando cosas solo para quien tenga cuenta. Te avisaremos en Avisos."))
         }
         .padding(.horizontal, 20).padding(.vertical, 22)
@@ -74,7 +75,7 @@ private struct AccountSignIn: View {
             Section { AccountPitch().listRowInsets(EdgeInsets()).listRowBackground(Color.clear) }
             Section {
                 switch available {
-                case nil: Text("Comprobando…").foregroundStyle(.secondary)
+                case nil: Text(L("Comprobando…")).foregroundStyle(.secondary)
                 case false?:
                     VStack(alignment: .leading, spacing: 2) {
                         Text(L("Las cuentas estarán disponibles muy pronto"))
@@ -142,12 +143,12 @@ private struct AccountKeyStep: View {
             if !typing {
                 Section {
                     Text(fresh).font(.title3.monospaced()).frame(maxWidth: .infinity).padding(.vertical, 8).textSelection(.enabled)
-                    Button { UIPasteboard.general.string = fresh; notice = "Clave copiada" } label: { Label("Copiar", systemImage: "doc.on.doc") }
+                    Button { UIPasteboard.general.string = fresh; notice = "Clave copiada" } label: { Label(L("Copiar"), systemImage: "doc.on.doc") }
                     Toggle(L("La he guardado"), isOn: $saved)
                 } header: {
                     Text(L("Tu clave de recuperación"))
                 } footer: {
-                    Text(L("Guárdala en tu gestor de contraseñas o apúntala. Es lo que cifra tu biblioteca: sin ella no se puede recuperar la copia de la nube en otro móvil. Pear Music no la guarda y no la puede recuperar."))
+                    Text(L("Guárdala en tu gestor de contraseñas o apúntala. Es lo que cifra tu biblioteca: sin ella no se puede recuperar la copia de la nube en otro móvil. Jiyu Pulse no la guarda y no la puede recuperar."))
                 }
                 .glassRow()
                 Section {
@@ -225,7 +226,7 @@ private struct AccountSignedIn: View {
             .glassRow()
             Section {
                 Button { run { try await Account.shared.upload(library); return L("Biblioteca guardada") } } label: {
-                    Label("Guardar ahora en la nube", systemImage: "icloud.and.arrow.up")
+                    Label(L("Guardar ahora en la nube"), systemImage: "icloud.and.arrow.up")
                 }
                 Button {
                     run {
@@ -234,19 +235,19 @@ private struct AccountSignedIn: View {
                     }
                 } label: {
                     VStack(alignment: .leading) {
-                        Label("Traer de la nube", systemImage: "icloud.and.arrow.down")
+                        Label(L("Traer de la nube"), systemImage: "icloud.and.arrow.down")
                         Text(L("Une la copia con lo de este móvil, sin borrar nada")).font(.footnote).foregroundStyle(.secondary)
                     }
                 }
-                Button { showKey = true } label: { Label("Ver clave de recuperación", systemImage: "key.fill") }
+                Button { showKey = true } label: { Label(L("Ver clave de recuperación"), systemImage: "key.fill") }
             }
             .disabled(busy)
             .glassRow()
             Section {
                 Button { Task { await Account.shared.signOut(); notice = L("Sesión cerrada") } } label: {
-                    Label("Cerrar sesión", systemImage: "rectangle.portrait.and.arrow.right")
+                    Label(L("Cerrar sesión"), systemImage: "rectangle.portrait.and.arrow.right")
                 }
-                Button(role: .destructive) { confirmDelete = true } label: { Label("Borrar la cuenta", systemImage: "person.crop.circle.badge.minus") }
+                Button(role: .destructive) { confirmDelete = true } label: { Label(L("Borrar la cuenta"), systemImage: "person.crop.circle.badge.minus") }
             } footer: { Text(L("Borrar la cuenta elimina al momento tu correo y la copia de la nube. La biblioteca de este móvil se queda.")) }
             .disabled(busy)
             .glassRow()

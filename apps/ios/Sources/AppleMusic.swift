@@ -34,7 +34,7 @@ enum AppleMusicImporter {
             switch self {
             case .badLink: return L("Pega un enlace de music.apple.com (Compartir → Copiar enlace).")
             case .noTracks: return L("No se encontraron canciones. ¿La playlist es pública?")
-            case .denied: return L("Sin permiso para leer la app Música. Actívalo en Ajustes → Pear Music.")
+            case .denied: return L("Sin permiso para leer la app Música. Actívalo en Ajustes → Jiyu Pulse.")
             }
         }
     }

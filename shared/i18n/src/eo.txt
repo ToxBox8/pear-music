@@ -30,7 +30,7 @@
 30	Ĝisdatigi konservitan ludliston
 31	Ŝaltu ĝin en Agordoj aŭ tajpu la kodon permane.
 32	Administrado
-33	Ĝi tuŝas ĉiujn, kiuj uzas Pear Music, tuj kiam ili malfermas la apon.
+33	Ĝi tuŝas ĉiujn, kiuj uzas Jiyu Pulse, tuj kiam ili malfermas la apon.
 34	Ne nun, daŭrigi
 35	Nun ludas
 36	Nun ludas (granda)
@@ -63,8 +63,8 @@
 63	Apelacii
 64	Apple Music aŭ Spotify: malfermu la ludliston → Kunhavigi → Kopii ligilon. Ĝi devas esti publika. El Spotify venas ĝis ĉirkaŭ 100 kantoj; por pli longaj listoj, uzu la CSV de Exportify.
 65	Celu al la QR de la Jam
-66	Dosiero library.json de Pear Music (ankaŭ tiu de Android). Aldoniĝas tio, kion vi ne havas, sen forigi ion.
-67	Dosiero library.json de Pear Music (ankaŭ tiu de iOS). Aldoniĝas tio, kion vi ne havas, sen forigi ion.
+66	Dosiero library.json de Jiyu Pulse (ankaŭ tiu de Android). Aldoniĝas tio, kion vi ne havas, sen forigi ion.
+67	Dosiero library.json de Jiyu Pulse (ankaŭ tiu de iOS). Aldoniĝas tio, kion vi ne havas, sen forigi ion.
 68	Trenu la dosierujojn por ŝanĝi la ordon.
 69	Trenu la ludlistojn, Elŝutitajn kaj Ŝatatajn por meti ilin kien vi volas.
 70	Trenu por ŝanĝi la ordon
@@ -86,11 +86,11 @@
 86	Altnivela
 87	Avizo
 88	Avizoj
-89	Avizoj de Pear Music publikigitaj en la retejo
+89	Avizoj de Jiyu Pulse publikigitaj en la retejo
 90	Gravaj avizoj
 91	Avizoj, {0} nelegitaj
 92	Helpo kaj subteno
-93	Vi helpas plibonigi Pear Music
+93	Vi helpas plibonigi Jiyu Pulse
 94	Aldonita al la ludlisto
 95	Lastatempe aldonitaj
 96	Aldoni
@@ -191,7 +191,7 @@
 191	Kasedo: turnu bobenon aŭ trenu la bendon por antaŭen- aŭ malantaŭenruli. Vinilo: turnu la diskon per fingro aŭ movu la brakon. Kun la telefono horizontale, la kasedo aŭ la vinilo okupas la tutan ekranon. Vi ankaŭ povas ŝanĝi ĝin longe premante la etan ludilon.
 192	Cast
 193	Paneoj kaj urĝaj versioj
-194	Paneoj, novaj versioj kaj novaĵoj de Pear Music
+194	Paneoj, novaj versioj kaj novaĵoj de Jiyu Pulse
 195	Fermi
 196	Fermi la avizon
 197	Fermi la rakontojn
@@ -253,7 +253,7 @@
 253	Kiom la butonoj similas al la koloro de la kovrilo
 254	Kiom la fonoj kaj menuoj kolorigiĝas
 255	Rakontu al ni, kio misfunkciis; vi povas aldoni ekrankopiojn
-256	Rakontu al ni, kion vi ŝatus, ke Pear Music faru
+256	Rakontu al ni, kion vi ŝatus, ke Jiyu Pulse faru
 257	Kapsulo kun viaj langetoj kaj Serĉi aparte, kiel SimpMusic. Trenu la guton por ŝanĝi langeton; kiam vi rulumas malsupren en listo, ĝi faldiĝas apud la eta ludilo.
 258	QR-kodo de la Jam
 259	6-cifera kodo
@@ -278,7 +278,7 @@
 278	Elŝutitaj kaj Ŝatataj
 279	Elŝutita
 280	Elŝutante
-281	Elŝutante Pear Music {0}…
+281	Elŝutante Jiyu Pulse {0}…
 282	Elŝutante {0} %
 283	Elŝuti
 284	Elŝuti la {0} mankantajn
@@ -410,7 +410,7 @@
 410	Konservi liston
 411	Konservi kaj eliri
 412	Konservu ĝin en via pasvortadministrilo aŭ notu ĝin. Ĝi ĉifras vian bibliotekon: sen ĝi oni ne povas 
-413	Konservu ĝin en via pasvortadministrilo aŭ notu ĝin. Ĝi ĉifras vian bibliotekon: sen ĝi oni ne povas restarigi la nuban kopion en alia telefono. Pear Music ne konservas ĝin kaj ne povas restarigi ĝin.
+413	Konservu ĝin en via pasvortadministrilo aŭ notu ĝin. Ĝi ĉifras vian bibliotekon: sen ĝi oni ne povas restarigi la nuban kopion en alia telefono. Jiyu Pulse ne konservas ĝin kaj ne povas restarigi ĝin.
 414	Komenca gvidilo
 415	Turnu ĝin por antaŭeniri aŭ malantaŭeniri
 416	Fari kopion nun
@@ -486,13 +486,13 @@
 486	Kreita de vi · {0}
 487	Kion ili eldonis ĉi-jare
 488	Kion vi plej aŭskultas
-489	Kion vi laste aŭskultis, radioj faritaj por vi, novaĵoj de viaj artistoj kaj kion vi fiksas supre. La sonorilo alportas la avizojn de Pear Music.
-490	Kion vi laste aŭskultis, radioj faritaj por vi, novaĵoj de viaj artistoj kaj kion vi fiksas supre. La sonorilo alportas la avizojn de Pear Music. Tuŝu la langeton Hejmo.
+489	Kion vi laste aŭskultis, radioj faritaj por vi, novaĵoj de viaj artistoj kaj kion vi fiksas supre. La sonorilo alportas la avizojn de Jiyu Pulse.
+490	Kion vi laste aŭskultis, radioj faritaj por vi, novaĵoj de viaj artistoj kaj kion vi fiksas supre. La sonorilo alportas la avizojn de Jiyu Pulse. Tuŝu la langeton Hejmo.
 491	Emblemo
 492	Tro longa linio
 493	Sendas nun la resumon de ĉi tiu semajno kun la markitaj kampoj (la devigaj ĉiam iras: identigilo, platformo, varianto, versio kaj semajno). La semajna resumo plu sendiĝas mem, se telemetrio estas ŝaltita.
 494	Sendu al mi kodon
-495	Tenu Pear Music malfermita. Kutime ĝi daŭras kelkajn sekundojn.
+495	Tenu Jiyu Pulse malfermita. Kutime ĝi daŭras kelkajn sekundojn.
 496	Tenu premite por forigi la elŝutaĵojn
 497	Tenu premite por forigi la statistikojn
 498	Tenu premite por malplenigi la vicon
@@ -551,7 +551,7 @@
 551	Neniuj rezultoj por «{0}»
 552	Neniuj unuopaĵoj aŭ EP-oj.
 553	Neniuj albumoj.
-554	Vi tute ne bezonas ĝin: Pear Music funkcias same sen ĝi. Sed se vi kreas unu, vi multe helpas nin plibonigi la apon, kaj vi kunportas vian muzikon kien ajn vi iras.
+554	Vi tute ne bezonas ĝin: Jiyu Pulse funkcias same sen ĝi. Sed se vi kreas unu, vi multe helpas nin plibonigi la apon, kaj vi kunportas vian muzikon kien ajn vi iras.
 555	Ĝi ne aspektas kiel CSV de Exportify (mankas la kolumno «Track URI»).
 556	Restas neniu kanto por aldoni
 557	Neniuj kantoj troviĝis. Ĉu la ludlisto estas publika?
@@ -624,18 +624,18 @@
 624	Paŭzo
 625	Paŭzigas la elŝuton de la listo
 626	Paŭzigi
-627	Pear Dev
-628	Pear Music
-629	Pear Music estas persona kaj senpaga projekto, sen rilato al YouTube nek Google. Necesa por uzi la apon.
-630	Pear Music ne havas kontojn nek servilon kun viaj datumoj: ĉio estas en ĉi tiu telefono. 
-631	Pear Music ne havas kontojn nek servilon kun viaj datumoj: ĉio estas en ĉi tiu telefono. La dosiero enhavas vian bibliotekon, statistikojn, kantotekstojn, malnetojn de subteno kaj agordojn; ne la elŝutitajn kantojn.
-632	Pear Music ne rajtas uzi la fotilon
-633	Pear Music {0}
+627	Jiyu Dev
+628	Jiyu Pulse
+629	Jiyu Pulse estas persona kaj senpaga projekto, sen rilato al YouTube nek Google. Necesa por uzi la apon.
+630	Jiyu Pulse ne havas kontojn nek servilon kun viaj datumoj: ĉio estas en ĉi tiu telefono. 
+631	Jiyu Pulse ne havas kontojn nek servilon kun viaj datumoj: ĉio estas en ĉi tiu telefono. La dosiero enhavas vian bibliotekon, statistikojn, kantotekstojn, malnetojn de subteno kaj agordojn; ne la elŝutitajn kantojn.
+632	Jiyu Pulse ne rajtas uzi la fotilon
+633	Jiyu Pulse {0}
 634	Peti plenan blokadon
 635	Algluu la ligilon de ludlisto de Spotify (Kunhavigi → Kopii ligilon).
 636	Algluu ligilon de music.apple.com (Kunhavigi → Kopii ligilon).
 637	Alglui
-638	Permesu instali apojn de Pear Music kaj denove premu Elŝuti.
+638	Permesu instali apojn de Jiyu Pulse kaj denove premu Elŝuti.
 639	Propra
 640	Aparta langeto
 641	Langetoj
@@ -671,7 +671,7 @@
 671	Forigi {0}
 672	Kio okazis
 673	Kio ekzakte estas sendata
-674	Kion vi ŝatus, ke Pear Music faru, kaj por kio ĝi utilus al vi (almenaŭ {0} signoj).
+674	Kion vi ŝatus, ke Jiyu Pulse faru, kaj por kio ĝi utilus al vi (almenaŭ {0} signoj).
 675	Daŭrigi · {0} el {1}
 676	Lastatempaj
 677	Memorigu min morgaŭ
@@ -691,7 +691,7 @@
 691	Ludilo
 692	Plurmedia ludilo
 693	Ludiloj kun personeco
-694	Respondo de Pear Music
+694	Respondo de Jiyu Pulse
 695	Neatendita respondo de la servilo.
 696	Restarigi
 697	Restarigi {0}
@@ -747,7 +747,7 @@
 747	Sen piktogramo
 748	Ankoraŭ neniuj linioj
 749	Nemarkita
-750	Neniu permeso legi la apon Muziko. Ŝaltu ĝin en Agordoj → Pear Music.
+750	Neniu permeso legi la apon Muziko. Ŝaltu ĝin en Agordoj → Jiyu Pulse.
 751	Sen spurado nek reklamoj. Vi decidas, kion vi kunhavigas.
 752	Neniuj rezultoj
 753	Nefinita
@@ -760,8 +760,8 @@
 760	Nur por vi
 761	Nur vi havas la ŝlosilon. Eĉ ni ne povas legi ĝin.
 762	Nur {0} nuntempe
-763	Vi ankaŭ povas longe premi la hejmekranon › Fenestraĵoj › Pear Music. Ili estas grandecŝanĝeblaj.
-764	Bonvenon al Pear Music
+763	Vi ankaŭ povas longe premi la hejmekranon › Fenestraĵoj › Jiyu Pulse. Ili estas grandecŝanĝeblaj.
+764	Bonvenon al Jiyu Pulse
 765	Ni sendis ĝin al {0}. Ĝi eksvalidiĝos post 10 minutoj.
 766	Telemetrio
 767	Rendimenta telemetrio
@@ -782,8 +782,8 @@
 782	Ĉiu muziko de YouTube Music, senpage kaj sen reklamoj. Kun malŝaltita ekrano, senkonekte kaj kun Jam por aŭskulti kun viaj amikoj.
 783	Ĉiuj
 784	Ĉiuj kongruas kun sia versio en YouTube Music.
-785	Ĝi ankoraŭ ne aperas. Kontrolu, ke la kodo estas ĝusta, ke vi estas en la sama Wi-Fi aŭ kun Bluetooth ŝaltita, kaj ke tiu, kiu kreis ĝin, havas Pear Music malfermita.
-786	Ĝi ankoraŭ ne aperas. Kontrolu, ke la kodo estas ĝusta, ke vi estas en la sama Wi-Fi kaj ke tiu, kiu kreis ĝin, havas Pear Music malfermita.
+785	Ĝi ankoraŭ ne aperas. Kontrolu, ke la kodo estas ĝusta, ke vi estas en la sama Wi-Fi aŭ kun Bluetooth ŝaltita, kaj ke tiu, kiu kreis ĝin, havas Jiyu Pulse malfermita.
+786	Ĝi ankoraŭ ne aperas. Kontrolu, ke la kodo estas ĝusta, ke vi estas en la sama Wi-Fi kaj ke tiu, kiu kreis ĝin, havas Jiyu Pulse malfermita.
 787	Ankoraŭ nenio ĉi tie
 788	Ankoraŭ neniuj ludlistoj
 789	Vi ankoraŭ ne havas albumojn
@@ -797,7 +797,7 @@
 797	Via biblioteko, ĉifrita en la nubo
 798	Via restariga ŝlosilo
 799	Via retpoŝtadreso
-800	Via konto de Pear Music
+800	Via konto de Jiyu Pulse
 801	Via ideo
 802	Via lanĉilo ne permesas aldoni ĝin de ĉi tie: longe premu la hejmekranon › Fenestraĵoj
 803	Via muziko
@@ -890,7 +890,7 @@
 890	ordo breto malkovri hejmo biblioteko
 891	privateco gdpr eksporti forigi datumoj zip
 892	senfina radio aŭtomata ludado vico fino
-893	restarigi la nuban kopion en alia telefono. Pear Music ne konservas ĝin kaj ne povas restarigi ĝin.
+893	restarigi la nuban kopion en alia telefono. Jiyu Pulse ne konservas ĝin kaj ne povas restarigi ĝin.
 894	resto de la apo
 895	sona eligo laŭtparolilo homepod apple tv bluetooth
 896	fluigo datumoj ŝparo maksimuma kbps
@@ -955,10 +955,10 @@
 957	Kodo {0}
 958	Homoj: {0}
 959	Ludlistoj: 
-960	Via retpoŝtadreso, la teksto kaj datumoj de la iPhone (modelo, versio de iOS kaj de la apo) sendiĝos al la privata subtena kanalo de Pear Music.
-961	Via retpoŝtadreso, la teksto kaj datumoj de la telefono (modelo, versio de Android kaj de la apo) sendiĝos al la privata subtena kanalo de Pear Music.
-962	Via retpoŝtadreso, la teksto, {0} foto(j) kaj datumoj de la iPhone (modelo, versio de iOS kaj de la apo) sendiĝos al la privata subtena kanalo de Pear Music.
-963	Via retpoŝtadreso, la teksto, {0} foto(j) kaj datumoj de la telefono (modelo, versio de Android kaj de la apo) sendiĝos al la privata subtena kanalo de Pear Music.
+960	Via retpoŝtadreso, la teksto kaj datumoj de la iPhone (modelo, versio de iOS kaj de la apo) sendiĝos al la privata subtena kanalo de Jiyu Pulse.
+961	Via retpoŝtadreso, la teksto kaj datumoj de la telefono (modelo, versio de Android kaj de la apo) sendiĝos al la privata subtena kanalo de Jiyu Pulse.
+962	Via retpoŝtadreso, la teksto, {0} foto(j) kaj datumoj de la iPhone (modelo, versio de iOS kaj de la apo) sendiĝos al la privata subtena kanalo de Jiyu Pulse.
+963	Via retpoŝtadreso, la teksto, {0} foto(j) kaj datumoj de la telefono (modelo, versio de Android kaj de la apo) sendiĝos al la privata subtena kanalo de Jiyu Pulse.
 964	Dankon! Ĝi estas la bileto #{0}. Ni respondos en Avizoj (nur al vi) kaj al la retpoŝtadreso, kiun vi skribis.
 965	Dankon! Ni respondos en Avizoj (nur al vi) kaj al la retpoŝtadreso, kiun vi skribis.
 966	«{0}» ĉiam uzas la helan reĝimon.
@@ -968,11 +968,11 @@
 970	Malsupra breto de SimpMusic, de maxrave-dev (GPL-3.0)
 971	Malsupra breto inspirita de SimpMusic, de maxrave-dev (GPL-3.0)
 972	hieraŭ
-973	Elŝutante Pear Music {0}… {1} %
-974	Via retpoŝtadreso, la teksto kaj la profilo de ĉi tiu iPhone (modelo, versio de iOS kaj de la aplikaĵo kaj, se vi ŝaltis la telemetrion, ĝia rendimento) estos senditaj al la privata subteno de Pear Music.
-975	Via retpoŝtadreso, la teksto kaj la profilo de ĉi tiu telefono (modelo, versio de Android kaj de la aplikaĵo kaj, se vi ŝaltis la telemetrion, ĝia rendimento) estos senditaj al la privata subteno de Pear Music.
-976	Via retpoŝtadreso, la teksto, {0} foto(j) kaj la profilo de ĉi tiu iPhone (modelo, versio de iOS kaj de la aplikaĵo kaj, se vi ŝaltis la telemetrion, ĝia rendimento) estos senditaj al la privata subteno de Pear Music.
-977	Via retpoŝtadreso, la teksto, {0} foto(j) kaj la profilo de ĉi tiu telefono (modelo, versio de Android kaj de la aplikaĵo kaj, se vi ŝaltis la telemetrion, ĝia rendimento) estos senditaj al la privata subteno de Pear Music.
+973	Elŝutante Jiyu Pulse {0}… {1} %
+974	Via retpoŝtadreso, la teksto kaj la profilo de ĉi tiu iPhone (modelo, versio de iOS kaj de la aplikaĵo kaj, se vi ŝaltis la telemetrion, ĝia rendimento) estos senditaj al la privata subteno de Jiyu Pulse.
+975	Via retpoŝtadreso, la teksto kaj la profilo de ĉi tiu telefono (modelo, versio de Android kaj de la aplikaĵo kaj, se vi ŝaltis la telemetrion, ĝia rendimento) estos senditaj al la privata subteno de Jiyu Pulse.
+976	Via retpoŝtadreso, la teksto, {0} foto(j) kaj la profilo de ĉi tiu iPhone (modelo, versio de iOS kaj de la aplikaĵo kaj, se vi ŝaltis la telemetrion, ĝia rendimento) estos senditaj al la privata subteno de Jiyu Pulse.
+977	Via retpoŝtadreso, la teksto, {0} foto(j) kaj la profilo de ĉi tiu telefono (modelo, versio de Android kaj de la aplikaĵo kaj, se vi ŝaltis la telemetrion, ĝia rendimento) estos senditaj al la privata subteno de Jiyu Pulse.
 978	Ĝisdatigoj
 979	Ne nun
 980	Agordoj povas esti en la breto aŭ supre en Hejmo, apud la Jam.
@@ -999,8 +999,8 @@
 1001	La kanto malfortiĝas fine kaj la sekva eniras milde: 3, 6 aŭ 10 sekundoj.
 1002	La letero malfermas la sugestan leterkeston kaj la skarabo, «Raporti eraron». Ĉiu sendaĵo havas biletnumeron kaj la respondo atingas nur vin, en la sonorilo.
 1003	La klasika aŭ la SimpMusic-stila: vitra kapsulo kun guto, kiun vi trenas, Serĉi aparte kaj faldiĝo dum rulumado.
-1004	La paneoj kaj novaĵoj de Pear Music, ankaŭ kiel sciigoj se vi volas.
-1005	La novaĵoj de Pear Music {0}
+1004	La paneoj kaj novaĵoj de Jiyu Pulse, ankaŭ kiel sciigoj se vi volas.
+1005	La novaĵoj de Jiyu Pulse {0}
 1006	La teknikaĵoj, falditaj: elŝuta kvalito, toleremo dum importado de ludlistoj kaj kaŝmemoro de kovriloj.
 1007	Maksimuma, aŭ datuma ŝparo kiam vi ne havas wifi-on. Elŝutoj ĉiam estas maksimumaj.
 1008	Normala, Kasedo, Vinilo aŭ Air. Oni ankaŭ ŝanĝas ĝin tenante premita la miniludilon.
@@ -1008,7 +1008,7 @@
 1010	Nova: ĝi gvidas vin tra ĉiuj Agordoj kaj klarigas ĉiun opcion. Ĝi estas apud la letero.
 1011	Nedeviga. Konservu vian bibliotekon en la nubo, ĉifritan per ŝlosilo kiun nur vi havas, kaj transportu ĝin al alia telefono.
 1012	Ordigu la langetojn trenante ilin. Ŝovu Malkovri maldekstren por forigi ĝin el la breto.
-1013	Pear Music nun haveblas en la portugala. Kaj «Español» nun nomiĝas «Castellano».
+1013	Jiyu Pulse nun haveblas en la portugala. Kaj «Español» nun nomiĝas «Castellano».
 1014	Português
 1015	Ke ĉiuj kantoj sonu same laŭte, sen mane plialtigi kaj mallaŭtigi la volumon.
 1016	Lastatempaj, A-Z, Z-A, laŭ grandeco aŭ mane. Per «Redakti ludlistojn» vi ordigas ilin trenante.
@@ -1022,8 +1022,108 @@
 1024	Kaj krome
 1025	Nun vi konas ĉiujn Agordojn. Revenu al ĉi tiu gvidilo kiam ajn per la butono apud la letero.
 1026	Ĝi ne plu markas Malkovri dum vi estas en Agordoj.
-1027	Nun vi povas uzi Pear Music en la portugala. Kaj «Español» nun nomiĝas «Castellano».
+1027	Nun vi povas uzi Jiyu Pulse en la portugala. Kaj «Español» nun nomiĝas «Castellano».
 1028	{0} el {1}
 1029	Preta!
 941	Choose your language · Tria la llengua · Escolle o idioma · Aukeratu hizkuntza · Elektu vian lingvon
 956	Castellano
+1030	 Agordoj estas supre en Hejmo kaj ne eniras la ordon.
+1031	Ordigi permane
+1032	Aliĝi
+1033	Vidi miajn ludlistojn
+1034	Kontrolante…
+1035	Ĉiam
+1036	Ni malfermis vian raporton
+1037	Eniri tamen (Dev)
+1038	Ni laboras pri tio
+1039	Ni malfermis vian raporton kaj esploras ĝin. Ni sciigos vin ĉi tie.
+1040	PRIZORGADO AKTIVA
+1041	Solvita! Dankon
+1042	 · likva vitro
+1043	Breto
+1044	Serĉi estas la cirklo dekstre. Rulumante malsupren en Hejmo la breto faldiĝas; se vi haltas 1,5 sekundojn, ĝi revenas tuta.
+1045	Serĉi revenas kiam vi haltas
+1046	Kun la klasika, serĉbreto supre en Hejmo aŭ aparta langeto. Kun la SimpMusic, la cirklo dekstre, kiu revenas kiam vi ĉesas rulumi.
+1047	La malsupra breto: ĝia stilo, kie estas Serĉi kaj la ordo de la langetoj, ĉio kune.
+1048	Forigu la serĉon por ŝanĝi la ordon.
+1049	Malfari
+1050	Kantoj, kiujn vi markis per «Ne interesas min», ne revenas, kaj artisto kun tri en unu monato ne aperas dum 30 tagoj. Ĝi konserviĝas nur en ĉi tiu telefono.
+1051	Kio ne interesas vin
+1052	Tenu premita kovrilon kaj trenu ĝin por ŝanĝi la ordon.
+1053	Ne interesas min
+1054	Ĝi ne plu aperos en Malkovri.
+1055	Malplenigi
+1056	Malplenigi tion, kio ne interesas vin
+1057	{0} kantoj
+1058	Ĝisdatigi
+1059	Forigis {0} raportojn
+1060	Forigi la retan protokolon
+1061	Ĉi tiu versio estas malnova
+1062	Devigi kolekton
+1063	La aplikaĵo kredas, ke ĝi estas {0}. Eliru kaj revenu por vidi la avizon.
+1064	La muziko plu funkcias. Se estas futbalo, eble temas pri la blokoj de LaLiga: avizoj kaj subteno revenas post la matĉo.
+1065	La serviloj de Jiyu Pulse ne respondas
+1066	Por ripeti la bonvenigon aŭ vidi la avizojn sen reinstali. Ili ne tuŝas vian bibliotekon nek viajn elŝutojn.
+1067	Por vidi la avizon pri nova versio
+1068	Petita. La aplikaĵoj vidos ĝin en sia ĉiutaga kontrolo.
+1069	Provoj
+1070	Ĝi povas malsukcesi. Ĝisdatigu por havi la riparojn.
+1071	Rekomenci la bonvenigon
+1072	Ĉiuj konservitaj raportoj estas forigitaj. La aparatkartoj de cimraportoj ne estas tuŝitaj. Ne eblas malfari.
+1073	Dua konfirmo: la panelo restos malplena.
+1074	Simuli malnovan version
+1075	SIMULITA VERSIO: {0}
+1076	Vidi la novaĵojn denove
+1077	Ĉu forigi la tutan telemetrion en la retejo?
+1078	Ĉu vi certas?
+1079	Ĉiu per sia telefono
+1080	De {0} · {1}
+1081	Kie ĝi sonas
+1082	Aŭskulti ankaŭ ĉi tie
+1083	Kio sonas ĉi tie, sonas samtempe en ĉies telefono, per sia propra sono. Ludu ion el la listo.
+1084	Sonas la samo kiel en la telefono de {0}, samtempe.
+1085	Ĝi sonas nur en ĉi tiu telefono; la aliaj aldonas kantojn.
+1086	Unu laŭtparolilo
+1087	{0} kaj {1}
+1088	{0}, {1} kaj {2}
+1089	 La kovrila foto ne eniras la QR-kodon.
+1090	Aldonante…
+1091	Aldoni al la biblioteko
+1092	Kunhavigi per QR
+1093	Kunhavigi ligilon
+1094	QR-kodo de {0}
+1095	Skanu ĝin per la fotilo de alia telefono kun Jiyu Pulse. Iras la nomo, la {0} kantoj kaj ilia ordo.
+1096	Ĉi tiu ludlisto estas malplena.
+1097	Ne eblis ŝargi la kantojn. Kontrolu la konekton kaj reprovu.
+1098	Kunhavigita ludlisto
+1099	Sen nomo
+1100	Ĝi havas tro da kantoj por QR (maksimume {0}).
+1101	{0} kantoj ne estas en YouTube Music kaj restis ekstere.
+1102	Agordoj, supre maldekstre
+1103	Biblioteko laŭ via gusto
+1104	Kunhavigu ludlistojn per QR
+1105	Kunhavigu ludliston per la QR de ĝia ekrano, kaj en Jam elektu ke ĝi sonu en ĉies telefono.
+1106	Kun la breto laŭ stilo de SimpMusic, se vi ĉesas rulumi en Hejmo, la breto revenas tuta.
+1107	En Malkovri, sub «⋯». Tiu kanto ne revenas, kaj se artisto ne plaĉas al vi, ĝi ne aperas dum iom da tempo.
+1108	En Hejmo. Kaj en Agordoj › Aspekto › Breto estas ĉio pri la breto kune.
+1109	Jam: ĉiu per sia telefono
+1110	Kion vi markis per «Ne interesas min». Malplenigu ĝin kiam vi volas.
+1111	Nova: la stilo de la breto, kie estas Serĉi kaj la langetoj, ĉio ĉi tie.
+1112	Nova: la stilo de la breto, kie estas Serĉi, la likva vitro kaj la langetoj, ĉio ĉi tie.
+1113	Alia telefono skanas ĝin per la fotilo kaj kunportas ĝin kun ĝiaj kantoj kaj ordo.
+1114	Ludlistoj en krado, kiel Viaj albumoj. Tenu premita kovrilon kaj trenu ĝin por ordigi.
+1115	Kiu kreas la Jam elektas: ke ĝi sonu en unu laŭtparolilo aŭ en ĉies telefono samtempe, per siaj aŭdiloj.
+1116	Ili aperas kun sia kovrilo komence de la dosierujo Playlists, en «Via muziko».
+1117	Premu la pinglon en ludlisto aŭ albumo kaj vi havos ĝin ĉi tie, en la ordo kiun vi volas.
+1118	Nun ĝi nomiĝas Jiyu Pulse
+1119	Koloroj de la kovrilo, pli legeblaj
+1120	Kun la koloroj de la kanto, la teksto de la butonoj mem elektas ĉu hela aŭ malhela.
+1121	Vitro kaj Sistemo debutas la koloron shu, la cinabron de Jiyu Pulse. Koloraj tekstoj kaj butonoj pli bone legeblas.
+1122	La cinabro de la japanaj sigeloj, sur butonoj, progreso kaj ŝatataj. Koloraj tekstoj pli bone legeblas, en hela kaj malhela reĝimoj.
+1123	La ĉiama ŝaltbutono, simetria, pli granda kaj en shu sur nigro.
+1124	Nova piktogramo
+1125	La apo nun nomiĝas Jiyu Pulse kaj havas novan piktogramon. Via biblioteko, elŝutoj kaj agordoj restas samaj.
+1126	Nova koloro: shu
+1127	«Jiyu» signifas «libereco» en la japana. Ĝi estas la sama apo: vi konservas vian bibliotekon, elŝutojn kaj agordojn.
+1128	Katalogo de la sponsoro
+1129	Demonstra reĝimo por registri la antaŭfilmon: Hejmo, serĉo, artisto, Biblioteko kaj elŝutoj nur kun kantoj de Michael Bennet, sen reto. Ĝi efikas kiam vi remalfermas la apon kaj ne tuŝas vian bibliotekon.

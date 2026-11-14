@@ -7,7 +7,7 @@ import SwiftUI
 // cada escenario en el simulador del iPhone 16 y guarda la captura con el mismo nombre.
 enum Demo {
     enum Tab: String { case home, reels, library, settings }
-    enum Route { case favorites, themePicker }
+    enum Route { case favorites, themePicker, artist, downloads }
 
     struct Scenario {
         var theme: AppTheme = .glass
@@ -19,6 +19,10 @@ enum Demo {
         var showPlayer = false
         var showJam = false
         var showImport = false
+        var barStyle = "classic"
+        var discover = true
+        /// Texto ya escrito en el buscador de Inicio (tráiler v2).
+        var query = ""
     }
 
     /// Los mismos nombres que las PNG de Android (shared/design/compare_shots.py los empareja).
@@ -38,6 +42,24 @@ enum Demo {
         "13_reproductor_neon": Scenario(theme: .neon, showPlayer: true),
         "14_jam": Scenario(playing: false, showJam: true),
         "15_importar": Scenario(playing: false, showImport: true),
+        // x.1.1 (1.5 y 1.3): con Descubrir oculta y Ajustes arriba quedan dos pestañas; tienen que ir centradas.
+        "37_barra_dos_pestanas": Scenario(playing: false, discover: false),
+        "38_barra_simpmusic_dos": Scenario(playing: false, barStyle: "simpmusic", discover: false),
+        // Tráiler v2 (4-11-2026): con `-demoCatalog YES` (DemoCatalog.swift), todo con canciones de Michael Bennet.
+        "v2_01_inicio": Scenario(tab: .home),
+        "v2_02_busqueda": Scenario(tab: .home, query: "Michael Bennet"),
+        "v2_03_artista": Scenario(tab: .home, route: .artist),
+        "v2_04_biblioteca": Scenario(tab: .library),
+        "v2_05_descargas": Scenario(tab: .library, route: .downloads),
+        "v2_06_reproductor": Scenario(showPlayer: true),
+        "v2_07_aire": Scenario(theme: .air, tab: .library),
+        "v2_08_neon": Scenario(theme: .neon, tab: .library),
+        "v2_09_sistema": Scenario(theme: .plain, tab: .library),
+        "v2_10_casete": Scenario(deck: .cassette, showPlayer: true),
+        "v2_11_vinilo": Scenario(deck: .vinyl, showPlayer: true),
+        "v2_12_air": Scenario(theme: .air, deck: .air, showPlayer: true),
+        "v2_13_jam": Scenario(showJam: true),
+        "v2_14_importar": Scenario(playing: false, showImport: true),
     ]
 
     static let current: Scenario? = UserDefaults.standard.string(forKey: "screenshotScenario").flatMap { scenarios[$0] }
@@ -63,6 +85,8 @@ enum Demo {
         d.set("home", forKey: "searchPlacement")
         d.set("recent", forKey: "playlistSort")
         d.set("", forKey: "jamName")
+        d.set(s.barStyle, forKey: "barStyle")
+        d.set(s.discover, forKey: "showDiscover")
     }
 
     /// Los mismos pasos que `seed()` en ScreenshotTest.kt, en el mismo orden.
@@ -79,7 +103,8 @@ enum Demo {
     /// Estado del reproductor y hojas abiertas.
     @MainActor static func apply(player: Player, jam: JamService) {
         guard let s = current else { return }
-        if s.playing { player.preview(queue: songs, index: 0, progress: 74, duration: 200) }
+        let queue = DemoCatalog.isActive ? DemoCatalog.songs : songs
+        if s.playing { player.preview(queue: queue, index: 0, progress: 74, duration: 200) }
         player.showFullPlayer = s.showPlayer
         jam.showSheet = s.showJam
     }

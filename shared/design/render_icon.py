@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Dibuja con Pillow el logo antiguo (violeta, de cuando la app se llamaba LibreMusic; mismo diseño que AppIcon.svg)
-para la evolución de la marca, y copia el de Pear Music (AppIcon-Encendido.png) a los tamaños de iOS y Android.
+para la evolución de la marca, y copia el de Jiyu Pulse (AppIcon-Encendido.png, generado con rsvg-convert desde el .svg) a los tamaños de iOS y Android.
 Así no hace falta ningún conversor de SVG.
 
     python3 shared/design/render_icon.py
@@ -187,7 +187,7 @@ def main():
     light, dark = render(False), render(True)
     ios = ROOT / "apps/ios/Sources/Assets.xcassets"
     # Este icono (nota y bobina, violeta) es el logo antiguo: ya no va en las apps y sólo se guarda aquí para la
-    # «evolución de la marca» del README y la web. El de Pear Music es el de encendido (AppIcon-Encendido.svg/.png),
+    # «evolución de la marca» del README y la web. El de Jiyu Pulse es el de encendido en shu (AppIcon-Encendido.svg/.png),
     # que se copia tal cual.
     light.save(ROOT / "shared/design/AppIcon.png")
     dark.save(ROOT / "shared/design/AppIcon-Dark.png")

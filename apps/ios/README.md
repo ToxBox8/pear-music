@@ -1,4 +1,4 @@
-# Pear Music para iOS (cliente no oficial de YouTube Music)
+# Jiyu Pulse para iOS (cliente no oficial de YouTube Music)
 
 Compilación en la nube (GitHub Actions) + instalación desde Linux.
 

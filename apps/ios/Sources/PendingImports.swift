@@ -33,7 +33,7 @@ struct PendingImportRow: View {
         if let l = pending.all[playlistID.uuidString], !l.isEmpty {
             NavigationLink { PendingImportView(playlistID: playlistID) } label: {
                 HStack(spacing: 12) {
-                    Image(systemName: "text.magnifyingglass").font(.title3).foregroundStyle(Color.accentColor)
+                    Image(systemName: "text.magnifyingglass").font(.title3).foregroundStyle(.tint)
                     VStack(alignment: .leading, spacing: 2) {
                         Text(L("Sin añadir: {0}", songCount(l.count))).font(.body.weight(.medium))
                         Text(L("De la importación. Toca para buscarlas otra vez.")).font(.caption).foregroundStyle(.secondary)
@@ -46,6 +46,8 @@ struct PendingImportRow: View {
 
 /// «Sin añadir»: se vuelven a buscar y se elige la versión, que se añade a la playlist. Igual que en Android.
 struct PendingImportView: View {
+    @Environment(\.accentFill) private var accentFill
+    @Environment(\.onAccent) private var onAccent
     let playlistID: UUID
     @EnvironmentObject var library: Library
     @ObservedObject private var pending = PendingImports.shared
@@ -65,7 +67,7 @@ struct PendingImportView: View {
                     Button { Task { await search() } } label: {
                         Label(searching ? "Buscando…" : "Buscar otra vez", systemImage: "arrow.clockwise").frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.borderedProminent)
+                    .buttonStyle(.borderedProminent).tint(accentFill).foregroundStyle(onAccent)
                     .disabled(searching)
                 } footer: {
                     Text(searching ? L("Buscando en YouTube Music… {0} de {1}", done, tracks.count)

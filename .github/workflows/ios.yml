@@ -11,6 +11,12 @@ on:
       - "shared/design/**"
       - ".github/workflows/ios.yml"
   workflow_dispatch:
+    inputs:
+      demo:
+        description: "Capturas del tráiler v2 con el catálogo del patrocinador (DemoCatalog.swift)"
+        type: boolean
+        required: false
+        default: false
   workflow_call:
     inputs:
       version:
@@ -61,7 +67,7 @@ jobs:
           fi
           mkdir -p Payload dist
           cp -R build/Build/Products/Release-iphoneos/LibreMusic.app Payload/
-          zip -qr "dist/LibreMusic-ios-$VERSION.ipa" Payload
+          zip -qr "dist/JiyuPulse-ios-$VERSION.ipa" Payload
           (cd dist && shasum -a 256 *.ipa > SHA256SUMS.txt && cat SHA256SUMS.txt)
 
       - uses: actions/upload-artifact@v4
@@ -101,6 +107,8 @@ jobs:
           }
 
       - name: Capturas
+        env:
+          DEMO: ${{ inputs.demo && '1' || '0' }}
         run: scripts/screenshots.sh build/Build/Products/Debug-iphonesimulator/LibreMusic.app shots
 
       - uses: actions/upload-artifact@v4

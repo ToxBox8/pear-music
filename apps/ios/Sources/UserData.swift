@@ -116,7 +116,7 @@ enum UserData {
     }
 
     private static let readme = """
-    Datos de Pear Music en este iPhone.
+    Datos de Jiyu Pulse en este iPhone.
 
     app/library.json      Biblioteca: playlists, canciones guardadas y álbumes (formato de docs/LIBRARY_FORMAT.md).
     app/stats.json        Estadísticas de escucha (sólo existen en el móvil).
@@ -124,7 +124,7 @@ enum UserData {
     app/support/          Borradores de «Informar de un error» (con tu correo, si lo escribiste).
     ajustes.plist         Ajustes de la app (tema, reproductor, avisos leídos, nombre en el Jam…).
 
-    Pear Music no tiene cuentas ni guarda estos datos en ningún servidor.
+    Jiyu Pulse no tiene cuentas ni guarda estos datos en ningún servidor.
     """
 }
 

@@ -1,8 +1,9 @@
-<!-- Icono original de la primera versión de Android (icono morado de encendido), recuperado del commit 2c14027
-     (ic_launcher_foreground.xml): el mismo trazo en el lienzo de 1024 del icono de iOS. Icono por defecto desde 0.8.1. -->
+<!-- Icono de Jiyu Pulse (marca Shu, 1-11-2026): el símbolo de encendido, ahora simétrico respecto a x = 20 (arcos
+     concéntricos con centro en 20, 20.55; caja del trazo de x 7.75–32.25 e y 7.75–32.80), en shu #F4511E sobre sumi
+     #0E0E10 y al 47 % del lado. Lo eligió Toxbox (cambio de look/marca/logo/icono-app-shu-47.svg). -->
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
-  <rect width="1024" height="1024" fill="#07070A"/>
-  <g transform="translate(272 260) scale(12.3)">
-    <path d="M12,13a11,11 0,1 0,15 0M16,16a6,6 0,1 0,8 0M20,9v12" fill="none" stroke="#A78BFA" stroke-width="2.5" stroke-linecap="round"/>
+  <rect width="1024" height="1024" fill="#0E0E10"/>
+  <g transform="translate(127.74 122.46) scale(19.2128)">
+    <path d="M12,13a11,11 0,1 0,16 0M16,16.078a6,6 0,1 0,8 0M20,9v12" fill="none" stroke="#F4511E" stroke-width="2.5" stroke-linecap="round"/>
   </g>
 </svg>

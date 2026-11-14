@@ -108,7 +108,7 @@ struct AirPlayerView: View {
             RepeatButton()
             SleepTimerButton()
             Menu {
-                Button(action: onLyrics) { Label("Ver letra", systemImage: "quote.bubble") }
+                Button(action: onLyrics) { Label(L("Ver letra"), systemImage: "quote.bubble") }
                 Divider()
                 SongMenuItems(song: song)
             } label: {
@@ -722,5 +722,29 @@ struct MiniAirDisc: View {
             .frame(width: s, height: s)
         }
         .aspectRatio(1, contentMode: .fit)
+    }
+}
+
+// MARK: Orientación
+/// Air se queda en vertical aunque se gire el móvil (x.1.1): es un objeto pensado de pie, no tiene vista horizontal.
+/// SwiftUI no deja bloquear una sola vista, así que se hace con el delegado de la app y se pide a la escena que
+/// vuelva a vertical. Sólo en iPhone; el resto de la app gira como siempre.
+@MainActor
+final class OrientationLock: NSObject, UIApplicationDelegate {
+    private static var portraitOnly = false
+
+    func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
+        if Self.portraitOnly { return .portrait }
+        return UIDevice.current.userInterfaceIdiom == .pad ? .all : .allButUpsideDown
+    }
+
+    static func portrait(_ on: Bool) {
+        guard UIDevice.current.userInterfaceIdiom == .phone, portraitOnly != on else { return }
+        portraitOnly = on
+        guard #available(iOS 16, *) else { return }
+        for scene in UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene }) {
+            for window in scene.windows { window.rootViewController?.setNeedsUpdateOfSupportedInterfaceOrientations() }
+            if on { scene.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait)) }
+        }
     }
 }

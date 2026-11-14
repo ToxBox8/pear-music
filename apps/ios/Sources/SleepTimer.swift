@@ -113,12 +113,12 @@ struct SleepTimerButton: View {
             }
             if timer.state != .off {
                 Divider()
-                Button(role: .destructive) { timer.cancel() } label: { Label("Desactivar temporizador", systemImage: "xmark") }
+                Button(role: .destructive) { timer.cancel() } label: { Label(L("Desactivar temporizador"), systemImage: "xmark") }
             }
         } label: {
             Image(systemName: timer.state == .off ? "moon.zzz" : "moon.zzz.fill")
                 .font(.title3)
-                .foregroundStyle(timer.state == .off ? Color.primary : Color.accentColor)
+                .foregroundStyle(timer.state == .off ? AnyShapeStyle(Color.primary) : AnyShapeStyle(.tint))
                 .frame(width: 44, height: 44)
                 .contentShape(Rectangle())
         }
@@ -134,7 +134,7 @@ struct SleepTimerLabel: View {
         if let l = timer.label() {
             Label(l, systemImage: "moon.zzz.fill")
                 .font(.caption.monospacedDigit())
-                .foregroundStyle(Color.accentColor)
+                .foregroundStyle(.tint)
                 .lineLimit(1)
         }
     }

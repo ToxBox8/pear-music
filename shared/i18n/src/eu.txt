@@ -30,7 +30,7 @@
 30	Eguneratu gordetako zerrenda
 31	Aktibatu Ezarpenetan edo idatzi kodea eskuz.
 32	Administrazioa
-33	Pear Music erabiltzen duten guztiei eragiten die, aplikazioa irekitzen duten unetik.
+33	Jiyu Pulse erabiltzen duten guztiei eragiten die, aplikazioa irekitzen duten unetik.
 34	Orain ez, jarraitu
 35	Orain jotzen
 36	Orain jotzen handia
@@ -63,8 +63,8 @@
 63	Helegitea jarri
 64	Apple Music edo Spotify: ireki zerrenda → Partekatu → Kopiatu esteka. Publikoa izan behar du. Spotify-tik 100 abesti inguru iristen dira gehienez; zerrenda luzeagoetarako, erabili Exportify-ren CSVa.
 65	Enfokatu Jam-aren QRa
-66	Pear Music-en library.json fitxategia (Androidekoa ere bai). Ez daukazuna gehitzen da, ezer ezabatu gabe.
-67	Pear Music-en library.json fitxategia (iOSekoa ere bai). Ez daukazuna gehitzen da, ezer ezabatu gabe.
+66	Jiyu Pulse-en library.json fitxategia (Androidekoa ere bai). Ez daukazuna gehitzen da, ezer ezabatu gabe.
+67	Jiyu Pulse-en library.json fitxategia (iOSekoa ere bai). Ez daukazuna gehitzen da, ezer ezabatu gabe.
 68	Arrastatu karpetak ordena aldatzeko.
 69	Arrastatu zerrendak, Deskargatuak eta Gogokoak nahi duzun lekuan jartzeko.
 70	Arrastatu ordena aldatzeko
@@ -86,11 +86,11 @@
 86	Aurreratua
 87	Abisua
 88	Abisuak
-89	Webgunean argitaratutako Pear Music-en abisuak
+89	Webgunean argitaratutako Jiyu Pulse-en abisuak
 90	Abisu garrantzitsuak
 91	Abisuak, {0} irakurri gabe
 92	Laguntza eta euskarria
-93	Pear Music hobetzen laguntzen duzu
+93	Jiyu Pulse hobetzen laguntzen duzu
 94	Zerrendara gehitua
 95	Duela gutxi gehituak
 96	Gehitu
@@ -191,7 +191,7 @@
 191	Kasetea: biratu bobina bat edo arrastatu zinta aurrera edo atzera egiteko. Biniloa: biratu diskoa hatzarekin edo mugitu besoa. Mugikorra horizontalean jarrita, kaseteak edo biniloak pantaila osoa hartzen dute. Mini erreproduzigailua luze sakatuta ere alda dezakezu.
 192	Cast
 193	Erorketak eta bertsio urgenteak
-194	Erorketak, bertsio berriak eta Pear Music-en berritasunak
+194	Erorketak, bertsio berriak eta Jiyu Pulse-en berritasunak
 195	Itxi
 196	Itxi abisua
 197	Itxi istorioak
@@ -253,7 +253,7 @@
 253	Botoiak azalaren kolorearen zenbateraino antza duten
 254	Atzealdeak eta menuak zenbateraino tindatzen diren
 255	Kontaiguzu zerk huts egin duen; pantaila-argazkiak gehi ditzakezu
-256	Kontaiguzu zer nahi zenukeen Pear Music-ek egitea
+256	Kontaiguzu zer nahi zenukeen Jiyu Pulse-ek egitea
 257	Fitxak dituen kapsula bat eta Bilatu bereizita, SimpMusic bezala. Arrastatu tanta fitxaz aldatzeko; zerrenda batean behera egitean, mini erreproduzigailuaren ondoan tolesten da.
 258	Jam-aren QR kodea
 259	6 zifrako kodea
@@ -278,7 +278,7 @@
 278	Deskargatuak eta Gogokoak
 279	Deskargatuta
 280	Deskargatzen
-281	Pear Music {0} deskargatzen…
+281	Jiyu Pulse {0} deskargatzen…
 282	Deskargatzen: % {0}
 283	Deskargatu
 284	Deskargatu falta diren {0} abestiak
@@ -410,7 +410,7 @@
 410	Gorde zerrenda
 411	Gorde eta irten
 412	Gorde zure pasahitz-kudeatzailean edo idatzi. Zure liburutegia zifratzen duena da: hura gabe ezin da 
-413	Gorde zure pasahitz-kudeatzailean edo idatzi. Zure liburutegia zifratzen duena da: hura gabe ezin da hodeiko kopia beste mugikor batean berreskuratu. Pear Music-ek ez du gordetzen eta ezin du berreskuratu.
+413	Gorde zure pasahitz-kudeatzailean edo idatzi. Zure liburutegia zifratzen duena da: hura gabe ezin da hodeiko kopia beste mugikor batean berreskuratu. Jiyu Pulse-ek ez du gordetzen eta ezin du berreskuratu.
 414	Hasierako gida
 415	Biratu aurrera edo atzera egiteko
 416	Egin kopia orain
@@ -486,13 +486,13 @@
 486	Zuk sortua · {0}
 487	Aurten atera dutena
 488	Gehien entzuten duzuna
-489	Azken entzundakoa, zuretzat egindako irratiak, zure artisten berritasunak eta goian finkatzen duzuna. Kanpaiak Pear Music-en abisuak dakartza.
-490	Azken entzundakoa, zuretzat egindako irratiak, zure artisten berritasunak eta goian finkatzen duzuna. Kanpaiak Pear Music-en abisuak dakartza. Ukitu Hasiera fitxa.
+489	Azken entzundakoa, zuretzat egindako irratiak, zure artisten berritasunak eta goian finkatzen duzuna. Kanpaiak Jiyu Pulse-en abisuak dakartza.
+490	Azken entzundakoa, zuretzat egindako irratiak, zure artisten berritasunak eta goian finkatzen duzuna. Kanpaiak Jiyu Pulse-en abisuak dakartza. Ukitu Hasiera fitxa.
 491	Logoa
 492	Lerro luzeegia
 493	Aste honetako laburpena orain bidaltzen du markatutako eremuekin (derrigorrezkoak beti doaz: identifikatzailea, plataforma, aldaera, bertsioa eta astea). Asteko laburpena bere kabuz bidaltzen da telemetria aktibatuta badago.
 494	Bidali kode bat
-495	Mantendu Pear Music irekita. Segundo batzuk behar izaten ditu.
+495	Mantendu Jiyu Pulse irekita. Segundo batzuk behar izaten ditu.
 496	Eutsi sakatuta deskargak ezabatzeko
 497	Eutsi sakatuta estatistikak ezabatzeko
 498	Eutsi sakatuta ilara husteko
@@ -551,7 +551,7 @@
 551	Ez dago emaitzarik «{0}» bilaketarako
 552	Ez dago single edo EPrik.
 553	Ez dago albumik.
-554	Ez duzu ezertarako behar: Pear Music berdin dabil hura gabe. Baina bat sortzen baduzu, asko laguntzen diguzu aplikazioa hobetzen, eta zure musika nahi duzun lekura eramango duzu.
+554	Ez duzu ezertarako behar: Jiyu Pulse berdin dabil hura gabe. Baina bat sortzen baduzu, asko laguntzen diguzu aplikazioa hobetzen, eta zure musika nahi duzun lekura eramango duzu.
 555	Ez dirudi Exportify-ren CSV bat denik («Track URI» zutabea falta da).
 556	Ez da gehitzeko abestirik geratzen
 557	Ez da abestirik aurkitu. Zerrenda publikoa da?
@@ -624,18 +624,18 @@
 624	Pausa
 625	Zerrendaren deskarga pausatzen du
 626	Pausatu
-627	Pear Dev
-628	Pear Music
-629	Pear Music proiektu pertsonal eta doakoa da, YouTube eta Google-rekin zerikusirik gabea. Beharrezkoa da aplikazioa erabiltzeko.
-630	Pear Music-ek ez du konturik ez zure datuak dituen zerbitzaririk: dena mugikor honetan dago. 
-631	Pear Music-ek ez du konturik ez zure datuak dituen zerbitzaririk: dena mugikor honetan dago. Fitxategiak zure liburutegia, estatistikak, letrak, euskarriko zirriborroak eta ezarpenak ditu; ez deskargatutako abestiak.
-632	Pear Music-ek ez du kamera erabiltzeko baimenik
-633	Pear Music {0}
+627	Jiyu Dev
+628	Jiyu Pulse
+629	Jiyu Pulse proiektu pertsonal eta doakoa da, YouTube eta Google-rekin zerikusirik gabea. Beharrezkoa da aplikazioa erabiltzeko.
+630	Jiyu Pulse-ek ez du konturik ez zure datuak dituen zerbitzaririk: dena mugikor honetan dago. 
+631	Jiyu Pulse-ek ez du konturik ez zure datuak dituen zerbitzaririk: dena mugikor honetan dago. Fitxategiak zure liburutegia, estatistikak, letrak, euskarriko zirriborroak eta ezarpenak ditu; ez deskargatutako abestiak.
+632	Jiyu Pulse-ek ez du kamera erabiltzeko baimenik
+633	Jiyu Pulse {0}
 634	Eskatu blokeo osoa
 635	Itsatsi Spotify-ko zerrenda baten esteka (Partekatu → Kopiatu esteka).
 636	Itsatsi music.apple.com-eko esteka bat (Partekatu → Kopiatu esteka).
 637	Itsatsi
-638	Baimendu Pear Music-en aplikazioak instalatzea eta sakatu berriro Deskargatu.
+638	Baimendu Jiyu Pulse-en aplikazioak instalatzea eta sakatu berriro Deskargatu.
 639	Pertsonalizatua
 640	Fitxa bereizia
 641	Fitxak
@@ -671,7 +671,7 @@
 671	Kendu {0}
 672	Zer gertatu da
 673	Zer bidaltzen den zehazki
-674	Zer nahi zenukeen Pear Music-ek egitea eta zertarako balioko lizukeen (gutxienez {0} karaktere).
+674	Zer nahi zenukeen Jiyu Pulse-ek egitea eta zertarako balioko lizukeen (gutxienez {0} karaktere).
 675	Berrekin · {0}/{1}
 676	Azkenak
 677	Gogorarazi bihar
@@ -691,7 +691,7 @@
 691	Erreproduzigailua
 692	Multimedia-erreproduzigailua
 693	Nortasuna duten erreproduzigailuak
-694	Pear Music-en erantzuna
+694	Jiyu Pulse-en erantzuna
 695	Zerbitzariaren ustekabeko erantzuna.
 696	Berrezarri
 697	Berrezarri {0}
@@ -747,7 +747,7 @@
 747	Ikonorik gabe
 748	Oraindik ez dago lerrorik
 749	Markatu gabe
-750	Ez dago Musika aplikazioa irakurtzeko baimenik. Aktibatu Ezarpenak → Pear Music atalean.
+750	Ez dago Musika aplikazioa irakurtzeko baimenik. Aktibatu Ezarpenak → Jiyu Pulse atalean.
 751	Jarraipenik eta publizitaterik gabe. Zuk erabakitzen duzu zer partekatu.
 752	Emaitzarik ez
 753	Amaitu gabe
@@ -760,8 +760,8 @@
 760	Zuretzat bakarrik
 761	Zuk bakarrik duzu gakoa. Guk ere ezin dugu irakurri.
 762	Oraingoz {0} bakarrik
-763	Hasierako pantaila luze sakatu ere egin dezakezu › Widgetak › Pear Music. Tamainaz alda daitezke.
-764	Ongi etorri Pear Music-era
+763	Hasierako pantaila luze sakatu ere egin dezakezu › Widgetak › Jiyu Pulse. Tamainaz alda daitezke.
+764	Ongi etorri Jiyu Pulse-era
 765	{0} helbidera bidali dizugu. 10 minutu barru iraungitzen da.
 766	Telemetria
 767	Errendimendu-telemetria
@@ -782,8 +782,8 @@
 782	YouTube Music-eko musika guztia, doan eta iragarkirik gabe. Pantaila itzalita, konexiorik gabe eta zure lagunekin entzuteko Jam batekin.
 783	Guztiak
 784	Denak bat datoz YouTube Music-eko bertsioarekin.
-785	Oraindik ez da agertzen. Egiaztatu kodea zuzena dela, wifi berean edo Bluetootha aktibatuta zaudetela eta sortu zuenak Pear Music irekita duela.
-786	Oraindik ez da agertzen. Egiaztatu kodea zuzena dela, wifi berean zaudetela eta sortu zuenak Pear Music irekita duela.
+785	Oraindik ez da agertzen. Egiaztatu kodea zuzena dela, wifi berean edo Bluetootha aktibatuta zaudetela eta sortu zuenak Jiyu Pulse irekita duela.
+786	Oraindik ez da agertzen. Egiaztatu kodea zuzena dela, wifi berean zaudetela eta sortu zuenak Jiyu Pulse irekita duela.
 787	Oraindik ez dago ezer hemen
 788	Oraindik ez dago zerrendarik
 789	Oraindik ez duzu albumik
@@ -797,7 +797,7 @@
 797	Zure liburutegia, hodeian zifratuta
 798	Zure berreskuratze-gakoa
 799	Zure posta elektronikoa
-800	Zure Pear Music kontua
+800	Zure Jiyu Pulse kontua
 801	Zure ideia
 802	Zure abiarazleak ez du hemendik gehitzen uzten: luze sakatu hasierako pantaila › Widgetak
 803	Zure musika
@@ -890,7 +890,7 @@
 890	ordena barra aurkitu hasiera liburutegia
 891	pribatutasuna dbeo esportatu ezabatu datuak zip
 892	irrati amaigabea erreprodukzio automatikoa ilara amaitu
-893	hodeiko kopia beste mugikor batean berreskuratu. Pear Music-ek ez du gordetzen eta ezin du berreskuratu.
+893	hodeiko kopia beste mugikor batean berreskuratu. Jiyu Pulse-ek ez du gordetzen eta ezin du berreskuratu.
 894	aplikazioaren gainerakoan
 895	audio irteera bozgorailua homepod apple tv bluetooth
 896	streaming datuak aurrezpena gorena kbps
@@ -955,10 +955,10 @@
 957	{0} kodea
 958	Pertsonak: {0}
 959	Zerrendak: 
-960	Zure posta, testua eta iPhonearen datuak (modeloa, iOS eta aplikazioaren bertsioa) Pear Music-en euskarriko kanal pribatura bidaliko dira.
-961	Zure posta, testua eta mugikorraren datuak (modeloa, Android eta aplikazioaren bertsioa) Pear Music-en euskarriko kanal pribatura bidaliko dira.
-962	Zure posta, testua, {0} argazki eta iPhonearen datuak (modeloa, iOS eta aplikazioaren bertsioa) Pear Music-en euskarriko kanal pribatura bidaliko dira.
-963	Zure posta, testua, {0} argazki eta mugikorraren datuak (modeloa, Android eta aplikazioaren bertsioa) Pear Music-en euskarriko kanal pribatura bidaliko dira.
+960	Zure posta, testua eta iPhonearen datuak (modeloa, iOS eta aplikazioaren bertsioa) Jiyu Pulse-en euskarriko kanal pribatura bidaliko dira.
+961	Zure posta, testua eta mugikorraren datuak (modeloa, Android eta aplikazioaren bertsioa) Jiyu Pulse-en euskarriko kanal pribatura bidaliko dira.
+962	Zure posta, testua, {0} argazki eta iPhonearen datuak (modeloa, iOS eta aplikazioaren bertsioa) Jiyu Pulse-en euskarriko kanal pribatura bidaliko dira.
+963	Zure posta, testua, {0} argazki eta mugikorraren datuak (modeloa, Android eta aplikazioaren bertsioa) Jiyu Pulse-en euskarriko kanal pribatura bidaliko dira.
 964	Eskerrik asko! #{0} txartela da. Abisuetan (zuri bakarrik) eta jarri duzun postan erantzungo dizugu.
 965	Eskerrik asko! Abisuetan (zuri bakarrik) eta jarri duzun postan erantzungo dizugu.
 966	«{0}» gaiak beti modu argia erabiltzen du.
@@ -968,11 +968,11 @@
 970	SimpMusic-en beheko barra, maxrave-dev-ena (GPL-3.0)
 971	SimpMusic-en inspiratutako beheko barra, maxrave-dev-ena (GPL-3.0)
 972	atzo
-973	Pear Music {0} deskargatzen… % {1}
-974	Zure posta, testua eta iPhone honen fitxa (modeloa, iOS eta aplikazioaren bertsioa eta, telemetria aktibatuta baduzu, haren errendimendua) Pear Music-en laguntza pribatura bidaliko dira.
-975	Zure posta, testua eta mugikor honen fitxa (modeloa, Android eta aplikazioaren bertsioa eta, telemetria aktibatuta baduzu, haren errendimendua) Pear Music-en laguntza pribatura bidaliko dira.
-976	Zure posta, testua, {0} argazki eta iPhone honen fitxa (modeloa, iOS eta aplikazioaren bertsioa eta, telemetria aktibatuta baduzu, haren errendimendua) Pear Music-en laguntza pribatura bidaliko dira.
-977	Zure posta, testua, {0} argazki eta mugikor honen fitxa (modeloa, Android eta aplikazioaren bertsioa eta, telemetria aktibatuta baduzu, haren errendimendua) Pear Music-en laguntza pribatura bidaliko dira.
+973	Jiyu Pulse {0} deskargatzen… % {1}
+974	Zure posta, testua eta iPhone honen fitxa (modeloa, iOS eta aplikazioaren bertsioa eta, telemetria aktibatuta baduzu, haren errendimendua) Jiyu Pulse-en laguntza pribatura bidaliko dira.
+975	Zure posta, testua eta mugikor honen fitxa (modeloa, Android eta aplikazioaren bertsioa eta, telemetria aktibatuta baduzu, haren errendimendua) Jiyu Pulse-en laguntza pribatura bidaliko dira.
+976	Zure posta, testua, {0} argazki eta iPhone honen fitxa (modeloa, iOS eta aplikazioaren bertsioa eta, telemetria aktibatuta baduzu, haren errendimendua) Jiyu Pulse-en laguntza pribatura bidaliko dira.
+977	Zure posta, testua, {0} argazki eta mugikor honen fitxa (modeloa, Android eta aplikazioaren bertsioa eta, telemetria aktibatuta baduzu, haren errendimendua) Jiyu Pulse-en laguntza pribatura bidaliko dira.
 978	Eguneraketak
 979	Orain ez
 980	Ezarpenak barran edo goian, Hasieran, Jam-aren ondoan egon daitezke.
@@ -999,8 +999,8 @@
 1001	Abestia amaieran jaisten da eta hurrengoa leun sartzen da: 3, 6 edo 10 segundo.
 1002	Gutunak iradokizunen postontzia irekitzen du eta kakalardoak, «Akats baten berri eman». Bidalketa bakoitzak txartel-zenbakia du eta erantzuna zuri bakarrik iristen zaizu, kanpaira.
 1003	Klasikoa edo SimpMusic estilokoa: kristalezko kapsula arrastatzen duzun tanta batekin, Bilatu aparte eta jaistean tolestuta.
-1004	Pear Music-en etenak eta berritasunak, nahi baduzu jakinarazpen gisa ere bai.
-1005	Pear Music {0}-ren berritasunak
+1004	Jiyu Pulse-en etenak eta berritasunak, nahi baduzu jakinarazpen gisa ere bai.
+1005	Jiyu Pulse {0}-ren berritasunak
 1006	Teknikoa, tolestuta: deskargaren kalitatea, zerrendak inportatzeko tolerantzia eta azalen cachea.
 1007	Gehienekoa, edo datu-aurrezpena wifirik ez duzunean. Deskargak beti gehienekoan.
 1008	Normala, Kasetea, Biniloa edo Air. Mini erreproduzigailua sakatuta edukita ere aldatzen da.
@@ -1008,7 +1008,7 @@
 1010	Berria: Ezarpen guztietan zehar eramaten zaitu eta aukera bakoitza azaltzen dizu. Gutunaren ondoan dago.
 1011	Aukerakoa. Gorde zure liburutegia hodeian, zuk bakarrik duzun gako batekin zifratuta, eta eraman beste mugikor batera.
 1012	Ordenatu fitxak arrastatuta. Irristatu Aurkitu ezkerrera barratik kentzeko.
-1013	Pear Music portugesez dago orain. Eta «Español»-i «Castellano» deitzen zaio orain.
+1013	Jiyu Pulse portugesez dago orain. Eta «Español»-i «Castellano» deitzen zaio orain.
 1014	Português
 1015	Abesti guztiek bolumen berean jo dezaten, bolumena eskuz igo eta jaitsi gabe.
 1016	Azkenak, A-Z, Z-A, tamainaren arabera edo eskuz. «Editatu zerrendak» erabiliz arrastatuta ordenatzen dituzu.
@@ -1022,8 +1022,108 @@
 1024	Eta gainera
 1025	Ezarpen guztiak ezagutzen dituzu orain. Itzuli gida honetara nahi duzunean gutunaren ondoko botoiarekin.
 1026	Ez du Aurkitu markatzen Ezarpenetan zaudenean.
-1027	Pear Music português-ez erabil dezakezu orain. Eta «Español»-i «Castellano» deitzen zaio orain.
+1027	Jiyu Pulse português-ez erabil dezakezu orain. Eta «Español»-i «Castellano» deitzen zaio orain.
 1028	{0}/{1}
 1029	Prest!
 941	Choose your language · Tria la llengua · Escolle o idioma · Aukeratu hizkuntza · Elektu vian lingvon
 956	Castellano
+1030	 Ezarpenak goian dago Hasieran eta ez da ordenan sartzen.
+1031	Eskuz ordenatu
+1032	Batu
+1033	Ikusi nire zerrendak
+1034	Egiaztatzen…
+1035	Beti
+1036	Zure intzidentzia ireki dugu
+1037	Sartu hala ere (Dev)
+1038	Lanean ari gara
+1039	Zure intzidentzia ireki dugu eta aztertzen ari gara. Hemen abisatuko dizugu.
+1040	MANTENTZE-LANAK AKTIBO
+1041	Konponduta! Eskerrik asko
+1042	 · kristal likidoa
+1043	Barra
+1044	Bilatu eskuineko zirkulua da. Hasieran behera egitean barra tolestu egiten da; 1,5 segundoz geldirik egonez gero, osorik itzultzen da.
+1045	Bilatu itzultzen da gelditzean
+1046	Klasikoarekin, barra bat Hasieraren goialdean edo fitxa bereizi bat. SimpMusic-ekin, eskuineko zirkulua, behera egiteari uzten badiozu itzultzen dena.
+1047	Beheko barra: bere estiloa, Bilatu non dagoen eta fitxen ordena, dena batera.
+1048	Ezabatu bilaketa ordena aldatzeko.
+1049	Desegin
+1050	«Ez zait interesatzen» markatu dituzun abestiak ez dira berriro agertzen, eta hilabetean hiru dituen artista bat 30 egunez ez da agertzen. Mugikor honetan bakarrik gordetzen da.
+1051	Interesatzen ez zaizuna
+1052	Eduki sakatuta azal bat eta arrastatu ordena aldatzeko.
+1053	Ez zait interesatzen
+1054	Ez da berriro agertuko Aurkitu atalean.
+1055	Hustu
+1056	Hustu interesatzen ez zaizuna
+1057	{0} abesti
+1058	Eguneratu
+1059	{0} txosten ezabatu dira
+1060	Ezabatu webeko erregistroa
+1061	Bertsio hau zaharra da
+1062	Behartu erauzketa
+1063	Aplikazioak {0} dela uste du. Irten eta itzuli abisua ikusteko.
+1064	Musikak funtzionatzen jarraitzen du. Futbola badago, LaLigaren blokeoengatik izan daiteke: abisuak eta laguntza partida amaitzean itzultzen dira.
+1065	Jiyu Pulse-en zerbitzariek ez dute erantzuten
+1066	Ongietorria errepikatzeko edo abisuak berriro instalatu gabe ikusteko. Ez dute zure liburutegia ez deskargak ukitzen.
+1067	Bertsio berriaren abisua ikusteko
+1068	Eskatuta. Aplikazioek eguneroko taupadan ikusiko dute.
+1069	Probak
+1070	Huts egin dezake. Eguneratu konponketak izateko.
+1071	Berrabiarazi ongietorria
+1072	Gordetako txosten guztiak ezabatzen dira. Akats-txostenen fitxak ez dira ukitzen. Ezin da desegin.
+1073	Bigarren berrespena: panela hutsik geratzen da.
+1074	Simulatu bertsio zahar bat
+1075	BERTSIO SIMULATUA: {0}
+1076	Ikusi berritasunak berriro
+1077	Webeko telemetria guztia ezabatu?
+1078	Ziur zaude?
+1079	Bakoitza bere mugikorrean
+1080	{0}(r)ena · {1}
+1081	Non entzuten da
+1082	Entzun hemen ere
+1083	Hemen entzuten dena aldi berean entzuten da bakoitzaren mugikorrean, bere audioarekin. Jarri zerbait zerrendatik.
+1084	{0}(r)en mugikorrean entzuten den gauza bera, aldi berean.
+1085	Mugikor honetan bakarrik entzuten da; besteek abestiak gehitzen dituzte.
+1086	Bozgorailu bat
+1087	{0} eta {1}
+1088	{0}, {1} eta {2}
+1089	 Azaleko argazkiak ez du lekurik QRan.
+1090	Gehitzen…
+1091	Gehitu liburutegira
+1092	Partekatu QR bidez
+1093	Partekatu esteka
+1094	{0}(r)en QR kodea
+1095	Eskaneatu Jiyu Pulse duen beste mugikor baten kamerarekin. Izena, {0} abestiak eta haien ordena bidaltzen dira.
+1096	Zerrenda hau hutsik dago.
+1097	Ezin izan dira abestiak kargatu. Begiratu konexioa eta saiatu berriro.
+1098	Partekatutako zerrenda
+1099	Izenik gabe
+1100	Abesti gehiegi ditu QR baterako (gehienez {0}).
+1101	{0} abesti ez daude YouTube Music-en eta kanpoan geratu dira.
+1102	Ezarpenak, goian ezkerrean
+1103	Liburutegia zure gustura
+1104	Partekatu zerrendak QR batekin
+1105	Partekatu zerrenda bat bere pantailako QRarekin, eta Jamean aukeratu bakoitzaren mugikorrean entzutea.
+1106	SimpMusic estiloko barrarekin, Hasieran behera egiteari uzten badiozu barra osorik itzultzen da.
+1107	Aurkitu atalean, «⋯»-n. Abesti hori ez da itzultzen, eta artista bat gustatzen ez bazaizu, denbora batez ez da agertzen.
+1108	Hasieran. Eta Ezarpenak › Itxura › Barra atalean dago barrari buruzko guztia.
+1109	Jam: bakoitza bere mugikorrean
+1110	«Ez zait interesatzen» markatu duzuna. Hustu nahi duzunean.
+1111	Berria: barraren estiloa, Bilatu non dagoen eta fitxak, dena hemen.
+1112	Berria: barraren estiloa, Bilatu non dagoen, kristal likidoa eta fitxak, dena hemen.
+1113	Beste mugikor batek kamerarekin eskaneatzen du eta abestiekin eta ordenarekin eramaten du.
+1114	Zerrendak saretan, Zure albumak bezala. Eduki sakatuta azal bat eta arrastatu ordenatzeko.
+1115	Jama sortzen duenak aukeratzen du: bozgorailu batean edo bakoitzaren mugikorrean aldi berean, bere entzungailuekin.
+1116	Azalarekin agertzen dira Playlists karpetaren hasieran, «Zure musika» atalean.
+1117	Sakatu txintxeta playlist edo album batean eta hemen izango duzu, nahi duzun ordenan.
+1118	Orain Jiyu Pulse du izena
+1119	Azalaren koloreak, irakurgarriago
+1120	Abestiaren koloreekin, botoien testuak berak aukeratzen du argia ala iluna izan.
+1121	Kristala eta Sistema shu kolorearekin estreinatzen dira, Jiyu Pulseren zinabrea. Koloretako testuak eta botoiak hobeto irakurtzen dira.
+1122	Japoniako zigiluen zinabrea, botoietan, aurrerapenean eta gogokoetan. Koloretako testuak hobeto irakurtzen dira, argian eta ilunean.
+1123	Betiko pizteko botoia, simetrikoa, handiagoa eta shu kolorean beltzaren gainean.
+1124	Ikono berria
+1125	Aplikazioak Jiyu Pulse du izena eta ikono berria. Zure liburutegia, deskargak eta ezarpenak berdin jarraitzen dute.
+1126	Kolore berri bat: shu
+1127	«Jiyu» japonieraz «askatasuna» da. Aplikazio bera da: liburutegia, deskargak eta ezarpenak gordetzen dituzu.
+1128	Babeslearen katalogoa
+1129	Trailerra grabatzeko demo modua: Hasiera, bilaketa, artista, Liburutegia eta deskargak Michael Bennet-en abestiekin bakarrik, sarerik gabe. Aplikazioa berriro irekitzean aplikatzen da eta ez du zure liburutegia ukitzen.

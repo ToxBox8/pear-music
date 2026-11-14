@@ -30,7 +30,7 @@
 30	Update saved playlist
 31	Turn it on in Settings or type the code by hand.
 32	Administration
-33	It affects everyone who uses Pear Music as soon as they open the app.
+33	It affects everyone who uses Jiyu Pulse as soon as they open the app.
 34	Not now, continue
 35	Now playing
 36	Now playing (large)
@@ -63,8 +63,8 @@
 63	Appeal
 64	Apple Music or Spotify: open the playlist → Share → Copy link. It must be public. Up to about 100 songs come from Spotify; for longer lists, use the Exportify CSV.
 65	Point at the Jam's QR code
-66	Pear Music library.json file (the Android one works too). Whatever you don't have is added, nothing is deleted.
-67	Pear Music library.json file (the iOS one works too). Whatever you don't have is added, nothing is deleted.
+66	Jiyu Pulse library.json file (the Android one works too). Whatever you don't have is added, nothing is deleted.
+67	Jiyu Pulse library.json file (the iOS one works too). Whatever you don't have is added, nothing is deleted.
 68	Drag the folders to change the order.
 69	Drag playlists, Downloaded and Favourites to place them wherever you like.
 70	Drag to change the order
@@ -86,11 +86,11 @@
 86	Advanced
 87	Notice
 88	Notices
-89	Pear Music notices published on the website
+89	Jiyu Pulse notices published on the website
 90	Important notices
 91	Notices, {0} unread
 92	Help and support
-93	You help improve Pear Music
+93	You help improve Jiyu Pulse
 94	Added to the playlist
 95	Recently added
 96	Add
@@ -191,7 +191,7 @@
 191	Cassette: turn a reel or drag the tape to fast-forward or rewind. Vinyl: spin the record with your finger or move the tonearm. With the phone in landscape, the cassette or vinyl fills the screen. You can also switch by long-pressing the mini player.
 192	Cast
 193	Outages and urgent versions
-194	Outages, new versions and Pear Music news
+194	Outages, new versions and Jiyu Pulse news
 195	Close
 196	Close the notice
 197	Close the stories
@@ -253,7 +253,7 @@
 253	How closely the buttons match the cover colour
 254	How much backgrounds and menus are tinted
 255	Tell us what went wrong; you can add screenshots
-256	Tell us what you'd like Pear Music to do
+256	Tell us what you'd like Jiyu Pulse to do
 257	A capsule with your tabs and Search apart, like SimpMusic. Drag the drop to switch tabs; scrolling down a list folds it next to the mini player.
 258	Jam QR code
 259	6-digit code
@@ -278,7 +278,7 @@
 278	Downloaded and Favourites
 279	Downloaded
 280	Downloading
-281	Downloading Pear Music {0}…
+281	Downloading Jiyu Pulse {0}…
 282	Downloading {0} %
 283	Download
 284	Download the {0} missing
@@ -410,7 +410,7 @@
 410	Save list
 411	Save and leave
 412	Keep it in your password manager or write it down. It's what encrypts your library: without it, you can't 
-413	Keep it in your password manager or write it down. It's what encrypts your library: without it, you can't restore the cloud backup on another phone. Pear Music doesn't store it and can't recover it.
+413	Keep it in your password manager or write it down. It's what encrypts your library: without it, you can't restore the cloud backup on another phone. Jiyu Pulse doesn't store it and can't recover it.
 414	Welcome guide
 415	Turn it to go forward or back
 416	Back up now
@@ -486,13 +486,13 @@
 486	Created by you · {0}
 487	What they released this year
 488	What you play most
-489	What you played last, radios made for you, what's new from your artists and whatever you pin to the top. The bell brings Pear Music notices.
-490	What you played last, radios made for you, what's new from your artists and whatever you pin to the top. The bell brings Pear Music notices. Tap the Home tab.
+489	What you played last, radios made for you, what's new from your artists and whatever you pin to the top. The bell brings Jiyu Pulse notices.
+490	What you played last, radios made for you, what's new from your artists and whatever you pin to the top. The bell brings Jiyu Pulse notices. Tap the Home tab.
 491	Logo
 492	Line too long
 493	Sends this week's summary now with the ticked fields (the required ones always go: identifier, platform, variant, version and week). The weekly summary still goes out on its own if telemetry is on.
 494	Email me a code
-495	Keep Pear Music open. It usually takes a few seconds.
+495	Keep Jiyu Pulse open. It usually takes a few seconds.
 496	Hold to delete downloads
 497	Hold to delete statistics
 498	Hold to clear the queue
@@ -551,7 +551,7 @@
 551	No results for "{0}"
 552	No singles or EPs.
 553	No albums.
-554	You don't need it at all: Pear Music works just the same without it. But if you create one, you help us a lot to improve the app, and you take your music wherever you go.
+554	You don't need it at all: Jiyu Pulse works just the same without it. But if you create one, you help us a lot to improve the app, and you take your music wherever you go.
 555	This doesn't look like an Exportify CSV (the "Track URI" column is missing).
 556	No songs left to add
 557	No songs were found. Is the playlist public?
@@ -624,18 +624,18 @@
 624	Pause
 625	Pauses the list download
 626	Pause
-627	Pear Dev
-628	Pear Music
-629	Pear Music is a free personal project, not related to YouTube or Google. Required to use the app.
-630	Pear Music has no accounts or server with your data: everything is on this phone. 
-631	Pear Music has no accounts or server with your data: everything is on this phone. The file contains your library, statistics, lyrics, support drafts and settings; not the downloaded songs.
-632	Pear Music isn't allowed to use the camera
-633	Pear Music {0}
+627	Jiyu Dev
+628	Jiyu Pulse
+629	Jiyu Pulse is a free personal project, not related to YouTube or Google. Required to use the app.
+630	Jiyu Pulse has no accounts or server with your data: everything is on this phone. 
+631	Jiyu Pulse has no accounts or server with your data: everything is on this phone. The file contains your library, statistics, lyrics, support drafts and settings; not the downloaded songs.
+632	Jiyu Pulse isn't allowed to use the camera
+633	Jiyu Pulse {0}
 634	Request full lockdown
 635	Paste a Spotify playlist link (Share → Copy link).
 636	Paste a music.apple.com link (Share → Copy link).
 637	Paste
-638	Allow installing apps from Pear Music and tap Download again.
+638	Allow installing apps from Jiyu Pulse and tap Download again.
 639	Custom
 640	Separate tab
 641	Tabs
@@ -671,7 +671,7 @@
 671	Remove {0}
 672	What happened
 673	What exactly is sent
-674	What you'd like Pear Music to do and how it would help you (at least {0} characters).
+674	What you'd like Jiyu Pulse to do and how it would help you (at least {0} characters).
 675	Resume · {0} of {1}
 676	Recent
 677	Remind me tomorrow
@@ -691,7 +691,7 @@
 691	Player
 692	Media player
 693	Players with personality
-694	Reply from Pear Music
+694	Reply from Jiyu Pulse
 695	Unexpected server response.
 696	Reset
 697	Reset {0}
@@ -747,7 +747,7 @@
 747	No icon
 748	No lines yet
 749	Not ticked
-750	No permission to read the Music app. Turn it on in Settings → Pear Music.
+750	No permission to read the Music app. Turn it on in Settings → Jiyu Pulse.
 751	No tracking or advertising. You decide what you share.
 752	No results
 753	Unfinished
@@ -760,8 +760,8 @@
 760	Just for you
 761	Only you have the key. Not even we can read it.
 762	Only {0} for now
-763	You can also long-press the home screen › Widgets › Pear Music. They can be resized.
-764	Welcome to Pear Music
+763	You can also long-press the home screen › Widgets › Jiyu Pulse. They can be resized.
+764	Welcome to Jiyu Pulse
 765	We've sent it to {0}. It expires in 10 minutes.
 766	Telemetry
 767	Performance telemetry
@@ -782,8 +782,8 @@
 782	All of YouTube Music, free and ad-free. With the screen off, offline and with a Jam to listen with your friends.
 783	All
 784	They all match their YouTube Music version.
-785	It doesn't show up yet. Check that the code is right, that you're on the same Wi-Fi or have Bluetooth on, and that whoever created it has Pear Music open.
-786	It doesn't show up yet. Check that the code is right, that you're on the same Wi-Fi and that whoever created it has Pear Music open.
+785	It doesn't show up yet. Check that the code is right, that you're on the same Wi-Fi or have Bluetooth on, and that whoever created it has Jiyu Pulse open.
+786	It doesn't show up yet. Check that the code is right, that you're on the same Wi-Fi and that whoever created it has Jiyu Pulse open.
 787	Nothing here yet
 788	No playlists yet
 789	You don't have any albums yet
@@ -797,7 +797,7 @@
 797	Your library, encrypted in the cloud
 798	Your recovery key
 799	Your email
-800	Your Pear Music account
+800	Your Jiyu Pulse account
 801	Your idea
 802	Your launcher doesn't allow adding it from here: long-press the home screen › Widgets
 803	Your music
@@ -890,7 +890,7 @@
 890	bar order discover home library
 891	privacy gdpr export delete data erase zip
 892	endless radio autoplay automatic queue end
-893	restore the cloud backup on another phone. Pear Music doesn't store it and can't recover it.
+893	restore the cloud backup on another phone. Jiyu Pulse doesn't store it and can't recover it.
 894	rest of the app
 895	audio output speaker homepod apple tv bluetooth
 896	streaming data saver maximum kbps
@@ -955,10 +955,10 @@
 957	Code {0}
 958	People: {0}
 959	Playlists: 
-960	Your email, the text and iPhone details (model, iOS and app version) will be sent to Pear Music's private support channel.
-961	Your email, the text and phone details (model, Android and app version) will be sent to Pear Music's private support channel.
-962	Your email, the text, {0} photo(s) and iPhone details (model, iOS and app version) will be sent to Pear Music's private support channel.
-963	Your email, the text, {0} photo(s) and phone details (model, Android and app version) will be sent to Pear Music's private support channel.
+960	Your email, the text and iPhone details (model, iOS and app version) will be sent to Jiyu Pulse's private support channel.
+961	Your email, the text and phone details (model, Android and app version) will be sent to Jiyu Pulse's private support channel.
+962	Your email, the text, {0} photo(s) and iPhone details (model, iOS and app version) will be sent to Jiyu Pulse's private support channel.
+963	Your email, the text, {0} photo(s) and phone details (model, Android and app version) will be sent to Jiyu Pulse's private support channel.
 964	Thank you! It's ticket #{0}. We'll reply in Notices (only to you) and to the email you entered.
 965	Thank you! We'll reply in Notices (only to you) and to the email you entered.
 966	"{0}" always uses light mode.
@@ -968,11 +968,11 @@
 970	Bottom bar from SimpMusic, by maxrave-dev (GPL-3.0)
 971	Bottom bar inspired by SimpMusic, by maxrave-dev (GPL-3.0)
 972	yesterday
-973	Downloading Pear Music {0}… {1}%
-974	Your email, the text and this iPhone's profile (model, iOS and app version and, if you have telemetry on, its performance) will be sent to Pear Music's private support.
-975	Your email, the text and this phone's profile (model, Android and app version and, if you have telemetry on, its performance) will be sent to Pear Music's private support.
-976	Your email, the text, {0} photo(s) and this iPhone's profile (model, iOS and app version and, if you have telemetry on, its performance) will be sent to Pear Music's private support.
-977	Your email, the text, {0} photo(s) and this phone's profile (model, Android and app version and, if you have telemetry on, its performance) will be sent to Pear Music's private support.
+973	Downloading Jiyu Pulse {0}… {1}%
+974	Your email, the text and this iPhone's profile (model, iOS and app version and, if you have telemetry on, its performance) will be sent to Jiyu Pulse's private support.
+975	Your email, the text and this phone's profile (model, Android and app version and, if you have telemetry on, its performance) will be sent to Jiyu Pulse's private support.
+976	Your email, the text, {0} photo(s) and this iPhone's profile (model, iOS and app version and, if you have telemetry on, its performance) will be sent to Jiyu Pulse's private support.
+977	Your email, the text, {0} photo(s) and this phone's profile (model, Android and app version and, if you have telemetry on, its performance) will be sent to Jiyu Pulse's private support.
 978	Updates
 979	Not now
 980	Settings can go in the bar or at the top of Home, next to Jam.
@@ -999,8 +999,8 @@
 1001	The song fades out at the end and the next one comes in softly: 3, 6 or 10 seconds.
 1002	The envelope opens the suggestions inbox and the bug, «Report a problem». Each one gets a ticket number and the reply reaches only you, in the bell.
 1003	The classic one or the SimpMusic-style one: a glass capsule with a drop you can drag, Search on its own and folding as you scroll.
-1004	Pear Music outages and news, also as notifications if you want.
-1005	What's new in Pear Music {0}
+1004	Jiyu Pulse outages and news, also as notifications if you want.
+1005	What's new in Jiyu Pulse {0}
 1006	The technical stuff, folded away: download quality, import tolerance for playlists and artwork cache.
 1007	Maximum, or data saver when you're not on wifi. Downloads always use maximum.
 1008	Normal, Cassette, Vinyl or Air. You can also change it by holding the mini player.
@@ -1008,7 +1008,7 @@
 1010	New: it walks you through all of Settings and explains each option. It's next to the envelope.
 1011	Optional. Keep your library in the cloud, encrypted with a key only you have, and move it to another phone.
 1012	Reorder the tabs by dragging them. Swipe Discover to the left to remove it from the bar.
-1013	Pear Music is now available in Portuguese. And «Español» is now called «Castellano».
+1013	Jiyu Pulse is now available in Portuguese. And «Español» is now called «Castellano».
 1014	Português
 1015	Every song plays equally loud, without turning the volume up and down yourself.
 1016	Recent, A-Z, Z-A, by size or by hand. With «Edit playlists» you reorder them by dragging.
@@ -1022,8 +1022,108 @@
 1024	And also
 1025	Now you know all of Settings. Come back to this guide whenever you like with the button next to the envelope.
 1026	It no longer highlights Discover while you're in Settings.
-1027	You can now use Pear Music in Portuguese. And «Español» is now called «Castellano».
+1027	You can now use Jiyu Pulse in Portuguese. And «Español» is now called «Castellano».
 1028	{0} of {1}
 1029	Done!
 941	Choose your language · Tria la llengua · Escolle o idioma · Aukeratu hizkuntza · Elektu vian lingvon
 956	Castellano
+1030	 Settings is at the top of Home and isn't part of the order.
+1031	Sort manually
+1032	Join
+1033	See my playlists
+1034	Checking…
+1035	All time
+1036	We've opened your report
+1037	Enter anyway (Dev)
+1038	We're on it
+1039	We've opened your report and we're looking into it. We'll let you know here.
+1040	MAINTENANCE ON
+1041	Fixed! Thank you
+1042	 · liquid glass
+1043	Bar
+1044	Search is the circle on the right. Scrolling down Home folds the bar; stop for 1.5 seconds and it comes back in full.
+1045	Search comes back when you stop
+1046	With the classic bar, a search bar at the top of Home or its own tab. With the SimpMusic one, the circle on the right, which comes back when you stop scrolling.
+1047	The bottom bar: its style, where Search is and the order of the tabs, all in one place.
+1048	Clear the search to change the order.
+1049	Undo
+1050	Songs you marked «Not interested» won't come back, and an artist with three in a month stops showing up for 30 days. It's only saved on this phone.
+1051	Marked as not interested
+1052	Touch and hold a cover and drag it to change the order.
+1053	Not interested
+1054	It won't show up in Discover again.
+1055	Clear
+1056	Clear what you're not interested in
+1057	{0} songs
+1058	Update
+1059	Deleted {0} reports
+1060	Delete the web log
+1061	This version is old
+1062	Force collection
+1063	The app thinks it's {0}. Leave and come back to see the notice.
+1064	Music still works. If there's football on, it may be LaLiga's blocks: notices and support come back when the match ends.
+1065	Jiyu Pulse's servers aren't responding
+1066	To repeat the welcome or see the notices without reinstalling. They don't touch your library or your downloads.
+1067	To see the new version notice
+1068	Requested. Apps will see it in their daily check-in.
+1069	Tests
+1070	It may fail. Update to get the fixes.
+1071	Restart the welcome
+1072	All saved reports are deleted. Bug report device cards aren't touched. It can't be undone.
+1073	Second confirmation: the panel will be empty.
+1074	Simulate an old version
+1075	SIMULATED VERSION: {0}
+1076	See what's new again
+1077	Delete all telemetry on the web?
+1078	Are you sure?
+1079	Everyone on their phone
+1080	By {0} · {1}
+1081	Where it plays
+1082	Listen here too
+1083	What plays here plays at the same time on everyone's phone, with their own audio. Play something from the list.
+1084	The same as on {0}'s phone, at the same time.
+1085	It only plays on this phone; the others add songs.
+1086	One speaker
+1087	{0} and {1}
+1088	{0}, {1} and {2}
+1089	 The cover photo doesn't fit in the QR.
+1090	Adding…
+1091	Add to library
+1092	Share with QR
+1093	Share link
+1094	QR code for {0}
+1095	Scan it with the camera of another phone with Jiyu Pulse. The name, the {0} songs and their order go along.
+1096	This playlist is empty.
+1097	The songs couldn't be loaded. Check the connection and try again.
+1098	Shared playlist
+1099	No name
+1100	It has too many songs for a QR (at most {0}).
+1101	{0} songs aren't on YouTube Music and were left out.
+1102	Settings, top left
+1103	Your library, your way
+1104	Share playlists with a QR
+1105	Share a playlist with the QR on its screen, and in a Jam choose to play on everyone's phone.
+1106	With the SimpMusic-style bar, if you stop scrolling Home the bar comes back in full.
+1107	In Discover, under «⋯». That song won't come back, and if an artist isn't for you, they stop showing up for a while.
+1108	On Home. And Settings › Appearance › Bar has everything about the bar in one place.
+1109	Jam: everyone on their phone
+1110	What you marked as «Not interested». Clear it whenever you like.
+1111	New: the bar's style, where Search is and the tabs, all here.
+1112	New: the bar's style, where Search is, liquid glass and the tabs, all here.
+1113	Another phone scans it with the camera and takes it with its songs and their order.
+1114	Playlists in a grid, like Your albums. Touch and hold a cover and drag it to reorder.
+1115	Whoever starts the Jam chooses: play on one speaker or on everyone's phone at once, with their own headphones.
+1116	They appear with their cover at the start of the Playlists folder, in “Your music”.
+1117	Tap the pin on a playlist or an album and you'll have it here, in whatever order you like.
+1118	It's now called Jiyu Pulse
+1119	Cover colours, easier to read
+1120	With the song's colours, button text picks light or dark by itself.
+1121	Glass and System debut the colour shu, Jiyu Pulse's vermilion. Coloured text and buttons are easier to read.
+1122	The vermilion of Japanese seals, on buttons, progress and favourites. Coloured text is easier to read, in light and dark mode.
+1123	The same power button as always, symmetrical, bigger and in shu on black.
+1124	New icon
+1125	The app is now called Jiyu Pulse and has a new icon. Your library, downloads and settings stay the same.
+1126	A new colour: shu
+1127	“Jiyu” means “freedom” in Japanese. It's the same app: you keep your library, downloads and settings.
+1128	Sponsor catalogue
+1129	Demo mode for recording the trailer: Home, search, artist, Library and downloads with Michael Bennet's songs only, offline. It applies when you reopen the app and doesn't touch your library.

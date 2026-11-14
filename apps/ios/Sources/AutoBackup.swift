@@ -3,12 +3,14 @@ import SwiftUI
 import UniformTypeIdentifiers
 
 /// Copia automática de la biblioteca: una vez al día (al abrir o salir de la app), `library.json` se copia a una
-/// carpeta que elige la persona (iCloud Drive, Google Drive…) como `PearMusic-copia-AAAA-MM-DD.json`, y se dejan las
+/// carpeta que elige la persona (iCloud Drive, Google Drive…) como `JiyuPulse-copia-AAAA-MM-DD.json`, y se dejan las
 /// 7 últimas. Mismo archivo que «Exportar copia» y mismas reglas que `AutoBackup` en Android.
 @MainActor
 final class AutoBackup: ObservableObject {
     static let shared = AutoBackup()
-    static let prefix = "PearMusic-copia-"
+    static let prefix = "JiyuPulse-copia-"
+    /// Prefijo de antes del cambio de nombre (Pear Music → Jiyu Pulse): se sigue reconociendo para limpiar las copias viejas.
+    static let oldPrefix = "PearMusic-copia-"
     static let keep = 7
 
     @Published private(set) var folderName: String?
@@ -28,9 +30,13 @@ final class AutoBackup: ObservableObject {
         return "\(prefix)\(f.string(from: day)).json"
     }
 
-    /// Las copias que sobran (las más antiguas) de `names`, dejando `keep`.
+    /// Las copias que sobran (las más antiguas) de `names`, dejando `keep`. Cuentan los dos prefijos y se ordena por
+    /// fecha (no por nombre, que mezclaría `JiyuPulse-` con `PearMusic-`); a igual fecha va primero la de nombre nuevo.
     static func toPrune(_ names: [String], keep: Int = keep) -> [String] {
-        Array(names.filter { $0.hasPrefix(prefix) && $0.hasSuffix(".json") }.sorted(by: >).dropFirst(keep))
+        func day(_ n: String) -> String { String(n.dropFirst(n.hasPrefix(prefix) ? prefix.count : oldPrefix.count).dropLast(5)) }
+        func key(_ n: String) -> (String, Int) { (day(n), n.hasPrefix(prefix) ? 1 : 0) }
+        let mine = names.filter { ($0.hasPrefix(prefix) || $0.hasPrefix(oldPrefix)) && $0.hasSuffix(".json") }
+        return Array(mine.sorted { key($0) > key($1) }.dropFirst(keep))
     }
 
     func setFolder(_ url: URL, library: Library) {
@@ -97,11 +103,11 @@ struct BackupSection: View {
                 }
                 .buttonStyle(.plain)
                 Button { message = backup.backup(library: library, force: true) ? L("Copia guardada") : L("No se pudo guardar la copia") } label: {
-                    Label("Hacer copia ahora", systemImage: "externaldrive.badge.checkmark")
+                    Label(L("Hacer copia ahora"), systemImage: "externaldrive.badge.checkmark")
                 }
-                Button("Desactivar", role: .destructive) { backup.disable() }
+                Button(L("Desactivar"), role: .destructive) { backup.disable() }
             } else {
-                Button { picking = true } label: { Label("Elegir carpeta", systemImage: "folder.badge.plus") }
+                Button { picking = true } label: { Label(L("Elegir carpeta"), systemImage: "folder.badge.plus") }
             }
         } header: { Text(L("Copia automática")) } footer: {
             Text(backup.error ?? message ?? (backup.enabled

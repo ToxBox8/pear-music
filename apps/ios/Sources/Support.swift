@@ -256,7 +256,7 @@ struct SupportView: View {
                     .lineLimit(5...12)
                     .onChange(of: draft.text) { if $0.count > SupportLimits.maxText { draft.text = String($0.prefix(SupportLimits.maxText)) } }
             } header: { Text(suggestion ? L("Tu idea") : L("Qué ha pasado")) } footer: {
-                Text(suggestion ? L("Qué te gustaría que hiciera Pear Music y para qué te serviría (mínimo {0} caracteres).", SupportLimits.minText)
+                Text(suggestion ? L("Qué te gustaría que hiciera Jiyu Pulse y para qué te serviría (mínimo {0} caracteres).", SupportLimits.minText)
                      : L("Cuenta qué hacías y qué esperabas que pasara. Cuanto más concreto, mejor (mínimo {0} caracteres).", SupportLimits.minText))
             }
             .glassRow()
@@ -341,8 +341,8 @@ struct SupportView: View {
             Button(L("Enviar")) { send() }
             Button(L("Cancelar"), role: .cancel) {}
         } message: {
-            Text(draft.photos.isEmpty ? L("Se enviarán tu correo, el texto y la ficha de este iPhone (modelo, versión de iOS y de la app y, si tienes la telemetría activada, su rendimiento) al soporte privado de Pear Music.")
-                 : L("Se enviarán tu correo, el texto, {0} foto(s) y la ficha de este iPhone (modelo, versión de iOS y de la app y, si tienes la telemetría activada, su rendimiento) al soporte privado de Pear Music.", draft.photos.count))
+            Text(draft.photos.isEmpty ? L("Se enviarán tu correo, el texto y la ficha de este iPhone (modelo, versión de iOS y de la app y, si tienes la telemetría activada, su rendimiento) al soporte privado de Jiyu Pulse.")
+                 : L("Se enviarán tu correo, el texto, {0} foto(s) y la ficha de este iPhone (modelo, versión de iOS y de la app y, si tienes la telemetría activada, su rendimiento) al soporte privado de Jiyu Pulse.", draft.photos.count))
         }
         .alert(L("No se pudo enviar"), isPresented: Binding(get: { failure != nil }, set: { if !$0 { failure = nil } })) {
             Button(L("Vale"), role: .cancel) {}
@@ -417,7 +417,7 @@ struct SupportDraftsView: View {
                     }
                 }
                 .swipeActions {
-                    Button(role: .destructive) { deleting = d } label: { Label("Eliminar", systemImage: "trash") }
+                    Button(role: .destructive) { deleting = d } label: { Label(L("Eliminar"), systemImage: "trash") }
                 }
             }
             .glassRow()

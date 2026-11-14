@@ -49,7 +49,13 @@ def gen_swift(t: dict) -> str:
     L = [f"// {HEADER}", "import SwiftUI", "", "enum Tokens {"]
     L.append("    enum Brand {")
     for k, v in t["brand"].items():
-        L.append(f"        static let {k} = {swift_color(v)}")
+        if k.startswith("$"):
+            continue
+        if isinstance(v, dict):  # pareja claro / oscuro
+            L.append(f"        static let {k}Light = {swift_color(v['light'])}")
+            L.append(f"        static let {k}Dark = {swift_color(v['dark'])}")
+        else:
+            L.append(f"        static let {k} = {swift_color(v)}")
     L.append("    }")
     L.append(f"    static let artworkFallback: [Color] = [{', '.join(swift_color(c) for c in t['artworkFallback'])}]")
     L.append("")
@@ -57,6 +63,9 @@ def gen_swift(t: dict) -> str:
     L.append("        let name: String")
     L.append("        let blurb: String")
     L.append("        let accent: Color")
+    L.append("        /// Acento para texto e iconos sueltos (4,5:1 sobre el fondo), en claro y en oscuro.")
+    L.append("        let accentTextLight: Color")
+    L.append("        let accentTextDark: Color")
     L.append("        let onAccent: Color")
     L.append("        let scheme: ColorScheme?")
     L.append("        let rounded: Bool")
@@ -67,6 +76,7 @@ def gen_swift(t: dict) -> str:
         scheme = "nil" if s["scheme"] is None else f".{s['scheme']}"
         L.append(
             f'        "{key}": ThemeSpec(name: "{s["name"]}", blurb: "{s["blurb"]}", accent: {swift_color(s["accent"])}, '
+            f'accentTextLight: {swift_color(s["accentText"]["light"])}, accentTextDark: {swift_color(s["accentText"]["dark"])}, '
             f'onAccent: {swift_color(s["onAccent"])}, scheme: {scheme}, rounded: {str(s["font"] == "rounded").lower()}, '
             f'maxRadius: {num(s["maxRadius"])}),'
         )
@@ -111,7 +121,13 @@ def gen_kotlin(t: dict) -> str:
     L = [f"// {HEADER}", "package app.libremusic.ui.theme", "", "import androidx.compose.ui.graphics.Color", "", "object Tokens {"]
     L.append("    object Brand {")
     for k, v in t["brand"].items():
-        L.append(f"        val {camel(k)} = {kotlin_color(v)}")
+        if k.startswith("$"):
+            continue
+        if isinstance(v, dict):  # pareja claro / oscuro
+            L.append(f"        val {camel(k)}Light = {kotlin_color(v['light'])}")
+            L.append(f"        val {camel(k)}Dark = {kotlin_color(v['dark'])}")
+        else:
+            L.append(f"        val {camel(k)} = {kotlin_color(v)}")
     L.append("    }")
     L.append(f"    val ArtworkFallback = listOf({', '.join(kotlin_color(c) for c in t['artworkFallback'])})")
     L.append("")
@@ -119,6 +135,9 @@ def gen_kotlin(t: dict) -> str:
     L.append("        val name: String,")
     L.append("        val blurb: String,")
     L.append("        val accent: Color,")
+    L.append("        /** Acento para texto e iconos sueltos (4,5:1 sobre el fondo), en claro y en oscuro. */")
+    L.append("        val accentTextLight: Color,")
+    L.append("        val accentTextDark: Color,")
     L.append("        val onAccent: Color,")
     L.append("        /** \"light\", \"dark\" o null (el que elija el usuario). */")
     L.append("        val scheme: String?,")
@@ -130,6 +149,7 @@ def gen_kotlin(t: dict) -> str:
         scheme = "null" if s["scheme"] is None else f'"{s["scheme"]}"'
         L.append(
             f'        "{key}" to ThemeSpec("{s["name"]}", "{s["blurb"]}", {kotlin_color(s["accent"])}, '
+            f'{kotlin_color(s["accentText"]["light"])}, {kotlin_color(s["accentText"]["dark"])}, '
             f'{kotlin_color(s["onAccent"])}, {scheme}, {str(s["font"] == "rounded").lower()}, {num(s["maxRadius"])}f),'
         )
     L.append("    )")

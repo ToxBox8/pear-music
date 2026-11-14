@@ -11,8 +11,15 @@ SCENARIOS=(
   01_biblioteca_cristal 02_biblioteca_cristal_oscuro 03_biblioteca_aire 04_biblioteca_neon
   05_biblioteca_sistema 06_playlist 07_ajustes 08_temas 09_reproductor_normal
   10_reproductor_casete 11_reproductor_vinilo 12_reproductor_air 13_reproductor_neon
-  14_jam 15_importar
+  14_jam 15_importar 37_barra_dos_pestanas 38_barra_simpmusic_dos
 )
+# DEMO=1: las del tráiler v2 con el catálogo del patrocinador (Sources/DemoCatalog.swift; sólo en Debug y Jiyu Dev).
+EXTRA=()
+if [[ "${DEMO:-0}" == "1" ]]; then
+  SCENARIOS=(v2_01_inicio v2_02_busqueda v2_03_artista v2_04_biblioteca v2_05_descargas v2_06_reproductor
+    v2_07_aire v2_08_neon v2_09_sistema v2_10_casete v2_11_vinilo v2_12_air v2_13_jam v2_14_importar)
+  EXTRA=(-demoCatalog YES)
+fi
 
 # iPhone 16 (393×852 pt a 3x = 1179×2556, el tamaño de ScreenshotTest) con el iOS más reciente instalado.
 RUNTIME="$(xcrun simctl list runtimes -j | python3 -c '
@@ -36,7 +43,7 @@ mkdir -p "$OUT"
 for s in "${SCENARIOS[@]}"; do
   xcrun simctl terminate "$UDID" "$BUNDLE" >/dev/null 2>&1 || true
   [[ "$s" == *oscuro* ]] && xcrun simctl ui "$UDID" appearance dark || xcrun simctl ui "$UDID" appearance light
-  xcrun simctl launch "$UDID" "$BUNDLE" -screenshotScenario "$s" >/dev/null
+  xcrun simctl launch "$UDID" "$BUNDLE" -screenshotScenario "$s" ${EXTRA[@]+"${EXTRA[@]}"} >/dev/null
   # Arranque, hojas y navegación (0,3 s) y el título que se revela con símbolos en el reproductor.
   sleep 7
   xcrun simctl io "$UDID" screenshot --type=png "$OUT/$s.png" >/dev/null

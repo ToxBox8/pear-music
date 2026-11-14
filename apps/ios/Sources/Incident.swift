@@ -40,10 +40,21 @@ final class Incident: ObservableObject {
         apply(Self.effective(p, firstSeen: d.object(forKey: "incident.firstSeen") as? Date ?? now, now: now))
     }
 
+    /// Los servidores de Pear (Cloudflare) no responden pero YouTube sí (2.5 de x.1.1): casi siempre, los bloqueos de
+    /// LaLiga a Cloudflare durante el fútbol. La música sigue; Inicio lo dice para que no parezca que la app falla.
+    @Published private(set) var unreachable = false
+
     func refresh(now: Date = Date()) async {
-        guard let (data, response) = try? await URLSession.shared.data(from: Self.url),
-              (response as? HTTPURLResponse)?.statusCode == 200 else { return }
+        let answer = try? await URLSession.shared.data(from: Self.url)
+        // Sin respuesta (no un error del servidor): ¿llega YouTube? Entonces es un bloqueo, no falta de red.
+        unreachable = answer == nil ? await Self.youtubeAnswers() : false
+        guard let (data, response) = answer, (response as? HTTPURLResponse)?.statusCode == 200 else { return }
         _ = accept(data, now: now)
+    }
+
+    private static func youtubeAnswers() async -> Bool {
+        guard let (_, r) = try? await URLSession.shared.data(from: URL(string: "https://www.youtube.com/generate_204")!) else { return false }
+        return (r as? HTTPURLResponse)?.statusCode == 204
     }
 
     @discardableResult
@@ -74,10 +85,21 @@ struct IncidentOverlay: View {
     @EnvironmentObject var downloads: DownloadStore
     @EnvironmentObject var player: Player
     @State private var dismissed: Int64 = -1
+    /// Pear Dev puede entrar igualmente (1.11 de x.1.1): si no, el mantenimiento la bloquea y no se puede usar para
+    /// volver al nivel 0. Sólo en la variante dev (`Channel.adminTools`).
+    @State private var devInside: Int64 = -1
 
     var body: some View {
         let st = incident.state
+        let bypass = Channel.adminTools && devInside == st.counter
         ZStack(alignment: .top) {
+            if st.level == 3 && bypass {
+                Text(L("MANTENIMIENTO ACTIVO"))
+                    .font(.footnote.weight(.semibold)).foregroundStyle(.white)
+                    .frame(maxWidth: .infinity).padding(.vertical, 4)
+                    .background(Color.orange.ignoresSafeArea(edges: .top))
+                    .allowsHitTesting(false)
+            }
             if (1...2).contains(st.level) && dismissed != st.counter {
                 let safe = st.level == 2
                 HStack(spacing: 10) {
@@ -100,7 +122,7 @@ struct IncidentOverlay: View {
                 .padding(.horizontal, 12).padding(.top, 6)
                 .transition(.opacity)
             }
-            if st.level == 3 {
+            if st.level == 3 && !bypass {
                 VStack(spacing: 10) {
                     GradientIcon(systemName: "wrench.and.screwdriver.fill", palette: 3, size: 72).padding(.bottom, 14)
                     Text(L("En mantenimiento")).font(.largeTitle.bold()).multilineTextAlignment(.center)
@@ -112,6 +134,10 @@ struct IncidentOverlay: View {
                             Text(L("Escuchar mis descargas")).frame(maxWidth: .infinity)
                         }
                         .buttonStyle(PillButtonStyle(prominent: true)).padding(.top, 18)
+                    }
+                    if Channel.adminTools {
+                        Button { devInside = st.counter } label: { Text(L("Entrar igualmente (Dev)")).frame(maxWidth: .infinity) }
+                            .buttonStyle(PillButtonStyle(prominent: false))
                     }
                 }
                 .padding(.horizontal, 28)

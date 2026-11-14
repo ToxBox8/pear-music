@@ -21,6 +21,8 @@ final class ReelsFeed: ObservableObject {
     @Published private(set) var buffering = false
     @Published private(set) var clipProgress: Double = 0
     @Published private(set) var brokenIDs: Set<String> = []
+    /// «No me interesa» recién pulsado (canción y su sitio), para «Deshacer» durante 4 s (2.7 de x.1.1).
+    @Published private(set) var undo: (song: Song, index: Int)?
 
     /// Se llama justo antes de que suene un fragmento (para pausar el reproductor principal).
     var onStart: (@MainActor () -> Void)?
@@ -72,7 +74,7 @@ final class ReelsFeed: ObservableObject {
             for r in radios where i < r.count { merged.append(r[i]) }
         }
         known = exclude
-        items = merged.filter { known.insert($0.id).inserted }
+        items = ReelsSkip.shared.filter(merged).filter { known.insert($0.id).inserted }
         index = 0
         loading = false
         failed = items.isEmpty
@@ -91,10 +93,34 @@ final class ReelsFeed: ObservableObject {
         loadingMore = true
         Task {
             let more = (try? await YTClient.radio(for: seed.id)) ?? []
-            items += more.filter { known.insert($0.id).inserted }
+            items += ReelsSkip.shared.filter(more).filter { known.insert($0.id).inserted }
             loadingMore = false
         }
     }
+
+    /// «No me interesa» (2.7 de x.1.1): se guarda, sale del feed y el siguiente ocupa su sitio.
+    func notInterested(_ song: Song) {
+        ReelsSkip.shared.add(song)
+        guard let i = items.firstIndex(where: { $0.id == song.id }) else { return }
+        items.remove(at: i)
+        index = min(index, max(items.count - 1, 0))
+        undo = (song, i)
+        clipProgress = 0
+        if items.isEmpty { stopAudio(); return }
+        if visible { activate() }
+        loadMoreIfNeeded()
+    }
+
+    func undoNotInterested() {
+        guard let (song, i) = undo else { return }
+        ReelsSkip.shared.remove(song.id)
+        items.insert(song, at: min(i, items.count))
+        index = min(i, items.count - 1)
+        undo = nil
+        if visible { activate() }
+    }
+
+    func clearUndo() { undo = nil }
 
     // MARK: Navegación
     func go(to i: Int) {
@@ -278,6 +304,22 @@ struct ReelsView: View {
                     .frame(height: top + 72)
                     .allowsHitTesting(false)
                 header.padding(.top, top + 6)
+                // «No me interesa»: aviso de 4 s con «Deshacer».
+                if feed.undo != nil {
+                    HStack(spacing: 8) {
+                        Text(L("No volverá a salir en Descubrir.")).font(.subheadline)
+                        Button(L("Deshacer")) { feed.undoNotInterested() }.font(.subheadline.weight(.semibold))
+                    }
+                    .padding(.leading, 16).padding(.trailing, 10).padding(.vertical, 10)
+                    .background(.thickMaterial, in: Capsule())
+                    .frame(maxHeight: .infinity, alignment: .bottom)
+                    .padding(.bottom, 110)
+                    .transition(.opacity)
+                    .task(id: feed.undo?.song.id) {
+                        try? await Task.sleep(nanoseconds: 4_000_000_000)
+                        if !Task.isCancelled { feed.clearUndo() }
+                    }
+                }
             }
             .frame(width: g.size.width, height: h)
             .clipped()
@@ -377,7 +419,7 @@ struct ReelsView: View {
                 Text(L("Revisa la conexión y vuelve a intentarlo."))
                     .font(.subheadline).foregroundStyle(.white.opacity(0.72))
                 Button { Task { await feed.reload(seeds: seeds, exclude: exclude) } } label: {
-                    Label("Reintentar", systemImage: "arrow.clockwise")
+                    Label(L("Reintentar"), systemImage: "arrow.clockwise")
                 }
                 .buttonStyle(PillButtonStyle(prominent: true))
                 .frame(maxWidth: 220)
@@ -474,7 +516,7 @@ private struct ReelPage: View {
             Text(song.title).displayTitle(26).lineLimit(2)
             Text(song.artist).font(.body.weight(.medium)).foregroundStyle(.white.opacity(0.85)).lineLimit(1)
             if broken {
-                Label("Este fragmento no se pudo cargar", systemImage: "exclamationmark.triangle.fill")
+                Label(L("Este fragmento no se pudo cargar"), systemImage: "exclamationmark.triangle.fill")
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(.white.opacity(0.85))
                     .padding(.top, 4)
@@ -485,7 +527,7 @@ private struct ReelPage: View {
                 player.play(song, in: rest)
                 player.showFullPlayer = true
             } label: {
-                Label("Escuchar completa", systemImage: "play.fill")
+                Label(L("Escuchar completa"), systemImage: "play.fill")
                     .font(.subheadline.weight(.bold))
                     .padding(.horizontal, 16)
                     .frame(height: 40)
@@ -510,7 +552,7 @@ private struct ReelPage: View {
 
             Menu {
                 if jam.isActive {
-                    Button { jam.add(song) } label: { Label("Añadir al Jam", systemImage: "person.3") }
+                    Button { jam.add(song) } label: { Label(L("Añadir al Jam"), systemImage: "person.3") }
                         .disabled(jam.contains(song))
                 }
                 ForEach(library.userPlaylists) { p in
@@ -530,7 +572,11 @@ private struct ReelPage: View {
                 }
             }
 
-            Menu { SongMenuItems(song: song) } label: {
+            Menu {
+                SongMenuItems(song: song)
+                // «No me interesa» (2.7 de x.1.1).
+                Button { feed.notInterested(song) } label: { Label(L("No me interesa"), systemImage: "hand.thumbsdown") }
+            } label: {
                 ReelActionLabel(symbol: "ellipsis", text: L("Más"))
             }
             .accessibilityLabel(L("Más opciones"))

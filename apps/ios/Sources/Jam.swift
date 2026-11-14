@@ -25,6 +25,9 @@ struct JamState: Codable, Equatable {
     var host: String
     var members: [String]
     var entries: [JamEntry]
+    /// v2.1 (x.1.1): «altavoz» (suena sólo en el anfitrión) o «todos» (cada uno en su móvil). nil = altavoz (antiguo).
+    var mode: String? = nil
+    var everyone: Bool { mode == JamSync.everyone }
 }
 
 private enum JamMessage: Codable {
@@ -86,6 +89,18 @@ final class JamService: NSObject, ObservableObject {
     private var guest2: JamGuestV2?
     private var names2: [UUID: String] = [:]
     private var joinedViaV2 = false
+
+    // «Cada uno en su móvil» (v2.1, 2.6 de x.1.1)
+    /// Invitado: lo último que suena en el anfitrión; `JamPlaybackSync` lo sigue con el reproductor.
+    @Published private(set) var remotePlay: JamWire?
+    /// Invitado en modo «todos»: si suena también en este iPhone (se puede quitar si está al lado del altavoz).
+    @Published var listenHere = true
+    private var clockSamples: [JamSync.Sample] = []
+    private var pinger: Task<Void, Never>?
+    /// Anfitrión: lo último que mandó, para quien entra a mitad de canción.
+    private var lastPlay: JamWire?
+    /// Diferencia de reloj con el anfitrión, o nil si aún no se ha medido.
+    var clockOffset: Int64? { JamSync.offset(clockSamples) }
 
     // MARK: Códigos
     static func makeCode() -> String { String((0..<6).map { _ in alphabet.randomElement()! }) }
@@ -203,6 +218,43 @@ final class JamService: NSObject, ObservableObject {
         guest2 = nil
         names2 = [:]
         joinedViaV2 = false
+        pinger?.cancel()
+        pinger = nil
+        clockSamples = []
+        remotePlay = nil
+        lastPlay = nil
+        listenHere = true
+    }
+
+    /// Anfitrión: un altavoz o cada uno en su móvil (2.6 de x.1.1). Sólo lo siguen los invitados del Jam v2.
+    func setMode(_ mode: String) {
+        guard isHost else { return }
+        jam?.mode = mode == JamSync.everyone ? JamSync.everyone : JamSync.speaker
+        broadcast()
+    }
+
+    /// Anfitrión en modo «todos»: lo que suena aquí, para que los demás lo sigan.
+    func hostPlayback(song: Song?, positionMs: Int64, playing: Bool) {
+        guard isHost, jam?.everyone == true else { return }
+        let msg = JamWire(type: "play", song: song, positionMs: positionMs, atMs: JamSync.now(), playing: playing)
+        lastPlay = msg
+        host2?.broadcast(msg, to: Set(names2.keys))
+    }
+
+    /// Invitado: unas medidas de reloj seguidas al entrar y luego una cada 30 s (sólo cuentan las más rápidas).
+    private func startPinger() {
+        pinger?.cancel()
+        clockSamples = []
+        pinger = Task { [weak self] in
+            for _ in 0..<JamSync.firstPings {
+                self?.guest2?.send(JamWire(type: "ping", t0: JamSync.now()))
+                try? await Task.sleep(nanoseconds: 300_000_000)
+            }
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: UInt64(JamSync.pingEvery * 1_000_000_000))
+                self?.guest2?.send(JamWire(type: "ping", t0: JamSync.now()))
+            }
+        }
     }
 
     // MARK: Canciones
@@ -274,6 +326,10 @@ final class JamService: NSObject, ObservableObject {
             current.members.append(name)
             jam = current
             broadcast()
+            if current.everyone, let lastPlay { host2?.send(lastPlay, to: id) }
+        case "ping":
+            guard names2[id] != nil, let t0 = msg.t0 else { return }
+            host2?.send(JamWire(type: "pong", t0: t0, th: JamSync.now()), to: id)
         case "add":
             guard names2[id] != nil, let e = msg.entry, JamV2.acceptable(e), current.entries.count < JamV2.maxEntries else { return }
             if !current.entries.contains(where: { $0.id == e.id }) {
@@ -309,9 +365,16 @@ final class JamService: NSObject, ObservableObject {
                 browser?.stopBrowsingForPeers()
                 UINotificationFeedbackGenerator().notificationOccurred(.success)
             }
+            if !joinedViaV2 { startPinger() }
             joinedViaV2 = true
             jam = s
             phase = .joined
+        case "play":
+            remotePlay = msg
+        case "pong":
+            guard let t0 = msg.t0, let th = msg.th else { return }
+            clockSamples.append(JamSync.sample(t0: t0, th: th, t1: JamSync.now()))
+            if clockSamples.count > 12 { clockSamples.removeFirst() }
         case "ended":
             let host = jam?.host ?? L("El anfitrión")
             disconnect()
@@ -530,4 +593,53 @@ final class ScannerController: UIViewController, AVCaptureMetadataOutputObjectsD
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         onCode?(code)
     }
+}
+
+/// «Cada uno en su móvil» (v2.1, 2.6 de x.1.1). El anfitrión cuenta lo que suena (al cambiar de canción o de pausa y
+/// cada 5 s, así un salto llega enseguida); cada invitado lo sigue con **su propio audio** y cada 2 s compara dónde va
+/// con dónde debería ir: más de 250 ms, salta; entre 60 y 250 ms, acelera o frena un 3 % hasta alcanzarlo. Nunca se
+/// transmite sonido. Igual que `JamPlaybackSync` en Android.
+struct JamPlaybackSync: ViewModifier {
+    @EnvironmentObject var jam: JamService
+    @EnvironmentObject var player: Player
+
+    private var hosting: Bool { jam.isHost && jam.jam?.everyone == true }
+    private var following: Bool { jam.phase == .joined && !jam.isHost && jam.jam?.everyone == true && jam.listenHere }
+
+    func body(content: Content) -> some View {
+        content
+            .task(id: "\(hosting)-\(player.current?.id ?? "")-\(player.isPlaying)") {
+                guard hosting else { return }
+                while !Task.isCancelled {
+                    jam.hostPlayback(song: player.current, positionMs: Self.ms(player.livePosition) ?? Int64(player.progress * 1000), playing: player.isPlaying)
+                    try? await Task.sleep(nanoseconds: 5_000_000_000)
+                }
+            }
+            .task(id: "\(following)-\(jam.remotePlay?.song?.id ?? "")-\(jam.remotePlay?.atMs ?? 0)-\(jam.remotePlay?.playing ?? false)") {
+                guard following, let r = jam.remotePlay else { player.nudge(1); return }
+                guard let song = r.song else { player.pause(); return }
+                if player.current?.id != song.id { player.play(song, in: [song]) }
+                let position = r.positionMs ?? 0, at = r.atMs ?? JamSync.now()
+                guard r.playing == true else {
+                    player.pause()
+                    player.seek(to: Double(position) / 1000)
+                    return
+                }
+                while !Task.isCancelled {
+                    if !player.isPlaying { player.resume() }
+                    // Mientras carga, la posición no es un número: corregir ahí haría saltar una y otra vez.
+                    if let actual = Self.ms(player.livePosition) {
+                        let expected = JamSync.expected(positionMs: position, atMs: at, playing: true, localNow: JamSync.now(), offset: jam.clockOffset ?? 0)
+                        switch JamSync.correct(expected: expected, actual: actual) {
+                        case .seek(let to): player.nudge(1); player.seek(to: Double(to) / 1000)
+                        case .speed(let f): player.nudge(f)
+                        case .none: player.nudge(1)
+                        }
+                    }
+                    try? await Task.sleep(nanoseconds: 2_000_000_000)
+                }
+            }
+    }
+
+    private static func ms(_ seconds: Double) -> Int64? { seconds.isFinite ? Int64(seconds * 1000) : nil }
 }

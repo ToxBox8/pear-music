@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Iconos de Pear Dev y Pear Pref (las variantes de Toxbox; nunca se publican). Lo pidió Toxbox el 15-10-2026:
-símbolo invertido y una cinta con el nombre.
+"""Iconos de Jiyu Dev y Jiyu Pref (las variantes de Toxbox; nunca se publican). Lo pidió Toxbox el 15-10-2026:
+símbolo invertido y una cinta con el nombre. Con la marca Shu (1-11-2026) siguen distinguiéndose de la pública
+(shu sobre sumi) con los colores de una tinta del brandbook:
 
-- Pear Dev: fondo lila, símbolo noche y cinta noche con «DEV» en lila.
-- Pear Pref: fondo blanco, símbolo noche y cinta noche con «PREF» en blanco.
+- Jiyu Dev: fondo kincha (oro), símbolo sumi y cinta sumi con «DEV» en kincha.
+- Jiyu Pref: fondo washi (papel), símbolo sumi y cinta sumi con «PREF» en washi.
 
 El símbolo es el trazo de AppIcon-Encendido.svg (librsvg vía ImageMagick); la cinta y el texto, con Pillow y la
 Inter de la app. Genera el primer plano del icono adaptable de Android (fondo en colors.xml del flavor) y el
@@ -20,12 +21,13 @@ from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[2]
 FONT = ROOT / "apps/android/app/src/main/res/font/inter_display_heavy.ttf"
-NIGHT, LILAC, WHITE = "#07070A", "#A78BFA", "#FFFFFF"
-PATH = "M12,13a11,11 0,1 0,15 0M16,16a6,6 0,1 0,8 0M20,9v12"
+SUMI, KINCHA, WASHI = "#0E0E10", "#E3A93B", "#F3EFE6"
+# El símbolo simétrico de la marca (cambio de look/marca/logo/).
+PATH = "M12,13a11,11 0,1 0,16 0M16,16.078a6,6 0,1 0,8 0M20,9v12"
 
 VARIANTS = {
-    "dev": {"bg": LILAC, "symbol": NIGHT, "band": NIGHT, "text": LILAC, "label": "DEV", "ios": "AppIcon-Dev"},
-    "pref": {"bg": WHITE, "symbol": NIGHT, "band": NIGHT, "text": WHITE, "label": "PREF", "ios": "AppIcon-Pref"},
+    "dev": {"bg": KINCHA, "symbol": SUMI, "band": SUMI, "text": KINCHA, "label": "DEV", "ios": "AppIcon-Dev"},
+    "pref": {"bg": WASHI, "symbol": SUMI, "band": SUMI, "text": WASHI, "label": "PREF", "ios": "AppIcon-Pref"},
 }
 
 
@@ -62,7 +64,7 @@ def band(img, v, top, height, inset=0):
 def android(name, v):
     # Primer plano del icono adaptable: lienzo de 108 dp a 4× (xxxhdpi). Zona visible segura: círculo de 66 dp.
     # Símbolo algo más arriba que en la pública para dejar sitio a la cinta.
-    fg = render(svg(108, "translate(31 22) scale(1.15)", v["symbol"], px=432), 432)
+    fg = render(svg(108, "translate(28.4 18.5) scale(1.28)", v["symbol"], px=432), 432)
     fg = band(fg, v, top=int(432 * 0.60), height=int(432 * 0.13))
     res = ROOT / f"apps/android/app/src/{name}/res"
     (res / "drawable-nodpi").mkdir(parents=True, exist_ok=True)
@@ -70,7 +72,7 @@ def android(name, v):
     (res / "mipmap-anydpi-v26").mkdir(parents=True, exist_ok=True)
     (res / "mipmap-anydpi-v26/ic_launcher.xml").write_text(
         '<?xml version="1.0" encoding="utf-8"?>\n'
-        f'<!-- Icono de Pear {name.capitalize()} (sólo el móvil de Toxbox): generado por shared/design/render_variant_icons.py. -->\n'
+        f'<!-- Icono de Jiyu {name.capitalize()} (sólo el móvil de Toxbox): generado por shared/design/render_variant_icons.py. -->\n'
         '<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">\n'
         '    <background android:drawable="@color/icon_variant_bg" />\n'
         '    <foreground android:drawable="@drawable/ic_launcher_variant" />\n'
@@ -84,7 +86,7 @@ def android(name, v):
 
 def ios(v):
     # Mismo encuadre que AppIcon-Encendido.svg, subido un poco por la cinta.
-    icon = render(svg(1024, "translate(272 200) scale(12.3)", v["symbol"], v["bg"]), 1024)
+    icon = render(svg(1024, "translate(166.4 92) scale(17.28)", v["symbol"], v["bg"]), 1024)
     icon = band(icon, v, top=int(1024 * 0.70), height=int(1024 * 0.15))
     d = ROOT / f"apps/ios/Sources/Assets.xcassets/{v['ios']}.appiconset"
     d.mkdir(parents=True, exist_ok=True)
@@ -99,4 +101,4 @@ if __name__ == "__main__":
     for name, v in VARIANTS.items():
         android(name, v)
         ios(v)
-        print(f"Pear {name.capitalize()}: Android e iOS")
+        print(f"Jiyu {name.capitalize()}: Android e iOS")

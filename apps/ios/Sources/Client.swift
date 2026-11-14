@@ -142,8 +142,12 @@ enum YTClient {
         if let vd = (json?["responseContext"] as? [String: Any])?["visitorData"] as? String { visitorData = vd }
     }
 
-    static let webContext: [String: Any] =
-        ["client": ["clientName": "WEB_REMIX", "clientVersion": "1.20240918.01.00", "hl": "es"]]
+    /// Siempre en «es»: al leer búsquedas y artistas se reconocen los tipos («Canción», «Álbum»…) en español. Sólo
+    /// Inicio se pide en el idioma de la app (`webContext(hl:)`, 1.8 de x.1.1).
+    static var webContext: [String: Any] { webContext(hl: "es") }
+    static func webContext(hl: String) -> [String: Any] {
+        ["client": ["clientName": "WEB_REMIX", "clientVersion": "1.20240918.01.00", "hl": hl]]
+    }
 
     /// Sesión propia con tiempos límite: sin esto una conexión colgada deja la búsqueda
     /// o la descarga esperando 60 s (el valor por defecto) o más.
@@ -189,6 +193,7 @@ enum YTClient {
     /// Canciones, álbumes y artistas a la vez (tres búsquedas filtradas en paralelo). Sólo falla si
     /// fallan las tres; si una falla, su sección sale vacía.
     static func searchAll(_ query: String) async throws -> SearchResults {
+        if DemoCatalog.isActive { return DemoCatalog.search(query) }
         // Modo seguro (Fase 4): sin búsqueda remota; la música guardada y descargada sigue funcionando.
         if Incident.restricted { throw YTError.detail("La búsqueda está en pausa mientras resolvemos un incidente.") }
         async let songs = try? search(query)
@@ -240,6 +245,7 @@ enum YTClient {
     /// Página de un artista. Los álbumes de su página sólo traen el año: se les pone «Álbum • Artista • año»
     /// para que se vean igual que en la búsqueda y `collectionSongs` sepa el artista.
     static func artist(_ artist: RemoteArtist) async throws -> ArtistPage {
+        if DemoCatalog.isActive { return DemoCatalog.artistPage() }
         let json = try await browse(["browseId": artist.id])
         let header = (json["header"] as? [String: Any])?.values.first as? [String: Any]
         let name = runsText(header?["title"]).isEmpty ? artist.name : runsText(header?["title"])
@@ -280,6 +286,7 @@ enum YTClient {
 
     /// Discografía completa de una sección («Ver todo»): YouTube Music la devuelve entera en una cuadrícula.
     static func discography(_ ref: BrowseRef, artist name: String) async throws -> [RemoteCollection] {
+        if DemoCatalog.isActive { return DemoCatalog.singles }
         var body: [String: Any] = ["browseId": ref.browseId]
         if let p = ref.params { body["params"] = p }
         let json = try await browse(body)
@@ -296,6 +303,7 @@ enum YTClient {
 
     /// El artista con ese nombre exacto (sin tildes ni mayúsculas), para abrir su perfil desde un álbum o una canción.
     static func findArtist(_ name: String) async -> RemoteArtist? {
+        if DemoCatalog.isActive { return DemoCatalog.artist }
         let key = Discography.normalize(name)
         guard let artists = try? await searchAll(name).artists else { return nil }
         return artists.first { Discography.normalize($0.name) == key }
@@ -303,6 +311,7 @@ enum YTClient {
     }
 
     static func suggestions(_ query: String) async throws -> [String] {
+        if DemoCatalog.isActive { return DemoCatalog.suggestions(query) }
         let json = try await post("https://music.youtube.com/youtubei/v1/music/get_search_suggestions?prettyPrint=false",
                                   body: ["context": webContext, "input": query],
                                   headers: ["Origin": "https://music.youtube.com"])
@@ -341,7 +350,9 @@ enum YTClient {
             let title = runs(0).first ?? "Sin título"
             // "Artista y Otro • Álbum • 3:08": el primer segmento son los artistas completos
             // (los conectores " y " / ", " vienen como runs sueltos).
-            let kinds: Set<String> = ["Canción", "Vídeo", "Video", "Song", "Episodio", "Álbum", "Single", "EP"]
+            // También en los idiomas en que se pide Inicio (1.8 de x.1.1): catalán, euskera, inglés y portugués.
+            let kinds: Set<String> = ["Canción", "Vídeo", "Video", "Song", "Episodio", "Álbum", "Single", "EP",
+                                      "Cançó", "Àlbum", "Abestia", "Bideoa", "Albuma", "Album", "Episode", "Música"]
             let raw = runs(1).joined().components(separatedBy: " • ").map { $0.trimmingCharacters(in: .whitespaces) }
             let duration = raw.lazy.compactMap(Self.seconds).first
             let segments = raw.filter { !$0.isEmpty && !kinds.contains($0) && Self.seconds($0) == nil }
@@ -365,16 +376,18 @@ enum YTClient {
     }
 
     private static let origin = ["Origin": "https://music.youtube.com"]
-    private static func browse(_ body: [String: Any]) async throws -> [String: Any] {
+    private static func browse(_ body: [String: Any], hl: String = "es") async throws -> [String: Any] {
         await ensureVisitorData()
         var b = body
-        b["context"] = webContext
+        b["context"] = webContext(hl: hl)
         return try await post("https://music.youtube.com/youtubei/v1/browse?prettyPrint=false", body: b, headers: origin)
     }
 
     // MARK: Inicio (recomendaciones de YouTube Music, sin sesión)
     static func home() async throws -> [HomeShelf] {
-        let json = try await browse(["browseId": "FEmusic_home"])
+        if DemoCatalog.isActive { return DemoCatalog.home() }
+        // Los títulos de las estanterías («Selecciones rápidas»…) vienen de YouTube: en el idioma de la app.
+        let json = try await browse(["browseId": "FEmusic_home"], hl: I18n.youtubeHl)
         var shelves: [HomeShelf] = []
         collect(json, key: "musicCarouselShelfRenderer") { shelf in
             let header = (shelf["header"] as? [String: Any])?["musicCarouselShelfBasicHeaderRenderer"] as? [String: Any]
@@ -402,6 +415,7 @@ enum YTClient {
 
     /// Canciones de un álbum o playlist pública. Los álbumes no traen carátula por pista: se usa la del álbum.
     static func collectionSongs(_ c: RemoteCollection) async throws -> [Song] {
+        if DemoCatalog.isActive { return DemoCatalog.collectionSongs(c) }
         let parts = c.subtitle.components(separatedBy: " • ")
         let fallbackArtist = parts.count > 1 ? parts[1] : c.subtitle
         var all: [Song] = []
@@ -422,6 +436,7 @@ enum YTClient {
 
     /// "Radio" de una canción: ~50 canciones parecidas. Se usa para «Para ti».
     static func radio(for videoId: String) async throws -> [Song] {
+        if DemoCatalog.isActive { return DemoCatalog.radio(for: videoId) }
         await ensureVisitorData()
         let json = try await post("https://music.youtube.com/youtubei/v1/next?prettyPrint=false",
                                   body: ["context": webContext, "videoId": videoId,
@@ -438,6 +453,29 @@ enum YTClient {
                             thumbnail: (thumbs?.last?["url"] as? String).flatMap(URL.init)))
         }
         return out
+    }
+
+    /// Título, artista y carátula de una lista de canciones por su id, en el mismo orden (0.6 de x.1.1: una playlist
+    /// compartida por QR sólo lleva los ids). La cola de YouTube Music (`music/get_queue`) da hasta 50 de golpe. Las
+    /// que no vengan se quedan fuera. Igual que `YTClient.songs` en Android.
+    static func songs(ids: [String]) async -> [Song] {
+        await ensureVisitorData()
+        var found: [String: Song] = [:]
+        var unique: [String] = []
+        for id in ids where !unique.contains(id) { unique.append(id) }
+        for start in stride(from: 0, to: unique.count, by: 50) {
+            let chunk = Array(unique[start..<min(start + 50, unique.count)])
+            guard let json = try? await post("https://music.youtube.com/youtubei/v1/music/get_queue?prettyPrint=false",
+                                             body: ["context": webContext, "videoIds": chunk], headers: origin) else { continue }
+            collect(json, key: "playlistPanelVideoRenderer") { item in
+                guard let vid = item["videoId"] as? String, found[vid] == nil else { return }
+                let thumbs = (item["thumbnail"] as? [String: Any])?["thumbnails"] as? [[String: Any]]
+                let artist = runsText(item["shortBylineText"]).components(separatedBy: " • ").first ?? ""
+                found[vid] = Song(id: vid, title: runsText(item["title"]), artist: artist,
+                                  thumbnail: (thumbs?.last?["url"] as? String).flatMap(URL.init))
+            }
+        }
+        return ids.compactMap { found[$0] }
     }
 
     /// La canción de YouTube Music que corresponde a una pista de Apple Music. Puntúa título,

@@ -31,8 +31,11 @@ enum AppTheme: String, CaseIterable, Identifiable {
         }
     }
 
+    /// Acento como relleno (botón principal, progreso, insignias). En Cristal y Sistema es shu.
     var accent: Color { spec.accent }
-    /// Texto sobre un relleno de acento.
+    /// Acento para texto e iconos sueltos: shu-text en Cristal y Sistema (4,5:1 sobre el fondo).
+    func accentText(dark: Bool) -> Color { dark ? spec.accentTextDark : spec.accentTextLight }
+    /// Texto sobre un relleno de acento (sumi sobre shu: el blanco no llega a 4,5:1).
     var onAccent: Color { spec.onAccent }
     /// Modo impuesto por la estética del tema (nil = el que elija el usuario).
     var scheme: ColorScheme? { spec.scheme }
@@ -118,10 +121,9 @@ struct ThemeAppearance: ViewModifier {
         let dark = forceDark || (t.scheme ?? userScheme ?? systemScheme) == .dark
         // «Colores de la carátula» en la app: el acento sale de la canción que suena.
         let level = ArtworkLevel(intensity: intensity, opacity: opacity)
-        let accent = artworkApp && level.enabled && player.current != nil
-            ? engine.palette[0].artworkAccent(dark: dark, level: level, base: t.accent) : t.accent
+        let artwork = artworkApp && level.enabled && player.current != nil
         let styled = content
-            .tint(accent)
+            .accentColors(artwork ? engine.palette[0] : nil, theme: t, dark: dark, level: level)
             .preferredColorScheme(forceDark ? .dark : (t.scheme ?? userScheme))
         if #available(iOS 16.1, *) {
             styled.fontDesign(t.fontDesign)
@@ -267,5 +269,64 @@ extension Color {
         UIColor(other).getRed(&r2, green: &g2, blue: &b2, alpha: &a2)
         let t = CGFloat(max(0, min(1, t)))
         return Color(red: Double(r1 + (r2 - r1) * t), green: Double(g1 + (g2 - g1) * t), blue: Double(b1 + (b2 - b1) * t))
+    }
+}
+
+
+// MARK: - Acento: relleno, texto y lo que va encima
+/// El acento como relleno (`.tint` se reserva para el texto y los iconos, que necesitan más contraste).
+private struct AccentFillKey: EnvironmentKey { static let defaultValue = Tokens.Brand.shu }
+/// Texto e iconos sobre `accentFill` (sumi o blanco, el que más contraste dé).
+private struct OnAccentKey: EnvironmentKey { static let defaultValue = Tokens.Brand.sumi }
+
+extension EnvironmentValues {
+    var accentFill: Color {
+        get { self[AccentFillKey.self] }
+        set { self[AccentFillKey.self] = newValue }
+    }
+    var onAccent: Color {
+        get { self[OnAccentKey.self] }
+        set { self[OnAccentKey.self] = newValue }
+    }
+}
+
+extension Color {
+    /// Sumi o blanco sobre este color, el que dé más contraste (shu → sumi 5,6:1; un acento oscuro de la
+    /// carátula → blanco). Mismo criterio que `onColor` en Android.
+    var onColor: Color {
+        Color.contrast(Tokens.Brand.sumi, self) >= Color.contrast(.white, self) ? Tokens.Brand.sumi : .white
+    }
+
+    /// Este color, oscurecido (en claro) o aclarado (en oscuro) hasta 4,5:1 sobre el fondo: para texto.
+    func readableText(dark: Bool) -> Color {
+        var h: CGFloat = 0, s: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        guard UIColor(self).getHue(&h, saturation: &s, brightness: &b, alpha: &a) else { return self }
+        let bg: Color = dark ? .black : .white
+        var c = self
+        var guardCount = 0
+        while Color.contrast(c, bg) < 4.5, guardCount < 30 {
+            guardCount += 1
+            b = dark ? min(b + 0.03, 1) : max(b - 0.03, 0)
+            if dark && b >= 1 { s = max(s - 0.05, 0) }
+            c = Color(hue: h, saturation: s, brightness: b)
+        }
+        return c
+    }
+}
+
+extension View {
+    /// Acento de la pantalla: `.tint` para texto e iconos (4,5:1) y `accentFill`/`onAccent` para los rellenos.
+    /// Con «Colores de la carátula», los tres salen del color de la canción (`art`).
+    func accentColors(_ art: Color?, theme: AppTheme, dark: Bool, level: ArtworkLevel) -> some View {
+        let fill = art.map { $0.artworkAccent(dark: dark, level: level, base: theme.accent) } ?? theme.accent
+        let text = art == nil ? theme.accentText(dark: dark) : fill.readableText(dark: dark)
+        let on = art == nil ? theme.onAccent : fill.onColor
+        return self.tint(text).environment(\.accentFill, fill).environment(\.onAccent, on)
+    }
+
+    /// Como `accentColors`, pero sin carátula deja el acento que venga de fuera (el reproductor hereda el de la app).
+    @ViewBuilder
+    func artworkAccentColors(_ art: Color?, theme: AppTheme, dark: Bool, level: ArtworkLevel) -> some View {
+        if let art { accentColors(art, theme: theme, dark: dark, level: level) } else { self }
     }
 }

@@ -1,5 +1,5 @@
 // Canal usr: la app pública (web, AltStore). Mismo bundle id de siempre para actualizar encima.
 PRODUCT_BUNDLE_IDENTIFIER = com.example.libremusic
-APP_DISPLAY_NAME = Pear Music
+APP_DISPLAY_NAME = Jiyu Pulse
 SWIFT_ACTIVE_COMPILATION_CONDITIONS = $(inherited)
 APP_ICON_NAME = AppIcon

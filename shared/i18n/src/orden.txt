@@ -30,7 +30,7 @@ Activada
 Actualizar playlist guardada
 Actívalo en Ajustes o escribe el código a mano.
 Administración
-Afecta a todas las personas que usan Pear Music en cuanto abran la app.
+Afecta a todas las personas que usan Jiyu Pulse en cuanto abran la app.
 Ahora no, seguir
 Ahora suena
 Ahora suena grande
@@ -63,8 +63,8 @@ Apelación enviada. Te contestaremos al correo.
 Apelar
 Apple Music o Spotify: abre la playlist → Compartir → Copiar enlace. Tiene que ser pública. De Spotify llegan hasta unas 100 canciones; para listas más largas, usa el CSV de Exportify.
 Apunta al QR del Jam
-Archivo library.json de Pear Music (también el de Android). Se añade lo que no tengas, sin borrar nada.
-Archivo library.json de Pear Music (también el de iOS). Se añade lo que no tengas, sin borrar nada.
+Archivo library.json de Jiyu Pulse (también el de Android). Se añade lo que no tengas, sin borrar nada.
+Archivo library.json de Jiyu Pulse (también el de iOS). Se añade lo que no tengas, sin borrar nada.
 Arrastra las carpetas para cambiar el orden.
 Arrastra las playlists, Descargadas y Favoritos para colocarlas donde quieras.
 Arrastra para cambiar el orden
@@ -86,11 +86,11 @@ Automático
 Avanzado
 Aviso
 Avisos
-Avisos de Pear Music publicados en la web
+Avisos de Jiyu Pulse publicados en la web
 Avisos importantes
 Avisos, {0} sin leer
 Ayuda y soporte
-Ayudas a mejorar Pear Music
+Ayudas a mejorar Jiyu Pulse
 Añadida a la playlist
 Añadidas recientemente
 Añadir
@@ -191,7 +191,7 @@ Casete: gira una bobina o arrastra la cinta para avanzar o rebobinar. Vinilo: gi
 Casete: gira una bobina o arrastra la cinta para avanzar o rebobinar. Vinilo: gira el disco con el dedo o mueve el brazo. Con el móvil en horizontal, el casete o el vinilo ocupan toda la pantalla. También puedes cambiarlo manteniendo pulsado el mini reproductor.
 Cast
 Caídas y versiones urgentes
-Caídas, versiones nuevas y novedades de Pear Music
+Caídas, versiones nuevas y novedades de Jiyu Pulse
 Cerrar
 Cerrar el aviso
 Cerrar las historias
@@ -253,7 +253,7 @@ Cuánto
 Cuánto se parecen los botones al color de la portada
 Cuánto se tiñen los fondos y los menús
 Cuéntanos qué ha fallado; puedes añadir capturas
-Cuéntanos qué te gustaría que hiciera Pear Music
+Cuéntanos qué te gustaría que hiciera Jiyu Pulse
 Cápsula con tus pestañas y Buscar aparte, como SimpMusic. Arrastra la gota para cambiar de pestaña; al bajar por una lista se pliega junto al mini reproductor.
 Código QR del Jam
 Código de 6 cifras
@@ -278,7 +278,7 @@ Descargadas
 Descargadas y Favoritos
 Descargado
 Descargando
-Descargando Pear Music {0}…
+Descargando Jiyu Pulse {0}…
 Descargando {0} %
 Descargar
 Descargar las {0} que faltan
@@ -410,7 +410,7 @@ Guardar en biblioteca
 Guardar lista
 Guardar y salir
 Guárdala en tu gestor de contraseñas o apúntala. Es lo que cifra tu biblioteca: sin ella no se puede 
-Guárdala en tu gestor de contraseñas o apúntala. Es lo que cifra tu biblioteca: sin ella no se puede recuperar la copia de la nube en otro móvil. Pear Music no la guarda y no la puede recuperar.
+Guárdala en tu gestor de contraseñas o apúntala. Es lo que cifra tu biblioteca: sin ella no se puede recuperar la copia de la nube en otro móvil. Jiyu Pulse no la guarda y no la puede recuperar.
 Guía inicial
 Gíralo para avanzar o retroceder
 Hacer copia ahora
@@ -486,13 +486,13 @@ Llévatela sin conexión
 Lo has creado tú · {0}
 Lo que han sacado este año
 Lo que más escuchas
-Lo último que has escuchado, radios hechas para ti, lo nuevo de tus artistas y lo que fijes arriba. La campana trae los avisos de Pear Music.
-Lo último que has escuchado, radios hechas para ti, lo nuevo de tus artistas y lo que fijes arriba. La campana trae los avisos de Pear Music. Toca la pestaña Inicio.
+Lo último que has escuchado, radios hechas para ti, lo nuevo de tus artistas y lo que fijes arriba. La campana trae los avisos de Jiyu Pulse.
+Lo último que has escuchado, radios hechas para ti, lo nuevo de tus artistas y lo que fijes arriba. La campana trae los avisos de Jiyu Pulse. Toca la pestaña Inicio.
 Logo
 Línea demasiado larga
 Manda ya el resumen de esta semana con los campos marcados (los obligatorios siempre van: identificador, plataforma, variante, versión y semana). El resumen semanal sigue saliendo solo si la telemetría está activada.
 Mandarme un código
-Mantén Pear Music abierta. Suele tardar unos segundos.
+Mantén Jiyu Pulse abierta. Suele tardar unos segundos.
 Mantén para borrar las descargas
 Mantén para borrar las estadísticas
 Mantén para vaciar la cola
@@ -551,7 +551,7 @@ No hay playlists en la biblioteca de este iPhone.
 No hay resultados para «{0}»
 No hay singles ni EP.
 No hay álbumes.
-No la necesitas para nada: Pear Music funciona igual sin ella. Pero si te la creas nos ayudas muchísimo a mejorar la app, y tú te llevas tu música allá donde vayas.
+No la necesitas para nada: Jiyu Pulse funciona igual sin ella. Pero si te la creas nos ayudas muchísimo a mejorar la app, y tú te llevas tu música allá donde vayas.
 No parece un CSV de Exportify (falta la columna «Track URI»).
 No queda ninguna canción por añadir
 No se encontraron canciones. ¿La playlist es pública?
@@ -624,18 +624,18 @@ Para ti
 Pausa
 Pausa la descarga de la lista
 Pausar
-Pear Dev
-Pear Music
-Pear Music es un proyecto personal y gratuito, sin relación con YouTube ni Google. Es necesario para usar la app.
-Pear Music no tiene cuentas ni servidor con tus datos: todo está en este móvil. 
-Pear Music no tiene cuentas ni servidor con tus datos: todo está en este móvil. El archivo lleva tu biblioteca, estadísticas, letras, borradores de soporte y ajustes; no las canciones descargadas.
-Pear Music no tiene permiso para usar la cámara
-Pear Music {0}
+Jiyu Dev
+Jiyu Pulse
+Jiyu Pulse es un proyecto personal y gratuito, sin relación con YouTube ni Google. Es necesario para usar la app.
+Jiyu Pulse no tiene cuentas ni servidor con tus datos: todo está en este móvil. 
+Jiyu Pulse no tiene cuentas ni servidor con tus datos: todo está en este móvil. El archivo lleva tu biblioteca, estadísticas, letras, borradores de soporte y ajustes; no las canciones descargadas.
+Jiyu Pulse no tiene permiso para usar la cámara
+Jiyu Pulse {0}
 Pedir bloqueo total
 Pega el enlace de una playlist de Spotify (Compartir → Copiar enlace).
 Pega un enlace de music.apple.com (Compartir → Copiar enlace).
 Pegar
-Permite instalar apps de Pear Music y vuelve a pulsar Descargar.
+Permite instalar apps de Jiyu Pulse y vuelve a pulsar Descargar.
 Personalizado
 Pestaña aparte
 Pestañas
@@ -671,7 +671,7 @@ Quitar foto
 Quitar {0}
 Qué ha pasado
 Qué se envía exactamente
-Qué te gustaría que hiciera Pear Music y para qué te serviría (mínimo {0} caracteres).
+Qué te gustaría que hiciera Jiyu Pulse y para qué te serviría (mínimo {0} caracteres).
 Reanudar · {0} de {1}
 Recientes
 Recordarme mañana
@@ -691,7 +691,7 @@ Reproducir a continuación
 Reproductor
 Reproductor multimedia
 Reproductores con personalidad
-Respuesta de Pear Music
+Respuesta de Jiyu Pulse
 Respuesta inesperada del servidor.
 Restablecer
 Restablecer {0}
@@ -747,7 +747,7 @@ Sin elegir
 Sin icono
 Sin líneas todavía
 Sin marcar
-Sin permiso para leer la app Música. Actívalo en Ajustes → Pear Music.
+Sin permiso para leer la app Música. Actívalo en Ajustes → Jiyu Pulse.
 Sin rastreo ni publicidad. Tú decides qué compartes.
 Sin resultados
 Sin terminar
@@ -760,8 +760,8 @@ Sutil
 Sólo para ti
 Sólo tú tienes la clave. Ni siquiera nosotros podemos leerla.
 Sólo {0} por ahora
-También puedes mantener pulsada la pantalla de inicio › Widgets › Pear Music. Se pueden cambiar de tamaño.
-Te damos la bienvenida a Pear Music
+También puedes mantener pulsada la pantalla de inicio › Widgets › Jiyu Pulse. Se pueden cambiar de tamaño.
+Te damos la bienvenida a Jiyu Pulse
 Te lo hemos mandado a {0}. Caduca en 10 minutos.
 Telemetría
 Telemetría de rendimiento
@@ -782,8 +782,8 @@ Toca para seguir · mantén para pausar
 Toda la música de YouTube Music, gratis y sin anuncios. Con la pantalla apagada, sin conexión y con un Jam para escuchar con tus amigos.
 Todas
 Todas encajan con su versión en YouTube Music.
-Todavía no aparece. Comprobad que el código es correcto, que estáis en la misma WiFi o con el Bluetooth activado y que quien lo creó tiene Pear Music abierta.
-Todavía no aparece. Comprobad que el código es correcto, que estáis en la misma WiFi y que quien lo creó tiene Pear Music abierta.
+Todavía no aparece. Comprobad que el código es correcto, que estáis en la misma WiFi o con el Bluetooth activado y que quien lo creó tiene Jiyu Pulse abierta.
+Todavía no aparece. Comprobad que el código es correcto, que estáis en la misma WiFi y que quien lo creó tiene Jiyu Pulse abierta.
 Todavía no hay nada aquí
 Todavía no hay playlists
 Todavía no tienes álbumes
@@ -797,7 +797,7 @@ Tu biblioteca, a tu manera
 Tu biblioteca, cifrada en la nube
 Tu clave de recuperación
 Tu correo
-Tu cuenta de Pear Music
+Tu cuenta de Jiyu Pulse
 Tu idea
 Tu lanzador no deja añadirlo desde aquí: mantén pulsada la pantalla de inicio › Widgets
 Tu música
@@ -890,7 +890,7 @@ orden a-z recientes a mano
 orden barra descubrir inicio biblioteca
 privacidad rgpd exportar borrar datos eliminar zip
 radio infinita autoplay automático cola acabar
-recuperar la copia de la nube en otro móvil. Pear Music no la guarda y no la puede recuperar.
+recuperar la copia de la nube en otro móvil. Jiyu Pulse no la guarda y no la puede recuperar.
 resto de la app
 salida audio altavoz homepod apple tv bluetooth
 streaming datos ahorro máxima kbps
@@ -957,10 +957,10 @@ Español
 Código {0}
 Personas: {0}
 Playlists: 
-Se enviarán tu correo, el texto y datos del iPhone (modelo, versión de iOS y de la app) al canal privado de soporte de Pear Music.
-Se enviarán tu correo, el texto y datos del móvil (modelo, versión de Android y de la app) al canal privado de soporte de Pear Music.
-Se enviarán tu correo, el texto, {0} foto(s) y datos del iPhone (modelo, versión de iOS y de la app) al canal privado de soporte de Pear Music.
-Se enviarán tu correo, el texto, {0} foto(s) y datos del móvil (modelo, versión de Android y de la app) al canal privado de soporte de Pear Music.
+Se enviarán tu correo, el texto y datos del iPhone (modelo, versión de iOS y de la app) al canal privado de soporte de Jiyu Pulse.
+Se enviarán tu correo, el texto y datos del móvil (modelo, versión de Android y de la app) al canal privado de soporte de Jiyu Pulse.
+Se enviarán tu correo, el texto, {0} foto(s) y datos del iPhone (modelo, versión de iOS y de la app) al canal privado de soporte de Jiyu Pulse.
+Se enviarán tu correo, el texto, {0} foto(s) y datos del móvil (modelo, versión de Android y de la app) al canal privado de soporte de Jiyu Pulse.
 ¡Gracias! Es el ticket #{0}. Te contestaremos en Avisos (sólo a ti) y al correo que has puesto.
 ¡Gracias! Te contestaremos en Avisos (sólo a ti) y al correo que has puesto.
 «{0}» usa siempre el modo claro.
@@ -970,11 +970,11 @@ Se enviarán tu correo, el texto, {0} foto(s) y datos del móvil (modelo, versi�
 Barra inferior de SimpMusic, de maxrave-dev (GPL-3.0)
 Barra inferior inspirada en SimpMusic, de maxrave-dev (GPL-3.0)
 ayer
-Descargando Pear Music {0}… {1} %
-Se enviarán tu correo, el texto y la ficha de este iPhone (modelo, versión de iOS y de la app y, si tienes la telemetría activada, su rendimiento) al soporte privado de Pear Music.
-Se enviarán tu correo, el texto y la ficha de este móvil (modelo, versión de Android y de la app y, si tienes la telemetría activada, su rendimiento) al soporte privado de Pear Music.
-Se enviarán tu correo, el texto, {0} foto(s) y la ficha de este iPhone (modelo, versión de iOS y de la app y, si tienes la telemetría activada, su rendimiento) al soporte privado de Pear Music.
-Se enviarán tu correo, el texto, {0} foto(s) y la ficha de este móvil (modelo, versión de Android y de la app y, si tienes la telemetría activada, su rendimiento) al soporte privado de Pear Music.
+Descargando Jiyu Pulse {0}… {1} %
+Se enviarán tu correo, el texto y la ficha de este iPhone (modelo, versión de iOS y de la app y, si tienes la telemetría activada, su rendimiento) al soporte privado de Jiyu Pulse.
+Se enviarán tu correo, el texto y la ficha de este móvil (modelo, versión de Android y de la app y, si tienes la telemetría activada, su rendimiento) al soporte privado de Jiyu Pulse.
+Se enviarán tu correo, el texto, {0} foto(s) y la ficha de este iPhone (modelo, versión de iOS y de la app y, si tienes la telemetría activada, su rendimiento) al soporte privado de Jiyu Pulse.
+Se enviarán tu correo, el texto, {0} foto(s) y la ficha de este móvil (modelo, versión de Android y de la app y, si tienes la telemetría activada, su rendimiento) al soporte privado de Jiyu Pulse.
 Actualizaciones
 Ahora no
 Ajustes puede ir en la barra o arriba en Inicio, junto al Jam.
@@ -1001,8 +1001,8 @@ La app y el reproductor toman los colores de la canción que suena. Elige dónde
 La canción baja al final y la siguiente entra suave: 3, 6 o 10 segundos.
 La carta abre el buzón de sugerencias y el escarabajo, «Informar de un error». Cada envío tiene número de ticket y la respuesta te llega sólo a ti, a la campana.
 La clásica o la estilo SimpMusic: cápsula de cristal con una gota que arrastras, Buscar aparte y plegado al bajar.
-Las caídas y novedades de Pear Music, también como notificación si quieres.
-Lo nuevo de Pear Music {0}
+Las caídas y novedades de Jiyu Pulse, también como notificación si quieres.
+Lo nuevo de Jiyu Pulse {0}
 Lo técnico, plegado: calidad de descarga, tolerancia al importar playlists y caché de carátulas.
 Máxima, o ahorro de datos cuando no tienes wifi. Las descargas siempre van a la máxima.
 Normal, Casete, Vinilo o Air. También se cambia manteniendo pulsado el mini reproductor.
@@ -1010,7 +1010,7 @@ Novedades
 Nueva: te lleva por todos los Ajustes y te explica cada opción. Está junto a la carta.
 Opcional. Guarda tu biblioteca en la nube, cifrada con una clave que sólo tienes tú, y pásala a otro móvil.
 Ordena las pestañas arrastrándolas. Desliza Descubrir a la izquierda para quitarla de la barra.
-Pear Music ya está en portugués. Y «Español» ahora se llama «Castellano».
+Jiyu Pulse ya está en portugués. Y «Español» ahora se llama «Castellano».
 Português
 Que todas las canciones suenen igual de fuerte, sin subir y bajar el volumen a mano.
 Recientes, A-Z, Z-A, por tamaño o a mano. Con «Editar playlists» las ordenas arrastrando.
@@ -1024,6 +1024,106 @@ Vuelve a ver la bienvenida, el recorrido y las historias.
 Y además
 Ya conoces todos los Ajustes. Vuelve a esta guía cuando quieras con el botón junto a la carta.
 Ya no marca Descubrir cuando estás en Ajustes.
-Ya puedes usar Pear Music en português. Y «Español» ahora se llama «Castellano».
+Ya puedes usar Jiyu Pulse en português. Y «Español» ahora se llama «Castellano».
 {0} de {1}
 ¡Listo!
+ Ajustes está arriba en Inicio y no entra en el orden.
+Ordenar a mano
+Unirme
+Ver mis playlists
+Comprobando…
+Siempre
+Abrimos tu incidencia
+Entrar igualmente (Dev)
+Estamos en ello
+Hemos abierto tu incidencia y la estamos mirando. Te avisaremos aquí.
+MANTENIMIENTO ACTIVO
+¡Solucionado! Gracias
+ · cristal líquido
+Barra
+Buscar es el círculo de la derecha. Al bajar por Inicio la barra se pliega; si dejas de moverte 1,5 segundos, vuelve entera.
+Buscar vuelve al parar
+Con la clásica, una barra arriba en Inicio o una pestaña aparte. Con la SimpMusic, el círculo de la derecha, que vuelve si dejas de bajar.
+La barra de abajo: su estilo, dónde está Buscar y el orden de las pestañas, todo junto.
+Borra la búsqueda para cambiar el orden.
+Deshacer
+Las canciones que marcaste con «No me interesa» no vuelven a salir, y un artista con tres en un mes deja de salir durante 30 días. Sólo se guarda en este móvil.
+Lo que no te interesa
+Mantén pulsada una portada y arrástrala para cambiar el orden.
+No me interesa
+No volverá a salir en Descubrir.
+Vaciar
+Vaciar lo que no te interesa
+{0} canciones
+Actualizar
+Borrados {0} informes
+Borrar el registro de la web
+Esta versión es antigua
+Forzar extracción
+La app se cree la {0}. Sal y vuelve para ver el aviso.
+La música sigue funcionando. Si hay fútbol, puede ser por los bloqueos de LaLiga: los avisos y el soporte vuelven al acabar el partido.
+Los servidores de Jiyu Pulse no responden
+Para repetir la bienvenida o ver los avisos sin reinstalar. No tocan tu biblioteca ni tus descargas.
+Para ver el aviso de versión nueva
+Pedido. Las apps lo verán en su latido diario.
+Pruebas
+Puede fallar. Actualiza para tener los arreglos.
+Reiniciar la bienvenida
+Se borran todos los informes guardados. Las fichas de los reportes no se tocan. No se puede deshacer.
+Segunda confirmación: el panel se queda vacío.
+Simular versión antigua
+VERSIÓN SIMULADA: {0}
+Ver las novedades otra vez
+¿Borrar toda la telemetría de la web?
+¿Seguro?
+Cada uno en su móvil
+De {0} · {1}
+Dónde suena
+Escuchar también aquí
+Lo que suena aquí suena a la vez en el móvil de cada uno, con su propio audio. Pon algo de la lista.
+Suena lo mismo que en el móvil de {0}, a la vez.
+Suena sólo en este móvil; los demás añaden canciones.
+Un altavoz
+{0} y {1}
+{0}, {1} y {2}
+ La foto de la portada no cabe en el QR.
+Añadiendo…
+Añadir a la biblioteca
+Compartir con QR
+Compartir enlace
+Código QR de {0}
+Escanéalo con la cámara de otro móvil con Jiyu Pulse. Viajan el nombre, las {0} canciones y su orden.
+Esta playlist está vacía.
+No se pudieron cargar las canciones. Revisa la conexión y vuelve a intentarlo.
+Playlist compartida
+Sin nombre
+Tiene demasiadas canciones para un QR (como mucho {0}).
+{0} canciones no están en YouTube Music y se han quedado fuera.
+Ajustes, arriba a la izquierda
+Biblioteca a tu gusto
+Comparte playlists con un QR
+Comparte una playlist con el QR de su pantalla, y en el Jam elige que suene en el móvil de cada uno.
+Con la barra estilo SimpMusic, si dejas de bajar por Inicio la barra vuelve entera.
+En Descubrir, en «⋯». Esa canción no vuelve, y si un artista no te va, deja de salir un tiempo.
+En Inicio. Y en Ajustes › Aspecto › Barra está todo lo de la barra junto.
+Jam: cada uno en su móvil
+Lo que marcaste con «No me interesa». Vacíalo cuando quieras.
+Nuevo: el estilo de la barra, dónde está Buscar y las pestañas, todo aquí.
+Nuevo: el estilo de la barra, dónde está Buscar, el cristal líquido y las pestañas, todo aquí.
+Otro móvil lo escanea con la cámara y se la lleva con sus canciones y su orden.
+Playlists en cuadrícula, como Tus álbumes. Mantén pulsada una portada y arrástrala para ordenarlas.
+Quien crea el Jam elige: que suene en un altavoz o en el móvil de cada uno a la vez, con sus cascos.
+Aparecen con su portada al principio de la carpeta Playlists, en «Tu música».
+Pulsa la chincheta en una playlist o un álbum y lo tendrás aquí, en el orden que quieras.
+Ahora se llama Jiyu Pulse
+Colores de la portada, más legibles
+Con los colores de la canción, el texto de los botones elige solo si va claro u oscuro.
+Cristal y Sistema estrenan el color shu, el bermellón de Jiyu Pulse. Los textos en color y los botones se leen mejor.
+El bermellón de los sellos japoneses, en botones, progreso y favoritos. Los textos en color se leen mejor, en claro y en oscuro.
+El botón de encendido de siempre, simétrico, más grande y en shu sobre negro.
+Icono nuevo
+La app se llama Jiyu Pulse y tiene icono nuevo. Tu biblioteca, tus descargas y tus ajustes siguen igual.
+Un color nuevo: shu
+«Jiyu» es «libertad» en japonés. Es la misma app: conservas tu biblioteca, tus descargas y tus ajustes.
+Catálogo del patrocinador
+Modo demo para grabar el tráiler: Inicio, búsqueda, artista, Biblioteca y descargas sólo con canciones de Michael Bennet, sin red. Se aplica al volver a abrir la app y no toca tu biblioteca.
