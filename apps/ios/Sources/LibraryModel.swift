@@ -308,8 +308,18 @@ enum LibraryOrder {
 }
 
 extension LibraryOrder {
+    /// Prefijo de las carpetas en `playlistOrder` y en las claves de la cuadrícula. Sin él, una carpeta con el mismo
+    /// id que una playlist (o llamada «downloads»/«favorites», en una copia hecha a mano) daría una clave repetida.
+    static let folderPrefix = "folder:"
+    static func key(folder id: String) -> String { folderPrefix + id }
+    /// El id de la carpeta de una clave, o nil si la clave no es de una carpeta.
+    static func folderID(_ key: String) -> String? {
+        key.hasPrefix(folderPrefix) ? String(key.dropFirst(folderPrefix.count)) : nil
+    }
+
     /// Las claves de un nivel de Tu música › Playlists (`folder` nil = arriba del todo), en el orden en que se ven:
-    /// Descargadas y Favoritos (sólo arriba del todo y si van «en Playlists»), las carpetas y las playlists. Las
+    /// Descargadas y Favoritos (sólo arriba del todo y si van «en Playlists»), las carpetas (`folder:<id>`) y las
+    /// playlists. Las
     /// carpetas se ordenan con el mismo criterio que las playlists («count»: canciones de todo lo que tienen dentro;
     /// «custom»: su sitio en `order`, lo nuevo al final). Igual que `LibraryOrder.level` en Android.
     static func level(_ folder: String?, playlists: [Playlist], folders: [PlaylistFolder], sort: String, order: [String],
@@ -322,9 +332,8 @@ extension LibraryOrder {
         switch sort {
         case "custom":
             var seen = Set<String>()
-            let ids = Set(mine.map(\.id))
-            let kept = order.filter { ids.contains($0) && seen.insert($0).inserted }
             let byID = Dictionary(mine.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
+            let kept = order.compactMap(folderID).filter { byID[$0] != nil && seen.insert($0).inserted }
             sorted = kept.compactMap { byID[$0] } + mine.filter { !seen.contains($0.id) }
         case "name": sorted = mine.sorted(by: byName)
         case "nameDesc": sorted = mine.sorted { byName($1, $0) }
@@ -337,7 +346,7 @@ extension LibraryOrder {
         }
         // Detrás de las listas inteligentes que vayan delante y antes de la primera playlist.
         let at = keys.firstIndex { $0 != downloads && $0 != favorites } ?? keys.endIndex
-        return Array(keys[..<at]) + sorted.map(\.id) + Array(keys[at...])
+        return Array(keys[..<at]) + sorted.map { key(folder: $0.id) } + Array(keys[at...])
     }
 
     /// El orden de todos los niveles seguidos, tal como se ven con `sort`. Al pasar a «A mano» arrastrando en un

@@ -911,7 +911,7 @@ struct ReorderPlaylistsView: View {
                         .font(.caption).foregroundStyle(.secondary)
                 }
             default:
-                if let f = library.folders.first(where: { $0.id == key }) {
+                if let f = LibraryOrder.folderID(key).flatMap({ id in library.folders.first { $0.id == id } }) {
                     FolderCover(folder: f).frame(width: 44, height: 44)
                     VStack(alignment: .leading, spacing: 2) {
                         Text(f.name).font(.body.weight(.medium)).lineLimit(1)

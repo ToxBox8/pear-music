@@ -121,7 +121,8 @@ struct PlaylistsListView: View {
         case LibraryOrder.favorites:
             return Entry(key: key, title: SmartList.favorites.title, subtitle: songCount(library.favorites.count), smart: .favorites)
         default:
-            if let f = library.folders.first(where: { $0.id == key }) {
+            if let id = LibraryOrder.folderID(key) {
+                guard let f = library.folders.first(where: { $0.id == id }) else { return nil }
                 return Entry(key: key, title: f.name, subtitle: path ? place(f.parent) ?? folderContents(f) : folderContents(f), folder: f)
             }
             guard let p = library.userPlaylists.first(where: { $0.id.uuidString == key }) else { return nil }
@@ -147,7 +148,7 @@ struct PlaylistsListView: View {
         let folders = library.folders.filter { f in f.id != folderID && (inside.map { s in f.parent.map(s.contains) ?? false } ?? true) }
         let lists = library.userPlaylists.filter { p in inside.map { s in p.folder.map(s.contains) ?? false } ?? true }
         let smart = smartHere ? [LibraryOrder.downloads, LibraryOrder.favorites] : []
-        let all = (smart + folders.map(\.id) + lists.map(\.id.uuidString)).compactMap { entry($0, path: true) }
+        let all = (smart + folders.map { LibraryOrder.key(folder: $0.id) } + lists.map(\.id.uuidString)).compactMap { entry($0, path: true) }
         return LocalSearch.filter(all, query) { $0.title }
     }
 
@@ -286,7 +287,7 @@ struct PlaylistsListView: View {
 
     // MARK: Arrastrar dentro de una carpeta
 
-    private func isFolder(_ key: String) -> Bool { library.folders.contains { $0.id == key } }
+    private func isFolder(_ key: String) -> Bool { LibraryOrder.folderID(key) != nil }
 
     private func canDropInto(_ dragged: String, _ target: String) -> Bool {
         guard isFolder(target) else { return false }
@@ -298,8 +299,8 @@ struct PlaylistsListView: View {
     private func canSwap(_ dragged: String, _ target: String) -> Bool { isFolder(dragged) == isFolder(target) }
 
     private func dropInto(_ dragged: String, _ target: String) {
-        guard let id = UUID(uuidString: dragged) else { return }
-        withAnimation(.uiEaseOut(0.25)) { library.movePlaylist(id, to: target) }
+        guard let id = UUID(uuidString: dragged), let folder = LibraryOrder.folderID(target) else { return }
+        withAnimation(.uiEaseOut(0.25)) { library.movePlaylist(id, to: folder) }
     }
 
     // MARK: Nombres

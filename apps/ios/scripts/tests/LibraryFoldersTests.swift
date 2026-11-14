@@ -125,18 +125,38 @@ igual(raiz.first { $0.name == "Cardio 160 bpm" }?.folder, nil, "borrar la de arr
 let propias = carpetas.playlists.filter { $0.album == nil }
 let b001 = "0000000A-0000-0000-0000-00000000B001", b004 = "0000000A-0000-0000-0000-00000000B004"
 let f002 = "0000000F-0000-0000-0000-00000000F002"
+let kGym = LibraryOrder.key(folder: gym), kViajes = LibraryOrder.key(folder: viajes), kF002 = LibraryOrder.key(folder: f002)
+igual(kGym, "folder:" + gym, "clave de carpeta con prefijo")
+igual(LibraryOrder.folderID(kGym), gym, "clave → id de carpeta")
+igual(LibraryOrder.folderID(b004), nil, "una playlist no es carpeta")
 igual(LibraryOrder.level(nil, playlists: propias, folders: fs, sort: "recent", order: [], smartInPlaylists: true),
-      ["downloads", "favorites", viajes, gym, b004], "nivel: recientes, carpetas delante")
+      ["downloads", "favorites", kViajes, kGym, b004], "nivel: recientes, carpetas delante")
 igual(LibraryOrder.level(nil, playlists: propias, folders: fs, sort: "name", order: [], smartInPlaylists: false),
-      [gym, viajes, b004], "nivel: por nombre, sin listas inteligentes")
+      [kGym, kViajes, b004], "nivel: por nombre, sin listas inteligentes")
 igual(LibraryOrder.level(gym, playlists: propias, folders: fs, sort: "name", order: [], smartInPlaylists: true),
-      [f002, b001], "nivel: dentro de Gimnasio, sin listas inteligentes")
-let movido = ["downloads", "favorites", gym, viajes, b004]
+      [kF002, b001], "nivel: dentro de Gimnasio, sin listas inteligentes")
+let movido = ["downloads", "favorites", kGym, kViajes, b004]
 let orden = LibraryOrder.reorder(level: movido, playlists: propias, folders: fs, sort: "recent", order: [], smartInPlaylists: true)
 igual(LibraryOrder.level(nil, playlists: propias, folders: fs, sort: "custom", order: orden, smartInPlaylists: true), movido,
       "a mano: el nivel queda como se dejó")
-igual(LibraryOrder.level(gym, playlists: propias, folders: fs, sort: "custom", order: orden, smartInPlaylists: true), [f002, b001],
+igual(LibraryOrder.level(gym, playlists: propias, folders: fs, sort: "custom", order: orden, smartInPlaylists: true), [kF002, b001],
       "a mano: los otros niveles no saltan")
+
+// MARK: Una carpeta con el mismo id que una playlist o que «downloads» (copia hecha a mano): sin claves repetidas
+let mismo = "0000000A-0000-0000-0000-00000000D001"
+let choqueCarpetas = PlaylistFolders.normalize([PlaylistFolder(id: mismo, name: "Igual que la lista"),
+                                                PlaylistFolder(id: "downloads", name: "Descargas falsa")])
+let choqueListas = PlaylistFolders.clean([Playlist(id: UUID(uuidString: mismo)!, name: "Lista"),
+                                          Playlist(id: UUID(uuidString: "0000000A-0000-0000-0000-00000000D002")!, name: "Dentro", folder: "downloads")],
+                                         folders: choqueCarpetas)
+for (criterio, orden) in [("recent", [String]()), ("custom", [mismo, LibraryOrder.key(folder: mismo), "downloads", LibraryOrder.key(folder: "downloads")])] {
+    let claves = LibraryOrder.level(nil, playlists: choqueListas, folders: choqueCarpetas, sort: criterio, order: orden, smartInPlaylists: true)
+    igual(claves.count, Set(claves).count, "choque (\(criterio)): sin claves repetidas")
+    cierto(claves.contains(mismo) && claves.contains(LibraryOrder.key(folder: mismo)), "choque (\(criterio)): la lista y la carpeta salen las dos")
+    cierto(claves.contains("downloads") && claves.contains(LibraryOrder.key(folder: "downloads")), "choque (\(criterio)): Descargadas y la carpeta «downloads» salen las dos")
+}
+igual(LibraryOrder.level("downloads", playlists: choqueListas, folders: choqueCarpetas, sort: "recent", order: [], smartInPlaylists: true),
+      ["0000000A-0000-0000-0000-00000000D002"], "choque: dentro de la carpeta «downloads» no salen las listas inteligentes")
 
 print(fallos == 0 ? "Carpetas (library.json): todo bien." : "Carpetas (library.json): \(fallos) fallos.")
 exit(fallos == 0 ? 0 : 1)
