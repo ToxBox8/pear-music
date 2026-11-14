@@ -140,9 +140,9 @@ enum Demo {
 
     /// Los mismos seguidos que `seedFollowed()` en ScreenshotTest.kt (sin foto: las capturas no tienen red).
     static let followed = [
-        FollowedArtist(browseId: "UCdemo-bad-bunny", name: "Bad Bunny", since: 1_763_100_000_000),
-        FollowedArtist(browseId: "UCdemo-dua-lipa", name: "Dua Lipa", since: 1_762_000_000_000),
-        FollowedArtist(browseId: "UCdemo-rosalia", name: "Rosalía", since: 1_760_000_000_000),
+        FollowedArtist(browseId: "UCdemo-bad-bunny", name: "Bad Bunny", since: 1_794_657_600_000),
+        FollowedArtist(browseId: "UCdemo-dua-lipa", name: "Dua Lipa", since: 1_793_534_400_000),
+        FollowedArtist(browseId: "UCdemo-rosalia", name: "Rosalía", since: 1_791_547_200_000),
     ]
 
     /// «Novedades de tus artistas» del escenario 48: las dos primeras, «Nuevo». Las mismas que `releasePicks` en Android.
