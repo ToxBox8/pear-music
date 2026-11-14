@@ -1127,3 +1127,37 @@
 1127	«Jiyu» é «liberdade» en xaponés. É a mesma app: conservas a biblioteca, as descargas e os axustes.
 1128	Catálogo do patrocinador
 1129	Modo demo para gravar o tráiler: Inicio, busca, artista, Biblioteca e descargas só con cancións de Michael Bennet, sen rede. Aplícase ao volver abrir a app e non toca a túa biblioteca.
+1130	1 cartafol
+1131	1 lista
+1132	Abrir
+1133	Arrastra para cambiar a orde. Ao mover algo, Listas ordénase «Á man».
+1134	Arrastra unha lista enriba do cartafol ou usa «Mover a…» no seu menú.
+1135	Caben ata 3 niveis de cartafoles.
+1136	Cartafol baleiro
+1137	Cartafol {0}
+1138	Editar orde
+1139	Eliminar cartafol
+1140	En {0}
+1141	É o que moves
+1142	Está dentro do que moves
+1143	Fóra dos cartafoles
+1144	Gardar
+1145	O que ten dentro pasa a «{0}». Non se borra ningunha lista nin canción.
+1146	Mantén premida unha portada e arrástraa para cambiar a orde ou metela nun cartafol.
+1147	Mover a outro cartafol
+1148	Mover a…
+1149	Mover cartafol a…
+1150	Ningún
+1151	Non cabe: pasaría de 3 niveis
+1152	Novo cartafol
+1153	Novo cartafol aquí
+1154	Nova lista aquí
+1155	Renomear
+1156	Renomear cartafol
+1157	Sacar de «{0}»
+1158	Soltar en {0}
+1159	Baleiro
+1160	{0} cartafoles
+1161	{0} listas
+1162	«{0}» está en {1}.
+1163	Eliminar o cartafol «{0}»?

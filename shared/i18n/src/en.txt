@@ -1127,3 +1127,37 @@
 1127	“Jiyu” means “freedom” in Japanese. It's the same app: you keep your library, downloads and settings.
 1128	Sponsor catalogue
 1129	Demo mode for recording the trailer: Home, search, artist, Library and downloads with Michael Bennet's songs only, offline. It applies when you reopen the app and doesn't touch your library.
+1130	1 folder
+1131	1 playlist
+1132	Open
+1133	Drag to change the order. Once you move something, Playlists is sorted “Custom”.
+1134	Drag a playlist onto the folder or use “Move to…” in its menu.
+1135	Up to 3 levels of folders.
+1136	Empty folder
+1137	Folder {0}
+1138	Edit order
+1139	Delete folder
+1140	In {0}
+1141	It's the one you're moving
+1142	It's inside the one you're moving
+1143	Outside folders
+1144	Save
+1145	Everything inside goes to “{0}”. No playlist or song is deleted.
+1146	Touch and hold a cover and drag it to change the order or put it in a folder.
+1147	Move to another folder
+1148	Move to…
+1149	Move folder to…
+1150	None
+1151	Doesn't fit: it would go past 3 levels
+1152	New folder
+1153	New folder here
+1154	New playlist here
+1155	Rename
+1156	Rename folder
+1157	Take out of “{0}”
+1158	Drop in {0}
+1159	Empty
+1160	{0} folders
+1161	{0} playlists
+1162	“{0}” is in {1}.
+1163	Delete the folder “{0}”?

@@ -1127,3 +1127,37 @@
 1127	«Jiyu» japonieraz «askatasuna» da. Aplikazio bera da: liburutegia, deskargak eta ezarpenak gordetzen dituzu.
 1128	Babeslearen katalogoa
 1129	Trailerra grabatzeko demo modua: Hasiera, bilaketa, artista, Liburutegia eta deskargak Michael Bennet-en abestiekin bakarrik, sarerik gabe. Aplikazioa berriro irekitzean aplikatzen da eta ez du zure liburutegia ukitzen.
+1130	Karpeta 1
+1131	Zerrenda 1
+1132	Ireki
+1133	Arrastatu ordena aldatzeko. Zerbait mugitzean, Zerrendak «Eskuz» ordenatzen da.
+1134	Arrastatu zerrenda bat karpetaren gainera edo erabili bere menuko «Eraman hona…».
+1135	Gehienez 3 karpeta-maila.
+1136	Karpeta hutsa
+1137	{0} karpeta
+1138	Editatu ordena
+1139	Ezabatu karpeta
+1140	Hemen: {0}
+1141	Mugitzen ari zarena da
+1142	Mugitzen ari zarenaren barruan dago
+1143	Karpetetatik kanpo
+1144	Gorde
+1145	Barruan dagoena «{0}»(e)ra pasatzen da. Ez da zerrendarik ez abestirik ezabatzen.
+1146	Eutsi sakatuta azal bat eta arrastatu ordena aldatzeko edo karpeta batean sartzeko.
+1147	Eraman beste karpeta batera
+1148	Eraman hona…
+1149	Eraman karpeta hona…
+1150	Bat ere ez
+1151	Ez da sartzen: 3 maila gaindituko lituzke
+1152	Karpeta berria
+1153	Karpeta berria hemen
+1154	Zerrenda berria hemen
+1155	Aldatu izena
+1156	Aldatu karpetaren izena
+1157	Atera «{0}»(e)tik
+1158	Askatu hemen: {0}
+1159	Hutsik
+1160	{0} karpeta
+1161	{0} zerrenda
+1162	«{0}» hemen dago: {1}.
+1163	«{0}» karpeta ezabatu?

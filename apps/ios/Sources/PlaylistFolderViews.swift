@@ -244,13 +244,11 @@ struct MoveToFolderSheet: View {
                 } footer: {
                     Text(L("Caben hasta 3 niveles de carpetas."))
                 }
-                .glassRow()
                 Section {
                     Button { newName = ""; naming = true } label: { Label(L("Nueva carpeta"), systemImage: "folder.badge.plus") }
                 }
-                .glassRow()
             }
-            .themed()
+            // Formulario del sistema, como el editor de playlist y la misma hoja en Android.
             .navigationTitle(L("Mover a…"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("Cancelar")) { dismiss() } } }
@@ -260,7 +258,6 @@ struct MoveToFolderSheet: View {
                 Button(L("Cancelar"), role: .cancel) {}
             }
         }
-        .presentationDetents([.medium, .large])
     }
 
     private func row(_ target: String?, title: String, subtitle: String?, level: Int, symbol: String) -> some View {
@@ -270,6 +267,7 @@ struct MoveToFolderSheet: View {
             HStack(spacing: 12) {
                 Image(systemName: symbol)
                     .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(.primary)
                     .frame(width: 30, height: 30)
                     .background(ThemeSurface(radius: 8))
                     .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
@@ -284,6 +282,8 @@ struct MoveToFolderSheet: View {
             .frame(minHeight: 44)
             .contentShape(Rectangle())
         }
+        // Sin el tinte de los botones de una lista: el único color es la marca de dónde está ahora.
+        .buttonStyle(.plain)
         .disabled(reason != nil)
         .opacity(reason != nil ? 0.45 : 1)
         .accessibilityAddTraits(here ? .isSelected : [])

@@ -1127,3 +1127,37 @@ Un color nuevo: shu
 «Jiyu» es «libertad» en japonés. Es la misma app: conservas tu biblioteca, tus descargas y tus ajustes.
 Catálogo del patrocinador
 Modo demo para grabar el tráiler: Inicio, búsqueda, artista, Biblioteca y descargas sólo con canciones de Michael Bennet, sin red. Se aplica al volver a abrir la app y no toca tu biblioteca.
+1 carpeta
+1 playlist
+Abrir
+Arrastra para cambiar el orden. Al mover algo, Playlists se ordena «A mano».
+Arrastra una playlist encima de la carpeta o usa «Mover a…» en su menú.
+Caben hasta 3 niveles de carpetas.
+Carpeta vacía
+Carpeta {0}
+Editar orden
+Eliminar carpeta
+En {0}
+Es la que mueves
+Está dentro de la que mueves
+Fuera de las carpetas
+Guardar
+Lo que tiene dentro pasa a «{0}». No se borra ninguna playlist ni canción.
+Mantén pulsada una portada y arrástrala para cambiar el orden o meterla en una carpeta.
+Mover a otra carpeta
+Mover a…
+Mover carpeta a…
+Ninguna
+No cabe: pasaría de 3 niveles
+Nueva carpeta
+Nueva carpeta aquí
+Nueva playlist aquí
+Renombrar
+Renombrar carpeta
+Sacar de «{0}»
+Soltar en {0}
+Vacía
+{0} carpetas
+{0} playlists
+«{0}» está en {1}.
+¿Eliminar la carpeta «{0}»?

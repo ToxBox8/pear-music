@@ -1127,3 +1127,37 @@
 1127	«Jiyu» signifas «libereco» en la japana. Ĝi estas la sama apo: vi konservas vian bibliotekon, elŝutojn kaj agordojn.
 1128	Katalogo de la sponsoro
 1129	Demonstra reĝimo por registri la antaŭfilmon: Hejmo, serĉo, artisto, Biblioteko kaj elŝutoj nur kun kantoj de Michael Bennet, sen reto. Ĝi efikas kiam vi remalfermas la apon kaj ne tuŝas vian bibliotekon.
+1130	1 dosierujo
+1131	1 ludlisto
+1132	Malfermi
+1133	Trenu por ŝanĝi la ordon. Kiam vi movas ion, Ludlistoj ordiĝas «Permane».
+1134	Trenu ludliston sur la dosierujon aŭ uzu «Movi al…» en ĝia menuo.
+1135	Ĝis 3 niveloj de dosierujoj.
+1136	Malplena dosierujo
+1137	Dosierujo {0}
+1138	Redakti ordon
+1139	Forigi dosierujon
+1140	En {0}
+1141	Ĝi estas tiu, kiun vi movas
+1142	Ĝi estas en tiu, kiun vi movas
+1143	Ekster la dosierujoj
+1144	Konservi
+1145	Ĉio interne iras al «{0}». Neniu ludlisto aŭ kanto estas forigita.
+1146	Tenu premita kovrilon kaj trenu ĝin por ŝanĝi la ordon aŭ meti ĝin en dosierujon.
+1147	Movi al alia dosierujo
+1148	Movi al…
+1149	Movi dosierujon al…
+1150	Neniu
+1151	Ne eniras: ĝi superus 3 nivelojn
+1152	Nova dosierujo
+1153	Nova dosierujo ĉi tie
+1154	Nova ludlisto ĉi tie
+1155	Alinomi
+1156	Alinomi dosierujon
+1157	Elpreni el «{0}»
+1158	Demeti en {0}
+1159	Malplena
+1160	{0} dosierujoj
+1161	{0} ludlistoj
+1162	«{0}» estas en {1}.
+1163	Ĉu forigi la dosierujon «{0}»?

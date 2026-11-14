@@ -117,7 +117,7 @@ enum Demo {
         // Carpetas (3.0, bloque 1): los mismos pasos que seedFolders() en ScreenshotTest.kt.
         if current?.folders == true {
             library.playlists.append(Playlist(name: "Fuerza", songs: Array(songs.prefix(3)), icon: "dumbbell.fill", tint: 5))
-            library.playlists.append(Playlist(name: "Domingo lento", songs: Array(songs.suffix(3)), icon: "moon.fill", tint: 6))
+            library.playlists.append(Playlist(name: "Domingo lento", songs: Array(songs.suffix(3)), icon: "moon.stars.fill", tint: 6))
             let gym = library.createFolder("Gimnasio")
             let pierna = library.createFolder("Pierna", in: gym)
             let viajes = library.createFolder("Viajes")

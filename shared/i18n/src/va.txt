@@ -1127,3 +1127,37 @@
 1127	«Jiyu» és «llibertat» en japonés. És la mateixa aplicació: conserves la biblioteca, les baixades i els ajustos.
 1128	Catàleg del patrocinador
 1129	Mode demo per a gravar el tràiler: Inici, busca, artista, Biblioteca i descàrregues només amb cançons de Michael Bennet, sense xarxa. S'aplica en tornar a obrir l'app i no toca la teua biblioteca.
+1130	1 carpeta
+1131	1 llista
+1132	Obri
+1133	Arrossega per a canviar l'orde. En moure alguna cosa, Llistes s'ordena «A mà».
+1134	Arrossega una llista damunt de la carpeta o utilitza «Mou a…» en el seu menú.
+1135	Hi caben fins a 3 nivells de carpetes.
+1136	Carpeta buida
+1137	Carpeta {0}
+1138	Edita l'orde
+1139	Elimina la carpeta
+1140	En {0}
+1141	És la que mous
+1142	Està dins de la que mous
+1143	Fora de les carpetes
+1144	Guarda
+1145	El que hi ha dins passa a «{0}». No s'esborra cap llista ni cançó.
+1146	Mantín premuda una portada i arrossega-la per a canviar l'orde o posar-la en una carpeta.
+1147	Mou a una altra carpeta
+1148	Mou a…
+1149	Mou la carpeta a…
+1150	Cap
+1151	No hi cap: passaria de 3 nivells
+1152	Carpeta nova
+1153	Carpeta nova ací
+1154	Llista nova ací
+1155	Canvia el nom
+1156	Canvia el nom de la carpeta
+1157	Trau de «{0}»
+1158	Deixa-la en {0}
+1159	Buida
+1160	{0} carpetes
+1161	{0} llistes
+1162	«{0}» està en {1}.
+1163	Vols eliminar la carpeta «{0}»?

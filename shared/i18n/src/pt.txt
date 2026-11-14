@@ -1127,3 +1127,37 @@
 1127	«Jiyu» significa «liberdade» em japonês. É a mesma app: manténs a biblioteca, as transferências e as definições.
 1128	Catálogo do patrocinador
 1129	Modo demo para gravar o trailer: Início, pesquisa, artista, Biblioteca e transferências só com músicas de Michael Bennet, sem rede. Aplica-se ao voltar a abrir a app e não mexe na tua biblioteca.
+1130	1 pasta
+1131	1 playlist
+1132	Abrir
+1133	Arraste para mudar a ordem. Ao mover algo, Playlists passa a ordenar-se «À mão».
+1134	Arraste uma playlist para cima da pasta ou use «Mover para…» no menu dela.
+1135	Cabem até 3 níveis de pastas.
+1136	Pasta vazia
+1137	Pasta {0}
+1138	Editar ordem
+1139	Eliminar pasta
+1140	Em {0}
+1141	É a que está a mover
+1142	Está dentro da que está a mover
+1143	Fora das pastas
+1144	Guardar
+1145	O que tem dentro passa para «{0}». Não se apaga nenhuma playlist nem música.
+1146	Mantenha premida uma capa e arraste-a para mudar a ordem ou metê-la numa pasta.
+1147	Mover para outra pasta
+1148	Mover para…
+1149	Mover pasta para…
+1150	Nenhuma
+1151	Não cabe: passaria de 3 níveis
+1152	Nova pasta
+1153	Nova pasta aqui
+1154	Nova playlist aqui
+1155	Mudar o nome
+1156	Mudar o nome da pasta
+1157	Tirar de «{0}»
+1158	Largar em {0}
+1159	Vazia
+1160	{0} pastas
+1161	{0} playlists
+1162	«{0}» está em {1}.
+1163	Eliminar a pasta «{0}»?
