@@ -72,97 +72,251 @@ struct NoMatchesView: View {
 
 /// Playlists (2.9 de x.1.1): la carpeta de «Tu música», en cuadrícula como «Tus álbumes». Es el único sitio de las
 /// playlists: el carrusel de Biblioteca lo ocupa ahora Fijados. Con Descargadas y Favoritos «en Playlists» (Ajustes ›
-/// Biblioteca), van aquí con su portada. Manteniendo pulsada una portada se arrastra y el orden pasa a «A mano». El
-/// lápiz lleva a «Editar playlists» (ordenar por…).
+/// Biblioteca), van aquí con su portada. Manteniendo pulsada una portada sale su menú y, si se arrastra, se cambia el
+/// orden (pasa a «A mano») o se mete en una carpeta.
+/// Carpetas (3.0, bloque 1; DECISIONS 35): con `folderID` es la pantalla de una carpeta, con Reproducir y Aleatorio
+/// de todo lo de dentro. En cada nivel van primero las carpetas y después las playlists. Igual que `PlaylistsScreen`
+/// en Android.
 struct PlaylistsListView: View {
+    var folderID: String? = nil
     @EnvironmentObject var library: Library
     @EnvironmentObject var downloads: DownloadStore
     @AppStorage("playlistSort") private var sort = "recent"
     @AppStorage("playlistOrder") private var orderRaw = ""
     @AppStorage("smartPlacement") private var placement = "playlists"
+    @AppStorage("playlistDragHintDone") private var hintDone = false
+    @Environment(\.dismiss) private var dismiss
     @State private var query = ""
     @State private var editing = false
+    @State private var naming: FolderNaming?
+    @State private var nameText = ""
+    @State private var moving: MoveItem?
+    @State private var deleting: PlaylistFolder?
+    @State private var opened: Entry?
 
-    /// Una casilla de la cuadrícula: una playlist o una lista inteligente (con un id fijo para poder arrastrarla).
+    /// Una casilla de la cuadrícula: una playlist, una lista inteligente o una carpeta. `key` es su clave en
+    /// `playlistOrder` (el id de la playlist o de la carpeta, o "downloads" / "favorites").
     struct Entry: Identifiable {
         let key: String
-        let id: UUID
+        var id: String { key }
         let title: String
         let subtitle: String
-        let playlist: Playlist?
-        let smart: SmartList?
+        var playlist: Playlist? = nil
+        var smart: SmartList? = nil
+        var folder: PlaylistFolder? = nil
     }
 
-    private static let downloadsID = UUID(uuidString: "00000000-0000-0000-0000-00000000D0D0")!
-    private static let favoritesID = UUID(uuidString: "00000000-0000-0000-0000-00000000FA00")!
+    private var folder: PlaylistFolder? { folderID.flatMap { id in library.folders.first { $0.id == id } } }
+    private var smartHere: Bool { folderID == nil && placement != "music" }
 
     private var keys: [String] {
-        LibraryOrder.keys(library.userPlaylists, sort: sort, order: LibraryOrder.decode(orderRaw), smartInPlaylists: placement != "music")
+        LibraryOrder.level(folderID, playlists: library.userPlaylists, folders: library.folders, sort: sort,
+                           order: LibraryOrder.decode(orderRaw), smartInPlaylists: smartHere)
     }
 
-    private var entries: [Entry] {
-        let byID = Dictionary(library.userPlaylists.map { ($0.id.uuidString, $0) }, uniquingKeysWith: { a, _ in a })
-        return keys.compactMap { key in
-            switch key {
-            case LibraryOrder.downloads:
-                return Entry(key: key, id: Self.downloadsID, title: SmartList.downloads.title, subtitle: songCount(downloads.songs.count), playlist: nil, smart: .downloads)
-            case LibraryOrder.favorites:
-                return Entry(key: key, id: Self.favoritesID, title: SmartList.favorites.title, subtitle: songCount(library.favorites.count), playlist: nil, smart: .favorites)
-            default:
-                guard let p = byID[key] else { return nil }
-                return Entry(key: key, id: p.id, title: p.name, subtitle: songCount(p.songs.count), playlist: p, smart: nil)
+    private func entry(_ key: String, path: Bool) -> Entry? {
+        switch key {
+        case LibraryOrder.downloads:
+            return Entry(key: key, title: SmartList.downloads.title, subtitle: songCount(downloads.songs.count), smart: .downloads)
+        case LibraryOrder.favorites:
+            return Entry(key: key, title: SmartList.favorites.title, subtitle: songCount(library.favorites.count), smart: .favorites)
+        default:
+            if let f = library.folders.first(where: { $0.id == key }) {
+                return Entry(key: key, title: f.name, subtitle: path ? place(f.parent) ?? folderContents(f) : folderContents(f), folder: f)
             }
+            guard let p = library.userPlaylists.first(where: { $0.id.uuidString == key }) else { return nil }
+            return Entry(key: key, title: p.name, subtitle: path ? place(p.folder) ?? songCount(p.songs.count) : songCount(p.songs.count), playlist: p)
         }
     }
 
+    /// «En Gimnasio › Pierna» (buscando: dónde está cada cosa). nil si está arriba del todo.
+    private func place(_ parent: String?) -> String? {
+        let names = PlaylistFolders.path(parent, in: library.folders).map(\.name)
+        return names.isEmpty ? nil : L("En {0}", names.joined(separator: " › "))
+    }
+
+    /// «3 playlists · 1 carpeta»: lo que hay justo dentro.
+    private func folderContents(_ f: PlaylistFolder) -> String {
+        FolderText.contents(playlists: library.userPlaylists.filter { $0.folder == f.id }.count,
+                            folders: library.folders.filter { $0.parent == f.id }.count)
+    }
+
+    /// Buscando: todo lo que hay en este nivel y por debajo, con su ruta.
+    private func searchEntries() -> [Entry] {
+        let inside: Set<String>? = folderID.map { PlaylistFolders.subtree($0, in: library.folders) }
+        let folders = library.folders.filter { f in f.id != folderID && (inside.map { s in f.parent.map(s.contains) ?? false } ?? true) }
+        let lists = library.userPlaylists.filter { p in inside.map { s in p.folder.map(s.contains) ?? false } ?? true }
+        let smart = smartHere ? [LibraryOrder.downloads, LibraryOrder.favorites] : []
+        let all = (smart + folders.map(\.id) + lists.map(\.id.uuidString)).compactMap { entry($0, path: true) }
+        return LocalSearch.filter(all, query) { $0.title }
+    }
+
     var body: some View {
-        let all = entries
-        let shown = LocalSearch.filter(all, query) { $0.title }
+        let all = keys.compactMap { entry($0, path: false) }
+        let shown = query.isEmpty ? all : searchEntries()
         ScrollView {
-            if !shown.isEmpty {
-                ReorderHint(enabled: query.isEmpty)
-                ReorderGrid(items: shown, enabled: query.isEmpty, onMoved: { moved in
-                    let byID = Dictionary(all.map { ($0.id, $0.key) }, uniquingKeysWith: { a, _ in a })
-                    orderRaw = LibraryOrder.merge(keys, moved.compactMap { byID[$0] }).joined(separator: "\n")
-                    sort = "custom"
-                }, destination: { e in
-                    if let p = e.playlist { PlaylistV11View(playlistID: p.id) } else if let k = e.smart { SmartListV11View(kind: k) }
-                }) { e in
-                    VStack(alignment: .leading, spacing: 6) {
-                        Group {
-                            if let p = e.playlist { PlaylistCover(playlist: p, size: nil) }
-                            else if let k = e.smart {
-                                SmartCover(kind: k, size: nil)
-                                    .aspectRatio(1, contentMode: .fit)
-                                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                            }
-                        }
-                        .shadow(color: .black.opacity(0.14), radius: 12, y: 6)
-                        Text(e.title).font(.subheadline.weight(.semibold)).lineLimit(1)
-                        Text(e.subtitle).font(.caption).foregroundStyle(.secondary).lineLimit(1)
-                    }
-                    .foregroundStyle(.primary)
-                    .accessibilityElement(children: .combine)
+            VStack(alignment: .leading, spacing: 0) {
+                if let folder { FolderHeader(folder: folder) }
+                if !shown.isEmpty {
+                    if !hintDone || !query.isEmpty { ReorderHint(enabled: query.isEmpty, folders: !library.folders.isEmpty) }
+                    ReorderGrid(items: shown, enabled: query.isEmpty, onMoved: { moved in
+                        orderRaw = LibraryOrder.reorder(level: moved, playlists: library.userPlaylists, folders: library.folders,
+                                                        sort: sort, order: LibraryOrder.decode(orderRaw),
+                                                        smartInPlaylists: smartHere).joined(separator: "\n")
+                        sort = "custom"
+                    }, canDropInto: canDropInto, canSwap: canSwap, onDropInto: dropInto, onDragEnd: { hintDone = true },
+                    menu: { AnyView(menu($0)) },
+                    destination: { e in
+                        if let p = e.playlist { PlaylistV11View(playlistID: p.id) }
+                        else if let f = e.folder { PlaylistsListView(folderID: f.id) }
+                        else if let k = e.smart { SmartListV11View(kind: k) }
+                    }) { e in cell(e) }
                 }
             }
         }
         .overlay {
-            if all.isEmpty { Text(L("Todavía no hay playlists")).foregroundStyle(.secondary) }
-            else if shown.isEmpty { NoMatchesView(query: query) }
+            if all.isEmpty && query.isEmpty {
+                if folderID == nil { Text(L("Todavía no hay playlists")).foregroundStyle(.secondary) }
+                else { FolderEmptyView() }
+            } else if shown.isEmpty { NoMatchesView(query: query) }
         }
-        .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: L("Buscar en playlists"))
+        .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always),
+                    prompt: folder.map { L("Buscar en {0}", $0.name) } ?? L("Buscar en playlists"))
         .scrollDismissesKeyboard(.interactively)
         .themed()
-        .navigationTitle(L("Playlists"))
-        // Lápiz (lo pidió Toxbox): editar el orden aquí mismo, sin ir a Ajustes.
+        .navigationTitle(folder?.name ?? L("Playlists"))
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
-                Button { editing = true } label: { Image(systemName: "pencil") }
-                    .accessibilityLabel(L("Editar el orden de las playlists"))
+                Menu { toolbarMenu } label: { Image(systemName: "ellipsis.circle") }
+                    .accessibilityLabel(L("Más opciones"))
             }
         }
-        .sheet(isPresented: $editing) { ReorderPlaylistsView() }
+        .sheet(isPresented: $editing) { ReorderPlaylistsView(folderID: folderID) }
+        .sheet(item: $moving) { MoveToFolderSheet(item: $0) }
+        .navigationDestination(isPresented: Binding(get: { opened != nil }, set: { if !$0 { opened = nil } })) {
+            if let p = opened?.playlist { PlaylistV11View(playlistID: p.id) }
+            else if let f = opened?.folder { PlaylistsListView(folderID: f.id) }
+        }
+        .alert(naming?.title ?? "", isPresented: Binding(get: { naming != nil }, set: { if !$0 { naming = nil } })) {
+            TextField(L("Nombre"), text: $nameText)
+            Button(naming?.confirm ?? L("Crear")) { applyName() }
+            Button(L("Cancelar"), role: .cancel) { naming = nil }
+        }
+        .alert(L("¿Eliminar la carpeta «{0}»?", deleting?.name ?? ""), isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } })) {
+            Button(L("Eliminar carpeta"), role: .destructive) {
+                if let f = deleting {
+                    library.deleteFolder(f.id)
+                    if f.id == folderID { dismiss() }
+                }
+                deleting = nil
+            }
+            Button(L("Cancelar"), role: .cancel) { deleting = nil }
+        } message: {
+            Text(L("Lo que tiene dentro pasa a «{0}». No se borra ninguna playlist ni canción.", destinationName(deleting)))
+        }
+        // La carpeta abierta ya no existe (borrada desde otro sitio o al importar): se vuelve atrás.
+        .onChange(of: library.folders.map(\.id)) { ids in if let folderID, !ids.contains(folderID) { dismiss() } }
+        .task { if Demo.current?.showMove == true, folderID != nil, let p = library.userPlaylists.first(where: { $0.folder == folderID }) { moving = .playlist(p.id) } }
         .miniPlayer()
+    }
+
+    // MARK: Celdas y menús
+
+    @ViewBuilder private func cell(_ e: Entry) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Group {
+                if let f = e.folder { FolderCover(folder: f) }
+                else if let p = e.playlist { PlaylistCover(playlist: p, size: nil).shadow(color: .black.opacity(0.14), radius: 12, y: 6) }
+                else if let k = e.smart {
+                    SmartCover(kind: k, size: nil)
+                        .aspectRatio(1, contentMode: .fit)
+                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                        .shadow(color: .black.opacity(0.14), radius: 12, y: 6)
+                }
+            }
+            Text(e.title).font(.subheadline.weight(.semibold)).lineLimit(1)
+            Text(e.subtitle).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+        }
+        .foregroundStyle(.primary)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(e.folder != nil ? L("Carpeta {0}", e.title) : e.title)
+        .accessibilityValue(e.subtitle)
+    }
+
+    /// Soltar sin mover abre el menú (como en Fijados; lo decidió Toxbox).
+    @ViewBuilder private func menu(_ e: Entry) -> some View {
+        if let p = e.playlist {
+            Button { opened = e } label: { Label(L("Abrir"), systemImage: "arrow.up.right.square") }
+            Button { moving = .playlist(p.id) } label: { Label(L("Mover a…"), systemImage: "folder") }
+            if let current = p.folder, let f = library.folders.first(where: { $0.id == current }) {
+                Button { library.movePlaylist(p.id, to: f.parent) } label: {
+                    Label(L("Sacar de «{0}»", f.name), systemImage: "arrow.up.forward.square")
+                }
+            }
+            Divider()
+            Button { library.update(p.id) { $0.pinned = $0.pinned == true ? nil : true } } label: {
+                p.pinned == true ? Label(L("Soltar de arriba"), systemImage: "pin.slash") : Label(L("Fijar arriba"), systemImage: "pin")
+            }
+        } else if let f = e.folder {
+            Button { opened = e } label: { Label(L("Abrir"), systemImage: "arrow.up.right.square") }
+            Button { nameText = f.name; naming = .rename(f) } label: { Label(L("Renombrar"), systemImage: "pencil") }
+            Button { moving = .folder(f.id) } label: { Label(L("Mover carpeta a…"), systemImage: "folder") }
+            Divider()
+            Button(role: .destructive) { deleting = f } label: { Label(L("Eliminar carpeta"), systemImage: "trash") }
+        }
+    }
+
+    @ViewBuilder private var toolbarMenu: some View {
+        if let folder {
+            Button { nameText = ""; naming = .newPlaylist(folder.id) } label: { Label(L("Nueva playlist aquí"), systemImage: "plus") }
+            if PlaylistFolders.canCreate(in: folder.id, folders: library.folders) {
+                Button { nameText = ""; naming = .newFolder(folder.id) } label: { Label(L("Nueva carpeta aquí"), systemImage: "folder.badge.plus") }
+            }
+            Divider()
+            Button { nameText = folder.name; naming = .rename(folder) } label: { Label(L("Renombrar"), systemImage: "pencil") }
+            Button { moving = .folder(folder.id) } label: { Label(L("Mover carpeta a…"), systemImage: "folder") }
+            Button { editing = true } label: { Label(L("Editar orden"), systemImage: "arrow.up.arrow.down") }
+            Divider()
+            Button(role: .destructive) { deleting = folder } label: { Label(L("Eliminar carpeta"), systemImage: "trash") }
+        } else {
+            Button { nameText = ""; naming = .newFolder(nil) } label: { Label(L("Nueva carpeta"), systemImage: "folder.badge.plus") }
+            Button { editing = true } label: { Label(L("Editar orden"), systemImage: "arrow.up.arrow.down") }
+        }
+    }
+
+    // MARK: Arrastrar dentro de una carpeta
+
+    private func isFolder(_ key: String) -> Bool { library.folders.contains { $0.id == key } }
+
+    private func canDropInto(_ dragged: String, _ target: String) -> Bool {
+        guard isFolder(target) else { return false }
+        if isFolder(dragged) { return false } // las carpetas se meten con «Mover carpeta a…»; arrastrando se ordenan
+        return library.userPlaylists.contains { $0.id.uuidString == dragged }
+    }
+
+    /// Las carpetas se ordenan entre ellas y las playlists entre ellas (las carpetas van siempre delante).
+    private func canSwap(_ dragged: String, _ target: String) -> Bool { isFolder(dragged) == isFolder(target) }
+
+    private func dropInto(_ dragged: String, _ target: String) {
+        guard let id = UUID(uuidString: dragged) else { return }
+        withAnimation(.uiEaseOut(0.25)) { library.movePlaylist(id, to: target) }
+    }
+
+    // MARK: Nombres
+
+    private func applyName() {
+        let n = nameText
+        switch naming {
+        case .newFolder(let parent): library.createFolder(n, in: parent)
+        case .newPlaylist(let folder): library.createPlaylist(n, in: folder)
+        case .rename(let f): library.renameFolder(f.id, to: n)
+        case nil: break
+        }
+        naming = nil
+    }
+
+    private func destinationName(_ f: PlaylistFolder?) -> String {
+        f?.parent.flatMap { p in library.folders.first { $0.id == p }?.name } ?? L("Playlists")
     }
 }
 
@@ -216,28 +370,54 @@ private struct GridCover: View {
     }
 }
 
-/// Cómo se reordena la cuadrícula; buscando no se puede (se ordenaría sólo lo encontrado).
-private struct ReorderHint: View {
+/// Cómo se reordena la cuadrícula; buscando no se puede (se ordenaría sólo lo encontrado). En Playlists sale sólo
+/// hasta el primer arrastre (`playlistDragHintDone`, lo pidió Toxbox); en Tus álbumes, siempre.
+struct ReorderHint: View {
     let enabled: Bool
+    /// Con carpetas, también dice que se puede meter una portada en una.
+    var folders = false
     var body: some View {
-        Text(enabled ? L("Mantén pulsada una portada y arrástrala para cambiar el orden.") : L("Borra la búsqueda para cambiar el orden."))
+        Text(!enabled ? L("Borra la búsqueda para cambiar el orden.")
+             : folders ? L("Mantén pulsada una portada y arrástrala para cambiar el orden o meterla en una carpeta.")
+             : L("Mantén pulsada una portada y arrástrala para cambiar el orden."))
             .font(.footnote).foregroundStyle(.secondary)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 20).padding(.top, 4).padding(.bottom, 4)
     }
 }
 
+/// La celda sobre la que se está soltando algo para meterlo dentro (una carpeta). La lee `FolderCover`.
+private struct DropIntoKey: EnvironmentKey { static let defaultValue = false }
+extension EnvironmentValues {
+    var dropInto: Bool {
+        get { self[DropIntoKey.self] }
+        set { self[DropIntoKey.self] = newValue }
+    }
+}
+
 /// Cuadrícula de dos columnas que se reordena manteniendo pulsado y arrastrando (2.9 de x.1.1). El sistema levanta
 /// la portada; al pasar por encima de otra, se apartan, y al soltar llega el orden nuevo a `onMoved`. Con
-/// `enabled = false` (buscando) sólo se tocan. Igual que `ReorderGrid` en Android.
-struct ReorderGrid<Item: Identifiable, Destination: View, Cell: View>: View where Item.ID == UUID {
+/// `enabled = false` (buscando) sólo se tocan. Las celdas que son contenedores (carpetas, 3.0) no se apartan: si lo
+/// que se arrastra cabe dentro, se marcan y al soltar llega a `onDropInto`. Igual que `ReorderGrid` en Android.
+struct ReorderGrid<Item: Identifiable, Destination: View, Cell: View>: View {
     let items: [Item]
     let enabled: Bool
-    let onMoved: ([UUID]) -> Void
+    let onMoved: ([Item.ID]) -> Void
+    /// ¿Se puede soltar `arrastrado` dentro de `celda`? (carpetas; por defecto, nada es contenedor).
+    var canDropInto: (Item.ID, Item.ID) -> Bool = { _, _ in false }
+    /// ¿Se aparta `celda` al pasar `arrastrado` por encima? (las carpetas van siempre delante de las playlists).
+    var canSwap: (Item.ID, Item.ID) -> Bool = { _, _ in true }
+    var onDropInto: (Item.ID, Item.ID) -> Void = { _, _ in }
+    /// Al acabar un arrastre, se haya movido o metido algo.
+    var onDragEnd: () -> Void = {}
+    /// Menú al mantener pulsado sin mover (si no se da, nada). Va en la misma vista que el arrastre, como en Fijados:
+    /// así el sistema enseña el menú al soltar sin mover y arrastra si se mueve.
+    var menu: ((Item) -> AnyView)? = nil
     @ViewBuilder let destination: (Item) -> Destination
     @ViewBuilder let cell: (Item) -> Cell
-    @State private var order: [UUID] = []
-    @State private var dragging: UUID?
+    @State private var order: [Item.ID] = []
+    @State private var dragging: Item.ID?
+    @State private var into: Item.ID?
     private let columns = [GridItem(.flexible(), spacing: 16, alignment: .top), GridItem(.flexible(), spacing: 16, alignment: .top)]
 
     var body: some View {
@@ -247,9 +427,13 @@ struct ReorderGrid<Item: Identifiable, Destination: View, Cell: View>: View wher
             ForEach(shown.count == items.count ? shown : items) { p in
                 NavigationLink { destination(p) } label: { cell(p) }
                     .buttonStyle(TactileButtonStyle())
+                    .environment(\.dropInto, into == p.id)
                     .opacity(dragging == p.id ? 0.35 : 1)
+                    .contextMenu { if let menu { menu(p) } }
                     .modifier(Lift(enabled: enabled, id: p.id, dragging: $dragging))
-                    .onDrop(of: [.text], delegate: CellDrop(target: p.id, order: $order, dragging: $dragging, finish: finish))
+                    .onDrop(of: [.text], delegate: CellDrop(target: p.id, order: $order, dragging: $dragging, into: $into,
+                                                            canDropInto: canDropInto, canSwap: canSwap,
+                                                            dropInto: { d, t in onDropInto(d, t); onDragEnd() }, finish: finish))
             }
         }
         .padding(.horizontal, 16)
@@ -263,22 +447,24 @@ struct ReorderGrid<Item: Identifiable, Destination: View, Cell: View>: View wher
     private func finish() {
         guard dragging != nil else { return }
         dragging = nil
+        into = nil
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
         onMoved(order)
+        onDragEnd()
     }
 }
 
 /// Mantener pulsado levanta la celda (sólo si se puede reordenar; buscando, no).
-struct Lift: ViewModifier {
+struct Lift<ID: Hashable>: ViewModifier {
     let enabled: Bool
-    let id: UUID
-    @Binding var dragging: UUID?
+    let id: ID
+    @Binding var dragging: ID?
     @ViewBuilder func body(content: Content) -> some View {
         if enabled {
             content.onDrag {
                 dragging = id
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                return NSItemProvider(object: id.uuidString as NSString)
+                return NSItemProvider(object: "\(id)" as NSString)
             }
         } else {
             content
@@ -286,22 +472,44 @@ struct Lift: ViewModifier {
     }
 }
 
-struct CellDrop: DropDelegate {
-    let target: UUID
-    @Binding var order: [UUID]
-    @Binding var dragging: UUID?
+struct CellDrop<ID: Hashable>: DropDelegate {
+    let target: ID
+    @Binding var order: [ID]
+    @Binding var dragging: ID?
+    /// Celda marcada para soltar dentro (carpetas). Sin carpetas, siempre nil.
+    var into: Binding<ID?> = .constant(nil)
+    var canDropInto: (ID, ID) -> Bool = { _, _ in false }
+    var canSwap: (ID, ID) -> Bool = { _, _ in true }
+    var dropInto: (ID, ID) -> Void = { _, _ in }
     let finish: () -> Void
 
     func dropEntered(info: DropInfo) {
-        guard let d = dragging, d != target, let from = order.firstIndex(of: d), let to = order.firstIndex(of: target) else { return }
+        guard let d = dragging, d != target else { return }
+        if canDropInto(d, target) {
+            into.wrappedValue = target
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            return
+        }
+        guard canSwap(d, target), let from = order.firstIndex(of: d), let to = order.firstIndex(of: target) else { return }
         withAnimation(.uiEaseOut(0.22)) { order.move(fromOffsets: IndexSet(integer: from), toOffset: to > from ? to + 1 : to) }
     }
+    func dropExited(info: DropInfo) { if into.wrappedValue == target { into.wrappedValue = nil } }
     func dropUpdated(info: DropInfo) -> DropProposal? { DropProposal(operation: .move) }
-    func performDrop(info: DropInfo) -> Bool { finish(); return true }
+    func performDrop(info: DropInfo) -> Bool {
+        if let d = dragging, into.wrappedValue == target {
+            dragging = nil
+            into.wrappedValue = nil
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            dropInto(d, target)
+        } else {
+            finish()
+        }
+        return true
+    }
 }
 
-struct GridDrop: DropDelegate {
-    @Binding var dragging: UUID?
+struct GridDrop<ID: Hashable>: DropDelegate {
+    @Binding var dragging: ID?
     let finish: () -> Void
     func dropUpdated(info: DropInfo) -> DropProposal? { DropProposal(operation: .move) }
     func performDrop(info: DropInfo) -> Bool { finish(); return true }
@@ -397,6 +605,7 @@ struct PlaylistEditor: View {
     @Environment(\.dismiss) private var dismiss
     @State private var name = ""
     @State private var photo: PhotosPickerItem?
+    @State private var moving = false
 
     private var playlist: Playlist? { library.playlists.first { $0.id == playlistID } }
 
@@ -410,6 +619,20 @@ struct PlaylistEditor: View {
                     }
                     Section(L("Nombre")) {
                         TextField(L("Nombre"), text: $name)
+                    }
+                    // Carpeta (3.0, bloque 1): dónde está y «Mover a…». Los álbumes no van en carpetas.
+                    if p.album == nil {
+                        Section(L("Carpeta")) {
+                            Button { moving = true } label: {
+                                HStack {
+                                    Text(PlaylistFolders.path(p.folder, in: library.folders).map(\.name).joined(separator: " › ").nilIfEmpty ?? L("Ninguna"))
+                                        .foregroundStyle(.primary)
+                                    Spacer()
+                                    Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(.tertiary)
+                                }
+                            }
+                            .accessibilityHint(L("Mover a otra carpeta"))
+                        }
                     }
                     Section {
                         PhotosPicker(selection: $photo, matching: .images) {
@@ -457,6 +680,7 @@ struct PlaylistEditor: View {
                         }
                     }
                 }
+                .sheet(isPresented: $moving) { MoveToFolderSheet(item: .playlist(p.id)) }
                 .navigationTitle(L("Editar playlist"))
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbar {

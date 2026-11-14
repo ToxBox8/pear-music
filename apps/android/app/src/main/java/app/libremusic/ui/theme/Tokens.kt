@@ -114,6 +114,18 @@ object Tokens {
         val Muted = Color(0xFF9A9A9E)
         val DotOff = Color(0xFF4A4A4E)
     }
+    object FolderLight {
+        val Tab = Color(0xFFEBCC90)
+        val Paper = Color(0xF0F3EFE6)
+        val Edge = Color(0xE6FFFFFF)
+        val Well = Color(0x24787880)
+    }
+    object FolderDark {
+        val Tab = Color(0xFF5C4927)
+        val Paper = Color(0xFF2A2722)
+        val Edge = Color(0x14FFFFFF)
+        val Well = Color(0x14FFFFFF)
+    }
     object Motion {
         val EaseOut = floatArrayOf(0.23f, 1f, 0.32f, 1f)
         const val FastMs = 150

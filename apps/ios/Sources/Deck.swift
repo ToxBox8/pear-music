@@ -512,7 +512,10 @@ struct ManagePlaylistsView: View {
                         PlaylistCover(playlist: p, size: 44)
                         VStack(alignment: .leading, spacing: 2) {
                             Text(p.name).lineLimit(1)
-                            Text(songCount(p.songs.count)).font(.caption).foregroundStyle(.secondary)
+                            // En qué carpeta está (3.0): borrar la playlist no toca la carpeta.
+                            let place = PlaylistFolders.path(p.folder, in: library.folders).map(\.name).joined(separator: " › ")
+                            Text(place.isEmpty ? songCount(p.songs.count) : "\(songCount(p.songs.count)) · " + L("En {0}", place))
+                                .font(.caption).foregroundStyle(.secondary).lineLimit(1)
                         }
                         Spacer()
                         Button(role: .destructive) { pending = p } label: {

@@ -91,6 +91,18 @@ enum Tokens {
         static let muted = Color(hex: 0x9A9A9E)
         static let dotOff = Color(hex: 0x4A4A4E)
     }
+    enum FolderLight {
+        static let tab = Color(hex: 0xEBCC90)
+        static let paper = Color(hex: 0xF3EFE6, opacity: 0.941)
+        static let edge = Color(hex: 0xFFFFFF, opacity: 0.902)
+        static let well = Color(hex: 0x787880, opacity: 0.141)
+    }
+    enum FolderDark {
+        static let tab = Color(hex: 0x5C4927)
+        static let paper = Color(hex: 0x2A2722)
+        static let edge = Color(hex: 0xFFFFFF, opacity: 0.078)
+        static let well = Color(hex: 0xFFFFFF, opacity: 0.078)
+    }
     enum Motion {
         static let easeOut: (Double, Double, Double, Double) = (0.23, 1, 0.32, 1)
         static let fast: Double = 0.15

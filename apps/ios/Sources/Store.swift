@@ -12,93 +12,7 @@ private func writeJSON<T: Encodable>(_ value: T, to url: URL) {
     if let data = try? JSONEncoder().encode(value) { try? data.write(to: url, options: .atomic) }
 }
 
-struct Playlist: Identifiable, Codable {
-    var id = UUID()
-    var name: String
-    var songs: [Song] = []
-    var icon: String?       // SF Symbol elegido (si no hay foto)
-    var tint: Int?          // índice en PlaylistStyle.palettes
-    /// Si es un álbum guardado («Tus álbumes»): no sale en Playlists. docs/LIBRARY_FORMAT.md
-    var album: AlbumInfo?
-    /// Fijado arriba en Biblioteca e Inicio para abrirlo de un toque (Fase 3.3). nil = no.
-    var pinned: Bool?
-}
-
-/// Datos de un álbum de YouTube Music guardado como lista. Mismo formato que `AlbumInfo` en Android.
-struct AlbumInfo: Codable, Hashable {
-    var browseId: String    // "MPREb_…"
-    var artist: String?
-    var year: String?
-
-    /// Del subtítulo de YouTube Music: «Álbum • Artista • 2024» o «Artista • 2024».
-    init(browseId: String, subtitle: String) {
-        self.browseId = browseId
-        let parts = subtitle.components(separatedBy: " • ").map { $0.trimmingCharacters(in: .whitespaces) }
-            .filter { !$0.isEmpty && ![L("Álbum"), "Album", "Single", "EP"].contains($0) }
-        if let last = parts.last, last.count == 4, Int(last) != nil {
-            year = last
-            artist = parts.dropLast().first
-        } else {
-            artist = parts.first
-        }
-    }
-
-    /// «Artista · 2024», lo que haya.
-    var line: String { [artist, year].compactMap { $0 }.joined(separator: " · ") }
-}
-
-// MARK: - Orden del carrusel de Playlists
-/// Mismas reglas que `LibraryOrder` en Android. Claves: el id de cada playlist y "downloads" /
-/// "favorites". `sort`: "recent", "name" (A-Z), "nameDesc" (Z-A), "count" o "custom" (a mano).
-enum LibraryOrder {
-    static let downloads = "downloads"
-    static let favorites = "favorites"
-
-    static func keys(_ playlists: [Playlist], sort: String, order: [String], smartInPlaylists: Bool) -> [String] {
-        let smart = smartInPlaylists ? [downloads, favorites] : []
-        let byRecent = playlists.reversed().map(\.id.uuidString)
-        if sort == "custom" {
-            let all = smart + byRecent
-            var seen = Set<String>()
-            let kept = order.filter { all.contains($0) && seen.insert($0).inserted }
-            // Lo nuevo (una playlist recién creada o importada) va al final del orden propio.
-            return kept + all.filter { !seen.contains($0) }
-        }
-        let byName: (Playlist, Playlist) -> Bool = { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
-        let sorted: [Playlist]
-        switch sort {
-        case "name": sorted = playlists.sorted(by: byName)
-        case "nameDesc": sorted = playlists.sorted { byName($1, $0) }
-        case "count": sorted = playlists.sorted { $0.songs.count > $1.songs.count }
-        default: sorted = playlists.reversed()
-        }
-        return smart + sorted.map(\.id.uuidString)
-    }
-
-    static func decode(_ raw: String) -> [String] { raw.split(separator: "\n").map(String.init) }
-
-    /// Mete el orden `moved` (sólo playlists, el de la cuadrícula de Playlists) en el orden completo `full` sin mover
-    /// Descargadas ni Favoritos (2.9 de x.1.1).
-    static func merge(_ full: [String], _ moved: [String]) -> [String] {
-        let set = Set(moved)
-        var next = moved.makeIterator()
-        return full.map { set.contains($0) ? (next.next() ?? $0) : $0 }
-    }
-
-    /// «Tus álbumes»: como se guardaron o, con «custom», el orden propio; lo nuevo va al final.
-    static func albums(_ albums: [Playlist], sort: String, order: [String]) -> [Playlist] {
-        guard sort == "custom" else { return albums }
-        let byID = Dictionary(albums.map { ($0.id.uuidString, $0) }, uniquingKeysWith: { a, _ in a })
-        var seen = Set<String>()
-        let kept = order.filter { byID[$0] != nil && seen.insert($0).inserted }
-        return kept.compactMap { byID[$0] } + albums.filter { !seen.contains($0.id.uuidString) }
-    }
-
-    /// «Fijados» (x.1.1): siempre en el orden propio; lo recién fijado va al final.
-    static func pinned(_ pinned: [Playlist], order: [String]) -> [Playlist] {
-        albums(pinned, sort: "custom", order: order)
-    }
-}
+// `Playlist`, `AlbumInfo` y las carpetas (`PlaylistFolder`, `PlaylistFolders`) están en LibraryModel.swift.
 
 // MARK: - Fotos de portada de las playlists (Documents/covers/<id>.jpg)
 enum PlaylistArt {
@@ -126,11 +40,12 @@ enum PlaylistArt {
 // MARK: - Biblioteca
 @MainActor
 final class Library: ObservableObject {
-    private struct Saved: Codable { var favorites: [Song]; var playlists: [Playlist]; var recents: [Song]? }
     private let file = docsDir.appendingPathComponent("library.json")
 
     @Published var favorites: [Song] = [] { didSet { save() } }
     @Published var playlists: [Playlist] = [] { didSet { save() } }
+    /// Carpetas de playlists (3.0, bloque 1). Siempre normalizadas: sin huérfanas, ciclos ni más de 3 niveles.
+    @Published private(set) var folders: [PlaylistFolder] = [] { didSet { save() } }
     /// Últimas canciones reproducidas (la más reciente primero).
     @Published private(set) var recents: [Song] = [] { didSet { save() } }
 
@@ -138,15 +53,20 @@ final class Library: ObservableObject {
         // Capturas: datos de ejemplo en memoria, sin leer ni escribir library.json.
         if DemoCatalog.isActive { DemoCatalog.seed(self); return }
         if Demo.isActive { Demo.seed(self); return }
-        if let s = readJSON(Saved.self, from: file) {
+        if let data = try? Data(contentsOf: file), let s = try? LibraryFile.decode(data) {
             favorites = s.favorites
+            folders = s.folders ?? []
             playlists = s.playlists
             recents = s.recents ?? []
         }
     }
     private func save() {
         guard !Demo.isActive, !DemoCatalog.isActive else { return }
-        writeJSON(Saved(favorites: favorites, playlists: playlists, recents: recents), to: file)
+        writeJSON(snapshot, to: file)
+    }
+
+    private var snapshot: LibraryFile {
+        LibraryFile(favorites: favorites, playlists: playlists, recents: recents, folders: folders)
     }
 
     func markPlayed(_ s: Song) {
@@ -160,9 +80,15 @@ final class Library: ObservableObject {
         if let i = favorites.firstIndex(where: { $0.id == s.id }) { favorites.remove(at: i) }
         else { favorites.insert(s, at: 0) }
     }
-    func createPlaylist(_ name: String) {
+    /// Crea una playlist vacía, dentro de `folder` si se da (3.0). nil si el nombre está vacío.
+    @discardableResult
+    func createPlaylist(_ name: String, in folder: String? = nil) -> UUID? {
         let n = name.trimmingCharacters(in: .whitespaces)
-        if !n.isEmpty { playlists.append(Playlist(name: n)) }
+        guard !n.isEmpty else { return nil }
+        var p = Playlist(name: n)
+        if let folder, folders.contains(where: { $0.id == folder }) { p.folder = folder }
+        playlists.append(p)
+        return p.id
     }
     func deletePlaylists(at offsets: IndexSet) { playlists.remove(atOffsets: offsets) }
     func deletePlaylist(_ id: UUID) {
@@ -213,7 +139,7 @@ final class Library: ObservableObject {
     func exportData(covers: Bool = true) -> Data {
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        let base = (try? encoder.encode(Saved(favorites: favorites, playlists: playlists, recents: recents))) ?? Data()
+        let base = (try? encoder.encode(snapshot)) ?? Data()
         guard var dict = (try? JSONSerialization.jsonObject(with: base)) as? [String: Any] else { return base }
         if covers {
             var map: [String: String] = [:]
@@ -243,16 +169,13 @@ final class Library: ObservableObject {
     /// Devuelve cuántas favoritas y playlists se han añadido.
     @discardableResult
     func importData(_ data: Data) throws -> (favorites: Int, playlists: Int) {
-        let other = try JSONDecoder().decode(Saved.self, from: data)
-        var favIDs = Set(favorites.map(\.id))
-        var listIDs = Set(playlists.map(\.id))
-        var recentIDs = Set(recents.map(\.id))
-        let newFavorites = other.favorites.filter { favIDs.insert($0.id).inserted }
-        let newPlaylists = other.playlists.filter { listIDs.insert($0.id).inserted }
-        let newRecents = (other.recents ?? []).filter { recentIDs.insert($0.id).inserted }
-        favorites += newFavorites
-        playlists += newPlaylists
-        recents = Array((recents + newRecents).prefix(40))
+        let merged = snapshot.merging(try LibraryFile.decode(data))
+        let added = (merged.favorites.count - favorites.count, merged.playlists.count - playlists.count)
+        favorites = merged.favorites
+        // Carpetas antes que playlists: así ninguna playlist apunta a una carpeta que aún no está.
+        folders = merged.folders ?? []
+        playlists = merged.playlists
+        recents = merged.recents ?? []
         // Portadas donde no haya una propia, y el orden unido: el tuyo se respeta y lo nuevo va detrás; si este
         // iPhone no tenía orden propio, se adopta el de la copia. Igual que Library.importJson en Android.
         if let extra = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] {
@@ -291,7 +214,48 @@ final class Library: ObservableObject {
                 }
             }
         }
-        return (newFavorites.count, newPlaylists.count)
+        return added
+    }
+
+    // MARK: Carpetas de playlists (3.0, bloque 1; reglas en PlaylistFolders)
+    /// Crea una carpeta dentro de `parent` (nil = arriba del todo). nil si el nombre está vacío o no cabe (3 niveles).
+    @discardableResult
+    func createFolder(_ name: String, in parent: String? = nil) -> String? {
+        let n = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !n.isEmpty, parent == nil || folders.contains(where: { $0.id == parent }),
+              PlaylistFolders.canCreate(in: parent, folders: folders) else { return nil }
+        let f = PlaylistFolder(name: n, parent: parent)
+        folders.append(f)
+        return f.id
+    }
+    func renameFolder(_ id: String, to name: String) {
+        let n = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !n.isEmpty, let i = folders.firstIndex(where: { $0.id == id }) else { return }
+        folders[i].name = n
+    }
+    /// Mueve una carpeta (con todo lo suyo) dentro de `target` (nil = arriba del todo). false si no cabe.
+    @discardableResult
+    func moveFolder(_ id: String, to target: String?) -> Bool {
+        guard let i = folders.firstIndex(where: { $0.id == id }),
+              target == nil || folders.contains(where: { $0.id == target }),
+              PlaylistFolders.canMove(id, to: target, folders: folders) else { return false }
+        folders[i].parent = target
+        return true
+    }
+    /// Mete una playlist en una carpeta (nil = la saca de todas). Los álbumes no van en carpetas.
+    func movePlaylist(_ id: UUID, to folder: String?) {
+        guard folder == nil || folders.contains(where: { $0.id == folder }) else { return }
+        update(id) { if $0.album == nil { $0.folder = folder } }
+    }
+    /// Borra la carpeta; lo que tenía dentro sube un nivel. Nunca borra playlists.
+    func deleteFolder(_ id: String) {
+        let (nextFolders, nextPlaylists) = PlaylistFolders.delete(id, folders: folders, members: playlists)
+        playlists = nextPlaylists
+        folders = nextFolders
+    }
+    /// Las playlists de una carpeta y de sus subcarpetas («Reproducir» y «Aleatorio» de la carpeta).
+    func playlists(inFolder id: String) -> [Playlist] {
+        PlaylistFolders.members(of: id, folders: folders, in: userPlaylists)
     }
 
     func add(_ s: Song, to playlist: Playlist) {

@@ -1,0 +1,11 @@
+{
+  "favorites": [{"id": "dQw4w9WgXcQ", "title": "ROCKSTAR", "artist": "Michael Bennet", "thumbnail": "https://lh3.example/a=w120-h120"}],
+  "playlists": [
+    {"id": "0000000A-0000-0000-0000-00000000A001", "name": "Atardecer", "songs": [{"id": "aaaaaaaaaaa", "title": "ME MATAS", "artist": "Michael Bennet"}], "icon": "sun.max.fill", "tint": 3},
+    {"id": "0000000A-0000-0000-0000-00000000A002", "name": "Domingo lento", "songs": [], "pinned": true},
+    {"id": "0000000A-0000-0000-0000-00000000A003", "name": "GENESIS", "songs": [], "tint": 5, "album": {"browseId": "MPREb_demo", "artist": "Michael Bennet", "year": "2025"}}
+  ],
+  "recents": [],
+  "playlistOrder": ["0000000A-0000-0000-0000-00000000A002", "0000000A-0000-0000-0000-00000000A001"],
+  "playlistSort": "custom"
+}

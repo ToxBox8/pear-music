@@ -1,0 +1,142 @@
+// Tests de library.json con carpetas (3.0, bloque 1), sólo Foundation: scripts/test-linux.sh.
+// Compila Sources/LibraryModel.swift (el código de verdad que usa Library) con I18n.swift. Los casos y lo que tiene
+// que salir están en shared/library/, los mismos que lee PlaylistFoldersTest.kt en Android.
+import Foundation
+
+var fallos = 0
+func igual<T: Equatable>(_ a: T, _ b: T, _ que: String) {
+    if a != b { fallos += 1; print("❌ \(que): \(a) ≠ \(b)") }
+}
+func cierto(_ c: Bool, _ que: String) { if !c { fallos += 1; print("❌ \(que)") } }
+
+// `Song` vive en Client.swift, que no compila en Linux: aquí, el mismo struct (mismas claves).
+struct Song: Identifiable, Hashable, Codable {
+    let id: String
+    let title: String
+    let artist: String
+    let thumbnail: URL?
+}
+
+let dir = URL(fileURLWithPath: CommandLine.arguments.count > 1 ? CommandLine.arguments[1] : "../../shared/library")
+func datos(_ nombre: String) -> Data { try! Data(contentsOf: dir.appendingPathComponent(nombre)) }
+let esperado = try! JSONSerialization.jsonObject(with: datos("esperado.json")) as! [String: Any]
+
+// MARK: Cada copia sale como dice esperado.json
+for nombre in ["antigua-sin-carpetas.json", "carpetas.json", "carpetas-rotas.json"] {
+    guard let file = try? LibraryFile.decode(datos(nombre)) else { fallos += 1; print("❌ \(nombre): no se lee"); continue }
+    let esp = esperado[nombre] as! [String: Any]
+    let carpetas = esp["folders"] as! [String: [String: Any]]
+    let leidas = file.folders ?? []
+    igual(Set(leidas.map(\.id)), Set(carpetas.keys), "\(nombre): carpetas")
+    for f in leidas {
+        guard let e = carpetas[f.id] else { continue }
+        igual(f.name, e["name"] as! String, "\(nombre): nombre de \(f.id)")
+        igual(f.parent, e["parent"] as? String, "\(nombre): carpeta de arriba de \(f.id)")
+    }
+    let listas = esp["playlists"] as! [String: Any]
+    igual(Set(file.playlists.map(\.id.uuidString)), Set(listas.keys), "\(nombre): playlists")
+    for p in file.playlists {
+        igual(p.folder, listas[p.id.uuidString] as? String, "\(nombre): carpeta de \(p.name)")
+    }
+    for f in leidas { cierto(PlaylistFolders.depth(f.id, in: leidas) <= PlaylistFolders.maxDepth, "\(nombre): \(f.name) pasa de 3 niveles") }
+}
+
+// MARK: Copia vieja → versión nueva: igual que antes y, al guardar, sin claves nuevas
+let antigua = try! LibraryFile.decode(datos("antigua-sin-carpetas.json"))
+igual(antigua.playlists.count, 3, "antigua: 3 listas")
+igual(antigua.playlists.first { $0.name == "Domingo lento" }?.pinned, true, "antigua: fijada")
+igual(antigua.playlists.first { $0.name == "GENESIS" }?.album?.artist, "Michael Bennet", "antigua: álbum")
+let reescrita = String(data: try! JSONEncoder().encode(antigua), encoding: .utf8)!
+cierto(!reescrita.contains("\"folders\"") && !reescrita.contains("\"folder\""), "antigua: no escribe folders ni folder")
+
+// MARK: Ida y vuelta con carpetas
+let carpetas = try! LibraryFile.decode(datos("carpetas.json"))
+let vuelta = try! LibraryFile.decode(JSONEncoder().encode(carpetas))
+igual(vuelta.folders ?? [], carpetas.folders ?? [], "ida y vuelta: carpetas")
+igual(vuelta.playlists.map(\.folder), carpetas.playlists.map(\.folder), "ida y vuelta: playlists")
+
+// MARK: Versión nueva → versión anterior (lector congelado de la 2.2 / 3.0.0-beta.1, Store.swift en 3da75cb)
+struct AntiguaPlaylist: Codable {
+    var id = UUID(); var name: String; var songs: [Song] = []; var icon: String?; var tint: Int?
+    var album: AntiguoAlbum?; var pinned: Bool?
+}
+struct AntiguoAlbum: Codable { var browseId: String; var artist: String?; var year: String? }
+struct AntiguaBiblioteca: Codable { var favorites: [Song]; var playlists: [AntiguaPlaylist]; var recents: [Song]? }
+
+for nombre in ["carpetas.json", "carpetas-rotas.json"] {
+    // Tal cual llega en la copia y tal cual la escribe la versión nueva.
+    for (como, data) in [("copia", datos(nombre)), ("exportada", try! JSONEncoder().encode(LibraryFile.decode(datos(nombre))))] {
+        if let vieja = try? JSONDecoder().decode(AntiguaBiblioteca.self, from: data) {
+            let n = (esperado[nombre] as! [String: Any])["playlists"] as! [String: Any]
+            igual(Set(vieja.playlists.map(\.id.uuidString)), Set(n.keys), "versión anterior lee \(nombre) (\(como)) sin perder playlists")
+        } else {
+            fallos += 1; print("❌ versión anterior no puede leer \(nombre) (\(como))")
+        }
+    }
+}
+
+// MARK: Importar = unir
+let local = carpetas
+let entrante = LibraryFile(
+    favorites: [],
+    playlists: [
+        { var p = carpetas.playlists[0]; p.folder = nil; p.name = "Otro nombre"; return p }(), // ya la tengo: no cambia
+        Playlist(id: UUID(uuidString: "0000000A-0000-0000-0000-00000000B010")!, name: "Nueva en Gimnasio", folder: "0000000F-0000-0000-0000-00000000F001"),
+        Playlist(id: UUID(uuidString: "0000000A-0000-0000-0000-00000000B011")!, name: "Nueva en la de 4.º nivel", folder: "0000000F-0000-0000-0000-00000000F005"),
+    ],
+    recents: nil,
+    folders: [
+        PlaylistFolder(id: "0000000F-0000-0000-0000-00000000F001", name: "Gym"),                    // ya existe: gana la mía
+        PlaylistFolder(id: "0000000F-0000-0000-0000-00000000F005", name: "Martes", parent: "0000000F-0000-0000-0000-00000000F003"), // sería el 4.º
+    ])
+let unida = local.merging(entrante)
+let porID = Dictionary(uniqueKeysWithValues: (unida.folders ?? []).map { ($0.id, $0) })
+igual(porID["0000000F-0000-0000-0000-00000000F001"]?.name, "Gimnasio", "unir: la carpeta propia no cambia")
+igual(porID["0000000F-0000-0000-0000-00000000F005"]?.parent, nil, "unir: la del 4.º nivel queda arriba")
+igual(unida.playlists.count, local.playlists.count + 2, "unir: llegan las 2 nuevas")
+igual(unida.playlists.first { $0.id.uuidString == "0000000A-0000-0000-0000-00000000B001" }?.folder, "0000000F-0000-0000-0000-00000000F001", "unir: la que ya tenía no se mueve")
+igual(unida.playlists.first { $0.id.uuidString == "0000000A-0000-0000-0000-00000000B001" }?.name, "Cardio 160 bpm", "unir: la que ya tenía no cambia de nombre")
+igual(unida.playlists.first { $0.name == "Nueva en Gimnasio" }?.folder, "0000000F-0000-0000-0000-00000000F001", "unir: la nueva llega en su carpeta")
+igual(unida.playlists.first { $0.name == "Nueva en la de 4.º nivel" }?.folder, "0000000F-0000-0000-0000-00000000F005", "unir: la nueva sigue a su carpeta")
+
+// MARK: Crear, mover, borrar, ruta (mismos casos que PlaylistFoldersTest.kt)
+let fs = carpetas.folders!
+let gym = "0000000F-0000-0000-0000-00000000F001", pierna = "0000000F-0000-0000-0000-00000000F002"
+let lunes = "0000000F-0000-0000-0000-00000000F003", viajes = "0000000F-0000-0000-0000-00000000F004"
+cierto(PlaylistFolders.canCreate(in: nil, folders: fs), "crear arriba")
+cierto(PlaylistFolders.canCreate(in: pierna, folders: fs), "crear en el 2.º nivel")
+cierto(!PlaylistFolders.canCreate(in: lunes, folders: fs), "no crear en el 3.º nivel")
+cierto(!PlaylistFolders.canMove(gym, to: viajes, folders: fs), "Gimnasio (3 niveles) no cabe en Viajes")
+cierto(PlaylistFolders.canMove(lunes, to: viajes, folders: fs), "Lunes cabe en Viajes")
+cierto(!PlaylistFolders.canMove(gym, to: pierna, folders: fs), "no dentro de una suya")
+cierto(!PlaylistFolders.canMove(gym, to: gym, folders: fs), "no dentro de sí misma")
+cierto(PlaylistFolders.canMove(pierna, to: nil, folders: fs), "subir arriba del todo")
+igual(PlaylistFolders.path(lunes, in: fs).map(\.name), ["Gimnasio", "Pierna", "Lunes"], "ruta")
+igual(PlaylistFolders.members(of: gym, folders: fs, in: carpetas.playlists).map(\.name), ["Cardio 160 bpm", "Pierna y glúteo", "Lunes duro"], "Reproducir carpeta")
+let (sinPierna, listas) = PlaylistFolders.delete(pierna, folders: fs, members: carpetas.playlists)
+igual(sinPierna.count, 3, "borrar: una carpeta menos")
+igual(sinPierna.first { $0.id == lunes }?.parent, gym, "borrar: la subcarpeta sube un nivel")
+igual(listas.count, carpetas.playlists.count, "borrar: no se borra ninguna playlist")
+igual(listas.first { $0.name == "Pierna y glúteo" }?.folder, gym, "borrar: la playlist sube un nivel")
+let (_, raiz) = PlaylistFolders.delete(gym, folders: fs, members: carpetas.playlists)
+igual(raiz.first { $0.name == "Cardio 160 bpm" }?.folder, nil, "borrar la de arriba: a Playlists")
+
+// MARK: Orden de cada nivel (mismos casos que PlaylistFoldersTest.kt)
+let propias = carpetas.playlists.filter { $0.album == nil }
+let b001 = "0000000A-0000-0000-0000-00000000B001", b004 = "0000000A-0000-0000-0000-00000000B004"
+let f002 = "0000000F-0000-0000-0000-00000000F002"
+igual(LibraryOrder.level(nil, playlists: propias, folders: fs, sort: "recent", order: [], smartInPlaylists: true),
+      ["downloads", "favorites", viajes, gym, b004], "nivel: recientes, carpetas delante")
+igual(LibraryOrder.level(nil, playlists: propias, folders: fs, sort: "name", order: [], smartInPlaylists: false),
+      [gym, viajes, b004], "nivel: por nombre, sin listas inteligentes")
+igual(LibraryOrder.level(gym, playlists: propias, folders: fs, sort: "name", order: [], smartInPlaylists: true),
+      [f002, b001], "nivel: dentro de Gimnasio, sin listas inteligentes")
+let movido = ["downloads", "favorites", gym, viajes, b004]
+let orden = LibraryOrder.reorder(level: movido, playlists: propias, folders: fs, sort: "recent", order: [], smartInPlaylists: true)
+igual(LibraryOrder.level(nil, playlists: propias, folders: fs, sort: "custom", order: orden, smartInPlaylists: true), movido,
+      "a mano: el nivel queda como se dejó")
+igual(LibraryOrder.level(gym, playlists: propias, folders: fs, sort: "custom", order: orden, smartInPlaylists: true), [f002, b001],
+      "a mano: los otros niveles no saltan")
+
+print(fallos == 0 ? "Carpetas (library.json): todo bien." : "Carpetas (library.json): \(fallos) fallos.")
+exit(fallos == 0 ? 0 : 1)

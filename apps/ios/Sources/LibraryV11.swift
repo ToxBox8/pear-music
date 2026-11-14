@@ -117,6 +117,8 @@ struct LibraryV11View: View {
     @EnvironmentObject var jam: JamService
     @State private var showNew = false
     @State private var newName = ""
+    @State private var showNewFolder = false
+    @State private var newFolderName = ""
     @State private var showImport = false
     @State private var editing: Playlist?
 
@@ -155,10 +157,17 @@ struct LibraryV11View: View {
                 Button(L("Crear")) { library.createPlaylist(newName); newName = "" }
                 Button(L("Cancelar"), role: .cancel) { newName = "" }
             }
+            .alert(L("Nueva carpeta"), isPresented: $showNewFolder) {
+                TextField(L("Nombre"), text: $newFolderName)
+                Button(L("Crear")) { library.createFolder(newFolderName) }
+                Button(L("Cancelar"), role: .cancel) {}
+            }
             .sheet(isPresented: $showImport) { ImportView() }
             .sheet(item: $editing) { PlaylistEditor(playlistID: $0.id) }
             .demoRoute(.favorites) { SmartListV11View(kind: .favorites) }
             .demoRoute(.downloads) { SmartListV11View(kind: .downloads) }
+            .demoRoute(.playlists) { PlaylistsListView() }
+            .demoRoute(.folder) { PlaylistsListView(folderID: Demo.folderID) }
             .miniPlayer()
         }
     }
@@ -173,6 +182,7 @@ struct LibraryV11View: View {
             Spacer(minLength: 12)
             Menu {
                 Button { showNew = true } label: { Label(L("Nueva playlist"), systemImage: "plus.rectangle.on.rectangle") }
+                Button { newFolderName = ""; showNewFolder = true } label: { Label(L("Nueva carpeta"), systemImage: "folder.badge.plus") }
                 Button { showImport = true } label: { Label(L("Importar de Apple Music"), systemImage: "square.and.arrow.down") }
                 Divider()
                 Button { jam.showSheet = true } label: { Label(L("Jam con amigos"), systemImage: "person.3") }
@@ -248,7 +258,9 @@ struct LibraryV11View: View {
                 SmartListV11View(kind: .favorites)
             }
         case "playlists":
-            LibraryLinkRow(title: L("Playlists"), count: library.userPlaylists.count, symbol: "music.note.list", last: last, editing: editingMusic) { PlaylistsListView() }
+            LibraryLinkRow(title: L("Playlists"), count: library.userPlaylists.count,
+                           detail: library.folders.isEmpty ? nil : "\(library.userPlaylists.count) · " + (library.folders.count == 1 ? L("1 carpeta") : L("{0} carpetas", library.folders.count)),
+                           symbol: "music.note.list", last: last, editing: editingMusic) { PlaylistsListView() }
         case "albums":
             LibraryLinkRow(title: L("Tus álbumes"), count: library.albums.count, symbol: "square.stack", last: last, editing: editingMusic) { AlbumsListView() }
         case "songs":
@@ -277,6 +289,8 @@ struct LibraryV11View: View {
 private struct LibraryLinkRow<Destination: View>: View {
     let title: String
     let count: Int
+    /// En vez del número, si se da («14 · 3 carpetas»).
+    var detail: String? = nil
     let symbol: String
     var last = false
     /// Modo edición de «Tu música»: sin navegar, con el asa en vez del chevron.
@@ -302,7 +316,7 @@ private struct LibraryLinkRow<Destination: View>: View {
                         .clipShape(Circle())
                     Text(title).font(.title3.weight(.semibold))
                     Spacer()
-                    Text("\(count)").font(.subheadline).foregroundStyle(.secondary).monospacedDigit()
+                    Text(detail ?? "\(count)").font(.subheadline).foregroundStyle(.secondary).monospacedDigit()
                     Image(systemName: editing ? "line.3.horizontal" : "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(.tertiary)
                 }
                 .padding(.vertical, 13)
@@ -819,9 +833,11 @@ struct SongListV11View: View {
 }
 
 // MARK: - Ordenar playlists a mano
-/// Orden propio del carrusel: se arrastran las filas (también Descargadas y Favoritos si están en
-/// Playlists). Al mover algo, el orden pasa a ser «A mano». Igual que ReorderPlaylistsScreen en Android.
+/// Orden propio de un nivel de Playlists (`folderID` nil = arriba del todo): se arrastran las filas (también
+/// Descargadas y Favoritos si están en Playlists, y las carpetas). Al mover algo, el orden pasa a ser «A mano».
+/// Igual que ReorderPlaylistsScreen en Android.
 struct ReorderPlaylistsView: View {
+    var folderID: String? = nil
     @EnvironmentObject var library: Library
     @EnvironmentObject var downloads: DownloadStore
     @AppStorage("playlistSort") private var sort = "recent"
@@ -837,7 +853,7 @@ struct ReorderPlaylistsView: View {
                     ForEach([("recent", L("Añadidas recientemente")), ("name", L("Nombre (A-Z)")), ("nameDesc", L("Nombre (Z-A)")), ("count", L("Nº de canciones")), ("custom", L("A mano"))], id: \.0) { item in
                         Button {
                             sort = item.0
-                            keys = LibraryOrder.keys(library.userPlaylists, sort: sort, order: LibraryOrder.decode(orderRaw), smartInPlaylists: placement != "music")
+                            keys = levelKeys()
                         } label: {
                             HStack {
                                 Text(item.1).foregroundStyle(.primary)
@@ -852,11 +868,14 @@ struct ReorderPlaylistsView: View {
                     ForEach(keys, id: \.self) { key in row(key) }
                         .onMove { from, to in
                             keys.move(fromOffsets: from, toOffset: to)
-                            orderRaw = keys.joined(separator: "\n")
+                            orderRaw = LibraryOrder.reorder(level: keys, playlists: library.userPlaylists, folders: library.folders,
+                                                            sort: sort, order: LibraryOrder.decode(orderRaw),
+                                                            smartInPlaylists: smartHere).joined(separator: "\n")
                             sort = "custom"
+                            keys = levelKeys()
                         }
                 } footer: {
-                    Text(L("Arrastra para cambiar el orden del carrusel. Al mover algo, Playlists se ordena «A mano»."))
+                    Text(L("Arrastra para cambiar el orden. Al mover algo, Playlists se ordena «A mano»."))
                 }
                 .glassRow()
             }
@@ -866,9 +885,16 @@ struct ReorderPlaylistsView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button(L("Hecho")) { dismiss() } } }
             .onAppear {
-                keys = LibraryOrder.keys(library.userPlaylists, sort: sort, order: LibraryOrder.decode(orderRaw), smartInPlaylists: placement != "music")
+                keys = levelKeys()
             }
         }
+    }
+
+    private var smartHere: Bool { folderID == nil && placement != "music" }
+
+    private func levelKeys() -> [String] {
+        LibraryOrder.level(folderID, playlists: library.userPlaylists, folders: library.folders, sort: sort,
+                           order: LibraryOrder.decode(orderRaw), smartInPlaylists: smartHere)
     }
 
     @ViewBuilder private func row(_ key: String) -> some View {
@@ -885,7 +911,15 @@ struct ReorderPlaylistsView: View {
                         .font(.caption).foregroundStyle(.secondary)
                 }
             default:
-                if let p = library.playlists.first(where: { $0.id.uuidString == key }) {
+                if let f = library.folders.first(where: { $0.id == key }) {
+                    FolderCover(folder: f).frame(width: 44, height: 44)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(f.name).font(.body.weight(.medium)).lineLimit(1)
+                        Text(FolderText.contents(playlists: library.userPlaylists.filter { $0.folder == f.id }.count,
+                                                 folders: library.folders.filter { $0.parent == f.id }.count))
+                            .font(.caption).foregroundStyle(.secondary)
+                    }
+                } else if let p = library.playlists.first(where: { $0.id.uuidString == key }) {
                     PlaylistCover(playlist: p, size: 44, radius: 10)
                     VStack(alignment: .leading, spacing: 2) {
                         Text(p.name).font(.body.weight(.medium)).lineLimit(1)

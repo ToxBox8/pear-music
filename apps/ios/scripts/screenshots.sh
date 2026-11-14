@@ -12,13 +12,16 @@ SCENARIOS=(
   05_biblioteca_sistema 06_playlist 07_ajustes 08_temas 09_reproductor_normal
   10_reproductor_casete 11_reproductor_vinilo 12_reproductor_air 13_reproductor_neon
   14_jam 15_importar 37_barra_dos_pestanas 38_barra_simpmusic_dos
+  43_carpetas 44_carpetas_oscuro 45_carpeta 46_mover_a
 )
 # DEMO=1: las del tráiler v2 con el catálogo del patrocinador (Sources/DemoCatalog.swift; sólo en Debug y Jiyu Dev).
-EXTRA=()
+# En castellano, como ScreenshotTest de Android: la app usa `language` (UserDefaults) o el idioma del sistema, y el
+# simulador de la CI está en inglés (PARIDAD.md, 14-11-2026).
+EXTRA=(-language es -AppleLanguages "(es)" -AppleLocale es_ES)
 if [[ "${DEMO:-0}" == "1" ]]; then
   SCENARIOS=(v2_01_inicio v2_02_busqueda v2_03_artista v2_04_biblioteca v2_05_descargas v2_06_reproductor
     v2_07_aire v2_08_neon v2_09_sistema v2_10_casete v2_11_vinilo v2_12_air v2_13_jam v2_14_importar)
-  EXTRA=(-demoCatalog YES)
+  EXTRA+=(-demoCatalog YES)
 fi
 
 # iPhone 16 (393×852 pt a 3x = 1179×2556, el tamaño de ScreenshotTest) con el iOS más reciente instalado.

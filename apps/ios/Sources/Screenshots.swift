@@ -7,7 +7,7 @@ import SwiftUI
 // cada escenario en el simulador del iPhone 16 y guarda la captura con el mismo nombre.
 enum Demo {
     enum Tab: String { case home, reels, library, settings }
-    enum Route { case favorites, themePicker, artist, downloads }
+    enum Route { case favorites, themePicker, artist, downloads, playlists, folder }
 
     struct Scenario {
         var theme: AppTheme = .glass
@@ -23,6 +23,10 @@ enum Demo {
         var discover = true
         /// Texto ya escrito en el buscador de Inicio (tráiler v2).
         var query = ""
+        /// Carpetas de playlists (3.0, bloque 1): Gimnasio (con Pierna dentro) y Viajes, como ScreenshotTest.
+        var folders = false
+        /// Con la carpeta abierta, la hoja «Mover a…» de su primera playlist.
+        var showMove = false
     }
 
     /// Los mismos nombres que las PNG de Android (shared/design/compare_shots.py los empareja).
@@ -45,6 +49,11 @@ enum Demo {
         // x.1.1 (1.5 y 1.3): con Descubrir oculta y Ajustes arriba quedan dos pestañas; tienen que ir centradas.
         "37_barra_dos_pestanas": Scenario(playing: false, discover: false),
         "38_barra_simpmusic_dos": Scenario(playing: false, barStyle: "simpmusic", discover: false),
+        // Carpetas de playlists (3.0, bloque 1).
+        "43_carpetas": Scenario(tab: .library, route: .playlists, folders: true),
+        "44_carpetas_oscuro": Scenario(appearance: "dark", tab: .library, route: .playlists, folders: true),
+        "45_carpeta": Scenario(tab: .library, route: .folder, folders: true),
+        "46_mover_a": Scenario(tab: .library, route: .folder, folders: true, showMove: true),
         // Tráiler v2 (4-11-2026): con `-demoCatalog YES` (DemoCatalog.swift), todo con canciones de Michael Bennet.
         "v2_01_inicio": Scenario(tab: .home),
         "v2_02_busqueda": Scenario(tab: .home, query: "Michael Bennet"),
@@ -98,7 +107,29 @@ enum Demo {
             Playlist(name: "Viaje a la playa", songs: Array(songs.dropFirst()), icon: "beach.umbrella.fill", tint: 4),
             Playlist(name: "Noche", songs: Array(songs.prefix(2))),
         ]
+        // «Tus álbumes»: los mismos tres álbumes guardados que ScreenshotTest de Android (PARIDAD.md, 14-11-2026).
+        let albums = [("After Hours", "The Weeknd", "2020"), ("Un Verano Sin Ti", "Bad Bunny", "2022"),
+                      ("Future Nostalgia", "Dua Lipa", "2020")]
+        for (i, a) in albums.enumerated() {
+            library.playlists.append(Playlist(name: a.0, songs: Array(songs.dropFirst(i).prefix(4)),
+                                              album: AlbumInfo(browseId: "MPREb_\(i)", subtitle: "\(a.1) • \(a.2)")))
+        }
+        // Carpetas (3.0, bloque 1): los mismos pasos que seedFolders() en ScreenshotTest.kt.
+        if current?.folders == true {
+            library.playlists.append(Playlist(name: "Fuerza", songs: Array(songs.prefix(3)), icon: "dumbbell.fill", tint: 5))
+            library.playlists.append(Playlist(name: "Domingo lento", songs: Array(songs.suffix(3)), icon: "moon.fill", tint: 6))
+            let gym = library.createFolder("Gimnasio")
+            let pierna = library.createFolder("Pierna", in: gym)
+            let viajes = library.createFolder("Viajes")
+            for (name, folder) in [("Para correr", gym), ("Fuerza", gym), ("Noche", pierna), ("Viaje a la playa", viajes)] {
+                if let p = library.playlists.first(where: { $0.name == name }) { library.movePlaylist(p.id, to: folder) }
+            }
+            folderID = gym
+        }
     }
+
+    /// La carpeta que abre el escenario `.folder` (Gimnasio).
+    @MainActor static var folderID: String?
 
     /// Estado del reproductor y hojas abiertas.
     @MainActor static func apply(player: Player, jam: JamService) {

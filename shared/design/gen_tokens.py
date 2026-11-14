@@ -107,6 +107,11 @@ def gen_swift(t: dict) -> str:
     for k, v in t["air"]["dark"].items():
         L.append(f"        static let {k} = {swift_color(v)}")
     L.append("    }")
+    for mode in ("light", "dark"):
+        L.append(f"    enum Folder{camel(mode)} {{")
+        for k, v in t["folder"][mode].items():
+            L.append(f"        static let {k} = {swift_color(v)}")
+        L.append("    }")
     e = t["motion"]["easeOut"]
     L.append("    enum Motion {")
     L.append(f"        static let easeOut: (Double, Double, Double, Double) = ({', '.join(num(x) for x in e)})")
@@ -179,6 +184,11 @@ def gen_kotlin(t: dict) -> str:
     for mode in ("light", "dark"):
         L.append(f"    object Air{camel(mode)} {{")
         for k, v in t["air"][mode].items():
+            L.append(f"        val {camel(k)} = {kotlin_color(v)}")
+        L.append("    }")
+    for mode in ("light", "dark"):
+        L.append(f"    object Folder{camel(mode)} {{")
+        for k, v in t["folder"][mode].items():
             L.append(f"        val {camel(k)} = {kotlin_color(v)}")
         L.append("    }")
     e = t["motion"]["easeOut"]
