@@ -7,7 +7,7 @@ import SwiftUI
 // cada escenario en el simulador del iPhone 16 y guarda la captura con el mismo nombre.
 enum Demo {
     enum Tab: String { case home, reels, library, settings }
-    enum Route { case favorites, themePicker, artist, downloads, playlists, folder, artists, manage }
+    enum Route { case favorites, themePicker, artist, downloads, playlists, folder, artists, manage, badges }
 
     struct Scenario {
         var theme: AppTheme = .glass
@@ -67,6 +67,9 @@ enum Demo {
         "49_artista_seguir": Scenario(playing: false, route: .artist),
         "50_artista_siguiendo": Scenario(playing: false, route: .artist, followed: true),
         "51_eliminar_biblioteca": Scenario(playing: false, tab: .settings, route: .manage),
+        // Insignia «NUEVO» sobre una portada clara (washi) y otra casi negra (sumi), en claro y en oscuro.
+        "52_insignia_nuevo_claro": Scenario(playing: false, route: .badges),
+        "52_insignia_nuevo_oscuro": Scenario(appearance: "dark", playing: false, route: .badges),
         // Tráiler v2 (4-11-2026): con `-demoCatalog YES` (DemoCatalog.swift), todo con canciones de Michael Bennet.
         "v2_01_inicio": Scenario(tab: .home),
         "v2_02_busqueda": Scenario(tab: .home, query: "Michael Bennet"),
@@ -201,5 +204,22 @@ private struct DemoRoute<Destination: View>: ViewModifier {
 extension View {
     func demoRoute<D: View>(_ route: Demo.Route, @ViewBuilder destination: @escaping () -> D) -> some View {
         modifier(DemoRoute(route: route, destination: destination))
+    }
+}
+
+/// Capturas 52: la insignia «NUEVO» sobre una portada clara y otra casi negra (sólo tokens), con el fondo del tema.
+/// Igual que `ScreenshotTest.insignia_nuevo_*` en Android.
+struct NewBadgePreview: View {
+    var body: some View {
+        HStack(spacing: 14) {
+            ForEach([Tokens.Brand.washi, Tokens.Brand.sumi], id: \.self) { cover in
+                RoundedRectangle(cornerRadius: Tokens.Radius.artworkCard, style: .continuous)
+                    .fill(cover)
+                    .frame(width: 150, height: 150)
+                    .overlay(alignment: .topLeading) { NewBadge().padding(8) }
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .themed()
     }
 }

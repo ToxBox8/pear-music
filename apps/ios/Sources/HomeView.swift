@@ -146,6 +146,7 @@ struct HomeView: View {
             }
             // Seguir o dejar de seguir a alguien cambia Novedades sin esperar a la próxima carga (lo ya pedido sale de la caché).
             .onChange(of: library.followedArtists.map(\.browseId)) { _ in Task { await loadReleases() } }
+            .demoRoute(.badges) { NewBadgePreview() }
             .demoRoute(.artist) { ArtistView(artist: DemoCatalog.isActive ? DemoCatalog.artist : Demo.artist) }
             .miniPlayer()
         }
@@ -215,20 +216,20 @@ struct ReleasesShelf: View {
     }
 }
 
-/// Insignia «Nuevo»: relleno shu con el texto `onAccent` (nunca blanco), como el resto de insignias.
+/// Insignia «Nuevo»: cápsula sumi con el texto en washi, sin shu (en Inicio el shu es el número de la campana). El
+/// borde washi semitransparente la separa de las portadas casi negras; la sombra, de las claras. Igual en claro y en
+/// oscuro, y que `NewBadge` en Android.
 struct NewBadge: View {
-    @Environment(\.accentFill) private var accentFill
-    @Environment(\.onAccent) private var onAccent
-
     var body: some View {
         Text(L("Nuevo"))
             .font(.caption2.weight(.bold))
             .textCase(.uppercase)
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
-            .foregroundStyle(onAccent)
-            .background(Capsule().fill(accentFill))
-            .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
+            .foregroundStyle(Tokens.Brand.washi)
+            .background(Capsule().fill(Tokens.Brand.sumi))
+            .overlay(Capsule().strokeBorder(Tokens.Brand.washi.opacity(0.35), lineWidth: 1))
+            .shadow(color: Tokens.Brand.sumi.opacity(0.25), radius: 4, y: 2)
     }
 }
 struct CardLabel: View {

@@ -13,7 +13,7 @@ SCENARIOS=(
   10_reproductor_casete 11_reproductor_vinilo 12_reproductor_air 13_reproductor_neon
   14_jam 15_importar 37_barra_dos_pestanas 38_barra_simpmusic_dos
   43_carpetas 44_carpetas_oscuro 45_carpeta 46_mover_a 47_artistas_siguiendo 48_inicio_novedades
-  49_artista_seguir 50_artista_siguiendo 51_eliminar_biblioteca
+  49_artista_seguir 50_artista_siguiendo 51_eliminar_biblioteca 52_insignia_nuevo_claro 52_insignia_nuevo_oscuro
 )
 # DEMO=1: las del tráiler v2 con el catálogo del patrocinador (Sources/DemoCatalog.swift; sólo en Debug y Jiyu Dev).
 # En castellano, como ScreenshotTest de Android: la app usa `language` (UserDefaults) o el idioma del sistema, y el
