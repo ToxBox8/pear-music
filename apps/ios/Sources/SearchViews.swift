@@ -156,20 +156,21 @@ struct AlbumCard: View {
 
 // MARK: - Seguir a un artista (3.0, bloque 1)
 
-/// «Seguir» / «Siguiendo» en la página del artista: cápsula con relleno shu (texto `onAccent`) cuando lo sigues y
-/// superficie del tema cuando no. Igual que `FollowButton` en Android.
+/// «Seguir» / «Siguiendo» en la página del artista. Sin shu: el único shu de la página es «Reproducir» (brandbook,
+/// un acento por pantalla). «Seguir» es una cápsula con borde y sin relleno; «✓ Siguiendo», una cápsula tenue de papel
+/// washi (en oscuro, washi muy transparente). Igual que `FollowButton` en Android.
 struct FollowButton: View {
     let browseId: String
     let name: String
     let thumbnail: URL?
     @EnvironmentObject var library: Library
-    @Environment(\.accentFill) private var accentFill
-    @Environment(\.onAccent) private var onAccent
+    @Environment(\.colorScheme) private var scheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var full = false
 
     var body: some View {
         let on = library.isFollowing(browseId)
+        let dark = scheme == .dark
         Button {
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
             withAnimation(reduceMotion ? nil : .uiEaseOut(0.22)) {
@@ -181,9 +182,14 @@ struct FollowButton: View {
                 .font(.subheadline.weight(.semibold))
                 .padding(.horizontal, 20)
                 .frame(minWidth: 132, minHeight: 44)
-                .foregroundStyle(on ? AnyShapeStyle(onAccent) : AnyShapeStyle(Color.primary))
+                .foregroundStyle(on ? (dark ? Tokens.Brand.washi : Tokens.Brand.sumi) : Color.primary)
                 .background {
-                    if on { Capsule().fill(accentFill) } else { ThemeSurface(radius: 22).clipShape(Capsule()) }
+                    if on {
+                        Capsule().fill(dark ? Tokens.Brand.washi.opacity(0.16) : Tokens.Brand.washi)
+                            .overlay(Capsule().strokeBorder(Color.primary.opacity(0.08), lineWidth: 1))
+                    } else {
+                        Capsule().strokeBorder(Color.primary.opacity(0.45), lineWidth: 1.5)
+                    }
                 }
                 .contentShape(Capsule())
         }
@@ -267,6 +273,8 @@ struct ArtistView: View {
         .navigationBarTitleDisplayMode(.inline)
         .navigationDestination(for: DiscographyRoute.self) { DiscographyView(page: $0.page, kind: $0.kind) }
         .task {
+            // Capturas (escenarios 49 y 50): la página de ejemplo, sin red.
+            if page == nil, Demo.isActive, !DemoCatalog.isActive { page = Demo.artistPage }
             if page == nil { page = try? await YTClient.artist(artist) }
             loading = false
         }

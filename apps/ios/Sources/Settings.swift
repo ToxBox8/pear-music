@@ -290,7 +290,7 @@ struct LibrarySettings: View {
             // Al final y en otra pantalla, para no borrar nada sin querer.
             Section {
                 NavigationLink { ManagePlaylistsView() } label: {
-                    Label(L("Eliminar playlists"), systemImage: "trash").foregroundStyle(.red)
+                    Label(L("Eliminar de la biblioteca"), systemImage: "trash").foregroundStyle(.red)
                 }
             } footer: {
                 Text(L("Antes de borrar se pide confirmación."))

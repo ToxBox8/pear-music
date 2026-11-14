@@ -146,7 +146,7 @@ struct HomeView: View {
             }
             // Seguir o dejar de seguir a alguien cambia Novedades sin esperar a la próxima carga (lo ya pedido sale de la caché).
             .onChange(of: library.followedArtists.map(\.browseId)) { _ in Task { await loadReleases() } }
-            .demoRoute(.artist) { ArtistView(artist: DemoCatalog.artist) }
+            .demoRoute(.artist) { ArtistView(artist: DemoCatalog.isActive ? DemoCatalog.artist : Demo.artist) }
             .miniPlayer()
         }
     }

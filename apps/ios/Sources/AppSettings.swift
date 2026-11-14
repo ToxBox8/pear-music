@@ -143,7 +143,7 @@ private var settingsIndex: [SettingEntry] { [
     SettingEntry(title: L("Ordenar playlists"), section: L("Biblioteca"), keywords: L("orden a-z recientes a mano"), destination: .library),
     SettingEntry(title: L("Descargadas y Favoritos"), section: L("Biblioteca"), keywords: L("carrusel tu música"), destination: .library),
     SettingEntry(title: L("Dónde está Buscar"), section: L("Barra"), keywords: L("buscar pestaña inicio barra"), destination: .bar),
-    SettingEntry(title: L("Eliminar playlists"), section: L("Biblioteca"), keywords: L("borrar quitar"), destination: .manage),
+    SettingEntry(title: L("Eliminar de la biblioteca"), section: L("Biblioteca"), keywords: L("borrar quitar playlists álbumes"), destination: .manage),
     SettingEntry(title: L("Avisos"), section: L("Ayuda y soporte"), keywords: L("notificaciones campana caídas novedades discord"), destination: .avisos),
     SettingEntry(title: L("Cuenta"), section: L("Ajustes"), keywords: L("cuenta correo nube sincronizar copia cifrada clave recuperación iniciar sesión"), destination: .account),
     SettingEntry(title: L("Telemetría"), section: L("Ayuda y soporte"), keywords: L("telemetría rendimiento datos consentimiento privacidad fps"), destination: .myData),
@@ -208,6 +208,7 @@ struct SettingsView: View {
             }
             .themed()
             .demoRoute(.themePicker) { AppearanceSettings() }
+            .demoRoute(.manage) { ManagePlaylistsView() }
             .miniPlayer()
         }
         .overlay {

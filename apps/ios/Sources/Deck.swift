@@ -499,50 +499,76 @@ struct DeckPicker: View {
     }
 }
 
-// MARK: - Ajustes: eliminar playlists (fuera del camino para evitar sustos)
+// MARK: - Ajustes: eliminar de la biblioteca (fuera del camino para evitar sustos)
+/// Playlists y álbumes guardados («Tus álbumes»), en dos secciones. Se borran igual: la papelera de la fila y una sola
+/// confirmación, que recuerda que las descargas se quedan. Igual que `ManagePlaylistsScreen` en Android.
 struct ManagePlaylistsView: View {
     @EnvironmentObject var library: Library
     @State private var pending: Playlist?
 
     var body: some View {
         List {
-            Section {
-                ForEach(library.userPlaylists) { p in
-                    HStack(spacing: 12) {
-                        PlaylistCover(playlist: p, size: 44)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(p.name).lineLimit(1)
-                            // En qué carpeta está (3.0): borrar la playlist no toca la carpeta.
-                            let place = PlaylistFolders.path(p.folder, in: library.folders).map(\.name).joined(separator: " › ")
-                            Text(place.isEmpty ? songCount(p.songs.count) : "\(songCount(p.songs.count)) · " + L("En {0}", place))
-                                .font(.caption).foregroundStyle(.secondary).lineLimit(1)
-                        }
-                        Spacer()
-                        Button(role: .destructive) { pending = p } label: {
-                            Image(systemName: "trash").frame(width: 44, height: 44).contentShape(Rectangle())
-                        }
-                        .buttonStyle(.borderless)
-                        .foregroundStyle(.red)
-                        .accessibilityLabel(L("Eliminar {0}", p.name))
+            if !library.userPlaylists.isEmpty {
+                Section {
+                    ForEach(library.userPlaylists) { p in
+                        // En qué carpeta está (3.0): borrar la playlist no toca la carpeta.
+                        let place = PlaylistFolders.path(p.folder, in: library.folders).map(\.name).joined(separator: " › ")
+                        row(p, detail: place.isEmpty ? songCount(p.songs.count) : "\(songCount(p.songs.count)) · " + L("En {0}", place))
                     }
+                } header: {
+                    Text(L("Playlists"))
+                } footer: {
+                    Text(L("Eliminar una playlist no borra sus canciones de Favoritos ni de Descargas."))
                 }
-            } footer: {
-                Text(L("Eliminar una playlist no borra sus canciones de Favoritos ni de Descargas."))
+                .glassRow()
             }
-            .glassRow()
+            if !library.albums.isEmpty {
+                Section {
+                    ForEach(library.albums) { a in
+                        let line = a.album?.line ?? ""
+                        row(a, detail: line.isEmpty ? songCount(a.songs.count) : "\(line) · \(songCount(a.songs.count))")
+                    }
+                } header: {
+                    Text(L("Tus álbumes"))
+                } footer: {
+                    Text(L("Las canciones descargadas se quedan en Descargadas."))
+                }
+                .glassRow()
+            }
         }
-        .overlay { if library.userPlaylists.isEmpty { Text(L("No hay playlists")).foregroundStyle(.secondary) } }
+        .overlay {
+            if library.userPlaylists.isEmpty && library.albums.isEmpty {
+                Text(L("No hay playlists ni álbumes")).foregroundStyle(.secondary)
+            }
+        }
         .themed()
-        .navigationTitle(L("Eliminar playlists"))
+        .navigationTitle(L("Eliminar de la biblioteca"))
         .navigationBarTitleDisplayMode(.inline)
         .alert(L("¿Eliminar «{0}»?", pending?.name ?? ""), isPresented: Binding(get: { pending != nil }, set: { if !$0 { pending = nil } })) {
-            Button(L("Eliminar playlist"), role: .destructive) {
+            Button(L("Eliminar"), role: .destructive) {
                 if let p = pending { library.deletePlaylist(p.id) }
                 pending = nil
             }
             Button(L("Cancelar"), role: .cancel) { pending = nil }
         } message: {
-            Text(L("Se borrará la playlist y su portada. No se puede deshacer."))
+            Text(L("Se quitará de tu biblioteca con su portada. Las canciones descargadas se quedan en Descargadas. No se puede deshacer."))
+        }
+    }
+
+    private func row(_ p: Playlist, detail: String) -> some View {
+        HStack(spacing: 12) {
+            PlaylistCover(playlist: p, size: 44)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(p.name).lineLimit(1)
+                Text(detail).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+            }
+            Spacer()
+            Button(role: .destructive) { pending = p } label: {
+                Image(systemName: "trash").frame(width: 44, height: 44).contentShape(Rectangle())
+            }
+            .buttonStyle(.borderless)
+            .foregroundStyle(.red)
+            .accessibilityLabel(L("Eliminar {0}", p.name))
         }
     }
 }
