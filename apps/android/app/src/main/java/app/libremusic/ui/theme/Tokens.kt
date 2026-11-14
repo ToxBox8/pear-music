@@ -5,18 +5,23 @@ import androidx.compose.ui.graphics.Color
 
 object Tokens {
     object Brand {
-        val Violet = Color(0xFF8B5CF6)
-        val VioletDeep = Color(0xFF5B21B6)
-        val Magenta = Color(0xFFEC4899)
-        val Amber = Color(0xFFF59E0B)
-        val Night = Color(0xFF07070A)
+        val Shu = Color(0xFFF4511E)
+        val ShuDeep = Color(0xFFA3300E)
+        val ShuTextLight = Color(0xFFB5330F)
+        val ShuTextDark = Color(0xFFFF6B3D)
+        val Kincha = Color(0xFFE3A93B)
+        val Sumi = Color(0xFF0E0E10)
+        val Washi = Color(0xFFF3EFE6)
     }
-    val ArtworkFallback = listOf(Color(0xFF8B5CF6), Color(0xFFEC4899), Color(0xFFF59E0B))
+    val ArtworkFallback = listOf(Color(0xFFF4511E), Color(0xFFE3A93B), Color(0xFFA3300E))
 
     data class ThemeSpec(
         val name: String,
         val blurb: String,
         val accent: Color,
+        /** Acento para texto e iconos sueltos (4,5:1 sobre el fondo), en claro y en oscuro. */
+        val accentTextLight: Color,
+        val accentTextDark: Color,
         val onAccent: Color,
         /** "light", "dark" o null (el que elija el usuario). */
         val scheme: String?,
@@ -24,10 +29,10 @@ object Tokens {
         val maxRadius: Float,
     )
     val Themes: Map<String, ThemeSpec> = mapOf(
-        "air" to ThemeSpec("Aire", "Plata con Helvetica negra y un anillo de puntos.", Color(0xFF111111), Color(0xFFFFFFFF), "light", false, 40f),
-        "glass" to ThemeSpec("Cristal", "Luz difusa con los colores de la carátula.", Color(0xFF8B5CF6), Color(0xFFFFFFFF), null, false, 40f),
-        "neon" to ThemeSpec("Neón", "Rejilla synthwave que avanza mientras suena.", Color(0xFFFF2BD6), Color(0xFFFFFFFF), "dark", true, 40f),
-        "plain" to ThemeSpec("Sistema", "Sin efectos ni fondos animados.", Color(0xFF8B5CF6), Color(0xFFFFFFFF), null, false, 40f),
+        "air" to ThemeSpec("Aire", "Plata con Helvetica negra y un anillo de puntos.", Color(0xFF111111), Color(0xFF111111), Color(0xFF111111), Color(0xFFFFFFFF), "light", false, 40f),
+        "glass" to ThemeSpec("Cristal", "Luz difusa con los colores de la carátula.", Color(0xFFF4511E), Color(0xFFB5330F), Color(0xFFFF6B3D), Color(0xFF0E0E10), null, false, 40f),
+        "neon" to ThemeSpec("Neón", "Rejilla synthwave que avanza mientras suena.", Color(0xFFFF2BD6), Color(0xFFFF2BD6), Color(0xFFFF2BD6), Color(0xFFFFFFFF), "dark", true, 40f),
+        "plain" to ThemeSpec("Sistema", "Sin efectos ni fondos animados.", Color(0xFFF4511E), Color(0xFFB5330F), Color(0xFFFF6B3D), Color(0xFF0E0E10), null, false, 40f),
     )
     val ThemeOrder = listOf("glass", "air", "neon", "plain")
     const val DefaultTheme = "glass"
