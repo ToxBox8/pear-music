@@ -882,8 +882,7 @@ struct ReorderPlaylistsView: View {
                         .onMove { from, to in
                             keys.move(fromOffsets: from, toOffset: to)
                             orderRaw = LibraryOrder.reorder(level: keys, playlists: library.userPlaylists, folders: library.folders,
-                                                            sort: sort, order: LibraryOrder.decode(orderRaw),
-                                                            smartInPlaylists: smartHere).joined(separator: "\n")
+                                                            sort: sort, order: LibraryOrder.decode(orderRaw)).joined(separator: "\n")
                             sort = "custom"
                             keys = levelKeys()
                         }

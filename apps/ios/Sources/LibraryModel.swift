@@ -127,12 +127,13 @@ enum PlaylistFolders {
         var seen = Set<String>()
         var list: [PlaylistFolder] = []
         for var f in folders {
-            let id = f.id.trimmingCharacters(in: .whitespaces)
+            // Espacios y saltos de línea, como `trim()` en Android: un id «F040\n» es la carpeta «F040» en las dos.
+            let id = f.id.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !id.isEmpty, seen.insert(id).inserted else { continue }
             f.id = id
             let name = f.name.trimmingCharacters(in: .whitespacesAndNewlines)
             f.name = name.isEmpty ? defaultName : name
-            if let p = f.parent?.trimmingCharacters(in: .whitespaces), !p.isEmpty { f.parent = p } else { f.parent = nil }
+            if let p = f.parent?.trimmingCharacters(in: .whitespacesAndNewlines), !p.isEmpty { f.parent = p } else { f.parent = nil }
             list.append(f)
         }
         let ids = Set(list.map(\.id))
@@ -365,10 +366,12 @@ extension LibraryOrder {
     }
 
     /// Guarda el orden nuevo de un nivel (`moved`, todo lo que se ve en él) en el orden completo, que pasa a «A mano».
+    /// Al pasar de otro orden, el completo se monta siempre con Descargadas y Favoritos en su sitio de arriba (si no
+    /// van «en Playlists», `keys` las salta): arrastrar dentro de una carpeta, donde no se ven, no las manda al final.
     static func reorder(level moved: [String], playlists: [Playlist], folders: [PlaylistFolder], sort: String,
-                        order: [String], smartInPlaylists: Bool) -> [String] {
+                        order: [String]) -> [String] {
         var full = sort == "custom" ? order : materialize(playlists: playlists, folders: folders, sort: sort,
-                                                          order: order, smartInPlaylists: smartInPlaylists)
+                                                          order: order, smartInPlaylists: true)
         let known = Set(full)
         full += moved.filter { !known.contains($0) }
         return merge(full, moved)
@@ -412,7 +415,7 @@ enum FollowedArtists {
         var out: [FollowedArtist] = []
         var index: [String: Int] = [:]
         for var a in list {
-            let id = a.browseId.trimmingCharacters(in: .whitespaces)
+            let id = a.browseId.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !id.isEmpty else { continue }
             if let i = index[id] {
                 if a.since > 0 && (out[i].since == 0 || a.since < out[i].since) { out[i].since = a.since }
@@ -437,7 +440,7 @@ enum FollowedArtists {
     /// Seguir: va el primero. nil si ya hay 500. Si ya lo seguías, no cambia nada.
     static func follow(_ artist: FollowedArtist, in list: [FollowedArtist]) -> [FollowedArtist]? {
         if list.contains(where: { $0.browseId == artist.browseId }) { return list }
-        guard list.count < max, !artist.browseId.trimmingCharacters(in: .whitespaces).isEmpty else { return nil }
+        guard list.count < max, !artist.browseId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
         return normalize([artist] + list)
     }
 

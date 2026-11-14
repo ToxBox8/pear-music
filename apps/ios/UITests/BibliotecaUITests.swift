@@ -16,10 +16,11 @@ final class BibliotecaUITests: XCTestCase {
         app = XCUIApplication()
     }
 
-    private func launch(_ scenario: String) {
+    /// `ready`: un texto que tiene que verse cuando la pantalla del escenario ya está.
+    private func launch(_ scenario: String, ready: String = "Tu música") {
         app.launchArguments = ["-screenshotScenario", scenario, "-language", "es", "-AppleLanguages", "(es)", "-AppleLocale", "es_ES"]
         app.launch()
-        XCTAssertTrue(any("Tu música").waitForExistence(timeout: 20), "La Biblioteca no llegó a salir")
+        XCTAssertTrue(any(ready).waitForExistence(timeout: 20), "La pantalla del escenario \(scenario) no llegó a salir")
     }
 
     // MARK: Ayudas
@@ -97,9 +98,31 @@ final class BibliotecaUITests: XCTestCase {
         XCTAssertTrue(created, "La playlist «Prueba UI» no sale en Tu música › Playlists")
     }
 
+    /// Lo que hace casi todo el mundo: escribir el nombre y pulsar Intro en el teclado, sin tocar «Crear».
+    func testCrearPlaylistConIntro() {
+        launch("01_biblioteca_cristal")
+        app.buttons["Añadir playlist"].tap()
+        let item = app.buttons["Nueva playlist"]
+        XCTAssertTrue(item.waitForExistence(timeout: 5), "El menú del + no tiene «Nueva playlist»")
+        item.tap()
+        let field = app.textFields.firstMatch
+        XCTAssertTrue(field.waitForExistence(timeout: 5), "No salió dónde escribir el nombre de la playlist")
+        field.tap()
+        field.typeText("Con intro\n")
+        sleep(2)
+        shot("1-despues-de-intro")
+        // Si el aviso sigue abierto, Intro no hizo nada: tampoco vale (hay que poder crear sin soltar el teclado).
+        XCTAssertFalse(app.buttons["Crear"].exists, "Intro no cierra el aviso de «Nueva playlist»")
+        if app.buttons["Cancelar"].exists { app.buttons["Cancelar"].tap() }
+        openPlaylists()
+        let created = any("Con intro").waitForExistence(timeout: 5)
+        shot("2-playlists")
+        XCTAssertTrue(created, "Escribir el nombre y pulsar Intro no crea la playlist")
+    }
+
     /// Dentro de una carpeta: ⋯ › Nueva playlist aquí.
     func testCrearPlaylistDentroDeUnaCarpeta() {
-        launch("45_carpeta")
+        launch("45_carpeta", ready: "Gimnasio")
         XCTAssertTrue(app.navigationBars["Gimnasio"].waitForExistence(timeout: 10), "No se abrió la carpeta Gimnasio")
         let more = app.buttons["Más opciones"]
         XCTAssertTrue(more.waitForExistence(timeout: 5), "No está el botón ⋯")
@@ -186,8 +209,9 @@ final class BibliotecaUITests: XCTestCase {
         let menu = app.buttons["Mover a…"].waitForExistence(timeout: 3)
         shot("2-menu")
         XCTAssertTrue(menu, "Mantener pulsada una portada no abre su menú")
-        // Cerrar tocando fuera (arriba, en la barra de estado).
-        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.04)).tap()
+        // Cerrar tocando fuera del menú.
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.85, dy: 0.62)).tap()
+        XCTAssertTrue(app.buttons["Mover a…"].waitForNonExistence(timeout: 5), "El menú no se cierra al tocar fuera")
         sleep(2)
         shot("3-cerrado")
         note("arbol", app.debugDescription)

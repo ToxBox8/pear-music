@@ -6,6 +6,8 @@
     {"browseId": "UCdemo-michael-bennet", "name": "Michael Bennet", "thumbnail": "https://lh3.example/mb=w240-h240", "since": 1700000000000},
     {"browseId": "UCrosalia", "name": "Rosalía", "thumbnail": null, "since": 1731500000000},
     {"browseId": "UCsin-nombre", "name": "UCsin-nombre", "thumbnail": null, "since": 0},
-    {"browseId": "UCfoto-rara", "name": "Foto rara", "thumbnail": null, "since": 1731300000000}
+    {"browseId": "UCfoto-rara", "name": "Foto rara", "thumbnail": null, "since": 1731300000000},
+    {"browseId": "UCsalto", "name": "Salto de línea y decimales", "thumbnail": null, "since": 1731200000000},
+    {"browseId": "UCmedio", "name": "Milisegundo y medio", "thumbnail": null, "since": 0}
   ]
 }

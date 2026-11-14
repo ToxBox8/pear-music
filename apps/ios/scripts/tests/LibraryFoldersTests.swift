@@ -136,11 +136,20 @@ igual(LibraryOrder.level(nil, playlists: propias, folders: fs, sort: "name", ord
 igual(LibraryOrder.level(gym, playlists: propias, folders: fs, sort: "name", order: [], smartInPlaylists: true),
       [kF002, b001], "nivel: dentro de Gimnasio, sin listas inteligentes")
 let movido = ["downloads", "favorites", kGym, kViajes, b004]
-let orden = LibraryOrder.reorder(level: movido, playlists: propias, folders: fs, sort: "recent", order: [], smartInPlaylists: true)
+let orden = LibraryOrder.reorder(level: movido, playlists: propias, folders: fs, sort: "recent", order: [])
 igual(LibraryOrder.level(nil, playlists: propias, folders: fs, sort: "custom", order: orden, smartInPlaylists: true), movido,
       "a mano: el nivel queda como se dejó")
 igual(LibraryOrder.level(gym, playlists: propias, folders: fs, sort: "custom", order: orden, smartInPlaylists: true), [kF002, b001],
       "a mano: los otros niveles no saltan")
+// Arrastrar dentro de una carpeta (donde Descargadas y Favoritos no se ven) con otro orden puesto: arriba del todo
+// siguen delante, no saltan al final (revisión del bloque 1).
+let dentro = LibraryOrder.reorder(level: [b001, kF002], playlists: propias, folders: fs, sort: "recent", order: [])
+igual(LibraryOrder.level(gym, playlists: propias, folders: fs, sort: "custom", order: dentro, smartInPlaylists: true), [kF002, b001],
+      "a mano dentro de una carpeta: las carpetas siguen delante")
+igual(LibraryOrder.level(nil, playlists: propias, folders: fs, sort: "custom", order: dentro, smartInPlaylists: true),
+      ["downloads", "favorites", kViajes, kGym, b004], "a mano dentro de una carpeta: Descargadas y Favoritos no saltan al final")
+igual(LibraryOrder.level(nil, playlists: propias, folders: fs, sort: "custom", order: dentro, smartInPlaylists: false),
+      [kViajes, kGym, b004], "a mano dentro de una carpeta: con Descargadas y Favoritos en Tu música, no salen")
 
 // MARK: Una carpeta con el mismo id que una playlist o que «downloads» (copia hecha a mano): sin claves repetidas
 let mismo = "0000000A-0000-0000-0000-00000000D001"

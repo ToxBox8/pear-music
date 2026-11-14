@@ -66,7 +66,7 @@ let mios = [FollowedArtist(browseId: "UCrosalia", name: "Rosalía (mía)", since
             FollowedArtist(browseId: "UCotro", name: "Otro", since: 1731700000000)]
 let base = LibraryFile(favorites: [], playlists: [], recents: nil, folders: nil, followedArtists: mios)
 let unida = base.merging(seguidos).followedArtists ?? []
-igual(unida.map(\.browseId), ["UCrosalia", "UCotro", "UCdemo-michael-bennet", "UCsin-nombre", "UCfoto-rara"], "unir: los míos primero y lo nuevo detrás")
+igual(unida.map(\.browseId), ["UCrosalia", "UCotro", "UCdemo-michael-bennet", "UCsin-nombre", "UCfoto-rara", "UCsalto", "UCmedio"], "unir: los míos primero y lo nuevo detrás")
 igual(unida.first?.name, "Rosalía (mía)", "unir: el mío no cambia de nombre")
 igual(unida.first?.since, 1731000000000, "unir: se queda el since más antiguo (el mío)")
 let sinRosalia = LibraryFile(favorites: [], playlists: [], recents: nil, folders: nil,

@@ -162,8 +162,7 @@ struct PlaylistsListView: View {
                     if !hintDone || !query.isEmpty { ReorderHint(enabled: query.isEmpty, folders: !library.folders.isEmpty) }
                     ReorderGrid(items: shown, enabled: query.isEmpty, onMoved: { moved in
                         orderRaw = LibraryOrder.reorder(level: moved, playlists: library.userPlaylists, folders: library.folders,
-                                                        sort: sort, order: LibraryOrder.decode(orderRaw),
-                                                        smartInPlaylists: smartHere).joined(separator: "\n")
+                                                        sort: sort, order: LibraryOrder.decode(orderRaw)).joined(separator: "\n")
                         sort = "custom"
                     }, canDropInto: canDropInto, canSwap: canSwap, onDropInto: dropInto, onDragEnd: { hintDone = true },
                     menu: { AnyView(menu($0)) },

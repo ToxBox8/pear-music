@@ -13,6 +13,8 @@
     {"browseId": 12, "name": "Id que no es texto"},
     {"browseId": "UCsin-nombre", "name": "   ", "since": "ayer"},
     {"browseId": "UCfoto-rara", "name": "Foto rara", "thumbnail": 5, "since": 1731300000000},
+    {"browseId": "UCsalto\n", "name": "Salto de línea y decimales", "since": 1731200000000.0},
+    {"browseId": "UCmedio", "name": "Milisegundo y medio", "since": 1731100000000.5},
     "no es un artista"
   ]
 }

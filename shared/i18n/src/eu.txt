@@ -1130,7 +1130,7 @@
 1130	Karpeta 1
 1131	Zerrenda 1
 1132	Ireki
-1133	Arrastatu ordena aldatzeko. Zerbait mugitzean, Zerrendak «Eskuz» ordenatzen da.
+1133	Arrastatu ordena aldatzeko. Zerbait mugitzean, Zerrendak «Eskuz» ordenatzen dira.
 1134	Arrastatu zerrenda bat karpetaren gainera edo erabili bere menuko «Eraman hona…».
 1135	Gehienez 3 karpeta-maila.
 1136	Karpeta hutsa
@@ -1142,8 +1142,8 @@
 1142	Mugitzen ari zarenaren barruan dago
 1143	Karpetetatik kanpo
 1144	Gorde
-1145	Barruan dagoena «{0}»(e)ra pasatzen da. Ez da zerrendarik ez abestirik ezabatzen.
-1146	Eutsi sakatuta azal bat eta arrastatu ordena aldatzeko edo karpeta batean sartzeko.
+1145	Barruan dagoena hona pasatzen da: «{0}». Ez da zerrendarik ez abestirik ezabatzen.
+1146	Eduki sakatuta azal bat eta arrastatu ordena aldatzeko edo karpeta batean sartzeko.
 1147	Eraman beste karpeta batera
 1148	Eraman hona…
 1149	Eraman karpeta hona…
@@ -1154,7 +1154,7 @@
 1154	Zerrenda berria hemen
 1155	Aldatu izena
 1156	Aldatu karpetaren izena
-1157	Atera «{0}»(e)tik
+1157	Atera hemendik: «{0}»
 1158	Askatu hemen: {0}
 1159	Hutsik
 1160	{0} karpeta
@@ -1163,7 +1163,7 @@
 1163	«{0}» karpeta ezabatu?
 1164	Utzi norbaiti jarraitzeari beste bati jarraitzeko.
 1165	Utzi {0} jarraitzeari
-1166	{0}(e)tik
+1166	Noiztik: {0}
 1167	Zure artisten berriena
 1168	Berria
 1169	Berria: {0}
@@ -1172,6 +1172,6 @@
 1172	Guztiak
 1173	Dagoeneko 500 artistari jarraitzen diezu
 1174	Ezabatu liburutegitik
-1175	Ez dago playlistik ez albumik
+1175	Ez dago zerrendarik ez albumik
 1176	Zure liburutegitik kenduko da, azalarekin. Deskargatutako abestiak Deskargatuak atalean geratzen dira. Ezin da desegin.
-1177	ezabatu kendu playlistak albumak
+1177	ezabatu kendu zerrendak albumak

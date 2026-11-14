@@ -1142,7 +1142,7 @@
 1142	Ĝi estas en tiu, kiun vi movas
 1143	Ekster la dosierujoj
 1144	Konservi
-1145	Ĉio interne iras al «{0}». Neniu ludlisto aŭ kanto estas forigita.
+1145	Ĉio interne iras al «{0}». Neniu ludlisto nek kanto foriĝas.
 1146	Tenu premita kovrilon kaj trenu ĝin por ŝanĝi la ordon aŭ meti ĝin en dosierujon.
 1147	Movi al alia dosierujo
 1148	Movi al…
@@ -1168,10 +1168,10 @@
 1168	Nova
 1169	Nova: {0}
 1170	Sekvi {0}
-1171	Sekvata
+1171	Vi sekvas
 1172	Ĉiuj
 1173	Vi jam sekvas 500 artistojn
 1174	Forigi el la biblioteko
 1175	Neniuj ludlistoj aŭ albumoj
 1176	Ĝi foriĝos el via biblioteko kun sia kovrilo. Elŝutitaj kantoj restas en Elŝutitaj. Ne eblas malfari.
-1177	forigi ludlistoj albumoj
+1177	forigi forpreni ludlistoj albumoj
