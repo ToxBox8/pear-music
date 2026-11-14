@@ -375,6 +375,77 @@ extension LibraryOrder {
     }
 }
 
+// MARK: - Artistas seguidos (3.0, bloque 1)
+
+/// Un artista que sigues desde su página. Sus lanzamientos salen en Inicio › Novedades. Mismo formato que
+/// `FollowedArtist` en Android (docs/LIBRARY_FORMAT.md).
+struct FollowedArtist: Identifiable, Codable, Hashable {
+    var id: String { browseId }
+    /// Id del canal de YouTube Music («UC…»).
+    var browseId: String
+    var name: String
+    var thumbnail: URL?
+    /// Desde cuándo lo sigues, en milisegundos desde 1970 (como `at` de las estadísticas).
+    var since: Int64
+
+    init(browseId: String, name: String, thumbnail: URL? = nil, since: Int64) {
+        self.browseId = browseId; self.name = name; self.thumbnail = thumbnail; self.since = since
+    }
+
+    /// `browseId` y `name` tienen que ser textos; `thumbnail` o `since` de otro tipo se leen como si no estuvieran.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        browseId = try c.decode(String.self, forKey: .browseId)
+        name = try c.decode(String.self, forKey: .name)
+        thumbnail = (try? c.decodeIfPresent(URL.self, forKey: .thumbnail)) ?? nil
+        since = (try? c.decodeIfPresent(Int64.self, forKey: .since)) ?? 0
+    }
+}
+
+/// Reglas de los seguidos. Mismos nombres, casos y resultados que `FollowedArtists` en Android.
+enum FollowedArtists {
+    static let max = 500
+
+    /// Sin `browseId` (o vacío) → fuera; repetido → se queda el primero (con el `since` más antiguo); nombre vacío →
+    /// el `browseId`; como mucho 500 (los primeros: la lista va del último que sigues al primero).
+    static func normalize(_ list: [FollowedArtist]) -> [FollowedArtist] {
+        var out: [FollowedArtist] = []
+        var index: [String: Int] = [:]
+        for var a in list {
+            let id = a.browseId.trimmingCharacters(in: .whitespaces)
+            guard !id.isEmpty else { continue }
+            if let i = index[id] {
+                if a.since > 0 && (out[i].since == 0 || a.since < out[i].since) { out[i].since = a.since }
+                continue
+            }
+            a.browseId = id
+            let name = a.name.trimmingCharacters(in: .whitespacesAndNewlines)
+            a.name = name.isEmpty ? id : name
+            if a.since < 0 { a.since = 0 }
+            index[id] = out.count
+            out.append(a)
+        }
+        return Array(out.prefix(max))
+    }
+
+    /// Importar = unir por `browseId`: se añaden los que no sigues (detrás); los tuyos se quedan como están, salvo
+    /// `since`, que pasa a ser el más antiguo. Nunca se deja de seguir a nadie (los «dejar de seguir» no viajan).
+    static func merge(_ local: [FollowedArtist], _ incoming: [FollowedArtist]) -> [FollowedArtist] {
+        normalize(local + incoming)
+    }
+
+    /// Seguir: va el primero. nil si ya hay 500. Si ya lo seguías, no cambia nada.
+    static func follow(_ artist: FollowedArtist, in list: [FollowedArtist]) -> [FollowedArtist]? {
+        if list.contains(where: { $0.browseId == artist.browseId }) { return list }
+        guard list.count < max, !artist.browseId.trimmingCharacters(in: .whitespaces).isEmpty else { return nil }
+        return normalize([artist] + list)
+    }
+
+    static func unfollow(_ browseId: String, in list: [FollowedArtist]) -> [FollowedArtist] {
+        list.filter { $0.browseId != browseId }
+    }
+}
+
 // MARK: - El archivo library.json
 
 /// Lo que guarda `Library` en library.json (y la parte común de «Exportar copia»). Los órdenes, las portadas y
@@ -387,10 +458,14 @@ struct LibraryFile: Codable {
     var recents: [Song]?
     /// Carpetas de playlists (3.0). Sólo se escribe si hay alguna: sin carpetas, library.json queda como antes.
     var folders: [PlaylistFolder]?
+    /// Artistas seguidos (3.0). Como `folders`: sólo se escribe si sigues a alguno.
+    var followedArtists: [FollowedArtist]?
 
-    init(favorites: [Song], playlists: [Playlist], recents: [Song]?, folders: [PlaylistFolder]?) {
+    init(favorites: [Song], playlists: [Playlist], recents: [Song]?, folders: [PlaylistFolder]?,
+         followedArtists: [FollowedArtist]? = nil) {
         self.favorites = favorites; self.playlists = playlists; self.recents = recents
         self.folders = folders?.isEmpty == false ? folders : nil
+        self.followedArtists = followedArtists?.isEmpty == false ? followedArtists : nil
     }
 
     /// Como el sintetizado, pero una carpeta que no se puede leer se salta en vez de tumbar la biblioteca.
@@ -400,6 +475,7 @@ struct LibraryFile: Codable {
         playlists = try c.decode([Playlist].self, forKey: .playlists)
         recents = try c.decodeIfPresent([Song].self, forKey: .recents)
         folders = (try? c.decodeIfPresent(LossyList<PlaylistFolder>.self, forKey: .folders))??.items
+        followedArtists = (try? c.decodeIfPresent(LossyList<FollowedArtist>.self, forKey: .followedArtists))??.items
     }
 
     /// Lee library.json (o una copia) y deja las carpetas listas: sin huérfanas, ciclos ni más de 3 niveles, y
@@ -409,11 +485,14 @@ struct LibraryFile: Codable {
         let folders = PlaylistFolders.normalize(file.folders ?? [])
         file.folders = folders.isEmpty ? nil : folders
         file.playlists = PlaylistFolders.clean(file.playlists, folders: folders)
+        let followed = FollowedArtists.normalize(file.followedArtists ?? [])
+        file.followedArtists = followed.isEmpty ? nil : followed
         return file
     }
 
     /// Importar = unir, sin borrar nada: favoritas y recientes por id de canción, playlists y carpetas por id. Lo que
-    /// ya estaba no cambia (tampoco de carpeta); lo nuevo llega en su carpeta si existe. Igual que `LibraryData.merge`.
+    /// ya estaba no cambia (tampoco de carpeta); lo nuevo llega en su carpeta si existe. Los seguidos se unen por
+    /// `browseId` (`FollowedArtists.merge`). Igual que `LibraryData.merge`.
     func merging(_ other: LibraryFile) -> LibraryFile {
         var favIDs = Set(favorites.map(\.id))
         var listIDs = Set(playlists.map(\.id))
@@ -424,6 +503,7 @@ struct LibraryFile: Codable {
             favorites: favorites + other.favorites.filter { favIDs.insert($0.id).inserted },
             playlists: PlaylistFolders.clean(playlists + other.playlists.filter { listIDs.insert($0.id).inserted }, folders: folders),
             recents: Array((mine + (other.recents ?? []).filter { recentIDs.insert($0.id).inserted }).prefix(Self.maxRecents)),
-            folders: folders)
+            folders: folders,
+            followedArtists: FollowedArtists.merge(followedArtists ?? [], other.followedArtists ?? []))
     }
 }

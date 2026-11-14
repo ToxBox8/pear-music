@@ -168,6 +168,7 @@ struct LibraryV11View: View {
             .demoRoute(.downloads) { SmartListV11View(kind: .downloads) }
             .demoRoute(.playlists) { PlaylistsListView() }
             .demoRoute(.folder) { PlaylistsListView(folderID: Demo.folderID) }
+            .demoRoute(.artists) { ArtistsView(artists: Self.artists(songs)) }
             .miniPlayer()
         }
     }
@@ -541,29 +542,41 @@ private struct FilterChips: View {
     var body: some View {
         HStack(spacing: 8) {
             ForEach(SongFilter.allCases) { f in
-                let on = selection == f
-                Button {
+                ChoiceChip(title: f.title, count: f == .all ? nil : counts[f] ?? 0, on: selection == f) {
                     withAnimation(.uiEaseOut(0.22)) { selection = f }
-                } label: {
-                    HStack(spacing: 5) {
-                        Text(f.title)
-                        if f != .all { Text("\(counts[f] ?? 0)").monospacedDigit().opacity(0.7) }
-                    }
-                    .font(.subheadline.weight(.semibold))
-                    .padding(.horizontal, 14)
-                    .frame(height: 36)
-                    .foregroundStyle(on ? Color(.systemBackground) : Color.primary)
-                    .background(
-                        Capsule().fill(on ? Color.primary : Color.clear)
-                            .background(ThemeSurface(radius: 18).opacity(on ? 0 : 1))
-                            .clipShape(Capsule())
-                    )
                 }
-                .buttonStyle(TactileButtonStyle())
-                .accessibilityAddTraits(on ? .isSelected : [])
             }
             Spacer(minLength: 0)
         }
+    }
+}
+
+/// Una cápsula de filtro: rellena (color del texto) la elegida y con la superficie del tema las demás. La usan los
+/// filtros de las listas y «Todos | Siguiendo» de Artistas. Igual que `ChoiceChip` en Android.
+struct ChoiceChip: View {
+    let title: String
+    var count: Int? = nil
+    let on: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 5) {
+                Text(title)
+                if let count { Text("\(count)").monospacedDigit().opacity(0.7) }
+            }
+            .font(.subheadline.weight(.semibold))
+            .padding(.horizontal, 14)
+            .frame(height: 36)
+            .foregroundStyle(on ? Color(.systemBackground) : Color.primary)
+            .background(
+                Capsule().fill(on ? Color.primary : Color.clear)
+                    .background(ThemeSurface(radius: 18).opacity(on ? 0 : 1))
+                    .clipShape(Capsule())
+            )
+        }
+        .buttonStyle(TactileButtonStyle())
+        .accessibilityAddTraits(on ? .isSelected : [])
     }
 }
 

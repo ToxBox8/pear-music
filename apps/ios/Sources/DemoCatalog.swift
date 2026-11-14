@@ -92,5 +92,15 @@ enum DemoCatalog {
             lists.append(Playlist(name: s.title, songs: [songs[i]], album: AlbumInfo(browseId: s.id, subtitle: s.subtitle), pinned: true))
         }
         library.playlists = lists
+        // Michael Bennet seguido (3.0, bloque 1): «Siguiendo» en su página y en Tu música › Artistas.
+        library.follow(browseId: artist.id, name: artistName, thumbnail: artist.thumbnail)
+    }
+
+    /// «Novedades de tus artistas» en el modo demo: sus singles (con el año, que en `singles` no va), los dos primeros
+    /// con la marca «Nuevo».
+    static var releases: [ReleasePick] {
+        singles.enumerated().map { i, s in
+            ReleasePick(item: ReleaseItem(id: s.id, title: s.title, subtitle: s.subtitle + " • 2026", thumbnail: s.thumbnail), isNew: i < 2)
+        }
     }
 }

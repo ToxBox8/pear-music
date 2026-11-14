@@ -25,8 +25,8 @@ struct HomeView: View {
     private var showingSearch: Bool { searchInHome && !query.isEmpty }
     @State private var shelves: [HomeShelf] = []
     @State private var forYou: [Song] = []
-    /// «Novedades de tus artistas» (lanzamientos de este año).
-    @State private var releases: [RemoteCollection] = []
+    /// «Novedades de tus artistas» (lanzamientos de este año de los que sigues y de los que más escuchas).
+    @State private var releases: [ReleasePick] = []
     @State private var seed: Song?
     @State private var loading = false
     @State private var failed = false
@@ -56,8 +56,9 @@ struct HomeView: View {
                         section(L("Para ti"), subtitle: seed.map { L("Porque escuchaste «{0}»", $0.title) }) { QuickPicks(songs: forYou) }
                     }
                     if !releases.isEmpty {
-                        section(L("Novedades de tus artistas"), subtitle: L("Lo que han sacado este año")) {
-                            ShelfContent(items: releases.map { .collection($0) })
+                        section(L("Novedades de tus artistas"),
+                                subtitle: library.followedArtists.isEmpty ? L("Lo que han sacado este año") : L("Lo nuevo de tus artistas")) {
+                            ReleasesShelf(picks: releases)
                         }
                     }
                     if !library.userPlaylists.isEmpty {
@@ -137,9 +138,14 @@ struct HomeView: View {
             .refreshable { await load() }
             .task(id: language) {
                 // Capturas: sin red, como en ScreenshotTest de Android.
-                if Demo.isActive && !DemoCatalog.isActive { failed = true; return }
+                if Demo.isActive && !DemoCatalog.isActive {
+                    if Demo.current?.releases == true { releases = Demo.releasePicks }
+                    failed = true; return
+                }
                 if shelves.isEmpty || shelvesLanguage != I18n.youtubeHl { await load() }
             }
+            // Seguir o dejar de seguir a alguien cambia Novedades sin esperar a la próxima carga (lo ya pedido sale de la caché).
+            .onChange(of: library.followedArtists.map(\.browseId)) { _ in Task { await loadReleases() } }
             .demoRoute(.artist) { ArtistView(artist: DemoCatalog.artist) }
             .miniPlayer()
         }
@@ -174,12 +180,57 @@ struct HomeView: View {
             forYou = Array(((try? await YTClient.radio(for: s.id)) ?? []).prefix(20))
         }
         loading = false
-        // Novedades después, para no retrasar el resto de Inicio (hasta 16 peticiones la primera vez al día).
-        releases = await Releases.load(artists: Releases.topArtists(saved: library.allSongs()))
+        await loadReleases()
+    }
+
+    /// Novedades después, para no retrasar el resto de Inicio (como mucho 8 artistas, cada uno cada 6 h).
+    private func loadReleases() async {
+        releases = await Releases.load(followed: library.followedArtists, top: Releases.topArtists(saved: library.allSongs()))
     }
 }
 
 // MARK: - Piezas del inicio
+
+/// «Novedades de tus artistas»: tarjetas de álbum con el año y, lo que ha salido en los últimos 7 días, la marca
+/// «Nuevo» sobre la portada. Igual que `ReleasesShelf` en Android.
+struct ReleasesShelf: View {
+    let picks: [ReleasePick]
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            LazyHStack(alignment: .top, spacing: 14) {
+                ForEach(picks, id: \.item.id) { p in
+                    let c = p.collection
+                    NavigationLink(value: c) {
+                        CardLabel(url: c.thumb(400), title: c.title, subtitle: albumLine(c.subtitle))
+                            .overlay(alignment: .topLeading) { if p.isNew { NewBadge().padding(8) } }
+                    }
+                    .buttonStyle(TactileButtonStyle())
+                    .accessibilityElement(children: .combine)
+                    .accessibilityLabel(p.isNew ? L("Nuevo: {0}", c.title) : c.title)
+                }
+            }
+            .padding(.horizontal)
+        }
+    }
+}
+
+/// Insignia «Nuevo»: relleno shu con el texto `onAccent` (nunca blanco), como el resto de insignias.
+struct NewBadge: View {
+    @Environment(\.accentFill) private var accentFill
+    @Environment(\.onAccent) private var onAccent
+
+    var body: some View {
+        Text(L("Nuevo"))
+            .font(.caption2.weight(.bold))
+            .textCase(.uppercase)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .foregroundStyle(onAccent)
+            .background(Capsule().fill(accentFill))
+            .shadow(color: .black.opacity(0.2), radius: 4, y: 2)
+    }
+}
 struct CardLabel: View {
     let url: URL?
     let title: String

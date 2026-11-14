@@ -7,7 +7,7 @@ import SwiftUI
 // cada escenario en el simulador del iPhone 16 y guarda la captura con el mismo nombre.
 enum Demo {
     enum Tab: String { case home, reels, library, settings }
-    enum Route { case favorites, themePicker, artist, downloads, playlists, folder }
+    enum Route { case favorites, themePicker, artist, downloads, playlists, folder, artists }
 
     struct Scenario {
         var theme: AppTheme = .glass
@@ -27,6 +27,10 @@ enum Demo {
         var folders = false
         /// Con la carpeta abierta, la hoja «Mover a…» de su primera playlist.
         var showMove = false
+        /// Artistas seguidos (3.0, bloque 1): Tu música › Artistas con «Siguiendo» elegido.
+        var artistsFollowing = false
+        /// Inicio con «Novedades de tus artistas» (dos con la marca «Nuevo»), sin red.
+        var releases = false
     }
 
     /// Los mismos nombres que las PNG de Android (shared/design/compare_shots.py los empareja).
@@ -54,6 +58,9 @@ enum Demo {
         "44_carpetas_oscuro": Scenario(appearance: "dark", tab: .library, route: .playlists, folders: true),
         "45_carpeta": Scenario(tab: .library, route: .folder, folders: true),
         "46_mover_a": Scenario(tab: .library, route: .folder, folders: true, showMove: true),
+        // Seguir artistas (3.0, bloque 1).
+        "47_artistas_siguiendo": Scenario(tab: .library, route: .artists, artistsFollowing: true),
+        "48_inicio_novedades": Scenario(playing: false, releases: true),
         // Tráiler v2 (4-11-2026): con `-demoCatalog YES` (DemoCatalog.swift), todo con canciones de Michael Bennet.
         "v2_01_inicio": Scenario(tab: .home),
         "v2_02_busqueda": Scenario(tab: .home, query: "Michael Bennet"),
@@ -126,7 +133,25 @@ enum Demo {
             }
             folderID = gym
         }
+        if current?.artistsFollowing == true || current?.releases == true {
+            for a in followed.reversed() { library.follow(browseId: a.browseId, name: a.name, thumbnail: nil, since: a.since) }
+        }
     }
+
+    /// Los mismos seguidos que `seedFollowed()` en ScreenshotTest.kt (sin foto: las capturas no tienen red).
+    static let followed = [
+        FollowedArtist(browseId: "UCdemo-bad-bunny", name: "Bad Bunny", since: 1_763_100_000_000),
+        FollowedArtist(browseId: "UCdemo-dua-lipa", name: "Dua Lipa", since: 1_762_000_000_000),
+        FollowedArtist(browseId: "UCdemo-rosalia", name: "Rosalía", since: 1_760_000_000_000),
+    ]
+
+    /// «Novedades de tus artistas» del escenario 48: las dos primeras, «Nuevo». Las mismas que `releasePicks` en Android.
+    static let releasePicks: [ReleasePick] = [
+        ("MPREb_r1", "Verano 26", "Álbum • Bad Bunny • 2026", true),
+        ("MPREb_r2", "Neon Nights", "Single • Dua Lipa • 2026", true),
+        ("MPREb_r3", "Luz", "Álbum • Rosalía • 2026", false),
+        ("MPREb_r4", "After Midnight", "EP • The Weeknd • 2026", false),
+    ].map { ReleasePick(item: ReleaseItem(id: $0.0, title: $0.1, subtitle: $0.2, thumbnail: nil), isNew: $0.3) }
 
     /// La carpeta que abre el escenario `.folder` (Gimnasio).
     @MainActor static var folderID: String?

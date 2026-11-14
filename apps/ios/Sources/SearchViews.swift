@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 // MARK: - Resultados de búsqueda (los usan Inicio y la pestaña Buscar)
 
@@ -153,6 +154,50 @@ struct AlbumCard: View {
     }
 }
 
+// MARK: - Seguir a un artista (3.0, bloque 1)
+
+/// «Seguir» / «Siguiendo» en la página del artista: cápsula con relleno shu (texto `onAccent`) cuando lo sigues y
+/// superficie del tema cuando no. Igual que `FollowButton` en Android.
+struct FollowButton: View {
+    let browseId: String
+    let name: String
+    let thumbnail: URL?
+    @EnvironmentObject var library: Library
+    @Environment(\.accentFill) private var accentFill
+    @Environment(\.onAccent) private var onAccent
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var full = false
+
+    var body: some View {
+        let on = library.isFollowing(browseId)
+        Button {
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            withAnimation(reduceMotion ? nil : .uiEaseOut(0.22)) {
+                if on { library.unfollow(browseId) }
+                else if !library.follow(browseId: browseId, name: name, thumbnail: thumbnail) { full = true }
+            }
+        } label: {
+            Label(on ? L("Siguiendo") : L("Seguir"), systemImage: on ? "checkmark" : "plus")
+                .font(.subheadline.weight(.semibold))
+                .padding(.horizontal, 20)
+                .frame(minWidth: 132, minHeight: 44)
+                .foregroundStyle(on ? AnyShapeStyle(onAccent) : AnyShapeStyle(Color.primary))
+                .background {
+                    if on { Capsule().fill(accentFill) } else { ThemeSurface(radius: 22).clipShape(Capsule()) }
+                }
+                .contentShape(Capsule())
+        }
+        .buttonStyle(TactileButtonStyle())
+        .accessibilityLabel(on ? L("Dejar de seguir a {0}", name) : L("Seguir a {0}", name))
+        .accessibilityAddTraits(on ? .isSelected : [])
+        .alert(L("Ya sigues a 500 artistas"), isPresented: $full) {
+            Button(L("Vale"), role: .cancel) {}
+        } message: {
+            Text(L("Deja de seguir a alguno para seguir a otro."))
+        }
+    }
+}
+
 // MARK: - Página de artista
 
 struct ArtistView: View {
@@ -172,6 +217,10 @@ struct ArtistView: View {
                     Text(page?.name ?? artist.name).font(.largeTitle.bold()).multilineTextAlignment(.center)
                     if !artist.subtitle.isEmpty {
                         Text(artist.subtitle).font(.subheadline).foregroundStyle(.secondary)
+                    }
+                    if !artist.id.isEmpty {
+                        FollowButton(browseId: artist.id, name: page?.name ?? artist.name,
+                                     thumbnail: page?.thumbnail ?? artist.thumbnail)
                     }
                     if let songs = page?.songs, !songs.isEmpty {
                         PlayShuffleBar(songs: songs).padding(.horizontal).padding(.top, 4)

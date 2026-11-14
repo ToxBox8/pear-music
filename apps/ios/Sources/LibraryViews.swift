@@ -532,41 +532,69 @@ private struct AlbumsEmptyView: View {
 
 struct ArtistsView: View {
     let artists: [ArtistGroup]
+    @EnvironmentObject var library: Library
     @State private var query = ""
+    /// «Todos» o «Siguiendo» (3.0, bloque 1). Sin canciones guardadas pero con seguidos, empieza en «Siguiendo».
+    @State private var following: Bool? = Demo.current?.artistsFollowing == true ? true : nil
     /// Orden A-Z / Z-A con el botón de arriba a la derecha (Fase 3.1); mismo ajuste que Android.
     @AppStorage("artistsSort") private var sort = "az"
 
+    private var showFollowing: Bool { following ?? (artists.isEmpty && !library.followedArtists.isEmpty) }
+
     var body: some View {
+        let followed = library.followedArtists
         let ordered = artists.sorted { LocalSearch.fold($0.name) < LocalSearch.fold($1.name) }
         let shown = LocalSearch.filter(sort == "za" ? ordered.reversed() : ordered, query) { $0.name }
-        List(shown) { a in
-            // Al tocar se abre su perfil de YouTube Music (discografía completa); sin red o sin encontrarlo, sus canciones.
-            NavigationLink {
-                ArtistProfileLoader(name: a.name, songs: a.songs)
-            } label: {
-                HStack(spacing: 12) {
-                    CoverImage(url: a.songs.first?.thumb(160))
-                        .frame(width: 46, height: 46)
-                        .clipShape(Circle())
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(a.name).font(.body.weight(.medium)).lineLimit(1)
-                        Text(songCount(a.songs.count))
-                            .font(.caption).foregroundStyle(.secondary)
+        let orderedFollowed = followed.sorted { LocalSearch.fold($0.name) < LocalSearch.fold($1.name) }
+        let shownFollowed = LocalSearch.filter(sort == "za" ? orderedFollowed.reversed() : orderedFollowed, query) { $0.name }
+        List {
+            if !followed.isEmpty {
+                HStack(spacing: 8) {
+                    ChoiceChip(title: L("Todos"), on: !showFollowing) { withAnimation(.uiEaseOut(0.22)) { following = false } }
+                    ChoiceChip(title: L("Siguiendo"), count: followed.count, on: showFollowing) {
+                        withAnimation(.uiEaseOut(0.22)) { following = true }
                     }
+                    Spacer(minLength: 0)
+                }
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 8, trailing: 16))
+            }
+            if showFollowing {
+                ForEach(shownFollowed) { a in
+                    // Se abre su página directamente por su browseId, sin buscarlo por nombre.
+                    NavigationLink {
+                        ArtistView(artist: RemoteArtist(id: a.browseId, name: a.name, subtitle: "", thumbnail: a.thumbnail))
+                    } label: {
+                        artistRow(name: a.name, thumbnail: a.thumbnail, detail: followedSince(a))
+                    }
+                    .glassRow()
+                }
+            } else {
+                ForEach(shown) { a in
+                    // Al tocar se abre su perfil de YouTube Music (discografía completa); sin red o sin encontrarlo, sus canciones.
+                    NavigationLink {
+                        ArtistProfileLoader(name: a.name, songs: a.songs)
+                    } label: {
+                        artistRow(name: a.name, thumbnail: a.songs.first?.thumb(160), detail: songCount(a.songs.count))
+                    }
+                    .glassRow()
                 }
             }
-            .glassRow()
         }
         .overlay {
-            if artists.isEmpty { Text(L("Guarda canciones para ver sus artistas")).foregroundStyle(.secondary) }
-            else if shown.isEmpty { NoMatchesView(query: query) }
+            if showFollowing {
+                if shownFollowed.isEmpty && !followed.isEmpty { NoMatchesView(query: query) }
+            } else if artists.isEmpty {
+                Text(L("Guarda canciones para ver sus artistas")).foregroundStyle(.secondary)
+            } else if shown.isEmpty { NoMatchesView(query: query) }
         }
         .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: L("Buscar artistas"))
         .scrollDismissesKeyboard(.interactively)
         .themed()
         .navigationTitle(L("Artistas"))
         .toolbar {
-            if !artists.isEmpty {
+            if !artists.isEmpty || !followed.isEmpty {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button { sort = sort == "za" ? "az" : "za" } label: {
                         Label(sort == "za" ? "Z-A" : "A-Z", systemImage: "textformat").labelStyle(.titleAndIcon)
@@ -576,6 +604,25 @@ struct ArtistsView: View {
             }
         }
         .miniPlayer()
+    }
+
+    private func artistRow(name: String, thumbnail: URL?, detail: String) -> some View {
+        HStack(spacing: 12) {
+            CoverImage(url: thumbnail)
+                .frame(width: 46, height: 46)
+                .clipShape(Circle())
+            VStack(alignment: .leading, spacing: 2) {
+                Text(name).font(.body.weight(.medium)).lineLimit(1)
+                Text(detail).font(.caption).foregroundStyle(.secondary).lineLimit(1)
+            }
+        }
+    }
+
+    /// «Desde el 14 nov 2026» (o, si la copia no lo traía, «Siguiendo»).
+    private func followedSince(_ a: FollowedArtist) -> String {
+        guard a.since > 0 else { return L("Siguiendo") }
+        let date = Date(timeIntervalSince1970: TimeInterval(a.since) / 1000)
+        return L("Desde el {0}", date.formatted(.dateTime.day().month(.abbreviated).year().locale(Locale(identifier: I18n.current == "va" ? "ca" : I18n.current))))
     }
 }
 

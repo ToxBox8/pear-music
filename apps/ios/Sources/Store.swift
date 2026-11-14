@@ -48,6 +48,8 @@ final class Library: ObservableObject {
     @Published private(set) var folders: [PlaylistFolder] = [] { didSet { save() } }
     /// Últimas canciones reproducidas (la más reciente primero).
     @Published private(set) var recents: [Song] = [] { didSet { save() } }
+    /// Artistas seguidos (3.0, bloque 1), el último que sigues primero. Como mucho 500.
+    @Published private(set) var followedArtists: [FollowedArtist] = [] { didSet { save() } }
 
     init() {
         // Capturas: datos de ejemplo en memoria, sin leer ni escribir library.json.
@@ -58,6 +60,7 @@ final class Library: ObservableObject {
             folders = s.folders ?? []
             playlists = s.playlists
             recents = s.recents ?? []
+            followedArtists = s.followedArtists ?? []
         }
     }
     private func save() {
@@ -66,7 +69,8 @@ final class Library: ObservableObject {
     }
 
     private var snapshot: LibraryFile {
-        LibraryFile(favorites: favorites, playlists: playlists, recents: recents, folders: folders)
+        LibraryFile(favorites: favorites, playlists: playlists, recents: recents, folders: folders,
+                    followedArtists: followedArtists)
     }
 
     func markPlayed(_ s: Song) {
@@ -176,6 +180,7 @@ final class Library: ObservableObject {
         folders = merged.folders ?? []
         playlists = merged.playlists
         recents = merged.recents ?? []
+        followedArtists = merged.followedArtists ?? []
         // Portadas donde no haya una propia, y el orden unido: el tuyo se respeta y lo nuevo va detrás; si este
         // iPhone no tenía orden propio, se adopta el de la copia. Igual que Library.importJson en Android.
         if let extra = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] {
@@ -216,6 +221,21 @@ final class Library: ObservableObject {
         }
         return added
     }
+
+    // MARK: Artistas seguidos (3.0, bloque 1; reglas en FollowedArtists)
+    func isFollowing(_ browseId: String) -> Bool { followedArtists.contains { $0.browseId == browseId } }
+
+    /// Sigue a un artista (va el primero). false si ya sigues a 500.
+    @discardableResult
+    func follow(browseId: String, name: String, thumbnail: URL?, since: Int64? = nil) -> Bool {
+        let a = FollowedArtist(browseId: browseId, name: name, thumbnail: thumbnail,
+                               since: since ?? Int64(Date().timeIntervalSince1970 * 1000))
+        guard let next = FollowedArtists.follow(a, in: followedArtists) else { return false }
+        if next != followedArtists { followedArtists = next }
+        return true
+    }
+
+    func unfollow(_ browseId: String) { followedArtists = FollowedArtists.unfollow(browseId, in: followedArtists) }
 
     // MARK: Carpetas de playlists (3.0, bloque 1; reglas en PlaylistFolders)
     /// Crea una carpeta dentro de `parent` (nil = arriba del todo). nil si el nombre está vacío o no cabe (3 niveles).

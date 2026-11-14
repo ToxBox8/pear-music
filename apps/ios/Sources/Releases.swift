@@ -1,11 +1,10 @@
 import Foundation
 
 /// «Novedades de tus artistas» en Inicio: lo que han sacado este año (o el anterior, en enero y febrero) los artistas
-/// que más escuchas. Mismas reglas y caché de un día que `Releases` en Android.
+/// que sigues y, si sigues a menos de 8, los que más escuchas. Las reglas (quién sale, qué se pide, «Nuevo», orden)
+/// están en `ReleaseMix` (ReleasesModel.swift); aquí, las peticiones y la caché. Igual que `Releases` en Android.
 enum Releases {
-    static let artistsCount = 8
-    static let max = 12
-    private static let ttl: TimeInterval = 24 * 3600
+    static let artistsCount = ReleaseMix.artists
 
     /// Los `n` artistas que más escuchas: escuchas de las estadísticas (×2) + canciones guardadas.
     @MainActor static func topArtists(saved: [Song], n: Int = artistsCount) -> [String] {
@@ -13,70 +12,88 @@ enum Releases {
         saved.forEach { score[primaryArtist($0.artist), default: 0] += 1 }
         let stats = PlayStats.shared
         stats.plays.forEach { p in if let s = stats.songs[p.id] { score[primaryArtist(s.artist), default: 0] += 2 } }
-        return score.filter { $0.key != "Desconocido" && !$0.key.isEmpty }
+        return score.filter { $0.key != "Desconocido" && $0.key != L("Desconocido") && !$0.key.isEmpty }
             .sorted { $0.value != $1.value ? $0.value > $1.value : $0.key.lowercased() < $1.key.lowercased() }
             .prefix(n).map(\.key)
     }
 
-    /// Año mínimo que cuenta como novedad: este año, o también el pasado en enero y febrero.
     static func minYear(_ date: Date = Date()) -> Int {
         let c = Calendar.current.dateComponents([.year, .month], from: date)
-        return (c.year ?? 0) - ((c.month ?? 12) <= 2 ? 1 : 0)
+        return ReleaseMix.minYear(year: c.year ?? 0, month: c.month ?? 12)
     }
 
-    static func year(of c: RemoteCollection) -> Int? {
-        c.subtitle.components(separatedBy: " • ").last.flatMap { Int($0.trimmingCharacters(in: .whitespaces)) }
+    /// Caché del móvil (no va en library.json). La de antes de la 3.0 (`releases.json`) se borra.
+    private static var cacheURL: URL {
+        FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("releases-v3.json")
     }
 
-    /// Lanzamientos recientes de cada artista, intercalados (uno de cada artista por turno) y como mucho `max`.
-    static func pick(_ byArtist: [[RemoteCollection]], minYear: Int) -> [RemoteCollection] {
-        let lists = byArtist.map { l in
-            l.enumerated().filter { (year(of: $0.element) ?? 0) >= minYear }
-                .sorted { (year(of: $0.element) ?? 0, -$0.offset) > (year(of: $1.element) ?? 0, -$1.offset) }
-                .map(\.element)
+    private static func readCache() -> ReleasesCache {
+        guard let data = try? Data(contentsOf: cacheURL), let c = try? JSONDecoder().decode(ReleasesCache.self, from: data) else {
+            return ReleasesCache()
         }
-        var out: [RemoteCollection] = []
-        var i = 0
-        while out.count < max, lists.contains(where: { $0.count > i }) {
-            for l in lists where l.count > i && !out.contains(where: { $0.id == l[i].id }) { out.append(l[i]) }
-            i += 1
-        }
-        return Array(out.prefix(max))
+        return c
     }
 
-    private struct Cached: Codable {
-        let key: String
-        let items: [Item]
-        struct Item: Codable { let id, title, subtitle: String; let thumbnail: URL? }
+    private enum Fetched {
+        /// Página del artista (con el `browseId` si se ha buscado por nombre).
+        case page(ReleaseSource, browseId: String, items: [ReleaseItem])
+        /// Buscado por nombre y no está en YouTube Music.
+        case notFound(ReleaseSource)
+        /// Sin red o error: no se toca lo guardado.
+        case failed
     }
 
-    static func load(artists: [String]) async -> [RemoteCollection] {
-        if DemoCatalog.isActive { return DemoCatalog.singles }
-        guard !artists.isEmpty else { return [] }
-        let url = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)[0].appendingPathComponent("releases.json")
-        let key = artists.joined(separator: "|")
-        if let date = (try? url.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate,
-           Date().timeIntervalSince(date) < ttl,
-           let data = try? Data(contentsOf: url), let c = try? JSONDecoder().decode(Cached.self, from: data), c.key == key {
-            return c.items.map { RemoteCollection(id: $0.id, title: $0.title, subtitle: $0.subtitle, thumbnail: $0.thumbnail) }
+    private static func fetch(_ s: ReleaseSource) async -> Fetched {
+        var id = s.browseId
+        if id == nil {
+            let folded = LocalSearch.fold(s.name)
+            guard let found = try? await YTClient.searchArtists(s.name) else { return .failed }
+            guard let a = found.first(where: { LocalSearch.fold($0.name) == folded }) else { return .notFound(s) }
+            id = a.id
         }
-        let pages = await withTaskGroup(of: (Int, [RemoteCollection]).self) { group in
-            for (i, name) in artists.enumerated() {
-                group.addTask {
-                    let folded = LocalSearch.fold(name)
-                    guard let found = try? await YTClient.searchArtists(name),
-                          let a = found.first(where: { LocalSearch.fold($0.name) == folded }),
-                          let page = try? await YTClient.artist(a) else { return (i, []) }
-                    return (i, page.albums + page.singles)
-                }
-            }
-            var out = Array(repeating: [RemoteCollection](), count: artists.count)
-            for await (i, l) in group { out[i] = l }
+        guard let id, let page = try? await YTClient.artist(RemoteArtist(id: id, name: s.name, subtitle: "", thumbnail: nil)) else {
+            return .failed
+        }
+        let items = (page.albums + page.singles).map { ReleaseItem(id: $0.id, title: $0.title, subtitle: $0.subtitle, thumbnail: $0.thumbnail) }
+        return .page(s, browseId: id, items: items)
+    }
+
+    /// Pide lo que toque (como mucho 8 artistas, cada uno como mucho cada 6 h), lo guarda y devuelve lo que sale en
+    /// Inicio. Sin red, lo último que se guardó.
+    static func load(followed: [FollowedArtist], top: [String]) async -> [ReleasePick] {
+        if DemoCatalog.isActive { return DemoCatalog.releases }
+        let now = Int64(Date().timeIntervalSince1970 * 1000)
+        let topPairs = top.map { (name: $0, folded: LocalSearch.fold($0)) }
+        try? FileManager.default.removeItem(at: cacheURL.deletingLastPathComponent().appendingPathComponent("releases.json"))
+        var cache = ReleaseMix.prune(readCache(), followed: followed, topFolded: topPairs.map(\.folded))
+        let due = ReleaseMix.toRefresh(ReleaseMix.sources(followed: followed, top: topPairs, resolved: cache.resolved,
+                                                          fold: LocalSearch.fold), cache: cache, now: now)
+        let results = await withTaskGroup(of: Fetched.self) { group in
+            for s in due { group.addTask { await fetch(s) } }
+            var out: [Fetched] = []
+            for await r in group { out.append(r) }
             return out
         }
-        let items = pick(pages, minYear: minYear())
-        let cached = Cached(key: key, items: items.map { .init(id: $0.id, title: $0.title, subtitle: $0.subtitle, thumbnail: $0.thumbnail) })
-        if let data = try? JSONEncoder().encode(cached) { try? data.write(to: url) }
-        return items
+        for r in results {
+            switch r {
+            case let .page(s, browseId, items):
+                if s.browseId == nil { cache = ReleaseMix.resolve(cache, folded: LocalSearch.fold(s.name), browseId: browseId) }
+                cache = ReleaseMix.record(cache, key: browseId, name: s.name, items: items, now: now)
+            case let .notFound(s):
+                cache = ReleaseMix.resolve(cache, folded: LocalSearch.fold(s.name), browseId: nil)
+                cache = ReleaseMix.record(cache, key: s.key, name: s.name, items: [], now: now)
+            case .failed:
+                break
+            }
+        }
+        if !due.isEmpty, let data = try? JSONEncoder().encode(cache) { try? data.write(to: cacheURL, options: .atomic) }
+        let sources = ReleaseMix.sources(followed: followed, top: topPairs, resolved: cache.resolved, fold: LocalSearch.fold)
+        return ReleaseMix.pick(sources, cache: cache, now: now, minYear: minYear())
+    }
+}
+
+extension ReleasePick {
+    var collection: RemoteCollection {
+        RemoteCollection(id: item.id, title: item.title, subtitle: item.subtitle, thumbnail: item.thumbnail)
     }
 }
