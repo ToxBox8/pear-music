@@ -282,6 +282,8 @@ struct MoveToFolderSheet: View {
             .frame(minHeight: 44)
             .contentShape(Rectangle())
         }
+        // Filas de 52 pt, como las de Android y los formularios de iOS 26 de la app.
+        .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
         // Sin el tinte de los botones de una lista: el único color es la marca de dónde está ahora.
         .buttonStyle(.plain)
         .disabled(reason != nil)
