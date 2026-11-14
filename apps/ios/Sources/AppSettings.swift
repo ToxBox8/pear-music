@@ -907,7 +907,7 @@ struct OnboardingView: View {
         switch current {
         case .language: return L("Siguiente")
         case .welcome: return L("Empezar")
-        case .privacy: return !terms ? L("Acepta las condiciones para seguir") : (last ? L("Seguir") : L("Ahora no, seguir"))
+        case .privacy: return !terms ? L("Acepta las condiciones para seguir") : (last ? L("Continuar") : L("Ahora no, seguir"))
         default: return last ? L("Empezar a escuchar") : L("Siguiente")
         }
     }
