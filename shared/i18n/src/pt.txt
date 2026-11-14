@@ -726,7 +726,7 @@
 726	Para dentro de {0} s
 727	A ligação perdeu-se
 728	A ligação com {0} perdeu-se.
-729	Continuar
+729	Seguir
 730	Continuar com músicas parecidas
 731	Seguro
 732	Sessão terminada
@@ -1161,3 +1161,17 @@
 1161	{0} playlists
 1162	«{0}» está em {1}.
 1163	Eliminar a pasta «{0}»?
+1164	Deixa de seguir alguém para seguir outro.
+1165	Deixar de seguir {0}
+1166	Desde {0}
+1167	O mais recente dos teus artistas
+1168	Novo
+1169	Novo: {0}
+1170	Seguir {0}
+1171	A seguir
+1172	Todos
+1173	Já segues 500 artistas
+1174	Eliminar da biblioteca
+1175	Não há playlists nem álbuns
+1176	Vai ser removido da tua biblioteca com a capa. As músicas transferidas ficam em Transferidas. Não é possível anular.
+1177	apagar remover playlists álbuns

@@ -76,6 +76,33 @@ jobs:
           path: apps/ios/dist/
           if-no-files-found: error
 
+  # Tests de interfaz (apps/ios/UITests) en el simulador: tocar, escribir y arrastrar como una persona.
+  uitests:
+    if: inputs.version == ''
+    runs-on: macos-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: apps/ios
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar XcodeGen
+        run: brew install xcodegen
+
+      - name: Generar proyecto
+        run: xcodegen generate
+
+      - name: Tests de interfaz
+        run: scripts/uitests.sh uitests-out
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: LibreMusic-ios-uitests
+          path: apps/ios/uitests-out/
+          if-no-files-found: warn
+
   # Capturas en el simulador del iPhone 16 con los mismos escenarios que ScreenshotTest de Android
   # (ver Sources/Screenshots.swift). Se publican en la rama «screenshots-ios». No corre en las versiones.
   screenshots:

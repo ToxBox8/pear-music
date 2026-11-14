@@ -1,0 +1,18 @@
+{
+  "favorites": [],
+  "playlists": [
+    {"id": "0000000A-0000-0000-0000-00000000E001", "name": "Para correr", "songs": []}
+  ],
+  "recents": [],
+  "followedArtists": [
+    {"browseId": "UCdemo-michael-bennet", "name": "Michael Bennet", "thumbnail": "https://lh3.example/mb=w240-h240", "since": 1731600000000},
+    {"browseId": " UCrosalia ", "name": "Rosalía", "since": 1731500000000},
+    {"browseId": "UCdemo-michael-bennet", "name": "Repetido", "since": 1700000000000},
+    {"browseId": "", "name": "Id vacío", "since": 1731400000000},
+    {"name": "Sin browseId", "since": 1731400000000},
+    {"browseId": 12, "name": "Id que no es texto"},
+    {"browseId": "UCsin-nombre", "name": "   ", "since": "ayer"},
+    {"browseId": "UCfoto-rara", "name": "Foto rara", "thumbnail": 5, "since": 1731300000000},
+    "no es un artista"
+  ]
+}

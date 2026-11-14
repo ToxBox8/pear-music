@@ -1161,3 +1161,17 @@ Vacía
 {0} playlists
 «{0}» está en {1}.
 ¿Eliminar la carpeta «{0}»?
+Deja de seguir a alguno para seguir a otro.
+Dejar de seguir a {0}
+Desde el {0}
+Lo nuevo de tus artistas
+Nuevo
+Nuevo: {0}
+Seguir a {0}
+Siguiendo
+Todos
+Ya sigues a 500 artistas
+Eliminar de la biblioteca
+No hay playlists ni álbumes
+Se quitará de tu biblioteca con su portada. Las canciones descargadas se quedan en Descargadas. No se puede deshacer.
+borrar quitar playlists álbumes

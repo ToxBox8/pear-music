@@ -1161,3 +1161,17 @@
 1161	{0} listas
 1162	«{0}» está en {1}.
 1163	Eliminar o cartafol «{0}»?
+1164	Deixa de seguir a algún para seguir a outro.
+1165	Deixar de seguir a {0}
+1166	Desde o {0}
+1167	O novo dos teus artistas
+1168	Novo
+1169	Novo: {0}
+1170	Seguir a {0}
+1171	Seguindo
+1172	Todos
+1173	Xa segues a 500 artistas
+1174	Eliminar da biblioteca
+1175	Non hai playlists nin álbums
+1176	Quitarase da túa biblioteca coa súa portada. As cancións descargadas quedan en Descargadas. Non se pode desfacer.
+1177	borrar quitar playlists álbums

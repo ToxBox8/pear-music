@@ -1,0 +1,11 @@
+{
+  "$comment": "Artistas seguidos que tienen que salir al leer cada copia, en este orden, igual en iOS (scripts/tests/FollowedArtistsTests.swift) y Android (FollowedArtistsTest.kt). thumbnail null = sin foto; since en ms (0 = no se sabe).",
+  "antigua-sin-carpetas.json": [],
+  "carpetas.json": [],
+  "seguidos.json": [
+    {"browseId": "UCdemo-michael-bennet", "name": "Michael Bennet", "thumbnail": "https://lh3.example/mb=w240-h240", "since": 1700000000000},
+    {"browseId": "UCrosalia", "name": "Rosalía", "thumbnail": null, "since": 1731500000000},
+    {"browseId": "UCsin-nombre", "name": "UCsin-nombre", "thumbnail": null, "since": 0},
+    {"browseId": "UCfoto-rara", "name": "Foto rara", "thumbnail": null, "since": 1731300000000}
+  ]
+}

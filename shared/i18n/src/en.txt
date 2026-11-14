@@ -726,7 +726,7 @@
 726	Stops in {0} s
 727	Connection lost
 728	The connection to {0} was lost.
-729	Continue
+729	Follow
 730	Keep playing similar songs
 731	Safe
 732	Signed out
@@ -1161,3 +1161,17 @@
 1161	{0} playlists
 1162	“{0}” is in {1}.
 1163	Delete the folder “{0}”?
+1164	Unfollow someone to follow another artist.
+1165	Unfollow {0}
+1166	Since {0}
+1167	The latest from your artists
+1168	New
+1169	New: {0}
+1170	Follow {0}
+1171	Following
+1172	All
+1173	You already follow 500 artists
+1174	Remove from library
+1175	No playlists or albums
+1176	It will be removed from your library with its cover. Downloaded songs stay in Downloaded. This can't be undone.
+1177	delete remove playlists albums

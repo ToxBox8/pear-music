@@ -726,7 +726,7 @@
 726	S'atura d'aquí a {0} s
 727	S'ha perdut la connexió
 728	S'ha perdut la connexió amb {0}.
-729	Continua
+729	Segueix
 730	Continua amb cançons semblants
 731	Segur
 732	Sessió tancada
@@ -1161,3 +1161,17 @@
 1161	{0} llistes
 1162	«{0}» és a {1}.
 1163	Vols eliminar la carpeta «{0}»?
+1164	Deixa de seguir algú per seguir-ne un altre.
+1165	Deixa de seguir {0}
+1166	Des del {0}
+1167	El més nou dels teus artistes
+1168	Nou
+1169	Nou: {0}
+1170	Segueix {0}
+1171	Seguint
+1172	Tots
+1173	Ja segueixes 500 artistes
+1174	Elimina de la biblioteca
+1175	No hi ha playlists ni àlbums
+1176	Es traurà de la teva biblioteca amb la portada. Les cançons baixades es queden a Baixades. No es pot desfer.
+1177	esborrar treure playlists àlbums

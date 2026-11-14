@@ -726,7 +726,7 @@
 726	Haltas post {0} s
 727	La konekto perdiĝis
 728	La konekto kun {0} perdiĝis.
-729	Daŭrigi
+729	Sekvi
 730	Daŭrigi per similaj kantoj
 731	Sekura
 732	Elsalutis
@@ -1161,3 +1161,17 @@
 1161	{0} ludlistoj
 1162	«{0}» estas en {1}.
 1163	Ĉu forigi la dosierujon «{0}»?
+1164	Ĉesu sekvi iun por sekvi alian.
+1165	Ĉesi sekvi {0}
+1166	Ekde {0}
+1167	La plej nova de viaj artistoj
+1168	Nova
+1169	Nova: {0}
+1170	Sekvi {0}
+1171	Sekvata
+1172	Ĉiuj
+1173	Vi jam sekvas 500 artistojn
+1174	Forigi el la biblioteko
+1175	Neniuj ludlistoj aŭ albumoj
+1176	Ĝi foriĝos el via biblioteko kun sia kovrilo. Elŝutitaj kantoj restas en Elŝutitaj. Ne eblas malfari.
+1177	forigi ludlistoj albumoj

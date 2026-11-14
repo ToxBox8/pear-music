@@ -1161,3 +1161,17 @@
 1161	{0} zerrenda
 1162	«{0}» hemen dago: {1}.
 1163	«{0}» karpeta ezabatu?
+1164	Utzi norbaiti jarraitzeari beste bati jarraitzeko.
+1165	Utzi {0} jarraitzeari
+1166	{0}(e)tik
+1167	Zure artisten berriena
+1168	Berria
+1169	Berria: {0}
+1170	Jarraitu {0}
+1171	Jarraitzen
+1172	Guztiak
+1173	Dagoeneko 500 artistari jarraitzen diezu
+1174	Ezabatu liburutegitik
+1175	Ez dago playlistik ez albumik
+1176	Zure liburutegitik kenduko da, azalarekin. Deskargatutako abestiak Deskargatuak atalean geratzen dira. Ezin da desegin.
+1177	ezabatu kendu playlistak albumak

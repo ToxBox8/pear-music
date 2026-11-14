@@ -64,6 +64,20 @@ targets:
         Pref:
           EXCLUDED_SOURCE_FILE_NAMES: "demo-*.jpg"
 
+  # Tests de interfaz (XCUITest) en el simulador: scripts/uitests.sh y el job «uitests» de ios.yml. No van en el .ipa.
+  LibreMusicUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources: [UITests]
+    dependencies:
+      - target: LibreMusic
+    settings:
+      base:
+        SWIFT_VERSION: "5.0"
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: LibreMusic
+
 # Un scheme por canal. `LibreMusic` es la pública y el que usan la CI y la release (no cambia de nombre).
 schemes:
   LibreMusic:
@@ -90,3 +104,15 @@ schemes:
       config: Dev
     archive:
       config: Dev
+  # Sólo para los tests de interfaz; `LibreMusic` se queda sin tests para que la compilación del .ipa no cambie.
+  LibreMusicUITests:
+    build:
+      targets:
+        LibreMusic: all
+        LibreMusicUITests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - LibreMusicUITests
