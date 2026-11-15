@@ -107,7 +107,7 @@ struct OrderBar: View {
 /// El aviso para escribir un nombre (nueva playlist, nueva carpeta, renombrar). Es un aviso de UIKit y no un
 /// `.alert` de SwiftUI por tres cosas: se puede abrir desde cualquier sitio (también desde el menú de una canción,
 /// que no tiene dónde colgar un aviso), el botón se apaga con el nombre vacío en cualquier versión de iOS, e Intro
-/// en el teclado hace lo mismo que el botón.
+/// en el teclado hace lo mismo que el botón. Los botones van del color del texto, no en shu (DECISIONS 40).
 enum NamePrompt {
     static func ask(_ title: String, initial: String = "", confirm: String = L("Crear"), onDone: @escaping (String) -> Void) {
         Task { @MainActor in present(title, initial: initial, confirm: confirm, onDone: onDone) }
@@ -134,6 +134,8 @@ enum NamePrompt {
         alert.addAction(UIAlertAction(title: L("Cancelar"), style: .cancel))
         alert.addAction(action)
         alert.preferredAction = action
+        // Sin texto shu (lo decidió Toxbox): los botones del color del texto, que se lee igual en claro y en oscuro.
+        alert.view.tintColor = .label
         top.present(alert, animated: true)
     }
 

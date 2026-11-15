@@ -267,6 +267,19 @@ final class BibliotecaUITests: XCTestCase {
         any(name).coordinate(withNormalizedOffset: CGVector(dx: 1, dy: 0)).withOffset(CGVector(dx: -22, dy: 22))
     }
 
+    /// Sube la cuadrícula hasta que el asa de `name` quede por encima de la barra «Antes / Después» (que va en el
+    /// borde de abajo); si no, el dedo empieza encima de la barra y no coge nada.
+    private func bringAboveBar(_ name: String) {
+        let barTop = app.buttons["Antes"].exists ? app.buttons["Antes"].frame.minY : app.frame.height - 200
+        for _ in 0..<4 {
+            let el = any(name)
+            guard el.exists, el.frame.minY + 44 > barTop - 24 else { return }
+            let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0)).withOffset(CGVector(dx: 0, dy: barTop - 40))
+            start.press(forDuration: 0.05, thenDragTo: start.withOffset(CGVector(dx: 0, dy: -160)), withVelocity: .slow, thenHoldForDuration: 0.3)
+            sleep(1)
+        }
+    }
+
     private func center(_ name: String) -> XCUICoordinate {
         any(name).coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.4))
     }
@@ -403,6 +416,8 @@ final class BibliotecaUITests: XCTestCase {
         XCTAssertTrue(app.navigationBars["Playlists"].waitForExistence(timeout: 10), "No se abrió Playlists")
         XCTAssertTrue(any("Domingo lento").waitForExistence(timeout: 5))
         startOrdering()
+        bringAboveBar("Domingo lento")
+        XCTAssertTrue(any("Carpeta Viajes").isHittable, "Al subir la cuadrícula, la carpeta «Viajes» se sale de la pantalla")
         grip("Domingo lento").press(forDuration: 0.2, thenDragTo: center("Carpeta Viajes"), withVelocity: .slow, thenHoldForDuration: 0.6)
         sleep(2)
         shot("1-soltada")

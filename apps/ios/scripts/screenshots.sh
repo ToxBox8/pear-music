@@ -49,8 +49,22 @@ for s in "${SCENARIOS[@]}"; do
   xcrun simctl terminate "$UDID" "$BUNDLE" >/dev/null 2>&1 || true
   [[ "$s" == *oscuro* ]] && xcrun simctl ui "$UDID" appearance dark || xcrun simctl ui "$UDID" appearance light
   xcrun simctl launch "$UDID" "$BUNDLE" -screenshotScenario "$s" ${EXTRA[@]+"${EXTRA[@]}"} >/dev/null
-  # Arranque, hojas y navegación (0,3 s) y el título que se revela con símbolos en el reproductor.
-  sleep 7
+  # Arranque, hojas y navegación (0,3 s) y el título que se revela con símbolos en el reproductor. Antes eran 7 s
+  # fijos y a veces no bastaban (la 01 en blanco, la 43 sin entrar, la 46 sin la hoja; T10 de la revisión del
+  # bloque 1): ahora, como mínimo 6 s y después hasta que dos capturas seguidas salen iguales (la pantalla está quieta)
+  # y no es una pantalla casi vacía. Como mucho unos 20 s; si no se queda quieta, se guarda la última.
+  sleep 6
   xcrun simctl io "$UDID" screenshot --type=png "$OUT/$s.png" >/dev/null
+  tries=0
+  while (( tries < 10 )); do
+    sleep 1.5
+    xcrun simctl io "$UDID" screenshot --type=png "$OUT/$s.next.png" >/dev/null
+    same=0; cmp -s "$OUT/$s.png" "$OUT/$s.next.png" && same=1
+    mv "$OUT/$s.next.png" "$OUT/$s.png"
+    # Una pantalla en blanco (sólo la barra de estado) pesa unos pocos KB; cualquier pantalla de verdad, cientos.
+    (( same == 1 && $(wc -c < "$OUT/$s.png") > 150000 )) && break
+    tries=$((tries + 1))
+  done
+  (( tries == 10 )) && echo "⚠ $s no se ha quedado quieta en 21 s: se guarda la última" || true
   echo "✓ $s"
 done
