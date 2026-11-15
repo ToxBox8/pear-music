@@ -222,6 +222,12 @@ enum PlaylistFolders {
         return depth(target, in: folders) + height(id, in: folders) <= maxDepth
     }
 
+    /// Se puede meter la carpeta `id` en una carpeta nueva de arriba del todo («Nueva carpeta» de «Mover a…»): con
+    /// 3 niveles dentro ya no cabe en ninguna.
+    static func canMoveIntoNew(_ id: String, folders: [PlaylistFolder]) -> Bool {
+        1 + height(id, in: folders) <= maxDepth
+    }
+
     /// Borrar una carpeta: lo que tenía dentro (carpetas y playlists) sube un nivel. Nunca borra playlists.
     static func delete<M: FolderMember>(_ id: String, folders: [PlaylistFolder], members: [M]) -> ([PlaylistFolder], [M]) {
         guard let gone = folders.first(where: { $0.id == id }) else { return (folders, members) }
@@ -375,6 +381,39 @@ extension LibraryOrder {
         let known = Set(full)
         full += moved.filter { !known.contains($0) }
         return merge(full, moved)
+    }
+}
+
+// MARK: - Orden de «Tu música»
+
+/// Orden de las carpetas de «Tu música» (`musicOrder`, separadas por comas). Igual que `Prefs.musicOrder` en Android.
+enum MusicOrder {
+    // «playlists» (2.9 de x.1.1): la carpeta con todas las playlists, arriba del todo.
+    static let defaults = ["playlists", "downloads", "favorites", "albums", "songs", "artists", "recents", "stats"]
+    /// Lo guardado más lo que falte, sin repetir ni desconocidos. Lo que falta entra en su sitio de fábrica (así
+    /// «Playlists» sale arriba también a quien ya tenía un orden propio).
+    static func decode(_ raw: String?) -> [String] {
+        var seen = Set<String>()
+        var out = (raw ?? "").split(separator: ",").map(String.init).filter { defaults.contains($0) && seen.insert($0).inserted }
+        if out.isEmpty { return defaults }
+        for (i, k) in defaults.enumerated() where !out.contains(k) { out.insert(k, at: min(i, out.count)) }
+        return out
+    }
+}
+
+extension MusicOrder {
+    /// Sube (`delta` < 0) o baja un puesto el apartado `key` entre los que se ven (`visible`) y devuelve el orden
+    /// completo (`all`): los que no se ven (Descargadas y Favoritos «en Playlists») conservan su sitio. Sin cambios si
+    /// ya está en el borde o no se ve. Igual que `Prefs.movedMusic` en Android.
+    static func moved(_ key: String, by delta: Int, visible: [String], all: [String]) -> [String] {
+        guard let i = visible.firstIndex(of: key) else { return all }
+        let j = i + (delta < 0 ? -1 : 1)
+        guard delta != 0, visible.indices.contains(j) else { return all }
+        var next = visible
+        next.swapAt(i, j)
+        let shown = Set(visible)
+        var it = next.makeIterator()
+        return all.map { shown.contains($0) ? (it.next() ?? $0) : $0 }
     }
 }
 

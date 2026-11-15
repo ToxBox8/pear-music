@@ -1175,3 +1175,7 @@
 1175	Não há playlists nem álbuns
 1176	Vai ser removido da tua biblioteca com a capa. As músicas transferidas ficam em Transferidas. Não é possível anular.
 1177	apagar remover playlists álbuns
+1178	Arrasta ≡ ou usa as setas para mudar a ordem.
+1179	Descer {0}
+1180	Muda a ordem das secções de A tua música
+1181	Subir {0}

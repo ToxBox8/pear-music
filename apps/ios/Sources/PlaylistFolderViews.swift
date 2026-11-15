@@ -31,7 +31,8 @@ enum MoveItem: Identifiable {
 /// El aviso con un nombre: crear una carpeta o una playlist, o renombrar una carpeta.
 enum FolderNaming {
     case newFolder(String?)
-    case newPlaylist(String)
+    /// En esa carpeta, o arriba del todo (nil).
+    case newPlaylist(String?)
     case rename(PlaylistFolder)
 
     var title: String {
@@ -220,6 +221,11 @@ struct MoveToFolderSheet: View {
         return out
     }
 
+    private var canUseNewFolder: Bool {
+        guard case .folder(let id) = item else { return true }
+        return PlaylistFolders.canMoveIntoNew(id, folders: library.folders)
+    }
+
     /// Por qué no se puede mover aquí (nil = se puede).
     private func blocked(_ target: String?) -> String? {
         guard case .folder(let id) = item else { return nil }
@@ -244,8 +250,12 @@ struct MoveToFolderSheet: View {
                 } footer: {
                     Text(L("Caben hasta 3 niveles de carpetas."))
                 }
-                Section {
-                    Button { newName = ""; naming = true } label: { Label(L("Nueva carpeta"), systemImage: "folder.badge.plus") }
+                // Una carpeta que ya ocupa 3 niveles no cabe en ninguna otra: sin «Nueva carpeta» (antes la creaba
+                // vacía y no movía nada).
+                if canUseNewFolder {
+                    Section {
+                        Button { newName = ""; naming = true } label: { Label(L("Nueva carpeta"), systemImage: "folder.badge.plus") }
+                    }
                 }
             }
             // Formulario del sistema, como el editor de playlist y la misma hoja en Android.

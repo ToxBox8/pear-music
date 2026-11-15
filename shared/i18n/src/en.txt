@@ -1175,3 +1175,7 @@
 1175	No playlists or albums
 1176	It will be removed from your library with its cover. Downloaded songs stay in Downloaded. This can't be undone.
 1177	delete remove playlists albums
+1178	Drag ≡ or use the arrows to change the order.
+1179	Move {0} down
+1180	Change the order of the sections in Your music
+1181	Move {0} up

@@ -120,6 +120,27 @@ final class BibliotecaUITests: XCTestCase {
         XCTAssertTrue(created, "Escribir el nombre y pulsar Intro no crea la playlist")
     }
 
+    /// En Tu música › Playlists: ⋯ › Nueva playlist (antes sólo ofrecía «Nueva carpeta»).
+    func testCrearPlaylistDesdePlaylists() {
+        launch("01_biblioteca_cristal")
+        openPlaylists()
+        app.buttons["Más opciones"].tap()
+        let item = app.buttons["Nueva playlist"]
+        let offered = item.waitForExistence(timeout: 5)
+        shot("1-menu")
+        XCTAssertTrue(offered, "El menú ⋯ de Playlists no ofrece «Nueva playlist»")
+        guard offered else { return }
+        item.tap()
+        let field = app.textFields.firstMatch
+        XCTAssertTrue(field.waitForExistence(timeout: 5), "No salió dónde escribir el nombre de la playlist")
+        field.tap()
+        field.typeText("Desde Playlists")
+        app.buttons["Crear"].tap()
+        let created = any("Desde Playlists").waitForExistence(timeout: 5)
+        shot("2-despues")
+        XCTAssertTrue(created, "La playlist «Desde Playlists» no sale en la cuadrícula")
+    }
+
     /// Dentro de una carpeta: ⋯ › Nueva playlist aquí.
     func testCrearPlaylistDentroDeUnaCarpeta() {
         launch("45_carpeta", ready: "Gimnasio")
@@ -149,49 +170,59 @@ final class BibliotecaUITests: XCTestCase {
 
     private let sections = ["Playlists", "Tus álbumes", "Canciones", "Artistas", "Recientes", "Estadísticas"]
 
-    /// Mantener pulsado un apartado, arrastrarlo dos puestos más abajo y «Hecho»: el orden tiene que cambiar.
-    func testOrdenarTuMusicaArrastrando() {
+    /// «Ordenar» entra en el modo de ordenar y «Bajar Playlists» la deja debajo de «Tus álbumes», sin arrastrar
+    /// (VoiceOver, Control por botón o quien no atina con el gesto).
+    func testOrdenarTuMusicaConLasFlechas() {
         launch("01_biblioteca_cristal")
         let before = vertical(sections)
-        note("1-antes", before.joined(separator: "\n"))
         XCTAssertEqual(before.first, "Playlists")
+        let sort = app.buttons["Ordenar"]
+        XCTAssertTrue(sort.waitForExistence(timeout: 5), "No hay botón «Ordenar» en Tu música")
+        sort.tap()
+        let down = app.buttons["Bajar Playlists"]
+        let exists = down.waitForExistence(timeout: 3)
+        shot("1-ordenando")
+        XCTAssertTrue(exists, "En el modo de ordenar no hay un botón para bajar un apartado sin arrastrar")
+        XCTAssertFalse(app.buttons["Subir Playlists"].isEnabled, "El primer apartado no puede subir")
+        if exists { down.tap() }
+        sleep(1)
+        XCTAssertTrue(app.buttons["Hecho"].exists, "No hay «Hecho» para salir del modo de ordenar")
+        app.buttons["Hecho"].tap()
+        sleep(1)
+        let after = vertical(sections)
+        shot("2-despues")
+        note("despues", after.joined(separator: "\n"))
+        XCTAssertEqual(Array(after.prefix(2)), ["Tus álbumes", "Playlists"], "«Bajar Playlists» no la deja debajo de «Tus álbumes»; antes: \(before)")
+        XCTAssertTrue(app.buttons["Ordenar"].exists, "«Hecho» no sale del modo de ordenar")
+    }
+
+    /// Arrastrar el asa (≡) de «Playlists» hasta la fila de «Canciones» la baja dos puestos.
+    func testOrdenarTuMusicaArrastrandoElAsa() {
+        launch("01_biblioteca_cristal")
+        app.buttons["Ordenar"].tap()
+        let down = app.buttons["Bajar Playlists"]
+        XCTAssertTrue(down.waitForExistence(timeout: 3), "No se entró en el modo de ordenar")
+        // El asa va a la derecha de la flecha de bajar (44 pt) y no es un elemento de accesibilidad: por coordenadas.
+        let handle = down.coordinate(withNormalizedOffset: CGVector(dx: 1.5, dy: 0.5))
+        let target = app.buttons["Bajar Canciones"].coordinate(withNormalizedOffset: CGVector(dx: 1.5, dy: 0.6))
+        handle.press(forDuration: 0.2, thenDragTo: target, withVelocity: .slow, thenHoldForDuration: 0.3)
+        sleep(1)
+        shot("1-arrastrado")
+        app.buttons["Hecho"].tap()
+        sleep(1)
+        let after = vertical(sections)
+        note("despues", after.joined(separator: "\n"))
+        XCTAssertEqual(Array(after.prefix(3)), ["Tus álbumes", "Canciones", "Playlists"], "Arrastrar el asa de «Playlists» hasta «Canciones» no la deja en su sitio")
+    }
+
+    /// Mantener pulsado un apartado también entra en el modo de ordenar (como antes, pero ahora funciona).
+    func testOrdenarTuMusicaManteniendoPulsado() {
+        launch("01_biblioteca_cristal")
         any("Playlists").press(forDuration: 1.0)
         let editing = app.buttons["Hecho"].waitForExistence(timeout: 3)
         shot("1-editando")
         XCTAssertTrue(editing, "Mantener pulsado un apartado no entra en el modo de ordenar")
-        // Como una persona: mantener pulsado el apartado y llevarlo encima de «Canciones».
-        any("Playlists").press(forDuration: 1.2, thenDragTo: any("Canciones"), withVelocity: .slow, thenHoldForDuration: 0.6)
-        sleep(1)
-        shot("2-arrastrado")
-        if app.buttons["Hecho"].exists { app.buttons["Hecho"].tap() }
-        sleep(1)
-        let after = vertical(sections)
-        shot("3-despues")
-        note("2-despues", after.joined(separator: "\n"))
-        note("arbol", app.debugDescription)
-        XCTAssertNotEqual(after, before, "Arrastrar «Playlists» encima de «Canciones» no cambia el orden de Tu música")
-    }
-
-    /// Lo mismo sin arrastrar (VoiceOver, Control por botón o quien no atina con el gesto): tiene que haber botones.
-    func testOrdenarTuMusicaSinArrastrar() {
-        launch("01_biblioteca_cristal")
-        let before = vertical(sections)
-        any("Playlists").press(forDuration: 1.0)
-        _ = app.buttons["Hecho"].waitForExistence(timeout: 3)
-        let down = app.buttons["Bajar Playlists"]
-        let exists = down.waitForExistence(timeout: 3)
-        shot("1-editando")
-        XCTAssertTrue(exists, "En el modo de ordenar no hay un botón para bajar un apartado sin arrastrar")
-        if exists {
-            down.tap()
-            sleep(1)
-            if app.buttons["Hecho"].exists { app.buttons["Hecho"].tap() }
-            sleep(1)
-            let after = vertical(sections)
-            shot("2-despues")
-            note("despues", after.joined(separator: "\n"))
-            XCTAssertEqual(Array(after.prefix(2)), ["Tus álbumes", "Playlists"], "«Bajar Playlists» no la deja debajo de «Tus álbumes»; antes: \(before)")
-        }
+        XCTAssertFalse(app.navigationBars["Playlists"].exists, "Mantener pulsado no puede abrir el apartado")
     }
 
     // MARK: Cuadrícula de Playlists: menú y arrastre
@@ -218,7 +249,13 @@ final class BibliotecaUITests: XCTestCase {
     }
 
     /// Mantener pulsada una playlist y arrastrarla al sitio de otra cambia el orden.
-    func testOrdenarPlaylistsArrastrando() {
+    func testOrdenarPlaylistsArrastrando() throws {
+        // El arrastre del sistema (onDrag) no responde a XCUITest y choca con el menú; se rehace con gesto propio en
+        // el paso B del punto 6 (docs/revision/v3-bloque-1.md). Hasta entonces este test no puede decir nada.
+        throw XCTSkip("La cuadrícula usa el arrastre del sistema; pendiente del modo «Ordenar» (punto 6, paso B)")
+    }
+
+    func pendienteOrdenarPlaylistsArrastrando() {
         launch("01_biblioteca_cristal")
         openPlaylists()
         XCTAssertTrue(any("Noche").waitForExistence(timeout: 5))

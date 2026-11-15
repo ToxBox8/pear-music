@@ -132,7 +132,12 @@ struct LibraryV11View: View {
 
     @AppStorage("smartPlacement") private var placement = "playlists"
     @AppStorage("musicOrder") private var musicRaw = ""
-    @State private var editingMusic = false
+    @State private var editingMusic = Demo.current?.musicEditing == true
+    /// Apartado que se arrastra por su asa, lo que lleva recorrido desde su sitio y el alto de una fila.
+    @State private var dragKey: String?
+    @State private var dragOffset: CGFloat = 0
+    @State private var dragBase: CGFloat = 0
+    @State private var musicRowHeight: CGFloat = 63
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
@@ -209,77 +214,148 @@ struct LibraryV11View: View {
     }
 
     // MARK: El resto de la música
-    /// «Tu música» en el orden de `musicOrder`. Mantener pulsada una carpeta entra en el modo edición (como la
-    /// pantalla de inicio): las filas tiemblan y se arrastran; «Hecho» sale. Lo pidió Toxbox. Igual en Android.
+    /// «Tu música» en el orden de `musicOrder`. «Ordenar» (o mantener pulsado un apartado) entra en el modo de ordenar:
+    /// cada fila lleva flechas para subir y bajar y un asa que se arrastra; «Hecho» sale. Igual en Android.
+    /// Antes iba con el arrastre del sistema (`draggable`), que se quedaba con la pulsación larga: en un iPhone no se
+    /// llegaba a entrar en el modo de ordenar ni se podía mover nada (revisión del bloque 1).
     private func musicSection(_ songs: [Song]) -> some View {
-        let order = MusicOrder.decode(musicRaw).filter { placement == "music" || ($0 != "downloads" && $0 != "favorites") }
+        let order = visibleMusicOrder
         return VStack(alignment: .leading, spacing: 4) {
             HStack(alignment: .lastTextBaseline) {
                 Text(L("Tu música")).displayTitle(24)
                 Spacer()
-                if editingMusic { Button(L("Hecho")) { withAnimation(.uiEaseOut(0.25)) { editingMusic = false } }.font(.body.weight(.semibold)) }
+                Button(editingMusic ? L("Hecho") : L("Ordenar")) {
+                    withAnimation(reduceMotion ? nil : .uiEaseOut(0.25)) { editingMusic.toggle() }
+                }
+                .font(.body.weight(.semibold))
+                .frame(minWidth: 44, minHeight: 44, alignment: .trailing)
+                .contentShape(Rectangle())
+                .accessibilityHint(editingMusic ? "" : L("Cambia el orden de los apartados de Tu música"))
             }
             .padding(.horizontal, inset)
-            .padding(.bottom, editingMusic ? 0 : 8)
             if editingMusic {
-                Text(L("Arrastra las carpetas para cambiar el orden.")).font(.footnote).foregroundStyle(.secondary)
+                Text(L("Arrastra ≡ o usa las flechas para cambiar el orden.")).font(.footnote).foregroundStyle(.secondary)
                     .padding(.horizontal, inset).padding(.bottom, 8)
             }
             VStack(spacing: 0) {
                 ForEach(Array(order.enumerated()), id: \.element) { i, key in
-                    musicRow(key, songs, last: i == order.count - 1)
-                        .rotationEffect(.degrees(editingMusic && !reduceMotion ? (i % 2 == 0 ? 0.45 : -0.45) : 0))
-                        .animation(editingMusic && !reduceMotion ? .easeInOut(duration: 0.32).repeatForever(autoreverses: true) : .default, value: editingMusic)
-                        .simultaneousGesture(LongPressGesture(minimumDuration: 0.5).onEnded { _ in
-                            withAnimation(.uiEaseOut(0.25)) { editingMusic = true }
+                    let lifted = dragKey == key
+                    musicRow(key, songs, last: i == order.count - 1, first: i == 0)
+                        .background(GeometryReader { g in
+                            Color.clear.onAppear { musicRowHeight = g.size.height }
+                                .onChange(of: g.size.height) { musicRowHeight = $0 }
                         })
-                        .draggable(key) { Text(key).hidden() }
-                        .dropDestination(for: String.self) { items, _ in
-                            guard editingMusic, let from = items.first, from != key else { return false }
-                            var all = MusicOrder.decode(musicRaw)
-                            all.removeAll { $0 == from }
-                            all.insert(from, at: all.firstIndex(of: key) ?? all.endIndex)
-                            withAnimation(.uiEaseOut(0.25)) { musicRaw = all.joined(separator: ",") }
-                            return true
+                        .rotationEffect(.degrees(editingMusic && !reduceMotion && !lifted ? (i % 2 == 0 ? 0.45 : -0.45) : 0))
+                        .animation(editingMusic && !reduceMotion ? .easeInOut(duration: 0.32).repeatForever(autoreverses: true) : .default, value: editingMusic)
+                        .background {
+                            if lifted {
+                                ThemeSurface(radius: Tokens.Radius.card)
+                                    .clipShape(RoundedRectangle(cornerRadius: Tokens.Radius.card, style: .continuous))
+                                    .shadow(color: .black.opacity(0.18), radius: 14, y: 8)
+                                    .padding(.horizontal, -10)
+                            }
                         }
+                        .scaleEffect(lifted && !reduceMotion ? 1.03 : 1)
+                        .offset(y: lifted ? dragOffset : 0)
+                        .zIndex(lifted ? 1 : 0)
+                        .simultaneousGesture(LongPressGesture(minimumDuration: 0.5).onEnded { _ in
+                            guard !editingMusic else { return }
+                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                            withAnimation(reduceMotion ? nil : .uiEaseOut(0.25)) { editingMusic = true }
+                        })
                 }
             }
             .padding(.horizontal, inset)
         }
     }
 
-    @ViewBuilder private func musicRow(_ key: String, _ songs: [Song], last: Bool) -> some View {
+    /// Los apartados que se ven: Descargadas y Favoritos sólo si van «en Tu música».
+    private var visibleMusicOrder: [String] {
+        MusicOrder.decode(musicRaw).filter { placement == "music" || ($0 != "downloads" && $0 != "favorites") }
+    }
+
+    /// Sube (-1) o baja (+1) un apartado un puesto entre los que se ven.
+    private func moveMusic(_ key: String, by delta: Int) {
+        musicRaw = MusicOrder.moved(key, by: delta, visible: visibleMusicOrder, all: MusicOrder.decode(musicRaw)).joined(separator: ",")
+    }
+
+    /// Flechas y asa de un apartado en el modo de ordenar.
+    private func musicControls(_ key: String, title: String, first: Bool, last: Bool) -> AnyView {
+        AnyView(HStack(spacing: 0) {
+            Button { withAnimation(reduceMotion ? nil : .uiEaseOut(0.22)) { moveMusic(key, by: -1) } } label: {
+                Image(systemName: "chevron.up").font(.body.weight(.semibold)).frame(width: 44, height: 44).contentShape(Rectangle())
+            }
+            .disabled(first).opacity(first ? 0.3 : 1)
+            .accessibilityLabel(L("Subir {0}", title))
+            Button { withAnimation(reduceMotion ? nil : .uiEaseOut(0.22)) { moveMusic(key, by: 1) } } label: {
+                Image(systemName: "chevron.down").font(.body.weight(.semibold)).frame(width: 44, height: 44).contentShape(Rectangle())
+            }
+            .disabled(last).opacity(last ? 0.3 : 1)
+            .accessibilityLabel(L("Bajar {0}", title))
+            Image(systemName: "line.3.horizontal").font(.body.weight(.semibold)).foregroundStyle(.secondary)
+                .frame(width: 44, height: 44).contentShape(Rectangle())
+                .gesture(DragGesture(minimumDistance: 0, coordinateSpace: .global)
+                    .onChanged { v in
+                        if dragKey != key {
+                            dragKey = key; dragBase = 0
+                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                        }
+                        // Al pasar media fila, cambia el sitio con la vecina y el desplazamiento se cuenta desde el nuevo.
+                        let step = max(musicRowHeight, 44)
+                        let delta = Int(((v.translation.height - dragBase) / step).rounded())
+                        if delta != 0 {
+                            let before = visibleMusicOrder
+                            withAnimation(reduceMotion ? nil : .uiEaseOut(0.22)) { moveMusic(key, by: delta > 0 ? 1 : -1) }
+                            if visibleMusicOrder != before {
+                                dragBase += (delta > 0 ? 1 : -1) * step
+                                UISelectionFeedbackGenerator().selectionChanged()
+                            }
+                        }
+                        dragOffset = v.translation.height - dragBase
+                    }
+                    .onEnded { _ in
+                        withAnimation(reduceMotion ? nil : .uiEaseOut(0.22)) { dragKey = nil; dragOffset = 0 }
+                    })
+                // El asa es sólo para el dedo: con VoiceOver se usan las flechas.
+                .accessibilityHidden(true)
+        }
+        .buttonStyle(TactileButtonStyle())
+        .foregroundStyle(.primary))
+    }
+
+    @ViewBuilder private func musicRow(_ key: String, _ songs: [Song], last: Bool, first: Bool) -> some View {
+        let controls: (String) -> AnyView? = { title in editingMusic ? musicControls(key, title: title, first: first, last: last) : nil }
         switch key {
         case "downloads":
-            LibraryLinkRow(title: SmartList.downloads.title, count: downloads.songs.count, symbol: "arrow.down.circle", last: last, editing: editingMusic) {
+            LibraryLinkRow(title: SmartList.downloads.title, count: downloads.songs.count, symbol: "arrow.down.circle", last: last, controls: controls) {
                 SmartListV11View(kind: .downloads)
             }
         case "favorites":
-            LibraryLinkRow(title: SmartList.favorites.title, count: library.favorites.count, symbol: "heart", last: last, editing: editingMusic) {
+            LibraryLinkRow(title: SmartList.favorites.title, count: library.favorites.count, symbol: "heart", last: last, controls: controls) {
                 SmartListV11View(kind: .favorites)
             }
         case "playlists":
             LibraryLinkRow(title: L("Playlists"), count: library.userPlaylists.count,
                            detail: library.folders.isEmpty ? nil : "\(library.userPlaylists.count) · " + (library.folders.count == 1 ? L("1 carpeta") : L("{0} carpetas", library.folders.count)),
-                           symbol: "music.note.list", last: last, editing: editingMusic) { PlaylistsListView() }
+                           symbol: "music.note.list", last: last, controls: controls) { PlaylistsListView() }
         case "albums":
-            LibraryLinkRow(title: L("Tus álbumes"), count: library.albums.count, symbol: "square.stack", last: last, editing: editingMusic) { AlbumsListView() }
+            LibraryLinkRow(title: L("Tus álbumes"), count: library.albums.count, symbol: "square.stack", last: last, controls: controls) { AlbumsListView() }
         case "songs":
-            LibraryLinkRow(title: L("Canciones"), count: songs.count, symbol: "music.note", last: last, editing: editingMusic) {
+            LibraryLinkRow(title: L("Canciones"), count: songs.count, symbol: "music.note", last: last, controls: controls) {
                 SongListV11View(title: L("Canciones"), songs: songs.sorted {
                     $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending
                 })
             }
         case "artists":
-            LibraryLinkRow(title: L("Artistas"), count: Set(songs.map { primaryArtist($0.artist) }).count, symbol: "music.mic", last: last, editing: editingMusic) {
+            LibraryLinkRow(title: L("Artistas"), count: Set(songs.map { primaryArtist($0.artist) }).count, symbol: "music.mic", last: last, controls: controls) {
                 ArtistsView(artists: Self.artists(songs))
             }
         case "recents":
-            LibraryLinkRow(title: L("Recientes"), count: library.recents.count, symbol: "clock", last: last, editing: editingMusic) {
+            LibraryLinkRow(title: L("Recientes"), count: library.recents.count, symbol: "clock", last: last, controls: controls) {
                 SongListV11View(title: L("Recientes"), songs: library.recents)
             }
         default:
-            LibraryLinkRow(title: L("Estadísticas"), count: PlayStats.shared.plays.filter { $0.at >= PlayStats.since(.month) }.count, symbol: "chart.bar", last: last, editing: editingMusic) {
+            LibraryLinkRow(title: L("Estadísticas"), count: PlayStats.shared.plays.filter { $0.at >= PlayStats.since(.month) }.count, symbol: "chart.bar", last: last, controls: controls) {
                 StatsView()
             }
         }
@@ -294,37 +370,43 @@ private struct LibraryLinkRow<Destination: View>: View {
     var detail: String? = nil
     let symbol: String
     var last = false
-    /// Modo edición de «Tu música»: sin navegar, con el asa en vez del chevron.
-    var editing = false
+    /// Modo de ordenar «Tu música»: sin navegar, con las flechas y el asa (según el título) en vez del recuento.
+    var controls: (String) -> AnyView? = { _ in nil }
     @ViewBuilder let destination: () -> Destination
 
     var body: some View {
-        if editing {
-            content.accessibilityHint(L("Arrastra para cambiar el orden"))
+        if let editControls = controls(title) {
+            content(trailing: editControls)
         } else {
-            NavigationLink { LazyDestination(build: destination) } label: { content }
+            NavigationLink { LazyDestination(build: destination) } label: { content(trailing: nil) }
                 .buttonStyle(RowHighlightStyle())
         }
     }
 
-    private var content: some View {
-            VStack(spacing: 0) {
-                HStack(spacing: 14) {
-                    Image(systemName: symbol)
-                        .font(.system(size: 16, weight: .semibold))
-                        .frame(width: 36, height: 36)
-                        .background(ThemeSurface(radius: 18))
-                        .clipShape(Circle())
-                    Text(title).font(.title3.weight(.semibold))
-                    Spacer()
+    private func content(trailing: AnyView?) -> some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 14) {
+                Image(systemName: symbol)
+                    .font(.system(size: 16, weight: .semibold))
+                    .frame(width: 36, height: 36)
+                    .background(ThemeSurface(radius: 18))
+                    .clipShape(Circle())
+                    .accessibilityHidden(true)
+                Text(title).font(.title3.weight(.semibold)).lineLimit(1).minimumScaleFactor(0.75)
+                Spacer(minLength: 0)
+                if let trailing {
+                    trailing
+                } else {
                     Text(detail ?? "\(count)").font(.subheadline).foregroundStyle(.secondary).monospacedDigit()
-                    Image(systemName: editing ? "line.3.horizontal" : "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(.tertiary)
+                    Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(.tertiary)
                 }
-                .padding(.vertical, 13)
-                .contentShape(Rectangle())
-                if !last { Divider() }
             }
-            .foregroundStyle(.primary)
+            // Con los botones de 44 pt la fila mide lo mismo que con el recuento (13 + 36 + 13).
+            .padding(.vertical, trailing == nil ? 13 : 9)
+            .contentShape(Rectangle())
+            if !last { Divider() }
+        }
+        .foregroundStyle(.primary)
     }
 }
 
@@ -992,6 +1074,7 @@ struct PinnedCarousel: View {
     @AppStorage("pinnedOrder") private var orderRaw = ""
     @State private var order: [UUID] = []
     @State private var dragging: UUID?
+    @State private var lifted: UUID?
     private let inset: CGFloat = 20
 
     var body: some View {
@@ -1019,7 +1102,7 @@ struct PinnedCarousel: View {
                     .carouselLayout()
                     .padding(.horizontal, carouselUsesMargins ? 0 : inset)
                     // Soltar entre portadas también termina el arrastre.
-                    .onDrop(of: [.text], delegate: GridDrop(dragging: $dragging, finish: finish))
+                    .onDrop(of: [.text], delegate: GridDrop(dragging: $dragging, lifted: $lifted, finish: finish))
                 }
                 .carouselScroll(inset: inset)
             }
@@ -1046,11 +1129,12 @@ struct PinnedCarousel: View {
                 Label(L("Soltar de arriba"), systemImage: "pin.slash")
             }
         }
-        .modifier(Lift(enabled: true, id: p.id, dragging: $dragging))
-        .onDrop(of: [.text], delegate: CellDrop(target: p.id, order: $order, dragging: $dragging, finish: finish))
+        .modifier(Lift(enabled: true, id: p.id, dragging: $dragging, lifted: $lifted))
+        .onDrop(of: [.text], delegate: CellDrop(target: p.id, order: $order, dragging: $dragging, lifted: $lifted, finish: finish))
     }
 
     private func finish() {
+        lifted = nil
         guard dragging != nil else { return }
         dragging = nil
         UIImpactFeedbackGenerator(style: .light).impactOccurred()

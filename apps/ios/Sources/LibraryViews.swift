@@ -279,6 +279,8 @@ struct PlaylistsListView: View {
             Divider()
             Button(role: .destructive) { deleting = folder } label: { Label(L("Eliminar carpeta"), systemImage: "trash") }
         } else {
+            // También aquí, no sólo en el + de Biblioteca: quien está en Playlists busca «Nueva playlist» en este menú.
+            Button { nameText = ""; naming = .newPlaylist(nil) } label: { Label(L("Nueva playlist"), systemImage: "plus") }
             Button { nameText = ""; naming = .newFolder(nil) } label: { Label(L("Nueva carpeta"), systemImage: "folder.badge.plus") }
             Button { editing = true } label: { Label(L("Editar orden"), systemImage: "arrow.up.arrow.down") }
         }
@@ -417,6 +419,8 @@ struct ReorderGrid<Item: Identifiable, Destination: View, Cell: View>: View {
     @ViewBuilder let cell: (Item) -> Cell
     @State private var order: [Item.ID] = []
     @State private var dragging: Item.ID?
+    /// La celda que se ha mantenido pulsada. Sólo pasa a `dragging` (y se apaga) cuando el arrastre se mueve de verdad.
+    @State private var lifted: Item.ID?
     @State private var into: Item.ID?
     private let columns = [GridItem(.flexible(), spacing: 16, alignment: .top), GridItem(.flexible(), spacing: 16, alignment: .top)]
 
@@ -430,8 +434,8 @@ struct ReorderGrid<Item: Identifiable, Destination: View, Cell: View>: View {
                     .environment(\.dropInto, into == p.id)
                     .opacity(dragging == p.id ? 0.35 : 1)
                     .contextMenu { if let menu { menu(p) } }
-                    .modifier(Lift(enabled: enabled, id: p.id, dragging: $dragging))
-                    .onDrop(of: [.text], delegate: CellDrop(target: p.id, order: $order, dragging: $dragging, into: $into,
+                    .modifier(Lift(enabled: enabled, id: p.id, dragging: $dragging, lifted: $lifted))
+                    .onDrop(of: [.text], delegate: CellDrop(target: p.id, order: $order, dragging: $dragging, lifted: $lifted, into: $into,
                                                             canDropInto: canDropInto, canSwap: canSwap,
                                                             dropInto: { d, t in onDropInto(d, t); onDragEnd() }, finish: finish))
             }
@@ -439,12 +443,13 @@ struct ReorderGrid<Item: Identifiable, Destination: View, Cell: View>: View {
         .padding(.horizontal, 16)
         .padding(.top, 8)
         // Soltar entre celdas también termina el arrastre.
-        .onDrop(of: [.text], delegate: GridDrop(dragging: $dragging, finish: finish))
+        .onDrop(of: [.text], delegate: GridDrop(dragging: $dragging, lifted: $lifted, finish: finish))
         .onAppear { order = items.map(\.id) }
         .onChange(of: items.map(\.id)) { ids in if dragging == nil { order = ids } }
     }
 
     private func finish() {
+        lifted = nil
         guard dragging != nil else { return }
         dragging = nil
         into = nil
@@ -455,14 +460,21 @@ struct ReorderGrid<Item: Identifiable, Destination: View, Cell: View>: View {
 }
 
 /// Mantener pulsado levanta la celda (sólo si se puede reordenar; buscando, no).
+/// El sistema pide lo que se arrastra en cuanto se mantiene pulsado, también si sólo se abre el menú y no se llega a
+/// arrastrar: por eso aquí sólo se apunta la celda en `lifted`, y `dragging` (que la apaga y congela el orden) lo
+/// ponen `CellDrop` y `GridDrop` cuando el arrastre se mueve. Antes, abrir el menú dejaba la portada apagada para
+/// siempre (revisión del bloque 1).
 struct Lift<ID: Hashable>: ViewModifier {
     let enabled: Bool
     let id: ID
     @Binding var dragging: ID?
+    @Binding var lifted: ID?
     @ViewBuilder func body(content: Content) -> some View {
         if enabled {
             content.onDrag {
-                dragging = id
+                // Un arrastre anterior que acabó fuera de la cuadrícula no avisa: se limpia al empezar otro.
+                dragging = nil
+                lifted = id
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                 return NSItemProvider(object: "\(id)" as NSString)
             }
@@ -476,6 +488,7 @@ struct CellDrop<ID: Hashable>: DropDelegate {
     let target: ID
     @Binding var order: [ID]
     @Binding var dragging: ID?
+    @Binding var lifted: ID?
     /// Celda marcada para soltar dentro (carpetas). Sin carpetas, siempre nil.
     var into: Binding<ID?> = .constant(nil)
     var canDropInto: (ID, ID) -> Bool = { _, _ in false }
@@ -484,6 +497,8 @@ struct CellDrop<ID: Hashable>: DropDelegate {
     let finish: () -> Void
 
     func dropEntered(info: DropInfo) {
+        // El arrastre ya se mueve sobre la cuadrícula: ahora sí es un arrastre.
+        if dragging == nil { dragging = lifted }
         guard let d = dragging, d != target else { return }
         if canDropInto(d, target) {
             into.wrappedValue = target
@@ -510,7 +525,9 @@ struct CellDrop<ID: Hashable>: DropDelegate {
 
 struct GridDrop<ID: Hashable>: DropDelegate {
     @Binding var dragging: ID?
+    @Binding var lifted: ID?
     let finish: () -> Void
+    func dropEntered(info: DropInfo) { if dragging == nil { dragging = lifted } }
     func dropUpdated(info: DropInfo) -> DropProposal? { DropProposal(operation: .move) }
     func performDrop(info: DropInfo) -> Bool { finish(); return true }
 }

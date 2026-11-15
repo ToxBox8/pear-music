@@ -1175,3 +1175,7 @@
 1175	Ez dago zerrendarik ez albumik
 1176	Zure liburutegitik kenduko da, azalarekin. Deskargatutako abestiak Deskargatuak atalean geratzen dira. Ezin da desegin.
 1177	ezabatu kendu zerrendak albumak
+1178	Arrastatu ≡ edo erabili geziak ordena aldatzeko.
+1179	Jaitsi {0}
+1180	Aldatu Zure musikako atalen ordena
+1181	Igo {0}

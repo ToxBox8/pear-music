@@ -151,6 +151,25 @@ igual(LibraryOrder.level(nil, playlists: propias, folders: fs, sort: "custom", o
 igual(LibraryOrder.level(nil, playlists: propias, folders: fs, sort: "custom", order: dentro, smartInPlaylists: false),
       [kViajes, kGym, b004], "a mano dentro de una carpeta: con Descargadas y Favoritos en Tu música, no salen")
 
+// MARK: «Nueva carpeta» de «Mover a…»: una carpeta con 3 niveles dentro no cabe en ninguna
+cierto(!PlaylistFolders.canMoveIntoNew(gym, folders: fs), "Gimnasio (3 niveles) no cabe en una carpeta nueva")
+cierto(PlaylistFolders.canMoveIntoNew(f002, folders: fs), "Pierna (2 niveles) cabe en una carpeta nueva")
+cierto(PlaylistFolders.canMoveIntoNew(viajes, folders: fs), "Viajes (1 nivel) cabe en una carpeta nueva")
+
+// MARK: Ordenar «Tu música» con las flechas o el asa (mismos casos que MusicOrderTest.kt)
+let todos = MusicOrder.defaults // playlists, downloads, favorites, albums, songs, artists, recents, stats
+let vistos = todos.filter { $0 != "downloads" && $0 != "favorites" }
+igual(MusicOrder.moved("playlists", by: 1, visible: vistos, all: todos),
+      ["albums", "downloads", "favorites", "playlists", "songs", "artists", "recents", "stats"],
+      "Tu música: bajar Playlists la deja detrás de Tus álbumes; Descargadas y Favoritos (que no se ven) no se mueven")
+igual(MusicOrder.moved("playlists", by: -1, visible: vistos, all: todos), todos, "Tu música: la primera no sube")
+igual(MusicOrder.moved("stats", by: 1, visible: vistos, all: todos), todos, "Tu música: la última no baja")
+igual(MusicOrder.moved("downloads", by: 1, visible: vistos, all: todos), todos, "Tu música: lo que no se ve no se mueve")
+igual(MusicOrder.moved("stats", by: -3, visible: todos, all: todos).suffix(3).map { $0 }, ["artists", "stats", "recents"],
+      "Tu música: un paso cada vez, aunque se pida más")
+igual(MusicOrder.decode(MusicOrder.moved("songs", by: -1, visible: todos, all: todos).joined(separator: ",")),
+      ["playlists", "downloads", "favorites", "songs", "albums", "artists", "recents", "stats"], "Tu música: se guarda y se lee igual")
+
 // MARK: Una carpeta con el mismo id que una playlist o que «downloads» (copia hecha a mano): sin claves repetidas
 let mismo = "0000000A-0000-0000-0000-00000000D001"
 let choqueCarpetas = PlaylistFolders.normalize([PlaylistFolder(id: mismo, name: "Igual que la lista"),

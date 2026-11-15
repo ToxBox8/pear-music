@@ -209,6 +209,8 @@ struct ReleasesShelf: View {
                     .buttonStyle(TactileButtonStyle())
                     .accessibilityElement(children: .combine)
                     .accessibilityLabel(p.isNew ? L("Nuevo: {0}", c.title) : c.title)
+                    // De quién es y de qué año: sin esto VoiceOver sólo decía el título.
+                    .accessibilityValue(albumLine(c.subtitle))
                 }
             }
             .padding(.horizontal)

@@ -33,6 +33,8 @@ enum Demo {
         var releases = false
         /// Con los tres seguidos de `followed` (sin cambiar de pantalla).
         var followed = false
+        /// Biblioteca con «Tu música» en el modo de ordenar (flechas y asa).
+        var musicEditing = false
     }
 
     /// Los mismos nombres que las PNG de Android (shared/design/compare_shots.py los empareja).
@@ -70,6 +72,8 @@ enum Demo {
         // Insignia «NUEVO» sobre una portada clara (washi) y otra casi negra (sumi), en claro y en oscuro.
         "52_insignia_nuevo_claro": Scenario(playing: false, route: .badges),
         "52_insignia_nuevo_oscuro": Scenario(appearance: "dark", playing: false, route: .badges),
+        // «Tu música» ordenando: «Hecho», flechas y asa (revisión del bloque 1).
+        "53_tu_musica_ordenar": Scenario(playing: false, tab: .library, musicEditing: true),
         // Tráiler v2 (4-11-2026): con `-demoCatalog YES` (DemoCatalog.swift), todo con canciones de Michael Bennet.
         "v2_01_inicio": Scenario(tab: .home),
         "v2_02_busqueda": Scenario(tab: .home, query: "Michael Bennet"),

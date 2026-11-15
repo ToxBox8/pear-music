@@ -500,17 +500,4 @@ final class DownloadStore: ObservableObject {
     }
 }
 
-/// Orden de las carpetas de «Tu música» (`musicOrder`, separadas por comas). Igual que `Prefs.musicOrder` en Android.
-enum MusicOrder {
-    // «playlists» (2.9 de x.1.1): la carpeta con todas las playlists, arriba del todo.
-    static let defaults = ["playlists", "downloads", "favorites", "albums", "songs", "artists", "recents", "stats"]
-    /// Lo guardado más lo que falte, sin repetir ni desconocidos. Lo que falta entra en su sitio de fábrica (así
-    /// «Playlists» sale arriba también a quien ya tenía un orden propio).
-    static func decode(_ raw: String?) -> [String] {
-        var seen = Set<String>()
-        var out = (raw ?? "").split(separator: ",").map(String.init).filter { defaults.contains($0) && seen.insert($0).inserted }
-        if out.isEmpty { return defaults }
-        for (i, k) in defaults.enumerated() where !out.contains(k) { out.insert(k, at: min(i, out.count)) }
-        return out
-    }
-}
+// `MusicOrder` (orden de los apartados de «Tu música») está en LibraryModel.swift.

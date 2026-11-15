@@ -1175,3 +1175,7 @@
 1175	Neniuj ludlistoj aŭ albumoj
 1176	Ĝi foriĝos el via biblioteko kun sia kovrilo. Elŝutitaj kantoj restas en Elŝutitaj. Ne eblas malfari.
 1177	forigi forpreni ludlistoj albumoj
+1178	Trenu ≡ aŭ uzu la sagojn por ŝanĝi la ordon.
+1179	Malsuprenigi {0}
+1180	Ŝanĝi la ordon de la sekcioj de Via muziko
+1181	Suprenigi {0}

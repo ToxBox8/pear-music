@@ -1175,3 +1175,7 @@
 1175	No hi ha playlists ni àlbums
 1176	Es traurà de la teva biblioteca amb la portada. Les cançons baixades es queden a Baixades. No es pot desfer.
 1177	esborrar treure playlists àlbums
+1178	Arrossega ≡ o fes servir les fletxes per canviar l'ordre.
+1179	Baixa {0}
+1180	Canvia l'ordre dels apartats de La teva música
+1181	Puja {0}

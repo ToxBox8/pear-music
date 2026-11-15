@@ -1175,3 +1175,7 @@ Eliminar de la biblioteca
 No hay playlists ni álbumes
 Se quitará de tu biblioteca con su portada. Las canciones descargadas se quedan en Descargadas. No se puede deshacer.
 borrar quitar playlists álbumes
+Arrastra ≡ o usa las flechas para cambiar el orden.
+Bajar {0}
+Cambia el orden de los apartados de Tu música
+Subir {0}
