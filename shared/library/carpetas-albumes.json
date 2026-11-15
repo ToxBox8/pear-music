@@ -1,0 +1,170 @@
+{
+  "favorites": [],
+  "folders": [
+    {
+      "id": "0000000F-0000-0000-0000-00000000F101",
+      "name": "Gimnasio",
+      "parent": null,
+      "icon": "dumbbell.fill",
+      "tint": 3
+    },
+    {
+      "id": "0000000F-0000-0000-0000-00000000F102",
+      "name": "Pierna",
+      "parent": "0000000F-0000-0000-0000-00000000F101"
+    }
+  ],
+  "albumFolders": [
+    {
+      "id": "0000000E-0000-0000-0000-00000000E001",
+      "name": "Años 70",
+      "parent": null,
+      "icon": "guitars.fill",
+      "tint": 6
+    },
+    {
+      "id": "0000000E-0000-0000-0000-00000000E002",
+      "name": "Directos",
+      "parent": "0000000E-0000-0000-0000-00000000E001"
+    },
+    {
+      "id": "0000000E-0000-0000-0000-00000000E003",
+      "name": "Bootlegs",
+      "parent": "0000000E-0000-0000-0000-00000000E002"
+    },
+    {
+      "id": "0000000E-0000-0000-0000-00000000E004",
+      "name": "Nivel 4",
+      "parent": "0000000E-0000-0000-0000-00000000E003"
+    },
+    {
+      "id": "0000000F-0000-0000-0000-00000000F101",
+      "name": "Repetida con Gimnasio"
+    },
+    {
+      "id": "0000000E-0000-0000-0000-00000000E005",
+      "name": "Hija de la repetida",
+      "parent": "0000000F-0000-0000-0000-00000000F101"
+    },
+    {
+      "id": "0000000E-0000-0000-0000-00000000E006",
+      "name": "Con padre de playlists",
+      "parent": "0000000F-0000-0000-0000-00000000F102"
+    },
+    {
+      "id": "0000000E-0000-0000-0000-00000000E001",
+      "name": "Repetida en su lista"
+    },
+    {
+      "name": "Sin id"
+    }
+  ],
+  "playlists": [
+    {
+      "id": "0000000A-0000-0000-0000-00000000E101",
+      "name": "Cardio 160 bpm",
+      "songs": [
+        {
+          "id": "ccccccccccc",
+          "title": "GENESIS",
+          "artist": "Michael Bennet"
+        }
+      ],
+      "folder": "0000000F-0000-0000-0000-00000000F101"
+    },
+    {
+      "id": "0000000A-0000-0000-0000-00000000E102",
+      "name": "Playlist en carpeta de álbumes",
+      "songs": [],
+      "folder": "0000000E-0000-0000-0000-00000000E001"
+    },
+    {
+      "id": "0000000A-0000-0000-0000-00000000E103",
+      "name": "Rumours",
+      "songs": [
+        {
+          "id": "ccccccccccc",
+          "title": "GENESIS",
+          "artist": "Michael Bennet"
+        }
+      ],
+      "album": {
+        "browseId": "MPREb_rumours",
+        "artist": "Michael Bennet",
+        "year": "1977"
+      },
+      "folder": "0000000E-0000-0000-0000-00000000E001"
+    },
+    {
+      "id": "0000000A-0000-0000-0000-00000000E104",
+      "name": "Live at Leeds",
+      "songs": [],
+      "album": {
+        "browseId": "MPREb_leeds",
+        "artist": "Michael Bennet",
+        "year": "1977"
+      },
+      "folder": "0000000E-0000-0000-0000-00000000E002"
+    },
+    {
+      "id": "0000000A-0000-0000-0000-00000000E105",
+      "name": "Álbum en carpeta de playlists",
+      "songs": [],
+      "album": {
+        "browseId": "MPREb_p",
+        "artist": "Michael Bennet",
+        "year": "1977"
+      },
+      "folder": "0000000F-0000-0000-0000-00000000F102"
+    },
+    {
+      "id": "0000000A-0000-0000-0000-00000000E106",
+      "name": "Álbum en la repetida",
+      "songs": [],
+      "album": {
+        "browseId": "MPREb_r",
+        "artist": "Michael Bennet",
+        "year": "1977"
+      },
+      "folder": "0000000F-0000-0000-0000-00000000F101"
+    },
+    {
+      "id": "0000000A-0000-0000-0000-00000000E107",
+      "name": "Álbum sin carpeta",
+      "songs": [],
+      "album": {
+        "browseId": "MPREb_s",
+        "artist": "Michael Bennet",
+        "year": "1977"
+      }
+    },
+    {
+      "id": "0000000A-0000-0000-0000-00000000E108",
+      "name": "Álbum en el nivel 4",
+      "songs": [],
+      "album": {
+        "browseId": "MPREb_n4",
+        "artist": "Michael Bennet",
+        "year": "1977"
+      },
+      "folder": "0000000E-0000-0000-0000-00000000E004"
+    }
+  ],
+  "recents": [],
+  "playlistOrder": [
+    "folder:0000000E-0000-0000-0000-00000000E001",
+    "folder:0000000F-0000-0000-0000-00000000F101",
+    "0000000A-0000-0000-0000-00000000E101"
+  ],
+  "playlistSort": "custom",
+  "albumOrder": [
+    "folder:0000000E-0000-0000-0000-00000000E001",
+    "0000000A-0000-0000-0000-00000000E104",
+    "folder:0000000E-0000-0000-0000-00000000E999",
+    "0000000A-0000-0000-0000-00000000E103",
+    "folder:0000000F-0000-0000-0000-00000000F101",
+    "folder:0000000E-0000-0000-0000-00000000E002",
+    "folder:0000000E-0000-0000-0000-00000000E001"
+  ],
+  "albumSort": "custom"
+}

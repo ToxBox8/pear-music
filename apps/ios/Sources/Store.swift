@@ -50,6 +50,8 @@ final class Library: ObservableObject {
     @Published var playlists: [Playlist] = [] { didSet { save() } }
     /// Carpetas de playlists (3.0, bloque 1). Siempre normalizadas: sin huérfanas, ciclos ni más de 3 niveles.
     @Published private(set) var folders: [PlaylistFolder] = [] { didSet { save() } }
+    /// Carpetas de álbumes (3.0, T15). Sin pantalla todavía: se leen, se conservan y se exportan.
+    @Published private(set) var albumFolders: [PlaylistFolder] = [] { didSet { save() } }
     /// Últimas canciones reproducidas (la más reciente primero).
     @Published private(set) var recents: [Song] = [] { didSet { save() } }
     /// Artistas seguidos (3.0, bloque 1), el último que sigues primero. Como mucho 500.
@@ -62,6 +64,7 @@ final class Library: ObservableObject {
         if let s = disk.load() {
             favorites = s.favorites
             folders = s.folders ?? []
+            albumFolders = s.albumFolders ?? []
             playlists = s.playlists
             recents = s.recents ?? []
             followedArtists = s.followedArtists ?? []
@@ -82,7 +85,7 @@ final class Library: ObservableObject {
 
     private var snapshot: LibraryFile {
         LibraryFile(favorites: favorites, playlists: playlists, recents: recents, folders: folders,
-                    followedArtists: followedArtists)
+                    followedArtists: followedArtists, albumFolders: albumFolders)
     }
 
     func markPlayed(_ s: Song) {
@@ -190,6 +193,7 @@ final class Library: ObservableObject {
         favorites = merged.favorites
         // Carpetas antes que playlists: así ninguna playlist apunta a una carpeta que aún no está.
         folders = merged.folders ?? []
+        albumFolders = merged.albumFolders ?? []
         playlists = merged.playlists
         recents = merged.recents ?? []
         followedArtists = merged.followedArtists ?? []

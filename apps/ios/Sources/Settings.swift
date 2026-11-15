@@ -250,7 +250,7 @@ struct LibrarySettings: View {
             .glassRow()
 
             Section {
-                Button { showReorder = true } label: { Label(L("Ordenar a mano"), systemImage: "line.3.horizontal") }
+                Button { showReorder = true } label: { Label(L("Editar playlists"), systemImage: "line.3.horizontal") }
             } footer: {
                 Text(L("Arrastra las playlists, Descargadas y Favoritos para colocarlas donde quieras."))
             }

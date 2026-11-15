@@ -69,12 +69,8 @@ struct CoverImage: View {
 // MARK: - Estilos de playlist (iconos y colores elegibles)
 enum PlaylistStyle {
     static let palettes: [[Color]] = Tokens.playlistPalettes
-    static let icons = [
-        "music.note.list", "heart.fill", "star.fill", "flame.fill", "bolt.fill", "moon.stars.fill",
-        "sun.max.fill", "car.fill", "figure.run", "dumbbell.fill", "headphones", "guitars.fill",
-        "pianokeys", "mic.fill", "party.popper.fill", "cup.and.saucer.fill", "book.fill", "leaf.fill",
-        "airplane", "gamecontroller.fill", "sparkles", "cloud.rain.fill", "beach.umbrella.fill", "bed.double.fill"
-    ]
+    /// Los 24 de `PlaylistIcons.names` (LibraryModel.swift): los mismos sirven para las carpetas (T16).
+    static let icons = PlaylistIcons.names
 
     static func gradient(_ index: Int?) -> LinearGradient {
         let colors = palettes[(index ?? 1) % palettes.count]

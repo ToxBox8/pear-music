@@ -35,8 +35,11 @@ enum Demo {
         var followed = false
         /// Biblioteca con «Tu música» en el modo de ordenar (flechas y asa).
         var musicEditing = false
-        /// Playlists en el modo «Ordenar» (asas, una portada elegida y la barra de botones).
+        /// Playlists en el modo «Ordenar» (sólo arrastrando; paso C).
         var playlistsOrdering = false
+        /// Sólo los tests de interfaz: 24 playlists más, para que la cuadrícula pase de la pantalla (desplazamiento al
+        /// borde en el modo «Ordenar»). No es una captura.
+        var manyPlaylists = false
     }
 
     /// Los mismos nombres que las PNG de Android (shared/design/compare_shots.py los empareja).
@@ -76,9 +79,11 @@ enum Demo {
         "52_insignia_nuevo_oscuro": Scenario(appearance: "dark", playing: false, route: .badges),
         // «Tu música» ordenando: «Hecho», flechas y asa (revisión del bloque 1).
         "53_tu_musica_ordenar": Scenario(playing: false, tab: .library, musicEditing: true),
-        // Modo «Ordenar» de Playlists (paso B de menús y gestos): asas, «Domingo lento» elegida y los botones.
+        // Modo «Ordenar» de Playlists (paso C de menús y gestos): sin barra, asas ni buscador.
         "54_playlists_ordenar": Scenario(playing: false, tab: .library, route: .playlists, folders: true, playlistsOrdering: true),
         "55_playlists_ordenar_oscuro": Scenario(appearance: "dark", playing: false, tab: .library, route: .playlists, folders: true, playlistsOrdering: true),
+        // Sólo tests de interfaz (BibliotecaUITests): Playlists con 24 playlists más, para el desplazamiento al borde.
+        "ui_muchas_playlists": Scenario(playing: false, tab: .library, route: .playlists, manyPlaylists: true),
         // Tráiler v2 (4-11-2026): con `-demoCatalog YES` (DemoCatalog.swift), todo con canciones de Michael Bennet.
         "v2_01_inicio": Scenario(tab: .home),
         "v2_02_busqueda": Scenario(tab: .home, query: "Michael Bennet"),
@@ -143,6 +148,9 @@ enum Demo {
             library.playlists.append(Playlist(name: a.0, songs: Array(songs.dropFirst(i).prefix(4)),
                                               album: AlbumInfo(browseId: "MPREb_\(i)", subtitle: "\(a.1) • \(a.2)")))
         }
+        if current?.manyPlaylists == true {
+            for i in 1...24 { library.playlists.append(Playlist(name: String(format: "Lista %02d", i), songs: Array(songs.prefix(1 + i % 4)), tint: i % 8)) }
+        }
         // Carpetas (3.0, bloque 1): los mismos pasos que seedFolders() en ScreenshotTest.kt.
         if current?.folders == true {
             library.playlists.append(Playlist(name: "Fuerza", songs: Array(songs.prefix(3)), icon: "dumbbell.fill", tint: 5))
@@ -154,7 +162,6 @@ enum Demo {
                 if let p = library.playlists.first(where: { $0.name == name }) { library.movePlaylist(p.id, to: folder) }
             }
             folderID = gym
-            orderingSelected = library.playlists.first { $0.name == "Domingo lento" }?.id.uuidString
         }
         if current?.artistsFollowing == true || current?.releases == true || current?.followed == true {
             for a in followed.reversed() { library.follow(browseId: a.browseId, name: a.name, thumbnail: nil, since: a.since) }
@@ -185,8 +192,6 @@ enum Demo {
 
     /// La carpeta que abre el escenario `.folder` (Gimnasio).
     @MainActor static var folderID: String?
-    /// La portada elegida en las capturas del modo «Ordenar» (su clave en `playlistOrder`).
-    static var orderingSelected: String?
 
     /// Estado del reproductor y hojas abiertas.
     @MainActor static func apply(player: Player, jam: JamService) {

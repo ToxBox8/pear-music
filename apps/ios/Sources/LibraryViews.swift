@@ -74,8 +74,8 @@ struct NoMatchesView: View {
 /// playlists: el carrusel de Biblioteca lo ocupa ahora Fijados. Con Descargadas y Favoritos «en Playlists» (Ajustes ›
 /// Biblioteca), van aquí con su portada.
 /// Menús y gestos (paso B; DECISIONS 40): mantener pulsada una portada abre su menú y nada más; el orden se cambia en
-/// el modo «Ordenar» (del ⋯ o del menú de una portada), arrastrando por el asa o con «Antes» y «Después», y pasa a
-/// «A mano». El + crea una playlist (y la abre) o una carpeta.
+/// el modo «Ordenar» (del ⋯ o del menú de una portada), arrastrando la portada entera (paso C; DECISIONS 42 y 43), y
+/// pasa a «A mano». El + crea una playlist (y la abre) o una carpeta.
 /// Carpetas (3.0, bloque 1; DECISIONS 35): con `folderID` es la pantalla de una carpeta, con Reproducir y Aleatorio
 /// de todo lo de dentro. En cada nivel van primero las carpetas y después las playlists. Igual que `PlaylistsScreen`
 /// en Android.
@@ -89,9 +89,8 @@ struct PlaylistsListView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var query = ""
-    /// Modo «Ordenar» y la portada elegida (su clave).
+    /// Modo «Ordenar» (sólo se arrastra; DECISIONS 42 y 43).
     @State private var ordering = Demo.current?.playlistsOrdering == true
-    @State private var selected: String? = Demo.current?.playlistsOrdering == true ? Demo.orderingSelected : nil
     @State private var moving: MoveItem?
     @State private var deleting: PlaylistFolder?
     @State private var deletingPlaylist: Playlist?
@@ -169,14 +168,13 @@ struct PlaylistsListView: View {
         let all = keys.compactMap { entry($0, path: false) }
         // En el modo «Ordenar» se ve el nivel entero: ordenar sólo lo encontrado no tendría sentido.
         let shown = query.isEmpty || ordering ? all : searchEntries()
-        let ids = all.map(\.key)
         ScrollViewReader { proxy in
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
                     if let folder, !ordering { FolderHeader(folder: folder) }
                     if !shown.isEmpty {
                         if ordering { OrderHint() }
-                        ReorderGrid(items: shown, ordering: ordering, selected: $selected, onMoved: saveOrder,
+                        ReorderGrid(items: shown, ordering: ordering, onMoved: saveOrder,
                                     canDropInto: canDropInto, canSwap: canSwap, onDropInto: dropInto,
                                     menu: { AnyView(menu($0)) },
                                     destination: { e in
@@ -198,9 +196,8 @@ struct PlaylistsListView: View {
                 EmptyCreate(folder: folderID != nil) { newPlaylist(in: folderID) }
             } else if shown.isEmpty { NoMatchesView(query: query) }
         }
-        .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always),
-                    prompt: folder.map { L("Buscar en {0}", $0.name) } ?? L("Buscar en playlists"))
-        .scrollDismissesKeyboard(.interactively)
+        // El buscador no se dibuja mientras se ordena (DECISIONS 42).
+        .orderSearchable(!ordering, text: $query, prompt: folder.map { L("Buscar en {0}", $0.name) } ?? L("Buscar en playlists"))
         .themed()
         .navigationTitle(ordering ? L("Ordenar") : folder?.name ?? L("Playlists"))
         .navigationBarBackButtonHidden(ordering)
@@ -214,18 +211,6 @@ struct PlaylistsListView: View {
                     Menu { toolbarMenu } label: { Image(systemName: "ellipsis.circle") }
                         .accessibilityLabel(L("Más opciones"))
                 }
-            }
-        }
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            if ordering {
-                OrderBar(canBefore: selected.map { GridOrder.canStep($0, by: -1, in: ids, canSwap: canSwap) } ?? false,
-                         canAfter: selected.map { GridOrder.canStep($0, by: 1, in: ids, canSwap: canSwap) } ?? false,
-                         onMove: moveSelected, canMove: selected.map { $0 != LibraryOrder.downloads && $0 != LibraryOrder.favorites && ids.contains($0) } ?? false) { delta in
-                    guard let s = selected else { return }
-                    UISelectionFeedbackGenerator().selectionChanged()
-                    withAnimation(reduceMotion ? nil : .uiEaseOut(0.22)) { saveOrder(GridOrder.step(s, by: delta, in: ids, canSwap: canSwap)) }
-                }
-                .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
         .sheet(item: $moving) { MoveToFolderSheet(item: $0) }
@@ -253,8 +238,6 @@ struct PlaylistsListView: View {
         }
         // La carpeta abierta ya no existe (borrada desde otro sitio o al importar): se vuelve atrás.
         .onChange(of: library.folders.map(\.id)) { ids in if let folderID, !ids.contains(folderID) { dismiss() } }
-        // Lo elegido ya no está en este nivel (se movió a una carpeta o se eliminó): nada elegido.
-        .onChange(of: ids) { now in if let s = selected, !now.contains(s) { selected = nil } }
         // Escribir en el buscador sale del modo «Ordenar».
         .onChange(of: query) { q in if !q.isEmpty && ordering { setOrdering(false) } }
         .task { if Demo.current?.showMove == true, folderID != nil, let p = library.userPlaylists.first(where: { $0.folder == folderID }) { moving = .playlist(p.id) } }
@@ -294,7 +277,7 @@ struct PlaylistsListView: View {
                     Label(L("Sacar de «{0}»", f.name), systemImage: "arrow.up.forward.square")
                 }
             }
-            Button { startOrdering(e.key) } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
+            Button { startOrdering() } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
             Button { library.update(p.id) { $0.pinned = $0.pinned == true ? nil : true } } label: {
                 p.pinned == true ? Label(L("Soltar de arriba"), systemImage: "pin.slash") : Label(L("Fijar arriba"), systemImage: "pin")
             }
@@ -304,11 +287,11 @@ struct PlaylistsListView: View {
         } else if let f = e.folder {
             Button { rename(f) } label: { Label(L("Renombrar"), systemImage: "pencil") }
             Button { moving = .folder(f.id) } label: { Label(L("Mover carpeta a…"), systemImage: "folder") }
-            Button { startOrdering(e.key) } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
+            Button { startOrdering() } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
             Divider()
             Button(role: .destructive) { deleting = f } label: { Label(L("Eliminar carpeta…"), systemImage: "trash") }
         } else {
-            Button { startOrdering(e.key) } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
+            Button { startOrdering() } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
         }
     }
 
@@ -325,7 +308,7 @@ struct PlaylistsListView: View {
     }
 
     @ViewBuilder private var toolbarMenu: some View {
-        Button { startOrdering(nil) } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
+        Button { startOrdering() } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
         // El criterio (antes en la pantalla «Editar orden»).
         Picker(L("Ordenar por"), selection: $sort) {
             ForEach(Self.sorts, id: \.0) { item in Text(item.1).tag(item.0) }
@@ -342,16 +325,12 @@ struct PlaylistsListView: View {
     // MARK: Modo «Ordenar»
 
     private func setOrdering(_ on: Bool) {
-        withAnimation(reduceMotion ? nil : .uiEaseOut(0.25)) {
-            ordering = on
-            if !on { selected = nil }
-        }
+        withAnimation(reduceMotion ? nil : .uiEaseOut(0.25)) { ordering = on }
     }
 
-    /// Entra en el modo «Ordenar», con esa portada ya elegida si viene de su menú.
-    private func startOrdering(_ key: String?) {
+    /// Entra en el modo «Ordenar» (del ⋯ o del menú de una portada): se borra lo buscado y se ve el nivel entero.
+    private func startOrdering() {
         query = ""
-        selected = key
         setOrdering(true)
     }
 
@@ -361,12 +340,6 @@ struct PlaylistsListView: View {
         orderRaw = LibraryOrder.reorder(level: moved, playlists: library.userPlaylists, folders: library.folders,
                                         sort: sort, order: LibraryOrder.decode(orderRaw)).joined(separator: "\n")
         sort = "custom"
-    }
-
-    private func moveSelected() {
-        guard let s = selected else { return }
-        if let f = LibraryOrder.folderID(s) { moving = .folder(f) }
-        else if let id = UUID(uuidString: s) { moving = .playlist(id) }
     }
 
     private func isFolder(_ key: String) -> Bool { LibraryOrder.folderID(key) != nil }
@@ -437,18 +410,16 @@ struct AlbumsListView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var query = ""
     @State private var ordering = false
-    @State private var selected: UUID?
     @State private var deleting: Playlist?
     @State private var opened: Playlist?
 
     var body: some View {
         let albums = LibraryOrder.albums(library.albums, sort: albumSort, order: LibraryOrder.decode(albumOrder))
         let shown = ordering ? albums : LocalSearch.filter(albums, query) { "\($0.name) \($0.album?.artist ?? "")" }
-        let ids = albums.map(\.id)
         ScrollView {
             if !shown.isEmpty {
                 if ordering { OrderHint() }
-                ReorderGrid(items: shown, ordering: ordering, selected: $selected, onMoved: save,
+                ReorderGrid(items: shown, ordering: ordering, onMoved: save,
                             menu: { AnyView(menu($0)) },
                             destination: { p in PlaylistV11View(playlistID: p.id) }) { p in
                     GridCover(playlist: p, subtitle: p.album?.line ?? songCount(p.songs.count))
@@ -459,8 +430,7 @@ struct AlbumsListView: View {
             if albums.isEmpty { AlbumsEmptyView() }
             else if shown.isEmpty { NoMatchesView(query: query) }
         }
-        .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: L("Buscar en tus álbumes"))
-        .scrollDismissesKeyboard(.interactively)
+        .orderSearchable(!ordering, text: $query, prompt: L("Buscar en tus álbumes"))
         .themed()
         .navigationTitle(ordering ? L("Ordenar") : L("Tus álbumes"))
         .navigationBarBackButtonHidden(ordering)
@@ -469,33 +439,21 @@ struct AlbumsListView: View {
                 if ordering {
                     Button(L("Hecho")) { setOrdering(false) }.fontWeight(.semibold)
                 } else if albums.count > 1 {
-                    Button(L("Ordenar")) { start(nil) }
+                    Button(L("Ordenar")) { start() }
                 }
-            }
-        }
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            if ordering {
-                OrderBar(canBefore: selected.map { GridOrder.canStep($0, by: -1, in: ids) } ?? false,
-                         canAfter: selected.map { GridOrder.canStep($0, by: 1, in: ids) } ?? false) { delta in
-                    guard let s = selected else { return }
-                    UISelectionFeedbackGenerator().selectionChanged()
-                    withAnimation(reduceMotion ? nil : .uiEaseOut(0.22)) { save(GridOrder.step(s, by: delta, in: ids)) }
-                }
-                .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
         .navigationDestination(isPresented: Binding(get: { opened != nil }, set: { if !$0 { opened = nil } })) {
             if let opened { PlaylistV11View(playlistID: opened.id) }
         }
         .deletePlaylistAlert($deleting, library: library)
-        .onChange(of: ids) { now in if let s = selected, !now.contains(s) { selected = nil } }
         .onChange(of: query) { q in if !q.isEmpty && ordering { setOrdering(false) } }
         .miniPlayer()
     }
 
     @ViewBuilder private func menu(_ p: Playlist) -> some View {
         Button { opened = p } label: { Label(L("Abrir"), systemImage: "arrow.up.right.square") }
-        Button { start(p.id) } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
+        Button { start() } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
         Button { library.update(p.id) { $0.pinned = $0.pinned == true ? nil : true } } label: {
             p.pinned == true ? Label(L("Soltar de arriba"), systemImage: "pin.slash") : Label(L("Fijar arriba"), systemImage: "pin")
         }
@@ -504,20 +462,17 @@ struct AlbumsListView: View {
     }
 
     private func setOrdering(_ on: Bool) {
-        withAnimation(reduceMotion ? nil : .uiEaseOut(0.25)) {
-            ordering = on
-            if !on { selected = nil }
-        }
+        withAnimation(reduceMotion ? nil : .uiEaseOut(0.25)) { ordering = on }
     }
 
-    private func start(_ id: UUID?) {
+    private func start() {
         query = ""
-        selected = id
         setOrdering(true)
     }
 
     private func save(_ moved: [UUID]) {
-        albumOrder = moved.map(\.uuidString).joined(separator: "\n")
+        // Las claves `folder:` de las carpetas de álbumes (T15) se quedan, aunque aún no se pinten.
+        albumOrder = LibraryOrder.savingAlbums(moved.map(\.uuidString), into: LibraryOrder.decode(albumOrder)).joined(separator: "\n")
         albumSort = "custom"
     }
 }
@@ -538,6 +493,18 @@ private struct GridCover: View {
     }
 }
 
+extension View {
+    /// El buscador de Playlists y Tus álbumes, que no se dibuja mientras se ordena (`on` false).
+    @ViewBuilder func orderSearchable(_ on: Bool, text: Binding<String>, prompt: String) -> some View {
+        if on {
+            searchable(text: text, placement: .navigationBarDrawer(displayMode: .always), prompt: prompt)
+                .scrollDismissesKeyboard(.interactively)
+        } else {
+            self
+        }
+    }
+}
+
 /// La celda sobre la que se está soltando algo para meterlo dentro (una carpeta). La lee `FolderCover`.
 private struct DropIntoKey: EnvironmentKey { static let defaultValue = false }
 extension EnvironmentValues {
@@ -547,17 +514,14 @@ extension EnvironmentValues {
     }
 }
 
-/// Cuadrícula de dos columnas de Playlists y Tus álbumes (paso B; DECISIONS 40).
-/// Normal: tocar abre y mantener pulsado abre el menú (`menu`), sin arrastre debajo: en iOS el arrastre del sistema
-/// se quedaba con la pulsación larga y chocaba con el menú.
-/// Modo «Ordenar» (`ordering`): tocar una portada la elige (`selected`) y su asa (≡) la arrastra al momento, con un
-/// gesto propio; las demás se apartan y al soltar llega el orden nuevo a `onMoved`. Las celdas que son contenedores
-/// (carpetas) no se apartan: si lo que se arrastra cabe dentro, se marcan y al soltar llega a `onDropInto`.
-/// Igual que `ReorderGrid` en Android.
+/// Cuadrícula de dos columnas de Playlists, de una carpeta y de Tus álbumes. Fuera de «Ordenar», tocar abre y
+/// mantener pulsado abre el menú (`menu`). En «Ordenar» (`ordering`) sólo se arrastra: el dedo quieto 0,2 s levanta la
+/// portada entera (deslizar antes desplaza la lista), la copia levantada sigue al dedo sin animación y deja su hueco
+/// marcado, las demás se apartan, soltar sobre una carpeta (`canDropInto`) la mete dentro y cerca del borde de arriba o
+/// de abajo la lista se desplaza sola (`OrderLift`). Tocar no hace nada. Igual que `ReorderGrid` en Android.
 struct ReorderGrid<Item: Identifiable, Destination: View, Cell: View>: View {
     let items: [Item]
     let ordering: Bool
-    @Binding var selected: Item.ID?
     let onMoved: ([Item.ID]) -> Void
     /// ¿Se puede soltar `arrastrado` dentro de `celda`? (carpetas; por defecto, nada es contenedor).
     var canDropInto: (Item.ID, Item.ID) -> Bool = { _, _ in false }
@@ -568,95 +532,79 @@ struct ReorderGrid<Item: Identifiable, Destination: View, Cell: View>: View {
     var menu: ((Item) -> AnyView)? = nil
     @ViewBuilder let destination: (Item) -> Destination
     @ViewBuilder let cell: (Item) -> Cell
-    @State private var order: [Item.ID] = []
-    @State private var frames: [Item.ID: CGRect] = [:]
-    @State private var drag: OrderDrag<Item.ID>?
+    @StateObject private var lift = OrderLift<Item.ID>()
+    @GestureState private var pressing = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     private let columns = [GridItem(.flexible(), spacing: 16, alignment: .top), GridItem(.flexible(), spacing: 16, alignment: .top)]
     private let space = "order-grid"
 
     var body: some View {
         let byID = Dictionary(items.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
-        let shown = order.compactMap { byID[$0] }
-        LazyVGrid(columns: columns, spacing: 22) {
-            ForEach(shown.count == items.count ? shown : items) { p in
-                Group {
-                    if ordering {
-                        orderCell(p)
-                    } else {
+        let shown = lift.order.compactMap { byID[$0] }
+        let list = shown.count == items.count ? shown : items
+        Group {
+            if ordering {
+                // Sin pereza mientras se ordena: la portada cogida no puede desaparecer a mitad del gesto.
+                OrderGridLayout { ForEach(list) { p in orderCell(p).id(p.id) } }
+            } else {
+                LazyVGrid(columns: columns, spacing: 22) {
+                    ForEach(list) { p in
                         NavigationLink { destination(p) } label: { cell(p) }
                             .buttonStyle(TactileButtonStyle())
                             .contextMenu { if let menu { menu(p) } }
+                            .id(p.id)
                     }
                 }
-                .id(p.id)
             }
         }
         .coordinateSpace(name: space)
-        .onPreferenceChange(OrderFrameKey<Item.ID>.self) { frames = $0 }
+        .background(OrderAnchorView(anchor: lift.anchor))
+        .onPreferenceChange(OrderFrameKey<Item.ID>.self) { lift.frames = $0 }
+        .overlay(alignment: .topLeading) { liftedCopy(byID) }
         .padding(.horizontal, 16)
         .padding(.top, 8)
         .padding(.bottom, ordering ? 12 : 0)
-        .onAppear { order = items.map(\.id) }
-        .onChange(of: items.map(\.id)) { ids in if drag == nil { order = ids } }
+        .onAppear { lift.order = items.map(\.id) }
+        .onChange(of: items.map(\.id)) { ids in if lift.drag == nil { lift.order = ids } }
+        .onChange(of: pressing) { on in if !on { finish() } }
+        .onChange(of: ordering) { on in if !on { lift.end() } }
     }
 
-    /// Una celda en el modo «Ordenar»: se elige tocándola y se arrastra por el asa.
+    /// Una celda en el modo «Ordenar»: no se toca; se coge con el dedo quieto y, mientras está levantada, en su sitio
+    /// queda el hueco.
     private func orderCell(_ p: Item) -> some View {
-        let lifted = drag?.id == p.id
-        return Button {
-            selected = p.id
-            UISelectionFeedbackGenerator().selectionChanged()
-        } label: { cell(p) }
-            .buttonStyle(.plain)
-            .accessibilityAddTraits(selected == p.id ? .isSelected : [])
-            .accessibilityHint(L("Elige esta portada para moverla con los botones"))
-            .environment(\.dropInto, drag?.into == p.id)
-            .modifier(OrderSelection(on: selected == p.id && !lifted))
-            .overlay(alignment: .topTrailing) { OrderGrip().gesture(grip(p.id)) }
-            .background(GeometryReader { g in
-                Color.clear.preference(key: OrderFrameKey<Item.ID>.self, value: [p.id: g.frame(in: .named(space))])
-            })
-            .scaleEffect(lifted && !reduceMotion ? 1.04 : 1)
-            .shadow(color: .black.opacity(lifted ? 0.22 : 0), radius: 16, y: 10)
-            .opacity(lifted && drag?.into != nil ? 0.85 : 1)
-            .offset(lifted ? drag?.offset(in: order) ?? .zero : .zero)
-            .zIndex(lifted ? 1 : 0)
+        let lifted = lift.drag?.id == p.id
+        return ZStack(alignment: .top) {
+            cell(p).opacity(lifted ? 0 : 1)
+            if lifted { OrderHole() }
+        }
+        .environment(\.dropInto, lift.drag?.into == p.id)
+        .contentShape(Rectangle())
+        .gesture(OrderGesture.lift(pressing: $pressing,
+                                   onLift: { lift.lift(p.id, axis: .vertical, reduceMotion: reduceMotion, canDropInto: canDropInto, canSwap: canSwap) },
+                                   onMove: { lift.move(start: $0, now: $1) },
+                                   onEnd: finish))
+        .background(GeometryReader { g in
+            Color.clear.preference(key: OrderFrameKey<Item.ID>.self, value: [p.id: g.frame(in: .named(space))])
+        })
     }
 
-    private func grip(_ id: Item.ID) -> some Gesture {
-        DragGesture(minimumDistance: 0, coordinateSpace: .named(space))
-            .onChanged { v in
-                if drag?.id != id {
-                    guard let start = order.firstIndex(of: id) else { return }
-                    var slots: [Int: CGRect] = [:]
-                    for (i, other) in order.enumerated() { if let f = frames[other] { slots[i] = f } }
-                    drag = OrderDrag(id: id, slots: slots, start: start)
-                    selected = id
-                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                }
-                guard var d = drag else { return }
-                let before = d.into
-                let next = d.move(to: v.location, translation: v.translation, order: order, canDropInto: canDropInto, canSwap: canSwap)
-                if next != order {
-                    UISelectionFeedbackGenerator().selectionChanged()
-                    withAnimation(reduceMotion ? nil : .uiEaseOut(0.22)) { order = next; drag = d }
-                } else {
-                    if d.into != before, d.into != nil { UIImpactFeedbackGenerator(style: .light).impactOccurred() }
-                    drag = d
-                }
-            }
-            .onEnded { _ in
-                guard let d = drag else { return }
-                withAnimation(reduceMotion ? nil : .uiEaseOut(0.22)) { drag = nil }
-                if let into = d.into {
-                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                    onDropInto(d.id, into)
-                } else if d.changed {
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                    onMoved(order)
-                }
-            }
+    /// La portada levantada, encima de la cuadrícula y en el sitio del dedo, sin animación.
+    @ViewBuilder private func liftedCopy(_ byID: [Item.ID: Item]) -> some View {
+        if let d = lift.drag, let item = byID[d.id], let r = d.slots[d.start] {
+            cell(item)
+                .frame(width: r.width, height: r.height, alignment: .top)
+                .orderLifted(reduceMotion: reduceMotion)
+                .opacity(d.into != nil ? 0.85 : 1)
+                .offset(x: r.minX + lift.shift.width, y: r.minY + lift.shift.height)
+                .accessibilityHidden(true)
+        }
+    }
+
+    private func finish() {
+        guard let d = lift.end() else { return }
+        if let into = d.into { onDropInto(d.id, into) }
+        else if d.changed { onMoved(lift.order) }
     }
 }
 

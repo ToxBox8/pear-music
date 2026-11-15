@@ -1,19 +1,32 @@
 {
-  "$comment": "Lo que tiene que salir al leer cada copia, igual en iOS (scripts/tests/LibraryFoldersTests.swift) y Android (PlaylistFoldersTest.kt). folders: id → carpeta de arriba (null = arriba del todo) y nombre; playlists: id → carpeta (null = sin carpeta). Lo que no sale aquí no existe después de leer.",
+  "$comment": "Lo que tiene que salir al leer cada copia, igual en iOS (scripts/tests/LibraryFoldersTests.swift) y Android (PlaylistFoldersTest.kt). folders y albumFolders: id → carpeta de arriba (null = arriba del todo), nombre y, si se dice, icon/tint guardados (null = no se guardan) y shownIcon/shownTint (lo que se pinta; null = el mosaico); playlists: id → carpeta (null = sin carpeta); albumFolderKeys: las claves folder: de albumOrder que valen; albumsShown: «Tus álbumes» con albumSort custom, en orden. Lo que no sale aquí no existe después de leer.",
   "antigua-sin-carpetas.json": {
     "folders": {},
     "playlists": {
       "0000000A-0000-0000-0000-00000000A001": null,
       "0000000A-0000-0000-0000-00000000A002": null,
       "0000000A-0000-0000-0000-00000000A003": null
-    }
+    },
+    "albumFolders": {}
   },
   "carpetas.json": {
     "folders": {
-      "0000000F-0000-0000-0000-00000000F001": {"name": "Gimnasio", "parent": null},
-      "0000000F-0000-0000-0000-00000000F002": {"name": "Pierna", "parent": "0000000F-0000-0000-0000-00000000F001"},
-      "0000000F-0000-0000-0000-00000000F003": {"name": "Lunes", "parent": "0000000F-0000-0000-0000-00000000F002"},
-      "0000000F-0000-0000-0000-00000000F004": {"name": "Viajes", "parent": null}
+      "0000000F-0000-0000-0000-00000000F001": {
+        "name": "Gimnasio",
+        "parent": null
+      },
+      "0000000F-0000-0000-0000-00000000F002": {
+        "name": "Pierna",
+        "parent": "0000000F-0000-0000-0000-00000000F001"
+      },
+      "0000000F-0000-0000-0000-00000000F003": {
+        "name": "Lunes",
+        "parent": "0000000F-0000-0000-0000-00000000F002"
+      },
+      "0000000F-0000-0000-0000-00000000F004": {
+        "name": "Viajes",
+        "parent": null
+      }
     },
     "playlists": {
       "0000000A-0000-0000-0000-00000000B001": "0000000F-0000-0000-0000-00000000F001",
@@ -21,23 +34,63 @@
       "0000000A-0000-0000-0000-00000000B003": "0000000F-0000-0000-0000-00000000F003",
       "0000000A-0000-0000-0000-00000000B004": null,
       "0000000A-0000-0000-0000-00000000B005": null
-    }
+    },
+    "albumFolders": {}
   },
   "carpetas-rotas.json": {
     "folders": {
-      "0000000F-0000-0000-0000-00000000F010": {"name": "Huérfana", "parent": null},
-      "0000000F-0000-0000-0000-00000000F011": {"name": "Ciclo A", "parent": null},
-      "0000000F-0000-0000-0000-00000000F012": {"name": "Ciclo B", "parent": null},
-      "0000000F-0000-0000-0000-00000000F013": {"name": "Hija del ciclo", "parent": "0000000F-0000-0000-0000-00000000F011"},
-      "0000000F-0000-0000-0000-00000000F014": {"name": "Ella misma", "parent": null},
-      "0000000F-0000-0000-0000-00000000F020": {"name": "Nivel 1", "parent": null},
-      "0000000F-0000-0000-0000-00000000F021": {"name": "Nivel 2", "parent": "0000000F-0000-0000-0000-00000000F020"},
-      "0000000F-0000-0000-0000-00000000F022": {"name": "Nivel 3", "parent": "0000000F-0000-0000-0000-00000000F021"},
-      "0000000F-0000-0000-0000-00000000F023": {"name": "Nivel 4", "parent": null},
-      "0000000F-0000-0000-0000-00000000F024": {"name": "Nivel 5", "parent": "0000000F-0000-0000-0000-00000000F023"},
-      "0000000F-0000-0000-0000-00000000F030": {"name": "Carpeta", "parent": null},
-      "0000000F-0000-0000-0000-00000000F032": {"name": "Padre raro", "parent": null},
-      "0000000F-0000-0000-0000-00000000F040": {"name": "Id con salto de línea", "parent": "0000000F-0000-0000-0000-00000000F020"}
+      "0000000F-0000-0000-0000-00000000F010": {
+        "name": "Huérfana",
+        "parent": null
+      },
+      "0000000F-0000-0000-0000-00000000F011": {
+        "name": "Ciclo A",
+        "parent": null
+      },
+      "0000000F-0000-0000-0000-00000000F012": {
+        "name": "Ciclo B",
+        "parent": null
+      },
+      "0000000F-0000-0000-0000-00000000F013": {
+        "name": "Hija del ciclo",
+        "parent": "0000000F-0000-0000-0000-00000000F011"
+      },
+      "0000000F-0000-0000-0000-00000000F014": {
+        "name": "Ella misma",
+        "parent": null
+      },
+      "0000000F-0000-0000-0000-00000000F020": {
+        "name": "Nivel 1",
+        "parent": null
+      },
+      "0000000F-0000-0000-0000-00000000F021": {
+        "name": "Nivel 2",
+        "parent": "0000000F-0000-0000-0000-00000000F020"
+      },
+      "0000000F-0000-0000-0000-00000000F022": {
+        "name": "Nivel 3",
+        "parent": "0000000F-0000-0000-0000-00000000F021"
+      },
+      "0000000F-0000-0000-0000-00000000F023": {
+        "name": "Nivel 4",
+        "parent": null
+      },
+      "0000000F-0000-0000-0000-00000000F024": {
+        "name": "Nivel 5",
+        "parent": "0000000F-0000-0000-0000-00000000F023"
+      },
+      "0000000F-0000-0000-0000-00000000F030": {
+        "name": "Carpeta",
+        "parent": null
+      },
+      "0000000F-0000-0000-0000-00000000F032": {
+        "name": "Padre raro",
+        "parent": null
+      },
+      "0000000F-0000-0000-0000-00000000F040": {
+        "name": "Id con salto de línea",
+        "parent": "0000000F-0000-0000-0000-00000000F020"
+      }
     },
     "playlists": {
       "0000000A-0000-0000-0000-00000000C001": null,
@@ -45,6 +98,186 @@
       "0000000A-0000-0000-0000-00000000C003": "0000000F-0000-0000-0000-00000000F011",
       "0000000A-0000-0000-0000-00000000C004": null,
       "0000000A-0000-0000-0000-00000000C005": "0000000F-0000-0000-0000-00000000F040"
+    },
+    "albumFolders": {}
+  },
+  "carpetas-albumes.json": {
+    "folders": {
+      "0000000F-0000-0000-0000-00000000F101": {
+        "name": "Gimnasio",
+        "parent": null,
+        "icon": "dumbbell.fill",
+        "tint": 3
+      },
+      "0000000F-0000-0000-0000-00000000F102": {
+        "name": "Pierna",
+        "parent": "0000000F-0000-0000-0000-00000000F101"
+      }
+    },
+    "albumFolders": {
+      "0000000E-0000-0000-0000-00000000E001": {
+        "name": "Años 70",
+        "parent": null,
+        "icon": "guitars.fill",
+        "tint": 6,
+        "shownIcon": "guitars.fill",
+        "shownTint": 6
+      },
+      "0000000E-0000-0000-0000-00000000E002": {
+        "name": "Directos",
+        "parent": "0000000E-0000-0000-0000-00000000E001"
+      },
+      "0000000E-0000-0000-0000-00000000E003": {
+        "name": "Bootlegs",
+        "parent": "0000000E-0000-0000-0000-00000000E002"
+      },
+      "0000000E-0000-0000-0000-00000000E004": {
+        "name": "Nivel 4",
+        "parent": null
+      },
+      "0000000E-0000-0000-0000-00000000E005": {
+        "name": "Hija de la repetida",
+        "parent": null
+      },
+      "0000000E-0000-0000-0000-00000000E006": {
+        "name": "Con padre de playlists",
+        "parent": null
+      }
+    },
+    "playlists": {
+      "0000000A-0000-0000-0000-00000000E101": "0000000F-0000-0000-0000-00000000F101",
+      "0000000A-0000-0000-0000-00000000E102": null,
+      "0000000A-0000-0000-0000-00000000E103": "0000000E-0000-0000-0000-00000000E001",
+      "0000000A-0000-0000-0000-00000000E104": "0000000E-0000-0000-0000-00000000E002",
+      "0000000A-0000-0000-0000-00000000E105": null,
+      "0000000A-0000-0000-0000-00000000E106": null,
+      "0000000A-0000-0000-0000-00000000E107": null,
+      "0000000A-0000-0000-0000-00000000E108": "0000000E-0000-0000-0000-00000000E004"
+    },
+    "albumFolderKeys": [
+      "folder:0000000E-0000-0000-0000-00000000E001",
+      "folder:0000000E-0000-0000-0000-00000000E002"
+    ],
+    "albumsShown": [
+      "0000000A-0000-0000-0000-00000000E104",
+      "0000000A-0000-0000-0000-00000000E103",
+      "0000000A-0000-0000-0000-00000000E108",
+      "0000000A-0000-0000-0000-00000000E107",
+      "0000000A-0000-0000-0000-00000000E106",
+      "0000000A-0000-0000-0000-00000000E105"
+    ]
+  },
+  "carpetas-iconos.json": {
+    "folders": {
+      "0000000F-0000-0000-0000-00000000F201": {
+        "name": "Icono y color",
+        "parent": null,
+        "icon": "dumbbell.fill",
+        "tint": 3,
+        "shownIcon": "dumbbell.fill",
+        "shownTint": 3
+      },
+      "0000000F-0000-0000-0000-00000000F202": {
+        "name": "Icono sin color",
+        "parent": null,
+        "icon": "heart.fill",
+        "tint": null,
+        "shownIcon": "heart.fill",
+        "shownTint": null
+      },
+      "0000000F-0000-0000-0000-00000000F203": {
+        "name": "Icono que no se conoce",
+        "parent": null,
+        "icon": "rocket.fill",
+        "tint": 2,
+        "shownIcon": null,
+        "shownTint": null
+      },
+      "0000000F-0000-0000-0000-00000000F204": {
+        "name": "Color 8",
+        "parent": null,
+        "icon": "star.fill",
+        "tint": 8,
+        "shownIcon": "star.fill",
+        "shownTint": null
+      },
+      "0000000F-0000-0000-0000-00000000F205": {
+        "name": "Color -1",
+        "parent": null,
+        "icon": "star.fill",
+        "tint": -1,
+        "shownIcon": "star.fill",
+        "shownTint": null
+      },
+      "0000000F-0000-0000-0000-00000000F206": {
+        "name": "Color 3.0",
+        "parent": null,
+        "icon": "sparkles",
+        "tint": 3,
+        "shownIcon": "sparkles",
+        "shownTint": 3
+      },
+      "0000000F-0000-0000-0000-00000000F207": {
+        "name": "Color en texto",
+        "parent": null,
+        "icon": "sparkles",
+        "tint": null,
+        "shownIcon": "sparkles",
+        "shownTint": null
+      },
+      "0000000F-0000-0000-0000-00000000F208": {
+        "name": "Icono numérico",
+        "parent": null,
+        "icon": null,
+        "tint": 1,
+        "shownIcon": null,
+        "shownTint": null
+      },
+      "0000000F-0000-0000-0000-00000000F209": {
+        "name": "Icono vacío",
+        "parent": null,
+        "icon": null,
+        "tint": 1,
+        "shownIcon": null,
+        "shownTint": null
+      },
+      "0000000F-0000-0000-0000-00000000F210": {
+        "name": "Color suelto",
+        "parent": null,
+        "icon": null,
+        "tint": 4,
+        "shownIcon": null,
+        "shownTint": null
+      },
+      "0000000F-0000-0000-0000-00000000F211": {
+        "name": "Color con decimales",
+        "parent": null,
+        "icon": "leaf.fill",
+        "tint": null,
+        "shownIcon": "leaf.fill",
+        "shownTint": null
+      }
+    },
+    "albumFolders": {
+      "0000000E-0000-0000-0000-00000000E201": {
+        "name": "Álbumes con icono",
+        "parent": null,
+        "icon": "guitars.fill",
+        "tint": 6,
+        "shownIcon": "guitars.fill",
+        "shownTint": 6
+      },
+      "0000000E-0000-0000-0000-00000000E202": {
+        "name": "Álbumes, icono futuro",
+        "parent": null,
+        "icon": "vinyl.fill",
+        "tint": 7,
+        "shownIcon": null,
+        "shownTint": null
+      }
+    },
+    "playlists": {
+      "0000000A-0000-0000-0000-00000000E201": "0000000F-0000-0000-0000-00000000F201"
     }
   }
 }

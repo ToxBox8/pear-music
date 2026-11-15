@@ -131,6 +131,8 @@ struct LibraryV11View: View {
     @AppStorage("smartPlacement") private var placement = "playlists"
     @AppStorage("musicOrder") private var musicRaw = ""
     @State private var editingMusic = Demo.current?.musicEditing == true
+    /// Fijados se está ordenando: «Ordenar» de «Tu música» no se dibuja (un solo shu; DECISIONS 42).
+    @State private var pinnedOrdering = false
     /// Apartado que se arrastra por su asa, lo que lleva recorrido desde su sitio y el alto de una fila.
     @State private var dragKey: String?
     @State private var dragOffset: CGFloat = 0
@@ -147,7 +149,7 @@ struct LibraryV11View: View {
                     header(songs)
                     // Fijados (x.1.1): en el sitio del antiguo carrusel de Playlists, con portadas igual de grandes.
                     // Las playlists están ya sólo en la carpeta de «Tu música».
-                    PinnedCarousel()
+                    PinnedCarousel(ordering: $pinnedOrdering, musicOrdering: editingMusic)
                     musicSection(songs)
                 }
                 .padding(.top, 6)
@@ -219,13 +221,18 @@ struct LibraryV11View: View {
             HStack(alignment: .lastTextBaseline) {
                 Text(L("Tu música")).displayTitle(24)
                 Spacer()
-                Button(editingMusic ? L("Hecho") : L("Ordenar")) {
-                    withAnimation(reduceMotion ? nil : .uiEaseOut(0.25)) { editingMusic.toggle() }
+                if !pinnedOrdering {
+                    Button(editingMusic ? L("Hecho") : L("Ordenar")) {
+                        withAnimation(reduceMotion ? nil : .uiEaseOut(0.25)) { editingMusic.toggle() }
+                    }
+                    .font(.body.weight(.semibold))
+                    .frame(minWidth: 44, minHeight: 44, alignment: .trailing)
+                    .contentShape(Rectangle())
+                    .accessibilityHint(editingMusic ? "" : L("Cambia el orden de los apartados de Tu música"))
+                } else {
+                    // El hueco del botón se queda, para que el título no salte.
+                    Color.clear.frame(width: 44, height: 44)
                 }
-                .font(.body.weight(.semibold))
-                .frame(minWidth: 44, minHeight: 44, alignment: .trailing)
-                .contentShape(Rectangle())
-                .accessibilityHint(editingMusic ? "" : L("Cambia el orden de los apartados de Tu música"))
             }
             .padding(.horizontal, inset)
             if editingMusic {
@@ -317,7 +324,8 @@ struct LibraryV11View: View {
         let controls: (String) -> AnyView? = { title in editingMusic ? musicControls(key, title: title, first: first, last: last) : nil }
         // Mantener pulsado un apartado también lleva al modo de ordenar (lo pidió Toxbox), por su menú.
         let hold = {
-            withAnimation(reduceMotion ? nil : .uiEaseOut(0.25)) { editingMusic = true }
+            // Nunca dos modos de ordenar a la vez: si Fijados se estaba ordenando, sale.
+            withAnimation(reduceMotion ? nil : .uiEaseOut(0.25)) { pinnedOrdering = false; editingMusic = true }
         }
         switch key {
         case "downloads":
@@ -329,8 +337,8 @@ struct LibraryV11View: View {
                 SmartListV11View(kind: .favorites)
             }
         case "playlists":
+            // Sólo el total de playlists, sin contar las carpetas (lo pidió Toxbox tras probarlo en el iPhone).
             LibraryLinkRow(title: L("Playlists"), count: library.userPlaylists.count,
-                           detail: library.folders.isEmpty ? nil : "\(library.userPlaylists.count) · " + (library.folders.count == 1 ? L("1 carpeta") : L("{0} carpetas", library.folders.count)),
                            symbol: "music.note.list", last: last, controls: controls, onHold: hold) { PlaylistsListView() }
         case "albums":
             LibraryLinkRow(title: L("Tus álbumes"), count: library.albums.count, symbol: "square.stack", last: last, controls: controls, onHold: hold) { AlbumsListView() }
@@ -1069,27 +1077,29 @@ struct PinnedRow: View {
     }
 }
 
-/// «Fijados» en Biblioteca (x.1.1): ocupa el sitio del antiguo carrusel de Playlists, con portadas igual de grandes.
-/// Mantener pulsada una portada abre su menú; «Ordenar» entra en el modo de ordenar (asa en cada portada, «Antes» y
-/// «Después» debajo, «Hecho» junto al título), como en Playlists (paso B; DECISIONS 40). El orden se guarda en
-/// `pinnedOrder` y lo sigue también la fila de Inicio. Igual que `PinnedCarousel` en Android.
+/// «Fijados» (x.1.1): portadas grandes en un carrusel. Fuera de «Ordenar», tocar abre y mantener pulsado abre el menú
+/// (Reproducir, Aleatorio, Ordenar, Soltar de arriba). En «Ordenar» se arrastra como en la cuadrícula (paso C;
+/// DECISIONS 42): el dedo quieto 0,2 s coge la portada, deslizar antes mueve el carrusel (a los lados) o la Biblioteca
+/// (en vertical), y cerca del borde izquierdo o derecho el carrusel avanza solo. Sin «Antes» ni «Después». Mientras se
+/// ordena, «Ordenar» de «Tu música» no se dibuja (`ordering`), y al revés (`musicOrdering`): un solo shu. El orden se
+/// guarda en `pinnedOrder` y lo sigue también la fila de Inicio. Igual que `PinnedCarousel` en Android.
 struct PinnedCarousel: View {
+    @Binding var ordering: Bool
+    /// «Tu música» se está ordenando: aquí no se ofrece «Ordenar».
+    var musicOrdering = false
     @EnvironmentObject var library: Library
     @EnvironmentObject var player: Player
     @AppStorage("pinnedOrder") private var orderRaw = ""
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var order: [UUID] = []
-    @State private var frames: [UUID: CGRect] = [:]
-    @State private var drag: OrderDrag<UUID>?
-    @State private var ordering = false
-    @State private var selected: UUID?
+    @StateObject private var lift = OrderLift<UUID>()
+    @GestureState private var pressing = false
     private let inset: CGFloat = 20
     private let space = "order-pinned"
 
     var body: some View {
         let pinned = LibraryOrder.pinned(library.playlists.filter { $0.pinned == true }, order: LibraryOrder.decode(orderRaw))
         let byID = Dictionary(pinned.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
-        let shown = order.count == pinned.count ? order.compactMap { byID[$0] } : pinned
+        let shown = lift.order.count == pinned.count ? lift.order.compactMap { byID[$0] } : pinned
         let ids = pinned.map(\.id)
         VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .lastTextBaseline) {
@@ -1120,42 +1130,32 @@ struct PinnedCarousel: View {
                         ForEach(shown) { p in card(p) }
                     }
                     .coordinateSpace(name: space)
-                    .onPreferenceChange(OrderFrameKey<UUID>.self) { frames = $0 }
+                    .background(OrderAnchorView(anchor: lift.anchor))
+                    .onPreferenceChange(OrderFrameKey<UUID>.self) { lift.frames = $0 }
+                    .overlay(alignment: .topLeading) { liftedCopy(byID) }
                     .carouselLayout()
                     .padding(.horizontal, carouselUsesMargins ? 0 : inset)
-                    // Sitio para el aro de la portada elegida y la sombra de la que se arrastra.
+                    // Sitio para la sombra de la portada levantada.
                     .padding(.vertical, ordering ? 8 : 0)
                 }
                 .carouselScroll(inset: inset)
-                if ordering {
-                    OrderButtons(canBefore: selected.map { GridOrder.canStep($0, by: -1, in: ids) } ?? false,
-                                 canAfter: selected.map { GridOrder.canStep($0, by: 1, in: ids) } ?? false) { delta in
-                        guard let s = selected else { return }
-                        UISelectionFeedbackGenerator().selectionChanged()
-                        withAnimation(reduceMotion ? nil : .uiEaseOut(0.22)) { save(GridOrder.step(s, by: delta, in: ids)) }
-                    }
-                    .padding(.horizontal, inset)
-                    .transition(.opacity)
-                }
             }
         }
-        .onAppear { order = ids }
+        .onAppear { lift.order = ids }
         .onChange(of: ids) { now in
-            if drag == nil { order = now }
-            if let s = selected, !now.contains(s) { selected = nil }
+            if lift.drag == nil { lift.order = now }
             if now.isEmpty { ordering = false }
         }
+        .onChange(of: pressing) { on in if !on { finish() } }
+        .onChange(of: ordering) { on in if !on { lift.end() } }
     }
 
     private func setOrdering(_ on: Bool) {
-        withAnimation(reduceMotion ? nil : .uiEaseOut(0.25)) {
-            ordering = on
-            if !on { selected = nil }
-        }
+        withAnimation(reduceMotion ? nil : .uiEaseOut(0.25)) { ordering = on }
     }
 
     private func save(_ ids: [UUID]) {
-        order = ids
+        lift.order = ids
         orderRaw = ids.map(\.uuidString).joined(separator: "\n")
     }
 
@@ -1165,22 +1165,20 @@ struct PinnedCarousel: View {
 
     @ViewBuilder private func card(_ p: Playlist) -> some View {
         if ordering {
-            let lifted = drag?.id == p.id
-            Button {
-                selected = p.id
-                UISelectionFeedbackGenerator().selectionChanged()
-            } label: { label(p) }
-                .buttonStyle(.plain)
-                .accessibilityAddTraits(selected == p.id ? .isSelected : [])
-                .accessibilityHint(L("Elige esta portada para moverla con los botones"))
-                .modifier(OrderSelection(on: selected == p.id && !lifted, radius: PlaylistCardV11.corner + 6))
-                .overlay(alignment: .topTrailing) { OrderGrip().gesture(grip(p.id)) }
-                .background(GeometryReader { g in
-                    Color.clear.preference(key: OrderFrameKey<UUID>.self, value: [p.id: g.frame(in: .named(space))])
-                })
-                .scaleEffect(lifted && !reduceMotion ? 1.04 : 1)
-                .offset(lifted ? drag?.offset(in: order) ?? .zero : .zero)
-                .zIndex(lifted ? 1 : 0)
+            // No se toca: se coge con el dedo quieto y en su sitio queda el hueco.
+            let lifted = lift.drag?.id == p.id
+            ZStack(alignment: .top) {
+                label(p).opacity(lifted ? 0 : 1)
+                if lifted { OrderHole(radius: PlaylistCardV11.corner, side: PlaylistCardV11.side) }
+            }
+            .contentShape(Rectangle())
+            .gesture(OrderGesture.lift(pressing: $pressing,
+                                       onLift: { lift.lift(p.id, axis: .horizontal, reduceMotion: reduceMotion) },
+                                       onMove: { lift.move(start: $0, now: $1) },
+                                       onEnd: finish))
+            .background(GeometryReader { g in
+                Color.clear.preference(key: OrderFrameKey<UUID>.self, value: [p.id: g.frame(in: .named(space))])
+            })
         } else {
             NavigationLink { PlaylistV11View(playlistID: p.id) } label: { label(p) }
                 .buttonStyle(TactileButtonStyle())
@@ -1192,8 +1190,10 @@ struct PinnedCarousel: View {
                     Button { let s = p.songs.shuffled(); if let f = s.first { player.play(f, in: s) } } label: {
                         Label(L("Aleatorio"), systemImage: "shuffle")
                     }
-                    Button { selected = p.id; setOrdering(true) } label: {
-                        Label(L("Ordenar"), systemImage: "arrow.up.arrow.down")
+                    if !musicOrdering {
+                        Button { setOrdering(true) } label: {
+                            Label(L("Ordenar"), systemImage: "arrow.up.arrow.down")
+                        }
                     }
                     Button { library.playlists.firstIndex(where: { $0.id == p.id }).map { library.playlists[$0].pinned = nil } } label: {
                         Label(L("Soltar de arriba"), systemImage: "pin.slash")
@@ -1202,34 +1202,19 @@ struct PinnedCarousel: View {
         }
     }
 
-    /// El asa: la portada sigue al dedo desde que se toca y las demás se apartan (`OrderDrag`).
-    private func grip(_ id: UUID) -> some Gesture {
-        DragGesture(minimumDistance: 0, coordinateSpace: .named(space))
-            .onChanged { v in
-                if drag?.id != id {
-                    guard let start = order.firstIndex(of: id) else { return }
-                    var slots: [Int: CGRect] = [:]
-                    for (i, other) in order.enumerated() { if let f = frames[other] { slots[i] = f } }
-                    drag = OrderDrag(id: id, slots: slots, start: start)
-                    selected = id
-                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                }
-                guard var d = drag else { return }
-                let next = d.move(to: v.location, translation: v.translation, order: order)
-                if next != order {
-                    UISelectionFeedbackGenerator().selectionChanged()
-                    withAnimation(reduceMotion ? nil : .uiEaseOut(0.22)) { order = next; drag = d }
-                } else {
-                    drag = d
-                }
-            }
-            .onEnded { _ in
-                guard let d = drag else { return }
-                withAnimation(reduceMotion ? nil : .uiEaseOut(0.22)) { drag = nil }
-                if d.changed {
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                    save(order)
-                }
-            }
+    /// La portada levantada, encima del carrusel y en el sitio del dedo, sin animación.
+    @ViewBuilder private func liftedCopy(_ byID: [UUID: Playlist]) -> some View {
+        if let d = lift.drag, let p = byID[d.id], let r = d.slots[d.start] {
+            label(p)
+                .frame(width: r.width, height: r.height, alignment: .top)
+                .orderLifted(reduceMotion: reduceMotion)
+                .offset(x: r.minX + lift.shift.width, y: r.minY + lift.shift.height)
+                .accessibilityHidden(true)
+        }
+    }
+
+    private func finish() {
+        guard let d = lift.end(), d.changed else { return }
+        save(lift.order)
     }
 }

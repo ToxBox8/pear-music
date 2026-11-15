@@ -261,27 +261,14 @@ final class BibliotecaUITests: XCTestCase {
 
     private let lists = ["Descargadas", "Favoritos", "Noche", "Viaje a la playa", "Para correr"]
 
-    /// El asa (≡) de una portada en el modo «Ordenar»: arriba a la derecha de su celda. No es un elemento de
-    /// accesibilidad (con VoiceOver se usan los botones), así que se toca por coordenadas.
-    private func grip(_ name: String) -> XCUICoordinate {
-        any(name).coordinate(withNormalizedOffset: CGVector(dx: 1, dy: 0)).withOffset(CGVector(dx: -22, dy: 22))
-    }
-
-    /// Sube la cuadrícula hasta que el asa de `name` quede por encima de la barra «Antes / Después» (que va en el
-    /// borde de abajo); si no, el dedo empieza encima de la barra y no coge nada.
-    private func bringAboveBar(_ name: String) {
-        let barTop = app.buttons["Antes"].exists ? app.buttons["Antes"].frame.minY : app.frame.height - 200
-        for _ in 0..<4 {
-            let el = any(name)
-            guard el.exists, el.frame.minY + 44 > barTop - 24 else { return }
-            let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0)).withOffset(CGVector(dx: 0, dy: barTop - 40))
-            start.press(forDuration: 0.05, thenDragTo: start.withOffset(CGVector(dx: 0, dy: -160)), withVelocity: .slow, thenHoldForDuration: 0.3)
-            sleep(1)
-        }
-    }
-
     private func center(_ name: String) -> XCUICoordinate {
         any(name).coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.4))
+    }
+
+    /// Coge la portada de `name` (dedo quieto más de 0,2 s) y la lleva despacio hasta `to`.
+    private func holdAndDrag(_ name: String, to: XCUICoordinate, hold: TimeInterval = 0.5) {
+        center(name).press(forDuration: hold, thenDragTo: to, withVelocity: .slow, thenHoldForDuration: 0.5)
+        sleep(1)
     }
 
     /// ⋯ › Ordenar. Tiene que salir «Hecho».
@@ -343,7 +330,8 @@ final class BibliotecaUITests: XCTestCase {
         XCTAssertTrue(gone, "«Eliminar» no quita la playlist de la cuadrícula")
     }
 
-    /// Menú de una portada › Ordenar: entra en el modo con esa portada ya elegida («Mover a…» encendido).
+    /// Menú de una portada › Ordenar: entra en el modo, sin barra, sin buscador, y tocar una portada no la abre
+    /// (paso C; DECISIONS 42 y 43).
     func testOrdenarDesdeElMenuDeUnaPortada() {
         launch("01_biblioteca_cristal")
         openPlaylists()
@@ -356,15 +344,20 @@ final class BibliotecaUITests: XCTestCase {
         shot("1-ordenando")
         XCTAssertTrue(editing, "«Ordenar» del menú no entra en el modo de ordenar")
         XCTAssertTrue(app.navigationBars["Ordenar"].exists, "El título del modo no es «Ordenar»")
-        XCTAssertTrue(app.buttons["Mover a…"].isEnabled, "La portada del menú no llega elegida")
-        XCTAssertTrue(app.buttons["Antes"].exists && app.buttons["Después"].exists, "Faltan «Antes» y «Después»")
+        for gone in ["Antes", "Después", "Mover a…"] {
+            XCTAssertFalse(app.buttons[gone].exists, "En «Ordenar» sigue «\(gone)»")
+        }
+        XCTAssertEqual(app.searchFields.count, 0, "El buscador sale mientras se ordena")
+        any("Noche").tap()
+        sleep(1)
+        XCTAssertTrue(app.navigationBars["Ordenar"].exists, "Tocar una portada en «Ordenar» la abre")
         app.buttons["Hecho"].tap()
         XCTAssertTrue(app.navigationBars["Playlists"].waitForExistence(timeout: 5), "«Hecho» no sale del modo de ordenar")
-        XCTAssertFalse(app.buttons["Antes"].exists, "La barra de botones sigue fuera del modo de ordenar")
+        XCTAssertTrue(app.searchFields.count > 0, "Al salir de «Ordenar» no vuelve el buscador")
     }
 
-    /// Modo «Ordenar»: coger «Noche» por su asa y llevarla al sitio de «Para correr» cambia el orden. Ya no se
-    /// salta: la cuadrícula arrastra con un gesto propio, no con el del sistema.
+    /// Modo «Ordenar»: el dedo quieto un momento sobre «Noche» la coge entera y, llevada al sitio de «Viaje a la
+    /// playa» (su vecina, lejos de los bordes), cambia el orden.
     func testOrdenarPlaylistsArrastrando() {
         launch("01_biblioteca_cristal")
         openPlaylists()
@@ -373,41 +366,57 @@ final class BibliotecaUITests: XCTestCase {
         note("1-antes", before.joined(separator: "\n"))
         startOrdering()
         shot("1-ordenando")
-        grip("Noche").press(forDuration: 0.2, thenDragTo: center("Para correr"), withVelocity: .slow, thenHoldForDuration: 0.5)
-        sleep(1)
+        holdAndDrag("Noche", to: center("Viaje a la playa"))
         shot("2-arrastrada")
         app.buttons["Hecho"].tap()
         sleep(1)
         let after = reading(lists)
         shot("3-despues")
         note("2-despues", after.joined(separator: "\n"))
-        XCTAssertEqual(after.firstIndex(of: "Noche"), before.firstIndex(of: "Para correr"),
-                       "Arrastrar «Noche» por su asa al sitio de «Para correr» no la deja ahí; antes \(before), después \(after)")
+        XCTAssertEqual(after.firstIndex(of: "Noche"), before.firstIndex(of: "Viaje a la playa"),
+                       "Arrastrar «Noche» al sitio de «Viaje a la playa» no la deja ahí; antes \(before), después \(after)")
         XCTAssertEqual(Set(after), Set(before), "Al ordenar se ha perdido alguna portada")
     }
 
-    /// Modo «Ordenar» sin arrastrar: tocar una portada la elige y «Antes» / «Después» la mueven un puesto.
-    func testOrdenarPlaylistsConLosBotones() {
+    /// Modo «Ordenar»: deslizar sin esperar desplaza la lista y no coge ninguna portada.
+    func testOrdenarDeslizarNoCogeLaPortada() {
         launch("01_biblioteca_cristal")
         openPlaylists()
         XCTAssertTrue(any("Noche").waitForExistence(timeout: 5))
-        let before = reading(lists)
         startOrdering()
-        XCTAssertFalse(app.buttons["Antes"].isEnabled || app.buttons["Después"].isEnabled, "Sin nada elegido, los botones tienen que estar apagados")
-        any("Noche").tap()
+        let before = reading(lists)
+        center("Noche").press(forDuration: 0.02, thenDragTo: center("Favoritos"), withVelocity: .fast, thenHoldForDuration: 0.3)
         sleep(1)
-        let forward = app.buttons["Después"].isEnabled
-        XCTAssertTrue(forward || app.buttons["Antes"].isEnabled, "Con una portada elegida no se enciende ningún botón")
-        shot("1-elegida")
-        (forward ? app.buttons["Después"] : app.buttons["Antes"]).tap()
-        sleep(1)
-        app.buttons["Hecho"].tap()
+        // Volver arriba, por si la lista se ha desplazado.
+        app.swipeDown()
         sleep(1)
         let after = reading(lists)
-        shot("2-despues")
         note("despues", "antes: \(before)\ndespués: \(after)")
-        let was = before.firstIndex(of: "Noche") ?? -1
-        XCTAssertEqual(after.firstIndex(of: "Noche"), was + (forward ? 1 : -1), "El botón no mueve «Noche» un puesto; antes \(before), después \(after)")
+        XCTAssertEqual(after, before, "Deslizar sin esperar ha movido una portada")
+    }
+
+    /// Modo «Ordenar» con muchas playlists: coger la primera y dejar el dedo cerca del borde de abajo desplaza la
+    /// lista sola, y la portada llega a lo que no se veía.
+    func testOrdenarDesplazamientoAlBorde() {
+        launch("ui_muchas_playlists", ready: "Lista 01")
+        XCTAssertTrue(app.navigationBars["Playlists"].waitForExistence(timeout: 10), "No se abrió Playlists")
+        startOrdering()
+        let first = reading(lists + (1...24).map { String(format: "Lista %02d", $0) }).first ?? "Descargadas"
+        let farName = "Lista 01"
+        let wasVisible = any(farName).exists && any(farName).isHittable
+        // El borde de abajo de lo que se ve: encima de la barra de pestañas y del mini reproductor.
+        let bottom = app.tabBars.firstMatch.exists ? app.tabBars.firstMatch.frame.minY : app.frame.height - 90
+        let edge = app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: app.frame.width * 0.3, dy: bottom - 40))
+        shot("1-antes")
+        center(first).press(forDuration: 0.5, thenDragTo: edge, withVelocity: .slow, thenHoldForDuration: 4)
+        sleep(1)
+        shot("2-al-borde")
+        note("arbol", app.debugDescription)
+        XCTAssertTrue(app.navigationBars["Ordenar"].exists, "Se ha salido del modo de ordenar")
+        // La lista ha bajado: la primera fila ya no está arriba del todo.
+        XCTAssertFalse(any("Descargadas").isHittable && any("Favoritos").isHittable,
+                       "Con el dedo cerca del borde de abajo, la lista no se desplaza sola")
+        XCTAssertFalse(wasVisible, "«\(farName)» ya se veía al empezar: el test no prueba nada")
     }
 
     /// Modo «Ordenar» con carpetas: soltar una playlist encima de una carpeta la mete dentro.
@@ -416,10 +425,9 @@ final class BibliotecaUITests: XCTestCase {
         XCTAssertTrue(app.navigationBars["Playlists"].waitForExistence(timeout: 10), "No se abrió Playlists")
         XCTAssertTrue(any("Domingo lento").waitForExistence(timeout: 5))
         startOrdering()
-        bringAboveBar("Domingo lento")
-        XCTAssertTrue(any("Carpeta Viajes").isHittable, "Al subir la cuadrícula, la carpeta «Viajes» se sale de la pantalla")
-        grip("Domingo lento").press(forDuration: 0.2, thenDragTo: center("Carpeta Viajes"), withVelocity: .slow, thenHoldForDuration: 0.6)
-        sleep(2)
+        XCTAssertTrue(any("Carpeta Viajes").isHittable, "La carpeta «Viajes» no se ve")
+        holdAndDrag("Domingo lento", to: center("Carpeta Viajes"))
+        sleep(1)
         shot("1-soltada")
         let moved = any("Domingo lento").waitForNonExistence(timeout: 5)
         note("arbol", app.debugDescription)
@@ -429,7 +437,8 @@ final class BibliotecaUITests: XCTestCase {
 
     // MARK: Fijados: menú y modo «Ordenar»
 
-    /// Fijar dos playlists, mantener pulsada una en Fijados › Ordenar, y moverla con el botón.
+    /// Fijar dos playlists, mantener pulsada una en Fijados › Ordenar y arrastrarla al sitio de la otra. Mientras
+    /// tanto, «Ordenar» de «Tu música» no se dibuja (un solo shu) y no hay «Antes» ni «Después».
     func testOrdenarFijados() {
         launch("01_biblioteca_cristal")
         openPlaylists()
@@ -447,25 +456,26 @@ final class BibliotecaUITests: XCTestCase {
         let before = pinned.sorted { any($0).frame.minX < any($1).frame.minX }
         shot("1-fijados")
         any(before[0]).press(forDuration: 1.2)
-        // Con el menú abierto puede haber dos «Ordenar»: el de «Tu música» (tapado) y el del menú.
+        // Con el menú abierto hay dos «Ordenar»: el de «Tu música» (tapado) y el del menú.
         let sorts = app.buttons.matching(NSPredicate(format: "label == %@", "Ordenar"))
         XCTAssertTrue(app.buttons["Soltar de arriba"].waitForExistence(timeout: 3), "Mantener pulsado un fijado no abre su menú")
         let item = (0..<sorts.count).map { sorts.element(boundBy: $0) }.first { $0.isHittable }
         shot("2-menu")
         XCTAssertNotNil(item, "El menú de un fijado no ofrece «Ordenar»")
         item?.tap()
-        let after = app.buttons["Después"]
-        let editing = after.waitForExistence(timeout: 5)
+        let done = app.buttons["Hecho"].firstMatch
+        let editing = done.waitForExistence(timeout: 5)
         shot("3-ordenando")
         XCTAssertTrue(editing, "«Ordenar» de un fijado no entra en el modo de ordenar")
         guard editing else { return }
-        XCTAssertTrue(after.isEnabled, "El primer fijado llega elegido y tiene que poder ir «Después»")
-        after.tap()
-        sleep(1)
+        XCTAssertFalse(app.buttons["Antes"].exists || app.buttons["Después"].exists, "Fijados sigue con «Antes» y «Después»")
+        XCTAssertEqual(app.buttons.matching(NSPredicate(format: "label == %@", "Ordenar")).count, 0,
+                       "Con Fijados ordenándose, «Ordenar» de «Tu música» sigue ahí (dos shu)")
+        holdAndDrag(before[0], to: center(before[1]))
         let now = pinned.sorted { any($0).frame.minX < any($1).frame.minX }
         shot("4-movido")
-        XCTAssertEqual(now, Array(before.reversed()), "«Después» no cambia el orden de Fijados")
-        app.buttons["Hecho"].firstMatch.tap()
-        XCTAssertTrue(after.waitForNonExistence(timeout: 5), "«Hecho» no sale del modo de ordenar de Fijados")
+        XCTAssertEqual(now, Array(before.reversed()), "Arrastrar no cambia el orden de Fijados")
+        done.tap()
+        XCTAssertTrue(app.buttons["Ordenar"].waitForExistence(timeout: 5), "Al terminar no vuelve «Ordenar» de «Tu música»")
     }
 }

@@ -1,0 +1,96 @@
+{
+  "favorites": [],
+  "folders": [
+    {
+      "id": "0000000F-0000-0000-0000-00000000F201",
+      "name": "Icono y color",
+      "icon": "dumbbell.fill",
+      "tint": 3
+    },
+    {
+      "id": "0000000F-0000-0000-0000-00000000F202",
+      "name": "Icono sin color",
+      "icon": "heart.fill"
+    },
+    {
+      "id": "0000000F-0000-0000-0000-00000000F203",
+      "name": "Icono que no se conoce",
+      "icon": "rocket.fill",
+      "tint": 2
+    },
+    {
+      "id": "0000000F-0000-0000-0000-00000000F204",
+      "name": "Color 8",
+      "icon": "star.fill",
+      "tint": 8
+    },
+    {
+      "id": "0000000F-0000-0000-0000-00000000F205",
+      "name": "Color -1",
+      "icon": "star.fill",
+      "tint": -1
+    },
+    {
+      "id": "0000000F-0000-0000-0000-00000000F206",
+      "name": "Color 3.0",
+      "icon": "sparkles",
+      "tint": 3.0
+    },
+    {
+      "id": "0000000F-0000-0000-0000-00000000F207",
+      "name": "Color en texto",
+      "icon": "sparkles",
+      "tint": "3"
+    },
+    {
+      "id": "0000000F-0000-0000-0000-00000000F208",
+      "name": "Icono numérico",
+      "icon": 5,
+      "tint": 1
+    },
+    {
+      "id": "0000000F-0000-0000-0000-00000000F209",
+      "name": "Icono vacío",
+      "icon": "",
+      "tint": 1
+    },
+    {
+      "id": "0000000F-0000-0000-0000-00000000F210",
+      "name": "Color suelto",
+      "tint": 4
+    },
+    {
+      "id": "0000000F-0000-0000-0000-00000000F211",
+      "name": "Color con decimales",
+      "icon": "leaf.fill",
+      "tint": 2.5
+    }
+  ],
+  "albumFolders": [
+    {
+      "id": "0000000E-0000-0000-0000-00000000E201",
+      "name": "Álbumes con icono",
+      "icon": "guitars.fill",
+      "tint": 6
+    },
+    {
+      "id": "0000000E-0000-0000-0000-00000000E202",
+      "name": "Álbumes, icono futuro",
+      "icon": "vinyl.fill",
+      "tint": 7
+    }
+  ],
+  "playlists": [
+    {
+      "id": "0000000A-0000-0000-0000-00000000E201",
+      "name": "En la de icono",
+      "songs": [],
+      "folder": "0000000F-0000-0000-0000-00000000F201"
+    }
+  ],
+  "recents": [],
+  "covers": {
+    "0000000F-0000-0000-0000-00000000F201": "/9j/4AAQSkZJRgABAQ==",
+    "0000000E-0000-0000-0000-00000000E201": "/9j/4AAQSkZJRgABAQ=="
+  }
+}

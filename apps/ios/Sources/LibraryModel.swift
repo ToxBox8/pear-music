@@ -82,14 +82,16 @@ struct AlbumInfo: Codable, Hashable {
 
 // MARK: - Carpetas de playlists (3.0, bloque 1)
 
-/// Una carpeta para ordenar las playlists. Puede estar dentro de otra (`parent`), hasta 3 niveles.
-/// En el código se llama `PlaylistFolder` para no confundirla con las «carpetas» de Tu música (`MusicOrder`).
+/// Una carpeta para ordenar las playlists (`folders`) o los álbumes guardados (`albumFolders`, 3.0, T15). Puede estar
+/// dentro de otra (`parent`, del mismo árbol), hasta 3 niveles. En el código se llama `PlaylistFolder` para no
+/// confundirla con las «carpetas» de Tu música (`MusicOrder`).
 struct PlaylistFolder: Identifiable, Codable, Hashable {
     var id: String
     var name: String
     var parent: String?
-    /// Reservados (opcionales): la portada de una carpeta es el mosaico de lo que guarda. Se conservan al
-    /// importar y exportar.
+    /// Icono y color propios (T16, docs/LIBRARY_FORMAT.md): uno de los 24 `PlaylistIcons.names` y un índice de las
+    /// paletas de playlist. Lo que no se conoce se conserva tal cual y se pinta como si no estuviera (`shownIcon`,
+    /// `shownTint`), para que una versión futura con más iconos no los pierda al pasar por ésta.
     var icon: String?
     var tint: Int?
 
@@ -97,15 +99,51 @@ struct PlaylistFolder: Identifiable, Codable, Hashable {
         self.id = id; self.name = name; self.parent = parent; self.icon = icon; self.tint = tint
     }
 
-    /// `id` y `name` tienen que ser textos; lo demás, si no es del tipo esperado, se lee como si no estuviera.
+    /// `id` y `name` tienen que ser textos; lo demás, si no es del tipo esperado, se lee como si no estuviera: un
+    /// `icon` vacío o que no es texto, o un `tint` que no es un número entero (`3.0` vale; `"3"` no).
     /// Igual que `PlaylistFolder.fromJson` en Android.
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         id = try c.decode(String.self, forKey: .id)
         name = try c.decode(String.self, forKey: .name)
         parent = (try? c.decodeIfPresent(String.self, forKey: .parent)) ?? nil
-        icon = (try? c.decodeIfPresent(String.self, forKey: .icon)) ?? nil
-        tint = (try? c.decodeIfPresent(Int.self, forKey: .tint)) ?? nil
+        let i = (try? c.decodeIfPresent(String.self, forKey: .icon)) ?? nil
+        icon = i?.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false ? i : nil
+        // Como Android (un `Int` de 32 bits): fuera de ese rango, como si no estuviera.
+        tint = WholeNumber.decode(c, .tint).flatMap { Int32(exactly: $0) }.map(Int.init)
+    }
+
+    /// El icono que se pinta: sólo si es uno de los 24. Sin él, la portada es el mosaico.
+    var shownIcon: String? { icon.flatMap { PlaylistIcons.names.contains($0) ? $0 : nil } }
+    /// El color que se pinta: sólo de 0 a 7 y con `shownIcon` (un `tint` suelto se conserva y no se pinta). Sin él,
+    /// el icono va sobre el papel washi de la carpeta.
+    var shownTint: Int? {
+        guard shownIcon != nil, let tint, PlaylistIcons.paletteRange.contains(tint) else { return nil }
+        return tint
+    }
+}
+
+/// Los iconos que se pueden elegir para una playlist o una carpeta (los de `PlaylistStyle.icons`, que es esta lista)
+/// y cuántas paletas hay (`playlistPalettes` de shared/design/tokens.json; el test de Linux lo comprueba). Mismo orden
+/// que `SfIcons.playlistIcons` / `FolderLook` en Android.
+enum PlaylistIcons {
+    static let names = [
+        "music.note.list", "heart.fill", "star.fill", "flame.fill", "bolt.fill", "moon.stars.fill",
+        "sun.max.fill", "car.fill", "figure.run", "dumbbell.fill", "headphones", "guitars.fill",
+        "pianokeys", "mic.fill", "party.popper.fill", "cup.and.saucer.fill", "book.fill", "leaf.fill",
+        "airplane", "gamecontroller.fill", "sparkles", "cloud.rain.fill", "beach.umbrella.fill", "bed.double.fill"
+    ]
+    static let paletteRange = 0..<8
+}
+
+/// Un número entero de JSON, aunque venga con decimales a cero (`3.0`), como `wholeNumber` en Android. nil si falta,
+/// no es un número o tiene decimales.
+enum WholeNumber {
+    static func decode<K: CodingKey>(_ c: KeyedDecodingContainer<K>, _ key: K) -> Int64? {
+        if let n = (try? c.decodeIfPresent(Int64.self, forKey: key)) ?? nil { return n }
+        guard let d = (try? c.decodeIfPresent(Double.self, forKey: key)) ?? nil, d == d.rounded(),
+              abs(d) < 9.0e18 else { return nil }
+        return Int64(d)
     }
 }
 
@@ -126,13 +164,13 @@ struct LossyList<T: Decodable>: Decodable {
 protocol FolderMember {
     var memberID: String { get }
     var folder: String? { get set }
-    /// Los álbumes guardados no van en carpetas.
-    var canBeInFolder: Bool { get }
+    /// Un álbum guardado: su carpeta se busca en `albumFolders`, no en `folders` (T15).
+    var isAlbumMember: Bool { get }
 }
 
 extension Playlist: FolderMember {
     var memberID: String { id.uuidString }
-    var canBeInFolder: Bool { album == nil }
+    var isAlbumMember: Bool { album != nil }
 }
 
 /// Reglas de las carpetas. Mismos nombres, casos y resultados que `PlaylistFolders` en Android
@@ -189,15 +227,23 @@ enum PlaylistFolders {
         return list.map { var f = $0; f.parent = parent[f.id]; return f }
     }
 
-    /// Quita la carpeta a lo que no puede tenerla: álbumes y carpetas que no existen.
-    static func clean<M: FolderMember>(_ members: [M], folders: [PlaylistFolder]) -> [M] {
-        let ids = Set(folders.map(\.id))
+    /// Quita la carpeta a lo que no puede tenerla: una playlist busca la suya en `folders` y un álbum en
+    /// `albumFolders` (T15); si no está en su árbol, queda sin carpeta aunque ese id exista en el otro.
+    static func clean<M: FolderMember>(_ members: [M], folders: [PlaylistFolder], albumFolders: [PlaylistFolder] = []) -> [M] {
+        let ids = Set(folders.map(\.id)), albumIDs = Set(albumFolders.map(\.id))
         return members.map { m in
             guard let f = m.folder else { return m }
             var m = m
-            if !m.canBeInFolder || !ids.contains(f) { m.folder = nil }
+            if !(m.isAlbumMember ? albumIDs : ids).contains(f) { m.folder = nil }
             return m
         }
+    }
+
+    /// El árbol de carpetas de álbumes listo para usar (T15): normalizado como `folders` y sin las que repiten el id
+    /// de una carpeta de playlists (gana `folders`; lo que tenían dentro sube arriba del todo).
+    static func albumTree(_ albumFolders: [PlaylistFolder], excluding folders: [PlaylistFolder]) -> [PlaylistFolder] {
+        let taken = Set(folders.map(\.id))
+        return normalize(normalize(albumFolders).filter { !taken.contains($0.id) })
     }
 
     /// Importar = unir: se añaden las carpetas que no existan (por id); las tuyas no cambian.
@@ -328,6 +374,24 @@ enum LibraryOrder {
         var seen = Set<String>()
         let kept = order.filter { byID[$0] != nil && seen.insert($0).inserted }
         return kept.compactMap { byID[$0] } + albums.filter { !seen.contains($0.id.uuidString) }
+    }
+
+    /// Guarda el orden nuevo de «Tus álbumes» (`moved`, ids de álbum) sin perder las claves `folder:<id>` que
+    /// hubiera en `albumOrder` (T15: la 3.0 no las pinta, pero las conserva en su sitio). Los ids de álbumes que ya no
+    /// están se quitan, como hasta ahora.
+    static func savingAlbums(_ moved: [String], into old: [String]) -> [String] {
+        let set = Set(moved)
+        let kept = old.filter { folderID($0) != nil || set.contains($0) }
+        let known = Set(kept)
+        return merge(kept + moved.filter { !known.contains($0) }, moved)
+    }
+
+    /// Las claves `folder:` de `albumOrder` que valen: las de carpetas de álbumes que existen, en su orden y sin
+    /// repetir. Las de una carpeta que no existe se ignoran (no se borran).
+    static func albumFolderKeys(_ order: [String], albumFolders: [PlaylistFolder]) -> [String] {
+        let ids = Set(albumFolders.map(\.id))
+        var seen = Set<String>()
+        return order.filter { k in folderID(k).map { ids.contains($0) } == true && seen.insert(k).inserted }
     }
 
     /// «Fijados» (x.1.1): siempre en el orden propio; lo recién fijado va al final.
@@ -524,12 +588,16 @@ struct LibraryFile: Codable {
     var folders: [PlaylistFolder]?
     /// Artistas seguidos (3.0). Como `folders`: sólo se escribe si sigues a alguno.
     var followedArtists: [FollowedArtist]?
+    /// Carpetas de álbumes (3.0, T15): otro árbol, con la misma forma que `folders`. La 3.0 las lee, arregla, conserva
+    /// y exporta, pero aún no tiene pantalla. Sólo se escribe si hay alguna.
+    var albumFolders: [PlaylistFolder]?
 
     init(favorites: [Song], playlists: [Playlist], recents: [Song]?, folders: [PlaylistFolder]?,
-         followedArtists: [FollowedArtist]? = nil) {
+         followedArtists: [FollowedArtist]? = nil, albumFolders: [PlaylistFolder]? = nil) {
         self.favorites = favorites; self.playlists = playlists; self.recents = recents
         self.folders = folders?.isEmpty == false ? folders : nil
         self.followedArtists = followedArtists?.isEmpty == false ? followedArtists : nil
+        self.albumFolders = albumFolders?.isEmpty == false ? albumFolders : nil
     }
 
     /// Tolerante, como `LibraryData.fromJson` en Android: una canción, playlist o carpeta que no se puede leer se
@@ -541,6 +609,7 @@ struct LibraryFile: Codable {
         recents = StoredSong.list(c, .recents)
         folders = (try? c.decodeIfPresent(LossyList<PlaylistFolder>.self, forKey: .folders))??.items
         followedArtists = (try? c.decodeIfPresent(LossyList<FollowedArtist>.self, forKey: .followedArtists))??.items
+        albumFolders = (try? c.decodeIfPresent(LossyList<PlaylistFolder>.self, forKey: .albumFolders))??.items
     }
 
     /// Cuántas canciones y playlists tiene: para saber si al leer se saltó algo (`LibraryDisk`).
@@ -548,20 +617,24 @@ struct LibraryFile: Codable {
         favorites.count + (recents?.count ?? 0) + playlists.count + playlists.reduce(0) { $0 + $1.songs.count }
     }
 
-    /// Lee library.json (o una copia) y deja las carpetas listas: sin huérfanas, ciclos ni más de 3 niveles, y
-    /// sin carpeta en los álbumes ni en las playlists cuya carpeta no existe.
+    /// Lee library.json (o una copia) y deja los dos árboles de carpetas listos: sin huérfanas, ciclos ni más de 3
+    /// niveles, sin carpetas de álbumes que repitan el id de una de playlists, y sin carpeta en las playlists y los
+    /// álbumes cuya carpeta no está en su árbol.
     static func decode(_ data: Data) throws -> LibraryFile {
         var file = try JSONDecoder().decode(LibraryFile.self, from: data)
         let folders = PlaylistFolders.normalize(file.folders ?? [])
         file.folders = folders.isEmpty ? nil : folders
-        file.playlists = PlaylistFolders.clean(file.playlists, folders: folders)
+        let albumFolders = PlaylistFolders.albumTree(file.albumFolders ?? [], excluding: folders)
+        file.albumFolders = albumFolders.isEmpty ? nil : albumFolders
+        file.playlists = PlaylistFolders.clean(file.playlists, folders: folders, albumFolders: albumFolders)
         let followed = FollowedArtists.normalize(file.followedArtists ?? [])
         file.followedArtists = followed.isEmpty ? nil : followed
         return file
     }
 
-    /// Importar = unir, sin borrar nada: favoritas y recientes por id de canción, playlists y carpetas por id. Lo que
-    /// ya estaba no cambia (tampoco de carpeta); lo nuevo llega en su carpeta si existe. Los seguidos se unen por
+    /// Importar = unir, sin borrar nada: favoritas y recientes por id de canción, playlists, álbumes y los dos árboles
+    /// de carpetas por id. Lo que ya estaba no cambia (tampoco de carpeta, nombre, icono o color); lo nuevo llega en su
+    /// carpeta si existe. Los seguidos se unen por
     /// `browseId` (`FollowedArtists.merge`). Igual que `LibraryData.merge`.
     func merging(_ other: LibraryFile) -> LibraryFile {
         var favIDs = Set(favorites.map(\.id))
@@ -569,12 +642,16 @@ struct LibraryFile: Codable {
         let mine = recents ?? []
         var recentIDs = Set(mine.map(\.id))
         let folders = PlaylistFolders.merge(self.folders ?? [], other.folders ?? [])
+        let albumFolders = PlaylistFolders.albumTree(PlaylistFolders.merge(self.albumFolders ?? [], other.albumFolders ?? []),
+                                                     excluding: folders)
         return LibraryFile(
             favorites: favorites + other.favorites.filter { favIDs.insert($0.id).inserted },
-            playlists: PlaylistFolders.clean(playlists + other.playlists.filter { listIDs.insert($0.id).inserted }, folders: folders),
+            playlists: PlaylistFolders.clean(playlists + other.playlists.filter { listIDs.insert($0.id).inserted },
+                                             folders: folders, albumFolders: albumFolders),
             recents: Array((mine + (other.recents ?? []).filter { recentIDs.insert($0.id).inserted }).prefix(Self.maxRecents)),
             folders: folders,
-            followedArtists: FollowedArtists.merge(followedArtists ?? [], other.followedArtists ?? []))
+            followedArtists: FollowedArtists.merge(followedArtists ?? [], other.followedArtists ?? []),
+            albumFolders: albumFolders)
     }
 }
 
