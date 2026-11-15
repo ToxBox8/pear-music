@@ -1179,3 +1179,15 @@
 1179	Baixar {0}
 1180	Cambia a orde dos apartados de A túa música
 1181	Subir {0}
+1182	Gardamos unha copia do ficheiro: sae ao exportar os teus datos en Axustes. Ata que elixas, o que cambies non se garda.
+1183	Non puidemos ler a túa biblioteca
+1184	Antes
+1185	Arrastra ≡ ou toca unha portada e usa os botóns.
+1186	Crea unha lista aquí ou trae unha con «Mover a…» do seu menú.
+1187	Crear lista
+1188	Despois
+1189	Elixe esta portada para movela cos botóns
+1190	Eliminar cartafol…
+1191	Eliminar…
+1192	Nova lista ou cartafol
+1193	Nova lista…

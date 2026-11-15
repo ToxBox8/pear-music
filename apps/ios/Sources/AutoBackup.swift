@@ -61,6 +61,8 @@ final class AutoBackup: ObservableObject {
     @discardableResult
     func backup(library: Library, force: Bool = false) -> Bool {
         guard let bookmark else { return false }
+        // Si library.json no se pudo leer, lo que hay en memoria no es la biblioteca: no se copia encima de las buenas.
+        guard library.unreadableCopy == nil else { return false }
         let name = Self.fileName(Date())
         let today = String(name.dropFirst(Self.prefix.count).dropLast(5))
         if !force && lastDay == today { return false }

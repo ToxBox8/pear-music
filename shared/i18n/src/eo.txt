@@ -1179,3 +1179,15 @@
 1179	Malsuprenigi {0}
 1180	Ŝanĝi la ordon de la sekcioj de Via muziko
 1181	Suprenigi {0}
+1182	Ni konservis kopion de la dosiero: ĝi aperas kiam vi eksportas viajn datumojn en Agordoj. Ĝis vi elektos, viaj ŝanĝoj ne konserviĝas.
+1183	Ni ne povis legi vian bibliotekon
+1184	Antaŭe
+1185	Trenu ≡ aŭ tuŝu kovrilon kaj uzu la butonojn.
+1186	Kreu ludliston ĉi tie aŭ alportu unu per «Movi al…» de ĝia menuo.
+1187	Krei ludliston
+1188	Poste
+1189	Elektu ĉi tiun kovrilon por movi ĝin per la butonoj
+1190	Forigi dosierujon…
+1191	Forigi…
+1192	Nova ludlisto aŭ dosierujo
+1193	Nova ludlisto…

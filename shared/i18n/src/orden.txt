@@ -1179,3 +1179,15 @@ Arrastra ≡ o usa las flechas para cambiar el orden.
 Bajar {0}
 Cambia el orden de los apartados de Tu música
 Subir {0}
+Hemos guardado una copia del archivo: sale al exportar tus datos en Ajustes. Hasta que elijas, lo que cambies no se guarda.
+No hemos podido leer tu biblioteca
+Antes
+Arrastra ≡ o toca una portada y usa los botones.
+Crea una playlist aquí o trae una con «Mover a…» de su menú.
+Crear playlist
+Después
+Elige esta portada para moverla con los botones
+Eliminar carpeta…
+Eliminar…
+Nueva playlist o carpeta
+Nueva playlist…

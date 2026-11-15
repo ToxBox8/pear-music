@@ -544,15 +544,7 @@ struct ManagePlaylistsView: View {
         .themed()
         .navigationTitle(L("Eliminar de la biblioteca"))
         .navigationBarTitleDisplayMode(.inline)
-        .alert(L("¿Eliminar «{0}»?", pending?.name ?? ""), isPresented: Binding(get: { pending != nil }, set: { if !$0 { pending = nil } })) {
-            Button(L("Eliminar"), role: .destructive) {
-                if let p = pending { library.deletePlaylist(p.id) }
-                pending = nil
-            }
-            Button(L("Cancelar"), role: .cancel) { pending = nil }
-        } message: {
-            Text(L("Se quitará de tu biblioteca con su portada. Las canciones descargadas se quedan en Descargadas. No se puede deshacer."))
-        }
+        .deletePlaylistAlert($pending, library: library)
     }
 
     private func row(_ p: Playlist, detail: String) -> some View {

@@ -1179,3 +1179,15 @@
 1179	Move {0} down
 1180	Change the order of the sections in Your music
 1181	Move {0} up
+1182	We saved a copy of the file: you'll find it when you export your data in Settings. Until you choose, your changes won't be saved.
+1183	We couldn't read your library
+1184	Before
+1185	Drag ≡ or tap a cover and use the buttons.
+1186	Create a playlist here or bring one in with “Move to…” from its menu.
+1187	Create playlist
+1188	After
+1189	Select this cover to move it with the buttons
+1190	Delete folder…
+1191	Delete…
+1192	New playlist or folder
+1193	New playlist…

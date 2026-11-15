@@ -40,7 +40,11 @@ enum PlaylistArt {
 // MARK: - Biblioteca
 @MainActor
 final class Library: ObservableObject {
-    private let file = docsDir.appendingPathComponent("library.json")
+    /// Lee y guarda library.json sin pisar nunca un archivo que no se pudo leer (`LibraryDisk`, en LibraryModel.swift).
+    private let disk = LibraryDisk(file: docsDir.appendingPathComponent("library.json"))
+    /// Si library.json no se pudo leer: el nombre de la copia que se ha guardado («» si ni eso). Mientras no sea
+    /// nil, la app avisa y nada de lo que cambies se guarda (`startOver`).
+    @Published private(set) var unreadableCopy: String?
 
     @Published var favorites: [Song] = [] { didSet { save() } }
     @Published var playlists: [Playlist] = [] { didSet { save() } }
@@ -55,17 +59,25 @@ final class Library: ObservableObject {
         // Capturas: datos de ejemplo en memoria, sin leer ni escribir library.json.
         if DemoCatalog.isActive { DemoCatalog.seed(self); return }
         if Demo.isActive { Demo.seed(self); return }
-        if let data = try? Data(contentsOf: file), let s = try? LibraryFile.decode(data) {
+        if let s = disk.load() {
             favorites = s.favorites
             folders = s.folders ?? []
             playlists = s.playlists
             recents = s.recents ?? []
             followedArtists = s.followedArtists ?? []
         }
+        unreadableCopy = disk.unreadableCopy
+        if unreadableCopy != nil { Logs.e("library", "library.json no se puede leer; copia guardada y escritura parada") }
     }
     private func save() {
         guard !Demo.isActive, !DemoCatalog.isActive else { return }
-        writeJSON(snapshot, to: file)
+        disk.save(snapshot)
+    }
+    /// «Empezar de cero» del aviso: la copia del archivo ilegible se queda y lo que hay ahora en pantalla se guarda.
+    func startOver() {
+        disk.startOver()
+        unreadableCopy = nil
+        save()
     }
 
     private var snapshot: LibraryFile {

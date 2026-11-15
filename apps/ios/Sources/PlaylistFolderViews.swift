@@ -28,26 +28,6 @@ enum MoveItem: Identifiable {
     }
 }
 
-/// El aviso con un nombre: crear una carpeta o una playlist, o renombrar una carpeta.
-enum FolderNaming {
-    case newFolder(String?)
-    /// En esa carpeta, o arriba del todo (nil).
-    case newPlaylist(String?)
-    case rename(PlaylistFolder)
-
-    var title: String {
-        switch self {
-        case .newFolder: return L("Nueva carpeta")
-        case .newPlaylist: return L("Nueva playlist")
-        case .rename: return L("Renombrar carpeta")
-        }
-    }
-    var confirm: String {
-        if case .rename = self { return L("Guardar") }
-        return L("Crear")
-    }
-}
-
 /// Silueta de la carpeta de atrás: rectángulo con la pestaña arriba a la izquierda.
 private struct FolderBackShape: Shape {
     func path(in r: CGRect) -> Path {
@@ -168,20 +148,6 @@ struct FolderHeader: View {
     }
 }
 
-/// Carpeta sin nada dentro: qué hacer.
-struct FolderEmptyView: View {
-    var body: some View {
-        VStack(spacing: 10) {
-            Image(systemName: "folder").font(.system(size: 40, weight: .regular)).foregroundStyle(.secondary)
-            Text(L("Carpeta vacía")).font(.headline)
-            Text(L("Arrastra una playlist encima de la carpeta o usa «Mover a…» en su menú."))
-                .font(.subheadline).foregroundStyle(.secondary)
-        }
-        .multilineTextAlignment(.center)
-        .padding(.horizontal, 40)
-    }
-}
-
 /// «Mover a…»: las carpetas en árbol, con la actual marcada. Al mover una carpeta, donde no cabe sale apagado y
 /// dice por qué. «Nueva carpeta» la crea arriba del todo y mete ahí lo que se mueve. Igual que `MoveToFolderSheet`
 /// en Android.
@@ -189,8 +155,6 @@ struct MoveToFolderSheet: View {
     let item: MoveItem
     @EnvironmentObject var library: Library
     @Environment(\.dismiss) private var dismiss
-    @State private var naming = false
-    @State private var newName = ""
 
     private var current: String? {
         switch item {
@@ -254,7 +218,9 @@ struct MoveToFolderSheet: View {
                 // vacía y no movía nada).
                 if canUseNewFolder {
                     Section {
-                        Button { newName = ""; naming = true } label: { Label(L("Nueva carpeta"), systemImage: "folder.badge.plus") }
+                        Button {
+                            NamePrompt.ask(L("Nueva carpeta")) { name in if let id = library.createFolder(name) { move(to: id) } }
+                        } label: { Label(L("Nueva carpeta"), systemImage: "folder.badge.plus") }
                     }
                 }
             }
@@ -262,11 +228,6 @@ struct MoveToFolderSheet: View {
             .navigationTitle(L("Mover a…"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("Cancelar")) { dismiss() } } }
-            .alert(L("Nueva carpeta"), isPresented: $naming) {
-                TextField(L("Nombre"), text: $newName)
-                Button(L("Crear")) { if let id = library.createFolder(newName) { move(to: id) } }
-                Button(L("Cancelar"), role: .cancel) {}
-            }
         }
     }
 

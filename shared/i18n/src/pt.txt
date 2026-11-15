@@ -1179,3 +1179,15 @@
 1179	Descer {0}
 1180	Muda a ordem das secções de A tua música
 1181	Subir {0}
+1182	Guardámos uma cópia do ficheiro: aparece ao exportares os teus dados em Definições. Até escolheres, o que alterares não é guardado.
+1183	Não conseguimos ler a tua biblioteca
+1184	Antes
+1185	Arrasta ≡ ou toca numa capa e usa os botões.
+1186	Cria uma playlist aqui ou traz uma com «Mover para…» do menu dela.
+1187	Criar playlist
+1188	Depois
+1189	Escolhe esta capa para a moveres com os botões
+1190	Eliminar pasta…
+1191	Eliminar…
+1192	Nova playlist ou pasta
+1193	Nova playlist…

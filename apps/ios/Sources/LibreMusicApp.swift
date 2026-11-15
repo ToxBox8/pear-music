@@ -95,6 +95,8 @@ struct RootView: View {
     @ObservedObject private var inbox = PlaylistInbox.shared
     @State private var tab = RootView.startTab()
     @State private var demoImport = Demo.current?.showImport ?? false
+    /// «Ahora no» en el aviso de la biblioteca ilegible: no vuelve a salir hasta abrir la app otra vez.
+    @State private var unreadableLater = false
 
     /// La app vuelve a abrirse en la última pestaña usada (la primera vez, Inicio).
     private static func startTab() -> String {
@@ -179,6 +181,16 @@ struct RootView: View {
             }
         }
         .sheet(isPresented: $showAccount) { NavigationStack { AccountView() }.environmentObject(library) }
+        // library.json no se pudo leer (revisión del bloque 1, T3): hay una copia guardada y no se escribe encima
+        // hasta que el usuario elija. «Ahora no» deja la app en memoria; el aviso vuelve al abrirla otra vez.
+        .alert(L("No hemos podido leer tu biblioteca"),
+               isPresented: Binding(get: { library.unreadableCopy != nil && !unreadableLater && Demo.current == nil },
+                                    set: { if !$0 { unreadableLater = true } })) {
+            Button(L("Empezar de cero"), role: .destructive) { library.startOver() }
+            Button(L("Ahora no"), role: .cancel) { unreadableLater = true }
+        } message: {
+            Text(L("Hemos guardado una copia del archivo: sale al exportar tus datos en Ajustes. Hasta que elijas, lo que cambies no se guarda."))
+        }
         // Novedades tras actualizar (1.1): una vez por versión; no se cierra deslizando, hay que elegir.
         .background(EmptyView().fullScreenCover(isPresented: Binding(
             get: { onboarded && termsAcceptedAt > 0 && introStage.isEmpty && !introCoverUp && !showAccount && whatsNewSeen != WhatsNew.current
@@ -416,16 +428,20 @@ struct SongMenuItems: View {
             Label(library.isFavorite(song) ? L("Quitar de favoritos") : L("Añadir a favoritos"),
                   systemImage: library.isFavorite(song) ? "heart.slash" : "heart")
         }
-        if !library.userPlaylists.isEmpty {
-            Menu {
-                // Con la portada de cada playlist, para reconocerlas de un vistazo (como en Android).
-                ForEach(library.userPlaylists) { p in
-                    Button { library.add(song, to: p) } label: {
-                        Label { Text(p.name) } icon: { Image(uiImage: PlaylistMenuIcon.image(for: p)) }
-                    }
+        // Siempre, también sin playlists: antes no salía y no había forma de crear la primera desde una canción.
+        Menu {
+            Button {
+                NamePrompt.ask(L("Nueva playlist")) { name in
+                    if let id = library.createPlaylist(name), let p = library.playlists.first(where: { $0.id == id }) { library.add(song, to: p) }
                 }
-            } label: { Label(L("Añadir a playlist"), systemImage: "plus.rectangle.on.rectangle") }
-        }
+            } label: { Label(L("Nueva playlist…"), systemImage: "plus") }
+            // Con la portada de cada playlist, para reconocerlas de un vistazo (como en Android).
+            ForEach(library.userPlaylists) { p in
+                Button { library.add(song, to: p) } label: {
+                    Label { Text(p.name) } icon: { Image(uiImage: PlaylistMenuIcon.image(for: p)) }
+                }
+            }
+        } label: { Label(L("Añadir a playlist"), systemImage: "plus.rectangle.on.rectangle") }
         if downloads.isDownloaded(song) {
             Button(role: .destructive) { downloads.remove(song) } label: { Label(L("Eliminar descarga"), systemImage: "trash") }
         } else {

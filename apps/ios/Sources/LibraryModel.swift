@@ -19,19 +19,41 @@ struct Playlist: Identifiable, Codable {
 }
 
 extension Playlist {
-    /// Igual que el decodificador sintetizado (mismas claves obligatorias), salvo `folder`: si no es un texto se
-    /// lee como «sin carpeta» en vez de hacer fallar toda la biblioteca. Al declararlo en una extensión, Swift
-    /// mantiene el inicializador por miembros.
+    /// Sólo el `id` es obligatorio (un UUID). Lo demás se lee como en Android (`Playlist.fromJson`): sin nombre es
+    /// «Playlist», las canciones que no se pueden leer se saltan y un `icon`, `tint`, `album`, `pinned` o `folder`
+    /// de otro tipo es como si no estuviera, en vez de hacer fallar toda la biblioteca. Al declararlo en una
+    /// extensión, Swift mantiene el inicializador por miembros.
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
         id = try c.decode(UUID.self, forKey: .id)
-        name = try c.decode(String.self, forKey: .name)
-        songs = try c.decode([Song].self, forKey: .songs)
-        icon = try c.decodeIfPresent(String.self, forKey: .icon)
-        tint = try c.decodeIfPresent(Int.self, forKey: .tint)
-        album = try c.decodeIfPresent(AlbumInfo.self, forKey: .album)
-        pinned = try c.decodeIfPresent(Bool.self, forKey: .pinned)
+        let n = ((try? c.decodeIfPresent(String.self, forKey: .name)) ?? nil) ?? ""
+        name = n.isEmpty ? "Playlist" : n
+        songs = StoredSong.list(c, .songs) ?? []
+        icon = (try? c.decodeIfPresent(String.self, forKey: .icon)) ?? nil
+        tint = (try? c.decodeIfPresent(Int.self, forKey: .tint)) ?? nil
+        album = (try? c.decodeIfPresent(AlbumInfo.self, forKey: .album)) ?? nil
+        pinned = (try? c.decodeIfPresent(Bool.self, forKey: .pinned)) ?? nil
         folder = (try? c.decodeIfPresent(String.self, forKey: .folder)) ?? nil
+    }
+}
+
+/// Una canción de library.json leída como en Android (`Song.fromJson`): sólo el `id` es obligatorio; sin título o
+/// artista quedan vacíos, y una carátula que no es una dirección es como si no estuviera.
+struct StoredSong: Decodable {
+    let song: Song
+    private enum Keys: String, CodingKey { case id, title, artist, thumbnail }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: Keys.self)
+        let id = try c.decode(String.self, forKey: .id)
+        func text(_ k: Keys) -> String? { (try? c.decodeIfPresent(String.self, forKey: k)) ?? nil }
+        let thumb = text(.thumbnail).flatMap { $0.trimmingCharacters(in: .whitespaces).isEmpty ? nil : URL(string: $0) }
+        song = Song(id: id, title: text(.title) ?? "", artist: text(.artist) ?? "", thumbnail: thumb)
+    }
+
+    /// La lista de `key` sin las canciones que no se pueden leer; nil si la clave falta o no es una lista.
+    static func list<K: CodingKey>(_ c: KeyedDecodingContainer<K>, _ key: K) -> [Song]? {
+        ((try? c.decodeIfPresent(LossyList<StoredSong>.self, forKey: key)) ?? nil)?.items.map(\.song)
     }
 }
 
@@ -510,14 +532,20 @@ struct LibraryFile: Codable {
         self.followedArtists = followedArtists?.isEmpty == false ? followedArtists : nil
     }
 
-    /// Como el sintetizado, pero una carpeta que no se puede leer se salta en vez de tumbar la biblioteca.
+    /// Tolerante, como `LibraryData.fromJson` en Android: una canción, playlist o carpeta que no se puede leer se
+    /// salta en vez de tumbar la biblioteca, y una lista que falta está vacía. Lo que tiene que ser es un objeto.
     init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
-        favorites = try c.decode([Song].self, forKey: .favorites)
-        playlists = try c.decode([Playlist].self, forKey: .playlists)
-        recents = try c.decodeIfPresent([Song].self, forKey: .recents)
+        favorites = StoredSong.list(c, .favorites) ?? []
+        playlists = ((try? c.decodeIfPresent(LossyList<Playlist>.self, forKey: .playlists)) ?? nil)?.items ?? []
+        recents = StoredSong.list(c, .recents)
         folders = (try? c.decodeIfPresent(LossyList<PlaylistFolder>.self, forKey: .folders))??.items
         followedArtists = (try? c.decodeIfPresent(LossyList<FollowedArtist>.self, forKey: .followedArtists))??.items
+    }
+
+    /// Cuántas canciones y playlists tiene: para saber si al leer se saltó algo (`LibraryDisk`).
+    var itemCount: Int {
+        favorites.count + (recents?.count ?? 0) + playlists.count + playlists.reduce(0) { $0 + $1.songs.count }
     }
 
     /// Lee library.json (o una copia) y deja las carpetas listas: sin huérfanas, ciclos ni más de 3 niveles, y
@@ -547,5 +575,157 @@ struct LibraryFile: Codable {
             recents: Array((mine + (other.recents ?? []).filter { recentIDs.insert($0.id).inserted }).prefix(Self.maxRecents)),
             folders: folders,
             followedArtists: FollowedArtists.merge(followedArtists ?? [], other.followedArtists ?? []))
+    }
+}
+
+// MARK: - library.json en disco, sin perder nunca lo que había
+
+/// Cómo se leyó library.json al arrancar.
+enum LibraryRead {
+    /// No hay archivo (o está vacío): primera vez.
+    case missing
+    /// Leído. `skipped`: canciones y playlists que había en el archivo y no se han podido leer.
+    case ok(LibraryFile, skipped: Int)
+    /// Hay archivo pero no se entiende (cortado, dañado, no es JSON).
+    case unreadable
+}
+
+/// Lee y guarda library.json. Regla: **nunca se escribe encima de algo que no se ha leído entero**. Si el archivo no
+/// se puede leer, se guarda una copia tal cual (`library-copia-<huella>.json`), `unreadableCopy` deja de ser nil
+/// (la app avisa) y `save` no escribe hasta `startOver()`. Si se leyó saltándose algo, la copia se guarda igual y se
+/// sigue. Sólo Foundation; igual que `LibraryDisk` y `Library` en Android.
+final class LibraryDisk {
+    let file: URL
+    /// El nombre de la copia del archivo que no se pudo leer. Mientras no sea nil, no se guarda nada.
+    private(set) var unreadableCopy: String?
+
+    init(file: URL) { self.file = file }
+
+    /// Lo que hay guardado, o nil si no hay nada o no se pudo leer (mira `unreadableCopy`).
+    func load() -> LibraryFile? {
+        switch Self.read(file) {
+        case .missing:
+            return nil
+        case .ok(let lib, let skipped):
+            // Se va a escribir sin lo que se saltó: antes, el archivo como estaba. Sin copia, no se escribe.
+            if skipped > 0, Self.keepCopy(of: file) == nil { unreadableCopy = "" }
+            return lib
+        case .unreadable:
+            unreadableCopy = Self.keepCopy(of: file) ?? ""
+            return nil
+        }
+    }
+
+    /// Guarda la biblioteca. No hace nada si el archivo que había no se pudo leer. true si se escribió.
+    @discardableResult
+    func save(_ library: LibraryFile) -> Bool {
+        guard unreadableCopy == nil, let data = try? JSONEncoder().encode(library) else { return false }
+        return (try? data.write(to: file, options: .atomic)) != nil
+    }
+
+    /// «Empezar de cero»: la copia se queda y se vuelve a guardar con normalidad.
+    func startOver() { unreadableCopy = nil }
+
+    static func read(_ file: URL) -> LibraryRead {
+        guard FileManager.default.fileExists(atPath: file.path) else { return .missing }
+        guard let data = try? Data(contentsOf: file) else { return .unreadable }
+        if data.isEmpty { return .missing }
+        guard let lib = try? LibraryFile.decode(data) else { return .unreadable }
+        return .ok(lib, skipped: max(0, rawItemCount(data) - lib.itemCount))
+    }
+
+    /// Canciones y playlists que dice tener el archivo, sin mirar si se pueden leer.
+    static func rawItemCount(_ data: Data) -> Int {
+        guard let o = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else { return 0 }
+        func count(_ v: Any?) -> Int { (v as? [Any])?.count ?? 0 }
+        let lists = o["playlists"] as? [Any] ?? []
+        return count(o["favorites"]) + count(o["recents"]) + lists.count
+            + lists.reduce(0) { $0 + count(($1 as? [String: Any])?["songs"]) }
+    }
+
+    /// Copia el archivo tal cual a su lado, con la huella del contenido en el nombre: abrir la app varias veces
+    /// con el mismo archivo roto no amontona copias. Devuelve el nombre, o nil si no se pudo copiar.
+    static func keepCopy(of file: URL) -> String? {
+        guard let data = try? Data(contentsOf: file) else { return nil }
+        let name = "library-copia-\(fingerprint(data)).json"
+        let copy = file.deletingLastPathComponent().appendingPathComponent(name)
+        if let there = try? Data(contentsOf: copy), there == data { return name }
+        return (try? data.write(to: copy, options: .atomic)) != nil ? name : nil
+    }
+
+    /// FNV-1a de 64 bits en hexadecimal (16 letras). No es seguridad: sólo da el mismo nombre al mismo contenido.
+    static func fingerprint(_ data: Data) -> String {
+        var h: UInt64 = 0xcbf29ce484222325
+        for b in data { h = (h ^ UInt64(b)) &* 0x100000001b3 }
+        let hex = String(h, radix: 16)
+        return String(repeating: "0", count: 16 - hex.count) + hex
+    }
+}
+
+// MARK: - Modo «Ordenar» (paso B de menús y gestos; DECISIONS 40)
+
+/// Mover una portada en el modo «Ordenar», sin arrastrar («Antes» / «Después») o arrastrándola por su asa.
+/// Sólo Foundation; igual que `GridOrder` en Android.
+enum GridOrder {
+    /// `id` un puesto antes (-1) o después (+1), si su vecina se puede apartar (`canSwap`: las carpetas se ordenan
+    /// entre ellas y las playlists entre ellas). Si no, el orden queda igual.
+    static func step<ID: Equatable>(_ id: ID, by delta: Int, in ids: [ID], canSwap: (ID, ID) -> Bool = { _, _ in true }) -> [ID] {
+        guard let i = ids.firstIndex(of: id), delta == 1 || delta == -1, ids.indices.contains(i + delta),
+              canSwap(id, ids[i + delta]) else { return ids }
+        var out = ids
+        out.swapAt(i, i + delta)
+        return out
+    }
+
+    static func canStep<ID: Equatable>(_ id: ID, by delta: Int, in ids: [ID], canSwap: (ID, ID) -> Bool = { _, _ in true }) -> Bool {
+        step(id, by: delta, in: ids, canSwap: canSwap) != ids
+    }
+
+    /// `id` pasa al puesto `index` y las de en medio se corren un sitio.
+    static func moved<ID: Equatable>(_ id: ID, to index: Int, in ids: [ID]) -> [ID] {
+        guard let from = ids.firstIndex(of: id), ids.indices.contains(index), from != index else { return ids }
+        var out = ids
+        out.insert(out.remove(at: from), at: index)
+        return out
+    }
+}
+
+/// El arrastre del modo «Ordenar»: una portada cogida por su asa que sigue al dedo. Los huecos (`slots`) son los
+/// marcos de las celdas al empezar, por puesto: como todas miden lo mismo, no cambian aunque cambie el orden, y así
+/// no hace falta esperar a que la pantalla se recoloque para saber qué hay bajo el dedo. Vale para la cuadrícula de
+/// Playlists y para el carrusel de Fijados. Sólo Foundation; igual que `OrderDrag` en Android.
+struct OrderDrag<ID: Hashable> {
+    let id: ID
+    /// Marco de cada puesto al empezar a arrastrar (sólo los que se ven).
+    let slots: [Int: CGRect]
+    /// Puesto en el que estaba al cogerla.
+    let start: Int
+    /// Lo que se ha movido el dedo desde que la cogió.
+    var translation: CGSize = .zero
+    /// Carpeta marcada para soltarla dentro, si el dedo está encima de una que la admite.
+    var into: ID?
+    /// Ha cambiado de puesto alguna vez (aunque vuelva al suyo).
+    var changed = false
+
+    /// El dedo se mueve a `location`. Devuelve el orden nuevo (el mismo si no cambia nada) y apunta `into`.
+    mutating func move(to location: CGPoint, translation: CGSize, order: [ID],
+                       canDropInto: (ID, ID) -> Bool = { _, _ in false },
+                       canSwap: (ID, ID) -> Bool = { _, _ in true }) -> [ID] {
+        self.translation = translation
+        guard let index = slots.first(where: { $0.value.contains(location) })?.key, order.indices.contains(index),
+              order[index] != id else { into = nil; return order }
+        let target = order[index]
+        if canDropInto(id, target) { into = target; return order }
+        into = nil
+        guard canSwap(id, target) else { return order }
+        changed = true
+        return GridOrder.moved(id, to: index, in: order)
+    }
+
+    /// Cuánto hay que desplazar la celda para que siga bajo el dedo: lo que se movió el dedo menos lo que ya se
+    /// ha corrido ella al cambiar de puesto.
+    func offset(in order: [ID]) -> CGSize {
+        guard let now = order.firstIndex(of: id), let a = slots[start], let b = slots[now] else { return translation }
+        return CGSize(width: translation.width - (b.minX - a.minX), height: translation.height - (b.minY - a.minY))
     }
 }

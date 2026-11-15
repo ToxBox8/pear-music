@@ -35,6 +35,8 @@ enum Demo {
         var followed = false
         /// Biblioteca con «Tu música» en el modo de ordenar (flechas y asa).
         var musicEditing = false
+        /// Playlists en el modo «Ordenar» (asas, una portada elegida y la barra de botones).
+        var playlistsOrdering = false
     }
 
     /// Los mismos nombres que las PNG de Android (shared/design/compare_shots.py los empareja).
@@ -74,6 +76,9 @@ enum Demo {
         "52_insignia_nuevo_oscuro": Scenario(appearance: "dark", playing: false, route: .badges),
         // «Tu música» ordenando: «Hecho», flechas y asa (revisión del bloque 1).
         "53_tu_musica_ordenar": Scenario(playing: false, tab: .library, musicEditing: true),
+        // Modo «Ordenar» de Playlists (paso B de menús y gestos): asas, «Domingo lento» elegida y los botones.
+        "54_playlists_ordenar": Scenario(playing: false, tab: .library, route: .playlists, folders: true, playlistsOrdering: true),
+        "55_playlists_ordenar_oscuro": Scenario(appearance: "dark", playing: false, tab: .library, route: .playlists, folders: true, playlistsOrdering: true),
         // Tráiler v2 (4-11-2026): con `-demoCatalog YES` (DemoCatalog.swift), todo con canciones de Michael Bennet.
         "v2_01_inicio": Scenario(tab: .home),
         "v2_02_busqueda": Scenario(tab: .home, query: "Michael Bennet"),
@@ -149,6 +154,7 @@ enum Demo {
                 if let p = library.playlists.first(where: { $0.name == name }) { library.movePlaylist(p.id, to: folder) }
             }
             folderID = gym
+            orderingSelected = library.playlists.first { $0.name == "Domingo lento" }?.id.uuidString
         }
         if current?.artistsFollowing == true || current?.releases == true || current?.followed == true {
             for a in followed.reversed() { library.follow(browseId: a.browseId, name: a.name, thumbnail: nil, since: a.since) }
@@ -179,6 +185,8 @@ enum Demo {
 
     /// La carpeta que abre el escenario `.folder` (Gimnasio).
     @MainActor static var folderID: String?
+    /// La portada elegida en las capturas del modo «Ordenar» (su clave en `playlistOrder`).
+    static var orderingSelected: String?
 
     /// Estado del reproductor y hojas abiertas.
     @MainActor static func apply(player: Player, jam: JamService) {

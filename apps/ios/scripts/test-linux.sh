@@ -22,3 +22,13 @@ mkdir "$OUT/seguidos"
 cp scripts/tests/FollowedArtistsTests.swift "$OUT/seguidos/main.swift"
 "$SWIFT" -o "$OUT/seguidos/tests" Sources/LibraryModel.swift Sources/ReleasesModel.swift Sources/I18n.swift "$OUT/seguidos/main.swift"
 "$OUT/seguidos/tests" ../../shared/library
+
+mkdir "$OUT/disco"
+cp scripts/tests/LibraryDiskTests.swift "$OUT/disco/main.swift"
+"$SWIFT" -o "$OUT/disco/tests" Sources/LibraryModel.swift Sources/I18n.swift "$OUT/disco/main.swift"
+"$OUT/disco/tests"
+
+mkdir "$OUT/ordenar"
+cp scripts/tests/GridOrderTests.swift "$OUT/ordenar/main.swift"
+"$SWIFT" -o "$OUT/ordenar/tests" Sources/LibraryModel.swift Sources/I18n.swift "$OUT/ordenar/main.swift"
+"$OUT/ordenar/tests"

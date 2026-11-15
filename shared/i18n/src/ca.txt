@@ -1179,3 +1179,15 @@
 1179	Baixa {0}
 1180	Canvia l'ordre dels apartats de La teva música
 1181	Puja {0}
+1182	Hem desat una còpia del fitxer: surt en exportar les teves dades a Configuració. Fins que triïs, el que canviïs no es desa.
+1183	No hem pogut llegir la teva biblioteca
+1184	Abans
+1185	Arrossega ≡ o toca una portada i fes servir els botons.
+1186	Crea una llista aquí o porta'n una amb «Mou a…» del seu menú.
+1187	Crea una llista
+1188	Després
+1189	Tria aquesta portada per moure-la amb els botons
+1190	Elimina la carpeta…
+1191	Elimina…
+1192	Llista o carpeta nova
+1193	Llista nova…

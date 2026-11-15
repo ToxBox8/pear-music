@@ -72,8 +72,10 @@ struct NoMatchesView: View {
 
 /// Playlists (2.9 de x.1.1): la carpeta de «Tu música», en cuadrícula como «Tus álbumes». Es el único sitio de las
 /// playlists: el carrusel de Biblioteca lo ocupa ahora Fijados. Con Descargadas y Favoritos «en Playlists» (Ajustes ›
-/// Biblioteca), van aquí con su portada. Manteniendo pulsada una portada sale su menú y, si se arrastra, se cambia el
-/// orden (pasa a «A mano») o se mete en una carpeta.
+/// Biblioteca), van aquí con su portada.
+/// Menús y gestos (paso B; DECISIONS 40): mantener pulsada una portada abre su menú y nada más; el orden se cambia en
+/// el modo «Ordenar» (del ⋯ o del menú de una portada), arrastrando por el asa o con «Antes» y «Después», y pasa a
+/// «A mano». El + crea una playlist (y la abre) o una carpeta.
 /// Carpetas (3.0, bloque 1; DECISIONS 35): con `folderID` es la pantalla de una carpeta, con Reproducir y Aleatorio
 /// de todo lo de dentro. En cada nivel van primero las carpetas y después las playlists. Igual que `PlaylistsScreen`
 /// en Android.
@@ -84,15 +86,21 @@ struct PlaylistsListView: View {
     @AppStorage("playlistSort") private var sort = "recent"
     @AppStorage("playlistOrder") private var orderRaw = ""
     @AppStorage("smartPlacement") private var placement = "playlists"
-    @AppStorage("playlistDragHintDone") private var hintDone = false
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var query = ""
-    @State private var editing = false
-    @State private var naming: FolderNaming?
-    @State private var nameText = ""
+    /// Modo «Ordenar» y la portada elegida (su clave).
+    @State private var ordering = Demo.current?.playlistsOrdering == true
+    @State private var selected: String? = Demo.current?.playlistsOrdering == true ? Demo.orderingSelected : nil
     @State private var moving: MoveItem?
     @State private var deleting: PlaylistFolder?
+    @State private var deletingPlaylist: Playlist?
+    @State private var editingPlaylist: Playlist?
     @State private var opened: Entry?
+    /// La playlist recién creada: se abre para que se vea que existe y añadirle canciones.
+    @State private var created: UUID?
+    /// La carpeta recién creada: la cuadrícula se desplaza hasta ella.
+    @State private var reveal: String?
 
     /// Una casilla de la cuadrícula: una playlist, una lista inteligente o una carpeta. `key` es su clave en
     /// `playlistOrder` (el id de la playlist o de la carpeta, o "downloads" / "favorites").
@@ -105,6 +113,11 @@ struct PlaylistsListView: View {
         var smart: SmartList? = nil
         var folder: PlaylistFolder? = nil
     }
+
+    private static var sorts: [(String, String)] { [
+        ("recent", L("Añadidas recientemente")), ("name", L("Nombre (A-Z)")), ("nameDesc", L("Nombre (Z-A)")),
+        ("count", L("Nº de canciones")), ("custom", L("A mano")),
+    ] }
 
     private var folder: PlaylistFolder? { folderID.flatMap { id in library.folders.first { $0.id == id } } }
     private var smartHere: Bool { folderID == nil && placement != "music" }
@@ -154,54 +167,78 @@ struct PlaylistsListView: View {
 
     var body: some View {
         let all = keys.compactMap { entry($0, path: false) }
-        let shown = query.isEmpty ? all : searchEntries()
-        ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                if let folder { FolderHeader(folder: folder) }
-                if !shown.isEmpty {
-                    if !hintDone || !query.isEmpty { ReorderHint(enabled: query.isEmpty, folders: !library.folders.isEmpty) }
-                    ReorderGrid(items: shown, enabled: query.isEmpty, onMoved: { moved in
-                        orderRaw = LibraryOrder.reorder(level: moved, playlists: library.userPlaylists, folders: library.folders,
-                                                        sort: sort, order: LibraryOrder.decode(orderRaw)).joined(separator: "\n")
-                        sort = "custom"
-                    }, canDropInto: canDropInto, canSwap: canSwap, onDropInto: dropInto, onDragEnd: { hintDone = true },
-                    menu: { AnyView(menu($0)) },
-                    destination: { e in
-                        if let p = e.playlist { PlaylistV11View(playlistID: p.id) }
-                        else if let f = e.folder { PlaylistsListView(folderID: f.id) }
-                        else if let k = e.smart { SmartListV11View(kind: k) }
-                    }) { e in cell(e) }
+        // En el modo «Ordenar» se ve el nivel entero: ordenar sólo lo encontrado no tendría sentido.
+        let shown = query.isEmpty || ordering ? all : searchEntries()
+        let ids = all.map(\.key)
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    if let folder, !ordering { FolderHeader(folder: folder) }
+                    if !shown.isEmpty {
+                        if ordering { OrderHint() }
+                        ReorderGrid(items: shown, ordering: ordering, selected: $selected, onMoved: saveOrder,
+                                    canDropInto: canDropInto, canSwap: canSwap, onDropInto: dropInto,
+                                    menu: { AnyView(menu($0)) },
+                                    destination: { e in
+                                        if let p = e.playlist { PlaylistV11View(playlistID: p.id) }
+                                        else if let f = e.folder { PlaylistsListView(folderID: f.id) }
+                                        else if let k = e.smart { SmartListV11View(kind: k) }
+                                    }) { e in cell(e) }
+                    }
                 }
+            }
+            .onChange(of: reveal) { key in
+                guard let key else { return }
+                withAnimation(reduceMotion ? nil : .uiEaseOut(0.3)) { proxy.scrollTo(key, anchor: .center) }
+                reveal = nil
             }
         }
         .overlay {
             if all.isEmpty && query.isEmpty {
-                if folderID == nil { Text(L("Todavía no hay playlists")).foregroundStyle(.secondary) }
-                else { FolderEmptyView() }
+                EmptyCreate(folder: folderID != nil) { newPlaylist(in: folderID) }
             } else if shown.isEmpty { NoMatchesView(query: query) }
         }
         .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always),
                     prompt: folder.map { L("Buscar en {0}", $0.name) } ?? L("Buscar en playlists"))
         .scrollDismissesKeyboard(.interactively)
         .themed()
-        .navigationTitle(folder?.name ?? L("Playlists"))
+        .navigationTitle(ordering ? L("Ordenar") : folder?.name ?? L("Playlists"))
+        .navigationBarBackButtonHidden(ordering)
         .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Menu { toolbarMenu } label: { Image(systemName: "ellipsis.circle") }
-                    .accessibilityLabel(L("Más opciones"))
+            ToolbarItemGroup(placement: .primaryAction) {
+                if ordering {
+                    Button(L("Hecho")) { setOrdering(false) }.fontWeight(.semibold)
+                } else {
+                    Menu { addMenu } label: { Image(systemName: "plus") }
+                        .accessibilityLabel(L("Nueva playlist o carpeta"))
+                    Menu { toolbarMenu } label: { Image(systemName: "ellipsis.circle") }
+                        .accessibilityLabel(L("Más opciones"))
+                }
             }
         }
-        .sheet(isPresented: $editing) { ReorderPlaylistsView(folderID: folderID) }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if ordering {
+                OrderBar(canBefore: selected.map { GridOrder.canStep($0, by: -1, in: ids, canSwap: canSwap) } ?? false,
+                         canAfter: selected.map { GridOrder.canStep($0, by: 1, in: ids, canSwap: canSwap) } ?? false,
+                         onMove: moveSelected, canMove: selected.map { $0 != LibraryOrder.downloads && $0 != LibraryOrder.favorites && ids.contains($0) } ?? false) { delta in
+                    guard let s = selected else { return }
+                    UISelectionFeedbackGenerator().selectionChanged()
+                    withAnimation(reduceMotion ? nil : .uiEaseOut(0.22)) { saveOrder(GridOrder.step(s, by: delta, in: ids, canSwap: canSwap)) }
+                }
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
         .sheet(item: $moving) { MoveToFolderSheet(item: $0) }
+        .sheet(item: $editingPlaylist) { PlaylistEditor(playlistID: $0.id) }
         .navigationDestination(isPresented: Binding(get: { opened != nil }, set: { if !$0 { opened = nil } })) {
             if let p = opened?.playlist { PlaylistV11View(playlistID: p.id) }
             else if let f = opened?.folder { PlaylistsListView(folderID: f.id) }
+            else if let k = opened?.smart { SmartListV11View(kind: k) }
         }
-        .alert(naming?.title ?? "", isPresented: Binding(get: { naming != nil }, set: { if !$0 { naming = nil } })) {
-            TextField(L("Nombre"), text: $nameText)
-            Button(naming?.confirm ?? L("Crear")) { applyName() }
-            Button(L("Cancelar"), role: .cancel) { naming = nil }
+        .navigationDestination(isPresented: Binding(get: { created != nil }, set: { if !$0 { created = nil } })) {
+            if let created { PlaylistV11View(playlistID: created) }
         }
+        .deletePlaylistAlert($deletingPlaylist, library: library)
         .alert(L("¿Eliminar la carpeta «{0}»?", deleting?.name ?? ""), isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } })) {
             Button(L("Eliminar carpeta"), role: .destructive) {
                 if let f = deleting {
@@ -216,6 +253,10 @@ struct PlaylistsListView: View {
         }
         // La carpeta abierta ya no existe (borrada desde otro sitio o al importar): se vuelve atrás.
         .onChange(of: library.folders.map(\.id)) { ids in if let folderID, !ids.contains(folderID) { dismiss() } }
+        // Lo elegido ya no está en este nivel (se movió a una carpeta o se eliminó): nada elegido.
+        .onChange(of: ids) { now in if let s = selected, !now.contains(s) { selected = nil } }
+        // Escribir en el buscador sale del modo «Ordenar».
+        .onChange(of: query) { q in if !q.isEmpty && ordering { setOrdering(false) } }
         .task { if Demo.current?.showMove == true, folderID != nil, let p = library.userPlaylists.first(where: { $0.folder == folderID }) { moving = .playlist(p.id) } }
         .miniPlayer()
     }
@@ -243,50 +284,90 @@ struct PlaylistsListView: View {
         .accessibilityValue(e.subtitle)
     }
 
-    /// Soltar sin mover abre el menú (como en Fijados; lo decidió Toxbox).
+    /// El menú de mantener pulsado (lo decidió Toxbox: mantener pulsado es sólo menú).
     @ViewBuilder private func menu(_ e: Entry) -> some View {
+        Button { opened = e } label: { Label(L("Abrir"), systemImage: "arrow.up.right.square") }
         if let p = e.playlist {
-            Button { opened = e } label: { Label(L("Abrir"), systemImage: "arrow.up.right.square") }
             Button { moving = .playlist(p.id) } label: { Label(L("Mover a…"), systemImage: "folder") }
             if let current = p.folder, let f = library.folders.first(where: { $0.id == current }) {
                 Button { library.movePlaylist(p.id, to: f.parent) } label: {
                     Label(L("Sacar de «{0}»", f.name), systemImage: "arrow.up.forward.square")
                 }
             }
-            Divider()
+            Button { startOrdering(e.key) } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
             Button { library.update(p.id) { $0.pinned = $0.pinned == true ? nil : true } } label: {
                 p.pinned == true ? Label(L("Soltar de arriba"), systemImage: "pin.slash") : Label(L("Fijar arriba"), systemImage: "pin")
             }
-        } else if let f = e.folder {
-            Button { opened = e } label: { Label(L("Abrir"), systemImage: "arrow.up.right.square") }
-            Button { nameText = f.name; naming = .rename(f) } label: { Label(L("Renombrar"), systemImage: "pencil") }
-            Button { moving = .folder(f.id) } label: { Label(L("Mover carpeta a…"), systemImage: "folder") }
             Divider()
-            Button(role: .destructive) { deleting = f } label: { Label(L("Eliminar carpeta"), systemImage: "trash") }
+            Button { editingPlaylist = p } label: { Label(L("Editar"), systemImage: "pencil") }
+            Button(role: .destructive) { deletingPlaylist = p } label: { Label(L("Eliminar…"), systemImage: "trash") }
+        } else if let f = e.folder {
+            Button { rename(f) } label: { Label(L("Renombrar"), systemImage: "pencil") }
+            Button { moving = .folder(f.id) } label: { Label(L("Mover carpeta a…"), systemImage: "folder") }
+            Button { startOrdering(e.key) } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
+            Divider()
+            Button(role: .destructive) { deleting = f } label: { Label(L("Eliminar carpeta…"), systemImage: "trash") }
+        } else {
+            Button { startOrdering(e.key) } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
+        }
+    }
+
+    /// El + de la barra: crear aquí.
+    @ViewBuilder private var addMenu: some View {
+        Button { newPlaylist(in: folderID) } label: {
+            Label(folderID == nil ? L("Nueva playlist") : L("Nueva playlist aquí"), systemImage: "plus.rectangle.on.rectangle")
+        }
+        if PlaylistFolders.canCreate(in: folderID, folders: library.folders) {
+            Button { newFolder(in: folderID) } label: {
+                Label(folderID == nil ? L("Nueva carpeta") : L("Nueva carpeta aquí"), systemImage: "folder.badge.plus")
+            }
         }
     }
 
     @ViewBuilder private var toolbarMenu: some View {
+        Button { startOrdering(nil) } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
+        // El criterio (antes en la pantalla «Editar orden»).
+        Picker(L("Ordenar por"), selection: $sort) {
+            ForEach(Self.sorts, id: \.0) { item in Text(item.1).tag(item.0) }
+        }
+        .pickerStyle(.inline)
         if let folder {
-            Button { nameText = ""; naming = .newPlaylist(folder.id) } label: { Label(L("Nueva playlist aquí"), systemImage: "plus") }
-            if PlaylistFolders.canCreate(in: folder.id, folders: library.folders) {
-                Button { nameText = ""; naming = .newFolder(folder.id) } label: { Label(L("Nueva carpeta aquí"), systemImage: "folder.badge.plus") }
-            }
             Divider()
-            Button { nameText = folder.name; naming = .rename(folder) } label: { Label(L("Renombrar"), systemImage: "pencil") }
+            Button { rename(folder) } label: { Label(L("Renombrar"), systemImage: "pencil") }
             Button { moving = .folder(folder.id) } label: { Label(L("Mover carpeta a…"), systemImage: "folder") }
-            Button { editing = true } label: { Label(L("Editar orden"), systemImage: "arrow.up.arrow.down") }
-            Divider()
-            Button(role: .destructive) { deleting = folder } label: { Label(L("Eliminar carpeta"), systemImage: "trash") }
-        } else {
-            // También aquí, no sólo en el + de Biblioteca: quien está en Playlists busca «Nueva playlist» en este menú.
-            Button { nameText = ""; naming = .newPlaylist(nil) } label: { Label(L("Nueva playlist"), systemImage: "plus") }
-            Button { nameText = ""; naming = .newFolder(nil) } label: { Label(L("Nueva carpeta"), systemImage: "folder.badge.plus") }
-            Button { editing = true } label: { Label(L("Editar orden"), systemImage: "arrow.up.arrow.down") }
+            Button(role: .destructive) { deleting = folder } label: { Label(L("Eliminar carpeta…"), systemImage: "trash") }
         }
     }
 
-    // MARK: Arrastrar dentro de una carpeta
+    // MARK: Modo «Ordenar»
+
+    private func setOrdering(_ on: Bool) {
+        withAnimation(reduceMotion ? nil : .uiEaseOut(0.25)) {
+            ordering = on
+            if !on { selected = nil }
+        }
+    }
+
+    /// Entra en el modo «Ordenar», con esa portada ya elegida si viene de su menú.
+    private func startOrdering(_ key: String?) {
+        query = ""
+        selected = key
+        setOrdering(true)
+    }
+
+    /// Guarda el orden de este nivel; al mover algo, Playlists pasa a ordenarse «A mano».
+    private func saveOrder(_ moved: [String]) {
+        guard moved != keys else { return }
+        orderRaw = LibraryOrder.reorder(level: moved, playlists: library.userPlaylists, folders: library.folders,
+                                        sort: sort, order: LibraryOrder.decode(orderRaw)).joined(separator: "\n")
+        sort = "custom"
+    }
+
+    private func moveSelected() {
+        guard let s = selected else { return }
+        if let f = LibraryOrder.folderID(s) { moving = .folder(f) }
+        else if let id = UUID(uuidString: s) { moving = .playlist(id) }
+    }
 
     private func isFolder(_ key: String) -> Bool { LibraryOrder.folderID(key) != nil }
 
@@ -301,20 +382,23 @@ struct PlaylistsListView: View {
 
     private func dropInto(_ dragged: String, _ target: String) {
         guard let id = UUID(uuidString: dragged), let folder = LibraryOrder.folderID(target) else { return }
-        withAnimation(.uiEaseOut(0.25)) { library.movePlaylist(id, to: folder) }
+        withAnimation(reduceMotion ? nil : .uiEaseOut(0.25)) { library.movePlaylist(id, to: folder) }
     }
 
     // MARK: Nombres
 
-    private func applyName() {
-        let n = nameText
-        switch naming {
-        case .newFolder(let parent): library.createFolder(n, in: parent)
-        case .newPlaylist(let folder): library.createPlaylist(n, in: folder)
-        case .rename(let f): library.renameFolder(f.id, to: n)
-        case nil: break
+    private func newPlaylist(in folder: String?) {
+        NamePrompt.ask(L("Nueva playlist")) { name in created = library.createPlaylist(name, in: folder) }
+    }
+
+    private func newFolder(in parent: String?) {
+        NamePrompt.ask(L("Nueva carpeta")) { name in
+            if let id = library.createFolder(name, in: parent) { reveal = LibraryOrder.key(folder: id) }
         }
-        naming = nil
+    }
+
+    private func rename(_ f: PlaylistFolder) {
+        NamePrompt.ask(L("Renombrar carpeta"), initial: f.name, confirm: L("Guardar")) { library.renameFolder(f.id, to: $0) }
     }
 
     private func destinationName(_ f: PlaylistFolder?) -> String {
@@ -322,24 +406,51 @@ struct PlaylistsListView: View {
     }
 }
 
-/// «Tus álbumes»: los álbumes guardados o descargados desde su página, en cuadrícula y con buscador. Se reordenan
-/// arrastrando, como Playlists (2.9 de x.1.1).
+/// Sin nada todavía (Playlists o una carpeta): qué es y un botón para empezar.
+private struct EmptyCreate: View {
+    let folder: Bool
+    let create: () -> Void
+    var body: some View {
+        VStack(spacing: 10) {
+            Image(systemName: folder ? "folder" : "music.note.list").font(.system(size: 40, weight: .regular)).foregroundStyle(.secondary)
+            Text(folder ? L("Carpeta vacía") : L("Todavía no hay playlists")).font(.headline)
+            if folder {
+                Text(L("Crea una playlist aquí o trae una con «Mover a…» de su menú."))
+                    .font(.subheadline).foregroundStyle(.secondary)
+            }
+            Button(action: create) { Text(L("Crear playlist")) }
+                .buttonStyle(PillButtonStyle(prominent: true))
+                .frame(maxWidth: 220)
+                .padding(.top, 8)
+        }
+        .multilineTextAlignment(.center)
+        .padding(.horizontal, 40)
+    }
+}
+
+/// «Tus álbumes»: los álbumes guardados o descargados desde su página, en cuadrícula y con buscador. Mantener pulsado
+/// abre el menú; «Ordenar» entra en el mismo modo que Playlists, sin «Mover a…» (paso B; DECISIONS 40).
 struct AlbumsListView: View {
     @EnvironmentObject var library: Library
     @AppStorage("albumSort") private var albumSort = "recent"
     @AppStorage("albumOrder") private var albumOrder = ""
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var query = ""
+    @State private var ordering = false
+    @State private var selected: UUID?
+    @State private var deleting: Playlist?
+    @State private var opened: Playlist?
 
     var body: some View {
         let albums = LibraryOrder.albums(library.albums, sort: albumSort, order: LibraryOrder.decode(albumOrder))
-        let shown = LocalSearch.filter(albums, query) { "\($0.name) \($0.album?.artist ?? "")" }
+        let shown = ordering ? albums : LocalSearch.filter(albums, query) { "\($0.name) \($0.album?.artist ?? "")" }
+        let ids = albums.map(\.id)
         ScrollView {
             if !shown.isEmpty {
-                ReorderHint(enabled: query.isEmpty)
-                ReorderGrid(items: shown, enabled: query.isEmpty, onMoved: { moved in
-                    albumOrder = moved.map(\.uuidString).joined(separator: "\n")
-                    albumSort = "custom"
-                }, destination: { p in PlaylistV11View(playlistID: p.id) }) { p in
+                if ordering { OrderHint() }
+                ReorderGrid(items: shown, ordering: ordering, selected: $selected, onMoved: save,
+                            menu: { AnyView(menu($0)) },
+                            destination: { p in PlaylistV11View(playlistID: p.id) }) { p in
                     GridCover(playlist: p, subtitle: p.album?.line ?? songCount(p.songs.count))
                 }
             }
@@ -351,8 +462,63 @@ struct AlbumsListView: View {
         .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: L("Buscar en tus álbumes"))
         .scrollDismissesKeyboard(.interactively)
         .themed()
-        .navigationTitle(L("Tus álbumes"))
+        .navigationTitle(ordering ? L("Ordenar") : L("Tus álbumes"))
+        .navigationBarBackButtonHidden(ordering)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                if ordering {
+                    Button(L("Hecho")) { setOrdering(false) }.fontWeight(.semibold)
+                } else if albums.count > 1 {
+                    Button(L("Ordenar")) { start(nil) }
+                }
+            }
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if ordering {
+                OrderBar(canBefore: selected.map { GridOrder.canStep($0, by: -1, in: ids) } ?? false,
+                         canAfter: selected.map { GridOrder.canStep($0, by: 1, in: ids) } ?? false) { delta in
+                    guard let s = selected else { return }
+                    UISelectionFeedbackGenerator().selectionChanged()
+                    withAnimation(reduceMotion ? nil : .uiEaseOut(0.22)) { save(GridOrder.step(s, by: delta, in: ids)) }
+                }
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
+        .navigationDestination(isPresented: Binding(get: { opened != nil }, set: { if !$0 { opened = nil } })) {
+            if let opened { PlaylistV11View(playlistID: opened.id) }
+        }
+        .deletePlaylistAlert($deleting, library: library)
+        .onChange(of: ids) { now in if let s = selected, !now.contains(s) { selected = nil } }
+        .onChange(of: query) { q in if !q.isEmpty && ordering { setOrdering(false) } }
         .miniPlayer()
+    }
+
+    @ViewBuilder private func menu(_ p: Playlist) -> some View {
+        Button { opened = p } label: { Label(L("Abrir"), systemImage: "arrow.up.right.square") }
+        Button { start(p.id) } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
+        Button { library.update(p.id) { $0.pinned = $0.pinned == true ? nil : true } } label: {
+            p.pinned == true ? Label(L("Soltar de arriba"), systemImage: "pin.slash") : Label(L("Fijar arriba"), systemImage: "pin")
+        }
+        Divider()
+        Button(role: .destructive) { deleting = p } label: { Label(L("Eliminar…"), systemImage: "trash") }
+    }
+
+    private func setOrdering(_ on: Bool) {
+        withAnimation(reduceMotion ? nil : .uiEaseOut(0.25)) {
+            ordering = on
+            if !on { selected = nil }
+        }
+    }
+
+    private func start(_ id: UUID?) {
+        query = ""
+        selected = id
+        setOrdering(true)
+    }
+
+    private func save(_ moved: [UUID]) {
+        albumOrder = moved.map(\.uuidString).joined(separator: "\n")
+        albumSort = "custom"
     }
 }
 
@@ -372,22 +538,6 @@ private struct GridCover: View {
     }
 }
 
-/// Cómo se reordena la cuadrícula; buscando no se puede (se ordenaría sólo lo encontrado). En Playlists sale sólo
-/// hasta el primer arrastre (`playlistDragHintDone`, lo pidió Toxbox); en Tus álbumes, siempre.
-struct ReorderHint: View {
-    let enabled: Bool
-    /// Con carpetas, también dice que se puede meter una portada en una.
-    var folders = false
-    var body: some View {
-        Text(!enabled ? L("Borra la búsqueda para cambiar el orden.")
-             : folders ? L("Mantén pulsada una portada y arrástrala para cambiar el orden o meterla en una carpeta.")
-             : L("Mantén pulsada una portada y arrástrala para cambiar el orden."))
-            .font(.footnote).foregroundStyle(.secondary)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 20).padding(.top, 4).padding(.bottom, 4)
-    }
-}
-
 /// La celda sobre la que se está soltando algo para meterlo dentro (una carpeta). La lee `FolderCover`.
 private struct DropIntoKey: EnvironmentKey { static let defaultValue = false }
 extension EnvironmentValues {
@@ -397,139 +547,117 @@ extension EnvironmentValues {
     }
 }
 
-/// Cuadrícula de dos columnas que se reordena manteniendo pulsado y arrastrando (2.9 de x.1.1). El sistema levanta
-/// la portada; al pasar por encima de otra, se apartan, y al soltar llega el orden nuevo a `onMoved`. Con
-/// `enabled = false` (buscando) sólo se tocan. Las celdas que son contenedores (carpetas, 3.0) no se apartan: si lo
-/// que se arrastra cabe dentro, se marcan y al soltar llega a `onDropInto`. Igual que `ReorderGrid` en Android.
+/// Cuadrícula de dos columnas de Playlists y Tus álbumes (paso B; DECISIONS 40).
+/// Normal: tocar abre y mantener pulsado abre el menú (`menu`), sin arrastre debajo: en iOS el arrastre del sistema
+/// se quedaba con la pulsación larga y chocaba con el menú.
+/// Modo «Ordenar» (`ordering`): tocar una portada la elige (`selected`) y su asa (≡) la arrastra al momento, con un
+/// gesto propio; las demás se apartan y al soltar llega el orden nuevo a `onMoved`. Las celdas que son contenedores
+/// (carpetas) no se apartan: si lo que se arrastra cabe dentro, se marcan y al soltar llega a `onDropInto`.
+/// Igual que `ReorderGrid` en Android.
 struct ReorderGrid<Item: Identifiable, Destination: View, Cell: View>: View {
     let items: [Item]
-    let enabled: Bool
+    let ordering: Bool
+    @Binding var selected: Item.ID?
     let onMoved: ([Item.ID]) -> Void
     /// ¿Se puede soltar `arrastrado` dentro de `celda`? (carpetas; por defecto, nada es contenedor).
     var canDropInto: (Item.ID, Item.ID) -> Bool = { _, _ in false }
     /// ¿Se aparta `celda` al pasar `arrastrado` por encima? (las carpetas van siempre delante de las playlists).
     var canSwap: (Item.ID, Item.ID) -> Bool = { _, _ in true }
     var onDropInto: (Item.ID, Item.ID) -> Void = { _, _ in }
-    /// Al acabar un arrastre, se haya movido o metido algo.
-    var onDragEnd: () -> Void = {}
-    /// Menú al mantener pulsado sin mover (si no se da, nada). Va en la misma vista que el arrastre, como en Fijados:
-    /// así el sistema enseña el menú al soltar sin mover y arrastra si se mueve.
+    /// Menú al mantener pulsado (si no se da, nada).
     var menu: ((Item) -> AnyView)? = nil
     @ViewBuilder let destination: (Item) -> Destination
     @ViewBuilder let cell: (Item) -> Cell
     @State private var order: [Item.ID] = []
-    @State private var dragging: Item.ID?
-    /// La celda que se ha mantenido pulsada. Sólo pasa a `dragging` (y se apaga) cuando el arrastre se mueve de verdad.
-    @State private var lifted: Item.ID?
-    @State private var into: Item.ID?
+    @State private var frames: [Item.ID: CGRect] = [:]
+    @State private var drag: OrderDrag<Item.ID>?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     private let columns = [GridItem(.flexible(), spacing: 16, alignment: .top), GridItem(.flexible(), spacing: 16, alignment: .top)]
+    private let space = "order-grid"
 
     var body: some View {
         let byID = Dictionary(items.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
         let shown = order.compactMap { byID[$0] }
         LazyVGrid(columns: columns, spacing: 22) {
             ForEach(shown.count == items.count ? shown : items) { p in
-                NavigationLink { destination(p) } label: { cell(p) }
-                    .buttonStyle(TactileButtonStyle())
-                    .environment(\.dropInto, into == p.id)
-                    .opacity(dragging == p.id ? 0.35 : 1)
-                    .contextMenu { if let menu { menu(p) } }
-                    .modifier(Lift(enabled: enabled, id: p.id, dragging: $dragging, lifted: $lifted))
-                    .onDrop(of: [.text], delegate: CellDrop(target: p.id, order: $order, dragging: $dragging, lifted: $lifted, into: $into,
-                                                            canDropInto: canDropInto, canSwap: canSwap,
-                                                            dropInto: { d, t in onDropInto(d, t); onDragEnd() }, finish: finish))
+                Group {
+                    if ordering {
+                        orderCell(p)
+                    } else {
+                        NavigationLink { destination(p) } label: { cell(p) }
+                            .buttonStyle(TactileButtonStyle())
+                            .contextMenu { if let menu { menu(p) } }
+                    }
+                }
+                .id(p.id)
             }
         }
+        .coordinateSpace(name: space)
+        .onPreferenceChange(OrderFrameKey<Item.ID>.self) { frames = $0 }
         .padding(.horizontal, 16)
         .padding(.top, 8)
-        // Soltar entre celdas también termina el arrastre.
-        .onDrop(of: [.text], delegate: GridDrop(dragging: $dragging, lifted: $lifted, finish: finish))
+        .padding(.bottom, ordering ? 12 : 0)
         .onAppear { order = items.map(\.id) }
-        .onChange(of: items.map(\.id)) { ids in if dragging == nil { order = ids } }
+        .onChange(of: items.map(\.id)) { ids in if drag == nil { order = ids } }
     }
 
-    private func finish() {
-        lifted = nil
-        guard dragging != nil else { return }
-        dragging = nil
-        into = nil
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        onMoved(order)
-        onDragEnd()
+    /// Una celda en el modo «Ordenar»: se elige tocándola y se arrastra por el asa.
+    private func orderCell(_ p: Item) -> some View {
+        let lifted = drag?.id == p.id
+        return Button {
+            selected = p.id
+            UISelectionFeedbackGenerator().selectionChanged()
+        } label: { cell(p) }
+            .buttonStyle(.plain)
+            .accessibilityAddTraits(selected == p.id ? .isSelected : [])
+            .accessibilityHint(L("Elige esta portada para moverla con los botones"))
+            .environment(\.dropInto, drag?.into == p.id)
+            .modifier(OrderSelection(on: selected == p.id && !lifted))
+            .overlay(alignment: .topTrailing) { OrderGrip().gesture(grip(p.id)) }
+            .background(GeometryReader { g in
+                Color.clear.preference(key: OrderFrameKey<Item.ID>.self, value: [p.id: g.frame(in: .named(space))])
+            })
+            .scaleEffect(lifted && !reduceMotion ? 1.04 : 1)
+            .shadow(color: .black.opacity(lifted ? 0.22 : 0), radius: 16, y: 10)
+            .opacity(lifted && drag?.into != nil ? 0.85 : 1)
+            .offset(lifted ? drag?.offset(in: order) ?? .zero : .zero)
+            .zIndex(lifted ? 1 : 0)
     }
-}
 
-/// Mantener pulsado levanta la celda (sólo si se puede reordenar; buscando, no).
-/// El sistema pide lo que se arrastra en cuanto se mantiene pulsado, también si sólo se abre el menú y no se llega a
-/// arrastrar: por eso aquí sólo se apunta la celda en `lifted`, y `dragging` (que la apaga y congela el orden) lo
-/// ponen `CellDrop` y `GridDrop` cuando el arrastre se mueve. Antes, abrir el menú dejaba la portada apagada para
-/// siempre (revisión del bloque 1).
-struct Lift<ID: Hashable>: ViewModifier {
-    let enabled: Bool
-    let id: ID
-    @Binding var dragging: ID?
-    @Binding var lifted: ID?
-    @ViewBuilder func body(content: Content) -> some View {
-        if enabled {
-            content.onDrag {
-                // Un arrastre anterior que acabó fuera de la cuadrícula no avisa: se limpia al empezar otro.
-                dragging = nil
-                lifted = id
-                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                return NSItemProvider(object: "\(id)" as NSString)
+    private func grip(_ id: Item.ID) -> some Gesture {
+        DragGesture(minimumDistance: 0, coordinateSpace: .named(space))
+            .onChanged { v in
+                if drag?.id != id {
+                    guard let start = order.firstIndex(of: id) else { return }
+                    var slots: [Int: CGRect] = [:]
+                    for (i, other) in order.enumerated() { if let f = frames[other] { slots[i] = f } }
+                    drag = OrderDrag(id: id, slots: slots, start: start)
+                    selected = id
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                }
+                guard var d = drag else { return }
+                let before = d.into
+                let next = d.move(to: v.location, translation: v.translation, order: order, canDropInto: canDropInto, canSwap: canSwap)
+                if next != order {
+                    UISelectionFeedbackGenerator().selectionChanged()
+                    withAnimation(reduceMotion ? nil : .uiEaseOut(0.22)) { order = next; drag = d }
+                } else {
+                    if d.into != before, d.into != nil { UIImpactFeedbackGenerator(style: .light).impactOccurred() }
+                    drag = d
+                }
             }
-        } else {
-            content
-        }
+            .onEnded { _ in
+                guard let d = drag else { return }
+                withAnimation(reduceMotion ? nil : .uiEaseOut(0.22)) { drag = nil }
+                if let into = d.into {
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                    onDropInto(d.id, into)
+                } else if d.changed {
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    onMoved(order)
+                }
+            }
     }
-}
-
-struct CellDrop<ID: Hashable>: DropDelegate {
-    let target: ID
-    @Binding var order: [ID]
-    @Binding var dragging: ID?
-    @Binding var lifted: ID?
-    /// Celda marcada para soltar dentro (carpetas). Sin carpetas, siempre nil.
-    var into: Binding<ID?> = .constant(nil)
-    var canDropInto: (ID, ID) -> Bool = { _, _ in false }
-    var canSwap: (ID, ID) -> Bool = { _, _ in true }
-    var dropInto: (ID, ID) -> Void = { _, _ in }
-    let finish: () -> Void
-
-    func dropEntered(info: DropInfo) {
-        // El arrastre ya se mueve sobre la cuadrícula: ahora sí es un arrastre.
-        if dragging == nil { dragging = lifted }
-        guard let d = dragging, d != target else { return }
-        if canDropInto(d, target) {
-            into.wrappedValue = target
-            UIImpactFeedbackGenerator(style: .light).impactOccurred()
-            return
-        }
-        guard canSwap(d, target), let from = order.firstIndex(of: d), let to = order.firstIndex(of: target) else { return }
-        withAnimation(.uiEaseOut(0.22)) { order.move(fromOffsets: IndexSet(integer: from), toOffset: to > from ? to + 1 : to) }
-    }
-    func dropExited(info: DropInfo) { if into.wrappedValue == target { into.wrappedValue = nil } }
-    func dropUpdated(info: DropInfo) -> DropProposal? { DropProposal(operation: .move) }
-    func performDrop(info: DropInfo) -> Bool {
-        if let d = dragging, into.wrappedValue == target {
-            dragging = nil
-            into.wrappedValue = nil
-            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-            dropInto(d, target)
-        } else {
-            finish()
-        }
-        return true
-    }
-}
-
-struct GridDrop<ID: Hashable>: DropDelegate {
-    @Binding var dragging: ID?
-    @Binding var lifted: ID?
-    let finish: () -> Void
-    func dropEntered(info: DropInfo) { if dragging == nil { dragging = lifted } }
-    func dropUpdated(info: DropInfo) -> DropProposal? { DropProposal(operation: .move) }
-    func performDrop(info: DropInfo) -> Bool { finish(); return true }
 }
 
 /// Sin álbumes todavía: qué es esto y cómo se llena.

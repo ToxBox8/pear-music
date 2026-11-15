@@ -1179,3 +1179,15 @@
 1179	Jaitsi {0}
 1180	Aldatu Zure musikako atalen ordena
 1181	Igo {0}
+1182	Fitxategiaren kopia bat gorde dugu: Ezarpenetan zure datuak esportatzean agertzen da. Aukeratu arte, aldatzen duzuna ez da gordeko.
+1183	Ezin izan dugu zure liburutegia irakurri
+1184	Aurretik
+1185	Arrastatu ≡ edo ukitu azal bat eta erabili botoiak.
+1186	Sortu zerrenda bat hemen edo ekarri bat bere menuko «Eraman hona…» aukerarekin.
+1187	Sortu zerrenda
+1188	Ondoren
+1189	Aukeratu azal hau botoiekin mugitzeko
+1190	Ezabatu karpeta…
+1191	Ezabatu…
+1192	Zerrenda edo karpeta berria
+1193	Zerrenda berria…

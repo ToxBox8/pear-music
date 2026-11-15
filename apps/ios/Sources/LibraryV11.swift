@@ -115,10 +115,8 @@ struct LibraryV11View: View {
     @EnvironmentObject var downloads: DownloadStore
     @EnvironmentObject var player: Player
     @EnvironmentObject var jam: JamService
-    @State private var showNew = false
-    @State private var newName = ""
-    @State private var showNewFolder = false
-    @State private var newFolderName = ""
+    /// La playlist recién creada: se abre para que se vea que existe y añadirle canciones (paso B; DECISIONS 40).
+    @State private var created: UUID?
     @State private var showImport = false
     @State private var editing: Playlist?
 
@@ -157,15 +155,8 @@ struct LibraryV11View: View {
             }
             .themed()
             .toolbar(.hidden, for: .navigationBar)
-            .alert(L("Nueva playlist"), isPresented: $showNew) {
-                TextField(L("Nombre"), text: $newName)
-                Button(L("Crear")) { library.createPlaylist(newName); newName = "" }
-                Button(L("Cancelar"), role: .cancel) { newName = "" }
-            }
-            .alert(L("Nueva carpeta"), isPresented: $showNewFolder) {
-                TextField(L("Nombre"), text: $newFolderName)
-                Button(L("Crear")) { library.createFolder(newFolderName) }
-                Button(L("Cancelar"), role: .cancel) {}
+            .navigationDestination(isPresented: Binding(get: { created != nil }, set: { if !$0 { created = nil } })) {
+                if let created { PlaylistV11View(playlistID: created) }
             }
             .sheet(isPresented: $showImport) { ImportView() }
             .sheet(item: $editing) { PlaylistEditor(playlistID: $0.id) }
@@ -187,8 +178,12 @@ struct LibraryV11View: View {
             }
             Spacer(minLength: 12)
             Menu {
-                Button { showNew = true } label: { Label(L("Nueva playlist"), systemImage: "plus.rectangle.on.rectangle") }
-                Button { newFolderName = ""; showNewFolder = true } label: { Label(L("Nueva carpeta"), systemImage: "folder.badge.plus") }
+                Button { NamePrompt.ask(L("Nueva playlist")) { created = library.createPlaylist($0) } } label: {
+                    Label(L("Nueva playlist"), systemImage: "plus.rectangle.on.rectangle")
+                }
+                Button { NamePrompt.ask(L("Nueva carpeta")) { library.createFolder($0) } } label: {
+                    Label(L("Nueva carpeta"), systemImage: "folder.badge.plus")
+                }
                 Button { showImport = true } label: { Label(L("Importar de Apple Music"), systemImage: "square.and.arrow.down") }
                 Divider()
                 Button { jam.showSheet = true } label: { Label(L("Jam con amigos"), systemImage: "person.3") }
@@ -1075,23 +1070,39 @@ struct PinnedRow: View {
 }
 
 /// «Fijados» en Biblioteca (x.1.1): ocupa el sitio del antiguo carrusel de Playlists, con portadas igual de grandes.
-/// Manteniendo pulsada una portada sale su menú y, si se arrastra, se lleva a otro sitio; el orden se guarda en
+/// Mantener pulsada una portada abre su menú; «Ordenar» entra en el modo de ordenar (asa en cada portada, «Antes» y
+/// «Después» debajo, «Hecho» junto al título), como en Playlists (paso B; DECISIONS 40). El orden se guarda en
 /// `pinnedOrder` y lo sigue también la fila de Inicio. Igual que `PinnedCarousel` en Android.
 struct PinnedCarousel: View {
     @EnvironmentObject var library: Library
     @EnvironmentObject var player: Player
     @AppStorage("pinnedOrder") private var orderRaw = ""
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var order: [UUID] = []
-    @State private var dragging: UUID?
-    @State private var lifted: UUID?
+    @State private var frames: [UUID: CGRect] = [:]
+    @State private var drag: OrderDrag<UUID>?
+    @State private var ordering = false
+    @State private var selected: UUID?
     private let inset: CGFloat = 20
+    private let space = "order-pinned"
 
     var body: some View {
         let pinned = LibraryOrder.pinned(library.playlists.filter { $0.pinned == true }, order: LibraryOrder.decode(orderRaw))
         let byID = Dictionary(pinned.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
         let shown = order.count == pinned.count ? order.compactMap { byID[$0] } : pinned
+        let ids = pinned.map(\.id)
         VStack(alignment: .leading, spacing: 14) {
-            Text(L("Fijados")).displayTitle(24).padding(.horizontal, inset)
+            HStack(alignment: .lastTextBaseline) {
+                Text(L("Fijados")).displayTitle(24)
+                Spacer()
+                if ordering {
+                    Button(L("Hecho")) { setOrdering(false) }
+                        .font(.body.weight(.semibold))
+                        .frame(minWidth: 44, minHeight: 44, alignment: .trailing)
+                        .contentShape(Rectangle())
+                }
+            }
+            .padding(.horizontal, inset)
             if pinned.isEmpty {
                 // Vacío: el hueco se queda, con lo que hay que hacer para llenarlo.
                 HStack(spacing: 18) {
@@ -1108,45 +1119,117 @@ struct PinnedCarousel: View {
                     HStack(alignment: .top, spacing: 18) {
                         ForEach(shown) { p in card(p) }
                     }
+                    .coordinateSpace(name: space)
+                    .onPreferenceChange(OrderFrameKey<UUID>.self) { frames = $0 }
                     .carouselLayout()
                     .padding(.horizontal, carouselUsesMargins ? 0 : inset)
-                    // Soltar entre portadas también termina el arrastre.
-                    .onDrop(of: [.text], delegate: GridDrop(dragging: $dragging, lifted: $lifted, finish: finish))
+                    // Sitio para el aro de la portada elegida y la sombra de la que se arrastra.
+                    .padding(.vertical, ordering ? 8 : 0)
                 }
                 .carouselScroll(inset: inset)
+                if ordering {
+                    OrderButtons(canBefore: selected.map { GridOrder.canStep($0, by: -1, in: ids) } ?? false,
+                                 canAfter: selected.map { GridOrder.canStep($0, by: 1, in: ids) } ?? false) { delta in
+                        guard let s = selected else { return }
+                        UISelectionFeedbackGenerator().selectionChanged()
+                        withAnimation(reduceMotion ? nil : .uiEaseOut(0.22)) { save(GridOrder.step(s, by: delta, in: ids)) }
+                    }
+                    .padding(.horizontal, inset)
+                    .transition(.opacity)
+                }
             }
         }
-        .onAppear { order = pinned.map(\.id) }
-        .onChange(of: pinned.map(\.id)) { ids in if dragging == nil { order = ids } }
+        .onAppear { order = ids }
+        .onChange(of: ids) { now in
+            if drag == nil { order = now }
+            if let s = selected, !now.contains(s) { selected = nil }
+            if now.isEmpty { ordering = false }
+        }
     }
 
-    private func card(_ p: Playlist) -> some View {
-        NavigationLink { PlaylistV11View(playlistID: p.id) } label: {
-            PlaylistCardV11(playlist: p, subtitle: p.album.map { [$0.artist, $0.year].compactMap { $0 }.joined(separator: " · ") })
+    private func setOrdering(_ on: Bool) {
+        withAnimation(reduceMotion ? nil : .uiEaseOut(0.25)) {
+            ordering = on
+            if !on { selected = nil }
         }
-        .buttonStyle(TactileButtonStyle())
-        .carouselFade()
-        .opacity(dragging == p.id ? 0.35 : 1)
-        .contextMenu {
-            Button { if let f = p.songs.first { player.play(f, in: p.songs) } } label: {
-                Label(L("Reproducir"), systemImage: "play.fill")
-            }
-            Button { let s = p.songs.shuffled(); if let f = s.first { player.play(f, in: s) } } label: {
-                Label(L("Aleatorio"), systemImage: "shuffle")
-            }
-            Button { library.playlists.firstIndex(where: { $0.id == p.id }).map { library.playlists[$0].pinned = nil } } label: {
-                Label(L("Soltar de arriba"), systemImage: "pin.slash")
-            }
-        }
-        .modifier(Lift(enabled: true, id: p.id, dragging: $dragging, lifted: $lifted))
-        .onDrop(of: [.text], delegate: CellDrop(target: p.id, order: $order, dragging: $dragging, lifted: $lifted, finish: finish))
     }
 
-    private func finish() {
-        lifted = nil
-        guard dragging != nil else { return }
-        dragging = nil
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-        orderRaw = order.map(\.uuidString).joined(separator: "\n")
+    private func save(_ ids: [UUID]) {
+        order = ids
+        orderRaw = ids.map(\.uuidString).joined(separator: "\n")
+    }
+
+    private func label(_ p: Playlist) -> some View {
+        PlaylistCardV11(playlist: p, subtitle: p.album.map { [$0.artist, $0.year].compactMap { $0 }.joined(separator: " · ") })
+    }
+
+    @ViewBuilder private func card(_ p: Playlist) -> some View {
+        if ordering {
+            let lifted = drag?.id == p.id
+            Button {
+                selected = p.id
+                UISelectionFeedbackGenerator().selectionChanged()
+            } label: { label(p) }
+                .buttonStyle(.plain)
+                .accessibilityAddTraits(selected == p.id ? .isSelected : [])
+                .accessibilityHint(L("Elige esta portada para moverla con los botones"))
+                .modifier(OrderSelection(on: selected == p.id && !lifted, radius: PlaylistCardV11.corner + 6))
+                .overlay(alignment: .topTrailing) { OrderGrip().gesture(grip(p.id)) }
+                .background(GeometryReader { g in
+                    Color.clear.preference(key: OrderFrameKey<UUID>.self, value: [p.id: g.frame(in: .named(space))])
+                })
+                .scaleEffect(lifted && !reduceMotion ? 1.04 : 1)
+                .offset(lifted ? drag?.offset(in: order) ?? .zero : .zero)
+                .zIndex(lifted ? 1 : 0)
+        } else {
+            NavigationLink { PlaylistV11View(playlistID: p.id) } label: { label(p) }
+                .buttonStyle(TactileButtonStyle())
+                .carouselFade()
+                .contextMenu {
+                    Button { if let f = p.songs.first { player.play(f, in: p.songs) } } label: {
+                        Label(L("Reproducir"), systemImage: "play.fill")
+                    }
+                    Button { let s = p.songs.shuffled(); if let f = s.first { player.play(f, in: s) } } label: {
+                        Label(L("Aleatorio"), systemImage: "shuffle")
+                    }
+                    Button { selected = p.id; setOrdering(true) } label: {
+                        Label(L("Ordenar"), systemImage: "arrow.up.arrow.down")
+                    }
+                    Button { library.playlists.firstIndex(where: { $0.id == p.id }).map { library.playlists[$0].pinned = nil } } label: {
+                        Label(L("Soltar de arriba"), systemImage: "pin.slash")
+                    }
+                }
+        }
+    }
+
+    /// El asa: la portada sigue al dedo desde que se toca y las demás se apartan (`OrderDrag`).
+    private func grip(_ id: UUID) -> some Gesture {
+        DragGesture(minimumDistance: 0, coordinateSpace: .named(space))
+            .onChanged { v in
+                if drag?.id != id {
+                    guard let start = order.firstIndex(of: id) else { return }
+                    var slots: [Int: CGRect] = [:]
+                    for (i, other) in order.enumerated() { if let f = frames[other] { slots[i] = f } }
+                    drag = OrderDrag(id: id, slots: slots, start: start)
+                    selected = id
+                    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                }
+                guard var d = drag else { return }
+                let next = d.move(to: v.location, translation: v.translation, order: order)
+                if next != order {
+                    UISelectionFeedbackGenerator().selectionChanged()
+                    withAnimation(reduceMotion ? nil : .uiEaseOut(0.22)) { order = next; drag = d }
+                } else {
+                    drag = d
+                }
+            }
+            .onEnded { _ in
+                guard let d = drag else { return }
+                withAnimation(reduceMotion ? nil : .uiEaseOut(0.22)) { drag = nil }
+                if d.changed {
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    save(order)
+                }
+            }
     }
 }
