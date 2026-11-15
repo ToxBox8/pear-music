@@ -113,6 +113,10 @@ enum Demo {
         d.set(true, forKey: "airDeckOffered")
         d.set("home", forKey: "searchPlacement")
         d.set("recent", forKey: "playlistSort")
+        // Los órdenes guardados por un escenario anterior (los tests de interfaz ordenan de verdad) no pasan al siguiente.
+        ["musicOrder", "playlistOrder", "pinnedOrder", "albumOrder"].forEach { d.removeObject(forKey: $0) }
+        d.set("recent", forKey: "albumSort")
+        d.set("playlists", forKey: "smartPlacement")
         d.set("", forKey: "jamName")
         d.set(s.barStyle, forKey: "barStyle")
         d.set(s.discover, forKey: "showDiscover")

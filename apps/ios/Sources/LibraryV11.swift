@@ -258,11 +258,6 @@ struct LibraryV11View: View {
                         .scaleEffect(lifted && !reduceMotion ? 1.03 : 1)
                         .offset(y: lifted ? dragOffset : 0)
                         .zIndex(lifted ? 1 : 0)
-                        .simultaneousGesture(LongPressGesture(minimumDuration: 0.5).onEnded { _ in
-                            guard !editingMusic else { return }
-                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-                            withAnimation(reduceMotion ? nil : .uiEaseOut(0.25)) { editingMusic = true }
-                        })
                 }
             }
             .padding(.horizontal, inset)
@@ -325,37 +320,42 @@ struct LibraryV11View: View {
 
     @ViewBuilder private func musicRow(_ key: String, _ songs: [Song], last: Bool, first: Bool) -> some View {
         let controls: (String) -> AnyView? = { title in editingMusic ? musicControls(key, title: title, first: first, last: last) : nil }
+        // Mantener pulsado un apartado también entra en el modo de ordenar (lo pidió Toxbox).
+        let hold = {
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            withAnimation(reduceMotion ? nil : .uiEaseOut(0.25)) { editingMusic = true }
+        }
         switch key {
         case "downloads":
-            LibraryLinkRow(title: SmartList.downloads.title, count: downloads.songs.count, symbol: "arrow.down.circle", last: last, controls: controls) {
+            LibraryLinkRow(title: SmartList.downloads.title, count: downloads.songs.count, symbol: "arrow.down.circle", last: last, controls: controls, onHold: hold) {
                 SmartListV11View(kind: .downloads)
             }
         case "favorites":
-            LibraryLinkRow(title: SmartList.favorites.title, count: library.favorites.count, symbol: "heart", last: last, controls: controls) {
+            LibraryLinkRow(title: SmartList.favorites.title, count: library.favorites.count, symbol: "heart", last: last, controls: controls, onHold: hold) {
                 SmartListV11View(kind: .favorites)
             }
         case "playlists":
             LibraryLinkRow(title: L("Playlists"), count: library.userPlaylists.count,
                            detail: library.folders.isEmpty ? nil : "\(library.userPlaylists.count) · " + (library.folders.count == 1 ? L("1 carpeta") : L("{0} carpetas", library.folders.count)),
-                           symbol: "music.note.list", last: last, controls: controls) { PlaylistsListView() }
+                           symbol: "music.note.list", last: last, controls: controls, onHold: hold) { PlaylistsListView() }
         case "albums":
-            LibraryLinkRow(title: L("Tus álbumes"), count: library.albums.count, symbol: "square.stack", last: last, controls: controls) { AlbumsListView() }
+            LibraryLinkRow(title: L("Tus álbumes"), count: library.albums.count, symbol: "square.stack", last: last, controls: controls, onHold: hold) { AlbumsListView() }
         case "songs":
-            LibraryLinkRow(title: L("Canciones"), count: songs.count, symbol: "music.note", last: last, controls: controls) {
+            LibraryLinkRow(title: L("Canciones"), count: songs.count, symbol: "music.note", last: last, controls: controls, onHold: hold) {
                 SongListV11View(title: L("Canciones"), songs: songs.sorted {
                     $0.title.localizedCaseInsensitiveCompare($1.title) == .orderedAscending
                 })
             }
         case "artists":
-            LibraryLinkRow(title: L("Artistas"), count: Set(songs.map { primaryArtist($0.artist) }).count, symbol: "music.mic", last: last, controls: controls) {
+            LibraryLinkRow(title: L("Artistas"), count: Set(songs.map { primaryArtist($0.artist) }).count, symbol: "music.mic", last: last, controls: controls, onHold: hold) {
                 ArtistsView(artists: Self.artists(songs))
             }
         case "recents":
-            LibraryLinkRow(title: L("Recientes"), count: library.recents.count, symbol: "clock", last: last, controls: controls) {
+            LibraryLinkRow(title: L("Recientes"), count: library.recents.count, symbol: "clock", last: last, controls: controls, onHold: hold) {
                 SongListV11View(title: L("Recientes"), songs: library.recents)
             }
         default:
-            LibraryLinkRow(title: L("Estadísticas"), count: PlayStats.shared.plays.filter { $0.at >= PlayStats.since(.month) }.count, symbol: "chart.bar", last: last, controls: controls) {
+            LibraryLinkRow(title: L("Estadísticas"), count: PlayStats.shared.plays.filter { $0.at >= PlayStats.since(.month) }.count, symbol: "chart.bar", last: last, controls: controls, onHold: hold) {
                 StatsView()
             }
         }
@@ -372,6 +372,8 @@ private struct LibraryLinkRow<Destination: View>: View {
     var last = false
     /// Modo de ordenar «Tu música»: sin navegar, con las flechas y el asa (según el título) en vez del recuento.
     var controls: (String) -> AnyView? = { _ in nil }
+    /// Al mantener pulsada la fila medio segundo.
+    var onHold: (() -> Void)? = nil
     @ViewBuilder let destination: () -> Destination
 
     var body: some View {
@@ -379,7 +381,7 @@ private struct LibraryLinkRow<Destination: View>: View {
             content(trailing: editControls)
         } else {
             NavigationLink { LazyDestination(build: destination) } label: { content(trailing: nil) }
-                .buttonStyle(RowHighlightStyle())
+                .buttonStyle(RowHighlightStyle(onHold: onHold))
         }
     }
 
