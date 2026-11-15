@@ -220,13 +220,14 @@ final class BibliotecaUITests: XCTestCase {
         launch("01_biblioteca_cristal")
         XCTAssertEqual(app.buttons.matching(NSPredicate(format: "label == %@", "Ordenar")).count, 1)
         any("Playlists").press(forDuration: 1.2)
-        // El «Ordenar» del menú es el segundo (el primero es el de junto al título).
+        // Con el menú abierto hay dos «Ordenar»: el de junto al título (tapado) y el del menú, que es el que se puede tocar.
         let inMenu = app.buttons.matching(NSPredicate(format: "label == %@", "Ordenar"))
         let shown = app.buttons["Hecho"].exists == false && inMenu.element(boundBy: 1).waitForExistence(timeout: 3)
+        let menuItem = [inMenu.element(boundBy: 0), inMenu.element(boundBy: 1)].first { $0.exists && $0.isHittable } ?? inMenu.element(boundBy: 0)
         shot("1-menu")
         XCTAssertTrue(shown, "Mantener pulsado un apartado no ofrece «Ordenar»")
         XCTAssertFalse(app.navigationBars["Playlists"].exists, "Mantener pulsado no puede abrir el apartado")
-        if shown { inMenu.element(boundBy: 1).tap() }
+        if shown { menuItem.tap() }
         let editing = app.buttons["Hecho"].waitForExistence(timeout: 3)
         shot("2-ordenando")
         XCTAssertTrue(editing, "«Ordenar» del menú no entra en el modo de ordenar")
