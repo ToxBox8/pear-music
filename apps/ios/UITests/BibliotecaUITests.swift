@@ -215,14 +215,21 @@ final class BibliotecaUITests: XCTestCase {
         XCTAssertEqual(Array(after.prefix(3)), ["Tus álbumes", "Canciones", "Playlists"], "Arrastrar el asa de «Playlists» hasta «Canciones» no la deja en su sitio")
     }
 
-    /// Mantener pulsado un apartado también entra en el modo de ordenar (como antes, pero ahora funciona).
+    /// Mantener pulsado un apartado abre su menú, con «Ordenar», y no abre el apartado.
     func testOrdenarTuMusicaManteniendoPulsado() {
         launch("01_biblioteca_cristal")
-        any("Playlists").press(forDuration: 1.0)
-        let editing = app.buttons["Hecho"].waitForExistence(timeout: 3)
-        shot("1-editando")
-        XCTAssertTrue(editing, "Mantener pulsado un apartado no entra en el modo de ordenar")
+        XCTAssertEqual(app.buttons.matching(NSPredicate(format: "label == %@", "Ordenar")).count, 1)
+        any("Playlists").press(forDuration: 1.2)
+        // El «Ordenar» del menú es el segundo (el primero es el de junto al título).
+        let inMenu = app.buttons.matching(NSPredicate(format: "label == %@", "Ordenar"))
+        let shown = app.buttons["Hecho"].exists == false && inMenu.element(boundBy: 1).waitForExistence(timeout: 3)
+        shot("1-menu")
+        XCTAssertTrue(shown, "Mantener pulsado un apartado no ofrece «Ordenar»")
         XCTAssertFalse(app.navigationBars["Playlists"].exists, "Mantener pulsado no puede abrir el apartado")
+        if shown { inMenu.element(boundBy: 1).tap() }
+        let editing = app.buttons["Hecho"].waitForExistence(timeout: 3)
+        shot("2-ordenando")
+        XCTAssertTrue(editing, "«Ordenar» del menú no entra en el modo de ordenar")
     }
 
     // MARK: Cuadrícula de Playlists: menú y arrastre

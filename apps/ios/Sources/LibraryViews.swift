@@ -31,30 +31,10 @@ func primaryArtist(_ s: String) -> String {
 }
 
 struct RowHighlightStyle: ButtonStyle {
-    /// Al mantener pulsada la fila medio segundo (si se da). Va aquí, con el «pulsado» del propio botón, y no con un
-    /// `LongPressGesture` aparte: sobre un `NavigationLink` dentro de una lista que se desplaza, el gesto aparte no
-    /// llega a dispararse y al soltar se abre el enlace (visto en el simulador, revisión del bloque 1).
-    var onHold: (() -> Void)? = nil
-
     func makeBody(configuration: Configuration) -> some View {
-        Row(configuration: configuration, onHold: onHold)
-    }
-
-    private struct Row: View {
-        let configuration: Configuration
-        let onHold: (() -> Void)?
-
-        var body: some View {
-            configuration.label
-                .background(Color.primary.opacity(configuration.isPressed ? 0.08 : 0))
-                .animation(.uiEaseOut(0.15), value: configuration.isPressed)
-                // Se cancela sola si se suelta o se empieza a desplazar antes de tiempo.
-                .task(id: configuration.isPressed) {
-                    guard configuration.isPressed, let onHold else { return }
-                    try? await Task.sleep(nanoseconds: 500_000_000)
-                    if !Task.isCancelled { onHold() }
-                }
-        }
+        configuration.label
+            .background(Color.primary.opacity(configuration.isPressed ? 0.08 : 0))
+            .animation(.uiEaseOut(0.15), value: configuration.isPressed)
     }
 }
 

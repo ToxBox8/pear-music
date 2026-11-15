@@ -214,7 +214,7 @@ struct LibraryV11View: View {
     }
 
     // MARK: El resto de la música
-    /// «Tu música» en el orden de `musicOrder`. «Ordenar» (o mantener pulsado un apartado) entra en el modo de ordenar:
+    /// «Tu música» en el orden de `musicOrder`. «Ordenar» (junto al título o en el menú de mantener pulsado) entra en el modo de ordenar:
     /// cada fila lleva flechas para subir y bajar y un asa que se arrastra; «Hecho» sale. Igual en Android.
     /// Antes iba con el arrastre del sistema (`draggable`), que se quedaba con la pulsación larga: en un iPhone no se
     /// llegaba a entrar en el modo de ordenar ni se podía mover nada (revisión del bloque 1).
@@ -320,9 +320,8 @@ struct LibraryV11View: View {
 
     @ViewBuilder private func musicRow(_ key: String, _ songs: [Song], last: Bool, first: Bool) -> some View {
         let controls: (String) -> AnyView? = { title in editingMusic ? musicControls(key, title: title, first: first, last: last) : nil }
-        // Mantener pulsado un apartado también entra en el modo de ordenar (lo pidió Toxbox).
+        // Mantener pulsado un apartado también lleva al modo de ordenar (lo pidió Toxbox), por su menú.
         let hold = {
-            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
             withAnimation(reduceMotion ? nil : .uiEaseOut(0.25)) { editingMusic = true }
         }
         switch key {
@@ -372,7 +371,7 @@ private struct LibraryLinkRow<Destination: View>: View {
     var last = false
     /// Modo de ordenar «Tu música»: sin navegar, con las flechas y el asa (según el título) en vez del recuento.
     var controls: (String) -> AnyView? = { _ in nil }
-    /// Al mantener pulsada la fila medio segundo.
+    /// «Ordenar» del menú que sale al mantener pulsada la fila.
     var onHold: (() -> Void)? = nil
     @ViewBuilder let destination: () -> Destination
 
@@ -381,7 +380,15 @@ private struct LibraryLinkRow<Destination: View>: View {
             content(trailing: editControls)
         } else {
             NavigationLink { LazyDestination(build: destination) } label: { content(trailing: nil) }
-                .buttonStyle(RowHighlightStyle(onHold: onHold))
+                .buttonStyle(RowHighlightStyle())
+                // Mantener pulsado: el menú del sistema, con «Ordenar». Un gesto de pulsación larga propio no llega a
+                // dispararse sobre un NavigationLink dentro de una lista que se desplaza (ni aparte ni con el
+                // «pulsado» del botón: dos intentos, vistos en el simulador) y al soltar se abría el apartado.
+                .contextMenu {
+                    if let onHold {
+                        Button(action: onHold) { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
+                    }
+                }
         }
     }
 
