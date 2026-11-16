@@ -100,7 +100,9 @@ struct PlaylistsListView: View {
     @State private var created: UUID?
     /// La carpeta recién creada: la cuadrícula se desplaza hasta ella.
     @State private var reveal: String?
-    /// Si se entra en «Ordenar» desde el menú de una portada, ésa se queda a la vista.
+    /// Al entrar y salir de «Ordenar» la lista no vuelve arriba (`ScrollKeeper`) y, si se entra desde el menú de una
+    /// portada, ésa se queda a la vista (`keepVisible`).
+    @State private var keeper = ScrollKeeper()
     @State private var keepVisible: String?
 
     /// Una casilla de la cuadrícula: una playlist, una lista inteligente o una carpeta. `key` es su clave en
@@ -173,11 +175,6 @@ struct PlaylistsListView: View {
         ScrollViewReader { proxy in
             ScrollView {
                 VStack(alignment: .leading, spacing: 0) {
-                    // El buscador es la primera fila de la lista, como en Android, y no se dibuja mientras se ordena
-                    // (DECISIONS 42 y 47): la lista no se vuelve a crear y se queda donde estaba.
-                    if !ordering && !all.isEmpty {
-                        ListSearchField(text: $query, prompt: folder.map { L("Buscar en {0}", $0.name) } ?? L("Buscar en playlists"))
-                    }
                     if let folder, !ordering { FolderHeader(folder: folder) }
                     if !shown.isEmpty {
                         if ordering { OrderHint() }
@@ -189,13 +186,10 @@ struct PlaylistsListView: View {
                                         else if let f = e.folder { PlaylistsListView(folderID: f.id) }
                                         else if let k = e.smart { SmartListV11View(kind: k) }
                                     }) { e in cell(e) }
-                            // Al entrar y salir de «Ordenar» se vuelve a crear sólo la cuadrícula (no la lista, que
-                            // se queda donde estaba): el arrastre empieza con sus celdas recién medidas.
-                            .id(ordering)
                     }
                 }
+                .background(OrderAnchorView(anchor: keeper.anchor))
             }
-            .scrollDismissesKeyboard(.interactively)
             .onChange(of: reveal) { key in
                 guard let key else { return }
                 withAnimation(reduceMotion ? nil : .uiEaseOut(0.3)) { proxy.scrollTo(key, anchor: .center) }
@@ -213,6 +207,8 @@ struct PlaylistsListView: View {
                 EmptyCreate(folder: folderID != nil) { newPlaylist(in: folderID) }
             } else if shown.isEmpty { NoMatchesView(query: query) }
         }
+        // El buscador no se dibuja mientras se ordena (DECISIONS 42).
+        .orderSearchable(!ordering, text: $query, prompt: folder.map { L("Buscar en {0}", $0.name) } ?? L("Buscar en playlists"))
         .themed()
         .navigationTitle(ordering ? L("Ordenar") : folder?.name ?? L("Playlists"))
         .navigationBarBackButtonHidden(ordering)
@@ -339,11 +335,12 @@ struct PlaylistsListView: View {
 
     // MARK: Modo «Ordenar»
 
-    /// Entra o sale de «Ordenar»; `keep`, la portada que tiene que quedar a la vista. La lista es la misma y se queda
-    /// donde estaba. Sin animación: la cuadrícula cambia de una perezosa a una que no lo es (un fundido enseñaría dos).
+    /// Entra o sale de «Ordenar» sin que la lista vuelva arriba; `keep`, la portada que tiene que quedar a la vista.
+    /// Sin animación: el buscador se quita y se pone, y la lista se vuelve a crear (un fundido enseñaría dos listas).
     private func setOrdering(_ on: Bool, keep: String? = nil) {
+        keeper.remember()
         ordering = on
-        if let keep { keepVisible = keep }
+        keeper.restore { if let keep { keepVisible = keep } }
     }
 
     /// Entra en el modo «Ordenar» (del ⋯ o, con `key`, del menú de esa portada): se borra lo buscado y se ve el nivel
@@ -429,7 +426,8 @@ struct AlbumsListView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var query = ""
     @State private var ordering = false
-    /// Como en Playlists: la portada del menú se queda a la vista al entrar en «Ordenar».
+    /// Como en Playlists: entrar y salir de «Ordenar» no lleva la lista arriba; la portada del menú, a la vista.
+    @State private var keeper = ScrollKeeper()
     @State private var keepVisible: UUID?
     @State private var deleting: Playlist?
     @State private var opened: Playlist?
@@ -440,8 +438,6 @@ struct AlbumsListView: View {
         ScrollViewReader { proxy in
             ScrollView {
                 VStack(spacing: 0) {
-                    // El buscador, primera fila de la lista; no se dibuja mientras se ordena (DECISIONS 42 y 47).
-                    if !ordering && !albums.isEmpty { ListSearchField(text: $query, prompt: L("Buscar en tus álbumes")) }
                     if !shown.isEmpty {
                         if ordering { OrderHint() }
                         ReorderGrid(items: shown, ordering: ordering, onMoved: save,
@@ -449,12 +445,10 @@ struct AlbumsListView: View {
                                     destination: { p in PlaylistV11View(playlistID: p.id) }) { p in
                             GridCover(playlist: p, subtitle: p.album?.line ?? songCount(p.songs.count))
                         }
-                        // Como en Playlists: al cambiar de modo se vuelve a crear sólo la cuadrícula.
-                        .id(ordering)
                     }
                 }
+                .background(OrderAnchorView(anchor: keeper.anchor))
             }
-            .scrollDismissesKeyboard(.interactively)
             .onChange(of: keepVisible) { id in
                 guard let id else { return }
                 proxy.scrollTo(id)
@@ -465,6 +459,7 @@ struct AlbumsListView: View {
             if albums.isEmpty { AlbumsEmptyView() }
             else if shown.isEmpty { NoMatchesView(query: query) }
         }
+        .orderSearchable(!ordering, text: $query, prompt: L("Buscar en tus álbumes"))
         .themed()
         .navigationTitle(ordering ? L("Ordenar") : L("Tus álbumes"))
         .navigationBarBackButtonHidden(ordering)
@@ -496,8 +491,9 @@ struct AlbumsListView: View {
     }
 
     private func setOrdering(_ on: Bool, keep: UUID? = nil) {
+        keeper.remember()
         ordering = on
-        if let keep { keepVisible = keep }
+        keeper.restore { if let keep { keepVisible = keep } }
     }
 
     private func start(_ keep: UUID? = nil) {
@@ -528,55 +524,15 @@ private struct GridCover: View {
     }
 }
 
-/// El buscador de Playlists, de una carpeta y de Tus álbumes: la primera fila de la lista (DECISIONS 47), con el mismo
-/// aspecto que `SearchField` en Android (36 de alto, relleno del sistema atenuado, lupa y botón de borrar). No es
-/// `.searchable`: iOS 16 no deja esconder ése sin volver a crear la lista, que acababa arriba al entrar y salir de
-/// «Ordenar». Sin shu: el cursor va del color del texto.
-struct ListSearchField: View {
-    @Binding var text: String
-    let prompt: String
-    @Environment(\.colorScheme) private var scheme
-    @FocusState private var focused: Bool
-
-    var body: some View {
-        HStack(spacing: 6) {
-            Image(systemName: "magnifyingglass")
-                .font(.system(size: 15, weight: .medium))
-                .foregroundStyle(.secondary)
-                .accessibilityHidden(true)
-            TextField(prompt, text: $text)
-                .font(.body)
-                .tint(Color.primary)
-                .focused($focused)
-                .submitLabel(.search)
-                .autocorrectionDisabled()
-                .textInputAutocapitalization(.never)
-                .onSubmit { focused = false }
-                .accessibilityAddTraits(.isSearchField)
-            if !text.isEmpty {
-                Button { text = "" } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.system(size: 16))
-                        .foregroundStyle(.tertiary)
-                        // El dibujo mide como en Android; la zona táctil, los 44 pt de siempre.
-                        .frame(width: 44, height: 44)
-                        .contentShape(Rectangle())
-                }
-                .buttonStyle(.plain)
-                .padding(.horizontal, -13)
-                .accessibilityLabel(L("Borrar"))
-            }
+extension View {
+    /// El buscador de Playlists y Tus álbumes, que no se dibuja mientras se ordena (`on` false).
+    @ViewBuilder func orderSearchable(_ on: Bool, text: Binding<String>, prompt: String) -> some View {
+        if on {
+            searchable(text: text, placement: .navigationBarDrawer(displayMode: .always), prompt: prompt)
+                .scrollDismissesKeyboard(.interactively)
+        } else {
+            self
         }
-        .padding(.horizontal, 8)
-        // 36 como en Android; crece con el tamaño de letra del sistema.
-        .frame(minHeight: 36)
-        // El mismo relleno que Android: `fill` de tokens.json (el relleno del sistema) al 45 % en claro y al 60 % en oscuro.
-        .background(Color(uiColor: .systemFill).opacity(scheme == .dark ? 0.6 : 0.45), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
-        .contentShape(Rectangle())
-        .onTapGesture { focused = true }
-        .padding(.horizontal, 16)
-        .padding(.top, 4)
-        .padding(.bottom, 10)
     }
 }
 
@@ -636,7 +592,6 @@ struct ReorderGrid<Item: Identifiable, Destination: View, Cell: View>: View {
         .background(OrderAnchorView(anchor: lift.anchor))
         .onPreferenceChange(OrderFrameKey<Item.ID>.self) { lift.frames = $0 }
         .overlay(alignment: .topLeading) { liftedCopy(byID) }
-        .overlay(alignment: .topLeading) { if ordering { OrderDebugLabel(text: lift.debug) } }
         .padding(.horizontal, 16)
         .padding(.top, 8)
         .padding(.bottom, ordering ? 12 : 0)
