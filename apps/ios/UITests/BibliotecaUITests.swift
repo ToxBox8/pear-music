@@ -271,6 +271,24 @@ final class BibliotecaUITests: XCTestCase {
         sleep(1)
     }
 
+    /// El registro del arrastre que deja la app en los tests (`OrderDebugLabel`): si el gesto se pidió, si arrancó,
+    /// por qué no y con cuántas celdas medidas.
+    private func orderLog(_ id: String = "orden-registro") -> String {
+        let e = app.descendants(matching: .any).matching(identifier: id).firstMatch
+        return e.exists ? "registro: \(e.label)" : "registro: no hay (\(id))"
+    }
+
+    /// Si `name` queda bajo el mini reproductor o la barra de pestañas, sube la lista hasta dejarla por encima, para
+    /// que la pulsación caiga en la portada.
+    private func liftAboveBars(_ name: String) {
+        let bottom = (app.tabBars.firstMatch.exists ? app.tabBars.firstMatch.frame.minY : app.frame.height - 90) - 90
+        let over = any(name).frame.maxY - bottom
+        guard over > 0 else { return }
+        let from = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+        from.press(forDuration: 0.05, thenDragTo: from.withOffset(CGVector(dx: 0, dy: -(over + 40))), withVelocity: .slow, thenHoldForDuration: 0.3)
+        sleep(1)
+    }
+
     /// ⋯ › Ordenar. Tiene que salir «Hecho».
     private func startOrdering() {
         app.buttons["Más opciones"].tap()
@@ -368,13 +386,15 @@ final class BibliotecaUITests: XCTestCase {
         shot("1-ordenando")
         holdAndDrag("Noche", to: center("Viaje a la playa"))
         shot("2-arrastrada")
+        let log = orderLog()
+        note("registro", log)
         app.buttons["Hecho"].tap()
         sleep(1)
         let after = reading(lists)
         shot("3-despues")
         note("2-despues", after.joined(separator: "\n"))
         XCTAssertEqual(after.firstIndex(of: "Noche"), before.firstIndex(of: "Viaje a la playa"),
-                       "Arrastrar «Noche» al sitio de «Viaje a la playa» no la deja ahí; antes \(before), después \(after)")
+                       "Arrastrar «Noche» al sitio de «Viaje a la playa» no la deja ahí; antes \(before), después \(after); \(log)")
         XCTAssertEqual(Set(after), Set(before), "Al ordenar se ha perdido alguna portada")
     }
 
@@ -417,14 +437,16 @@ final class BibliotecaUITests: XCTestCase {
         center(first).press(forDuration: 1.0, thenDragTo: edge, withVelocity: .slow, thenHoldForDuration: 4)
         sleep(1)
         shot("2-al-borde")
+        let log = orderLog()
+        note("registro", log)
         note("arbol", app.debugDescription)
         XCTAssertTrue(app.navigationBars["Ordenar"].exists, "Se ha salido del modo de ordenar")
         // Dos fallos distintos: que la portada no se haya cogido (sigue en su sitio) o que, cogida, la lista no baje.
         let stayed = any(first).isHittable && abs(any(first).frame.minY - y0) < 2 && any("Favoritos").isHittable
-        XCTAssertFalse(stayed, "«Descargadas» sigue en su sitio (\(y0)): la portada no se ha cogido o la lista no se ha movido nada")
+        XCTAssertFalse(stayed, "«Descargadas» sigue en su sitio (\(y0)): la portada no se ha cogido o la lista no se ha movido nada; \(log)")
         // La lista ha bajado: la primera fila ya no está arriba del todo.
         XCTAssertFalse(any("Descargadas").isHittable && any("Favoritos").isHittable,
-                       "Con el dedo cerca del borde de abajo, la lista no se desplaza sola")
+                       "Con el dedo cerca del borde de abajo, la lista no se desplaza sola; \(log)")
         XCTAssertFalse(wasVisible, "«\(farName)» ya se veía al empezar: el test no prueba nada")
     }
 
@@ -491,9 +513,11 @@ final class BibliotecaUITests: XCTestCase {
         holdAndDrag("Domingo lento", to: center("Carpeta Viajes"))
         sleep(1)
         shot("1-soltada")
+        let log = orderLog()
+        note("registro", log)
         let moved = any("Domingo lento").waitForNonExistence(timeout: 5)
         note("arbol", app.debugDescription)
-        XCTAssertTrue(moved, "Soltar «Domingo lento» encima de la carpeta «Viajes» no la mete dentro")
+        XCTAssertTrue(moved, "Soltar «Domingo lento» encima de la carpeta «Viajes» no la mete dentro; \(log)")
         XCTAssertTrue(any("Carpeta Viajes").exists, "La carpeta ha desaparecido")
     }
 
@@ -506,9 +530,19 @@ final class BibliotecaUITests: XCTestCase {
         openPlaylists()
         for name in ["Noche", "Para correr"] {
             XCTAssertTrue(any(name).waitForExistence(timeout: 5))
+            // Que la pulsación no caiga en el mini reproductor ni en la barra de pestañas.
+            liftAboveBars(name)
+            let where_ = any(name).frame
+            shot("0-antes-de-\(name.filter { $0.isLetter })")
             any(name).press(forDuration: 1.2)
             let pin = app.buttons["Fijar arriba"]
-            XCTAssertTrue(pin.waitForExistence(timeout: 3), "El menú de «\(name)» no ofrece «Fijar arriba»")
+            let offered = pin.waitForExistence(timeout: 3)
+            if !offered {
+                shot("0-sin-menu-\(name.filter { $0.isLetter })")
+                note("sin-menu", "«\(name)» en \(where_), hittable \(any(name).isHittable)\n\(app.debugDescription)")
+            }
+            XCTAssertTrue(offered, "El menú de «\(name)» no ofrece «Fijar arriba» (portada en \(where_))")
+            guard offered else { return }
             pin.tap()
             sleep(1)
         }
@@ -536,7 +570,9 @@ final class BibliotecaUITests: XCTestCase {
         holdAndDrag(before[0], to: center(before[1]))
         let now = pinned.sorted { any($0).frame.minX < any($1).frame.minX }
         shot("4-movido")
-        XCTAssertEqual(now, Array(before.reversed()), "Arrastrar no cambia el orden de Fijados")
+        let log = orderLog("orden-registro-fijados")
+        note("registro", log)
+        XCTAssertEqual(now, Array(before.reversed()), "Arrastrar no cambia el orden de Fijados; \(log)")
         // Arrastrar a los lados no puede cambiar de pestaña (lo hacía: el test acababa en Inicio).
         XCTAssertTrue(any("Tu música").exists, "Arrastrar en Fijados ha cambiado de pestaña")
         done.tap()

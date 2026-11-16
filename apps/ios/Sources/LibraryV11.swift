@@ -1133,6 +1133,7 @@ struct PinnedCarousel: View {
                     .background(OrderAnchorView(anchor: lift.anchor))
                     .onPreferenceChange(OrderFrameKey<UUID>.self) { lift.frames = $0 }
                     .overlay(alignment: .topLeading) { liftedCopy(byID) }
+                    .overlay(alignment: .topLeading) { if ordering { OrderDebugLabel(text: lift.debug, id: "orden-registro-fijados") } }
                     .carouselLayout()
                     .padding(.horizontal, carouselUsesMargins ? 0 : inset)
                     // Sitio para la sombra de la portada levantada.

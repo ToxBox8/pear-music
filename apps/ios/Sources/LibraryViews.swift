@@ -189,6 +189,9 @@ struct PlaylistsListView: View {
                                         else if let f = e.folder { PlaylistsListView(folderID: f.id) }
                                         else if let k = e.smart { SmartListV11View(kind: k) }
                                     }) { e in cell(e) }
+                            // Al entrar y salir de «Ordenar» se vuelve a crear sólo la cuadrícula (no la lista, que
+                            // se queda donde estaba): el arrastre empieza con sus celdas recién medidas.
+                            .id(ordering)
                     }
                 }
             }
@@ -446,6 +449,8 @@ struct AlbumsListView: View {
                                     destination: { p in PlaylistV11View(playlistID: p.id) }) { p in
                             GridCover(playlist: p, subtitle: p.album?.line ?? songCount(p.songs.count))
                         }
+                        // Como en Playlists: al cambiar de modo se vuelve a crear sólo la cuadrícula.
+                        .id(ordering)
                     }
                 }
             }
@@ -631,6 +636,7 @@ struct ReorderGrid<Item: Identifiable, Destination: View, Cell: View>: View {
         .background(OrderAnchorView(anchor: lift.anchor))
         .onPreferenceChange(OrderFrameKey<Item.ID>.self) { lift.frames = $0 }
         .overlay(alignment: .topLeading) { liftedCopy(byID) }
+        .overlay(alignment: .topLeading) { if ordering { OrderDebugLabel(text: lift.debug) } }
         .padding(.horizontal, 16)
         .padding(.top, 8)
         .padding(.bottom, ordering ? 12 : 0)
