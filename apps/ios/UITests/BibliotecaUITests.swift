@@ -402,18 +402,26 @@ final class BibliotecaUITests: XCTestCase {
         launch("ui_muchas_playlists", ready: "Descargadas")
         XCTAssertTrue(app.navigationBars["Playlists"].waitForExistence(timeout: 10), "No se abrió Playlists")
         startOrdering()
-        let first = reading(lists + (1...24).map { String(format: "Lista %02d", $0) }).first ?? "Descargadas"
+        // La primera portada es siempre «Descargadas». (Antes se buscaba leyendo las 29 portadas, que en la CI tardaba
+        // de 2 a 5 minutos con la app parada en «Ordenar» antes del gesto.)
+        let first = "Descargadas"
+        XCTAssertTrue(any(first).isHittable, "«Descargadas» no está arriba al entrar en «Ordenar»")
         let farName = "Lista 01"
         let wasVisible = any(farName).exists && any(farName).isHittable
+        let y0 = any(first).frame.minY
         // El borde de abajo de lo que se ve: encima de la barra de pestañas y del mini reproductor.
         let bottom = app.tabBars.firstMatch.exists ? app.tabBars.firstMatch.frame.minY : app.frame.height - 90
         let edge = app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: app.frame.width * 0.3, dy: bottom - 40))
         shot("1-antes")
-        center(first).press(forDuration: 0.5, thenDragTo: edge, withVelocity: .slow, thenHoldForDuration: 4)
+        // 1 s quieto (la app pide 0,2 s): con margen para una máquina lenta.
+        center(first).press(forDuration: 1.0, thenDragTo: edge, withVelocity: .slow, thenHoldForDuration: 4)
         sleep(1)
         shot("2-al-borde")
         note("arbol", app.debugDescription)
         XCTAssertTrue(app.navigationBars["Ordenar"].exists, "Se ha salido del modo de ordenar")
+        // Dos fallos distintos: que la portada no se haya cogido (sigue en su sitio) o que, cogida, la lista no baje.
+        let stayed = any(first).isHittable && abs(any(first).frame.minY - y0) < 2 && any("Favoritos").isHittable
+        XCTAssertFalse(stayed, "«Descargadas» sigue en su sitio (\(y0)): la portada no se ha cogido o la lista no se ha movido nada")
         // La lista ha bajado: la primera fila ya no está arriba del todo.
         XCTAssertFalse(any("Descargadas").isHittable && any("Favoritos").isHittable,
                        "Con el dedo cerca del borde de abajo, la lista no se desplaza sola")

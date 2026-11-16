@@ -57,10 +57,6 @@ enum OrderGesture {
 @MainActor
 final class OrderAnchor {
     fileprivate weak var view: UIView?
-    /// Se llama cada vez que la vista se coloca (la usa `ScrollKeeper` para devolver el desplazamiento en cuanto la
-    /// lista nueva existe, sin esperar a otro fotograma).
-    var onLayout: (() -> Void)?
-
     /// El dedo en coordenadas de la cuadrícula.
     func local(_ window: CGPoint) -> CGPoint? { view.map { $0.convert(window, from: nil) } }
 
@@ -76,111 +72,14 @@ final class OrderAnchor {
 struct OrderAnchorView: UIViewRepresentable {
     let anchor: OrderAnchor
 
-    final class Probe: UIView {
-        weak var anchor: OrderAnchor?
-        override func layoutSubviews() {
-            super.layoutSubviews()
-            anchor?.onLayout?()
-        }
-    }
-
     func makeUIView(context: Context) -> UIView {
-        let v = Probe()
+        let v = UIView()
         v.isUserInteractionEnabled = false
         v.backgroundColor = .clear
-        v.anchor = anchor
         anchor.view = v
         return v
     }
-    func updateUIView(_ v: UIView, context: Context) {
-        (v as? Probe)?.anchor = anchor
-        anchor.view = v
-    }
-}
-
-/// Conserva el desplazamiento de una lista cuando cambia por debajo. Al entrar y salir de «Ordenar», Playlists y Tus
-/// álbumes quitan y ponen el buscador (`orderSearchable`; iOS 16 no deja esconderlo de otra forma) y la lista acaba
-/// arriba del todo: SwiftUI hace una lista nueva (o conserva el `UIScrollView` y lo sube al recolocar la barra). Antes
-/// de cambiar, `remember()` apunta qué se veía arriba (el desplazamiento más lo que tapan las barras); después,
-/// `restore` deja eso mismo arriba, sea la lista nueva o la de antes y aunque las barras hayan cambiado de alto.
-/// No va por tiempo sino por fotogramas: lo corrige en cada colocación y en cada fotograma hasta que la lista lleva
-/// unos cuantos seguidos en su sitio (o 3 s como tope, o el dedo empieza a desplazar). Las dos primeras versiones
-/// daban un plazo fijo (0,25 s y 0,4 s): si la lista nueva tardaba más en existir, no se devolvía nada (CI
-/// 43881693489 y 43889028728). El ancla va de fondo del contenido de la lista.
-@MainActor
-final class ScrollKeeper: NSObject {
-    let anchor = OrderAnchor()
-    private var top: CGFloat?
-    private var done: (() -> Void)?
-    private var link: CADisplayLink?
-    private var started: CFTimeInterval = 0
-    /// Fotogramas seguidos con la lista ya en su sitio.
-    private var steady = 0
-    /// Cuántas veces se puede corregir por recolocarse la lista dentro de un mismo fotograma (para no pelearse sin
-    /// fin con SwiftUI); se repone en cada fotograma.
-    private var layoutTries = 0
-
-    func remember() {
-        guard let sv = anchor.scrollViews.first else { top = nil; return }
-        top = sv.contentOffset.y + sv.adjustedContentInset.top
-    }
-
-    /// Devuelve la lista a donde estaba y después llama a `then` (para llevar a la vista una portada).
-    func restore(then: @escaping () -> Void = {}) {
-        finish(run: false)
-        done = then
-        steady = 0
-        started = CACurrentMediaTime()
-        layoutTries = 4
-        anchor.onLayout = { [weak self] in
-            guard let self, self.layoutTries > 0 else { return }
-            self.layoutTries -= 1
-            _ = self.apply()
-        }
-        let l = CADisplayLink(target: self, selector: #selector(step))
-        l.add(to: .main, forMode: .common)
-        link = l
-    }
-
-    @objc private func step() {
-        layoutTries = 4
-        let elapsed = CACurrentMediaTime() - started
-        switch apply() {
-        case .waiting: steady = 0
-        case .placed: steady += 1
-        case .stop: steady = .max
-        }
-        // En su sitio seis fotogramas seguidos (y al menos 0,3 s, por si la barra aún se mueve), o el tope.
-        if steady == .max || (steady >= 6 && elapsed > 0.3) || elapsed > 3 { finish(run: true) }
-    }
-
-    private enum Step { case waiting, placed, stop }
-
-    /// Pone la lista donde estaba. `.waiting` si aún no hay lista, no cabe todavía o ha habido que moverla.
-    private func apply() -> Step {
-        guard done != nil, let top else { return .stop }
-        guard let sv = anchor.scrollViews.first, sv.window != nil else { return .waiting }
-        // El dedo ya manda: no se le quita la lista.
-        if sv.isTracking || sv.isDecelerating { return .stop }
-        let inset = sv.adjustedContentInset
-        let maxY = max(-inset.top, sv.contentSize.height + inset.bottom - sv.bounds.height)
-        let want = max(top - inset.top, -inset.top)
-        let y = min(want, maxY)
-        let moved = abs(sv.contentOffset.y - y) > 0.5
-        if moved { sv.setContentOffset(CGPoint(x: sv.contentOffset.x, y: y), animated: false) }
-        // Si aún no cabe (la lista no tiene todavía su alto), se sigue esperando.
-        return moved || want > maxY + 0.5 ? .waiting : .placed
-    }
-
-    private func finish(run: Bool) {
-        link?.invalidate()
-        link = nil
-        anchor.onLayout = nil
-        let then = done
-        top = nil
-        done = nil
-        if run { then?() }
-    }
+    func updateUIView(_ v: UIView, context: Context) { anchor.view = v }
 }
 
 /// Desplaza un `UIScrollView` solo mientras el dedo esté cerca de su borde (en el eje que se le diga), más rápido
