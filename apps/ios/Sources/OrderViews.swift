@@ -57,9 +57,8 @@ enum OrderGesture {
 @MainActor
 final class OrderAnchor {
     fileprivate weak var view: UIView?
-    /// Se llama cada vez que la vista se coloca (la usa `ScrollKeeper` para devolver el desplazamiento en cuanto la
-    /// lista nueva existe, sin esperar a otro fotograma).
-    var onLayout: (() -> Void)?
+    /// La vista existe y está en pantalla.
+    var attached: Bool { view?.window != nil }
 
     /// El dedo en coordenadas de la cuadrícula.
     func local(_ window: CGPoint) -> CGPoint? { view.map { $0.convert(window, from: nil) } }
@@ -76,74 +75,14 @@ final class OrderAnchor {
 struct OrderAnchorView: UIViewRepresentable {
     let anchor: OrderAnchor
 
-    final class Probe: UIView {
-        weak var anchor: OrderAnchor?
-        override func layoutSubviews() {
-            super.layoutSubviews()
-            anchor?.onLayout?()
-        }
-    }
-
     func makeUIView(context: Context) -> UIView {
-        let v = Probe()
+        let v = UIView()
         v.isUserInteractionEnabled = false
         v.backgroundColor = .clear
-        v.anchor = anchor
         anchor.view = v
         return v
     }
-    func updateUIView(_ v: UIView, context: Context) {
-        (v as? Probe)?.anchor = anchor
-        anchor.view = v
-    }
-}
-
-/// Conserva el desplazamiento de una lista cuando su vista se vuelve a crear. Al entrar y salir de «Ordenar», Playlists
-/// y Tus álbumes quitan y ponen el buscador (`orderSearchable`; iOS 16 no deja esconderlo de otra forma) y SwiftUI hace
-/// una lista nueva, que empezaría arriba del todo. Antes de cambiar, `remember()` apunta qué se veía arriba (el
-/// desplazamiento más lo que tapan las barras); en cuanto la lista nueva se coloca, `restore` deja eso mismo arriba,
-/// aunque las barras hayan cambiado de alto (con buscador o sin él). El ancla va de fondo del contenido de la lista.
-@MainActor
-final class ScrollKeeper {
-    let anchor = OrderAnchor()
-    private var top: CGFloat?
-    private var done: (() -> Void)?
-    /// La lista de antes: también avisa al colocarse justo antes de irse, y no es la que hay que mover.
-    private weak var old: UIScrollView?
-
-    func remember() {
-        guard let sv = anchor.scrollViews.first else { top = nil; return }
-        old = sv
-        top = sv.contentOffset.y + sv.adjustedContentInset.top
-    }
-
-    /// Devuelve la lista a donde estaba y después llama a `then` (para llevar a la vista una portada).
-    func restore(then: @escaping () -> Void = {}) {
-        done = then
-        anchor.onLayout = { [weak self] in self?.apply(final: false) }
-        // Por si la lista nueva no llega a colocarse (o ya lo estaba): un último intento y se acaba.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak self] in self?.apply(final: true) }
-    }
-
-    private func apply(final: Bool) {
-        guard let then = done else { return }
-        if let top, let sv = anchor.scrollViews.first, sv.window != nil, sv !== old {
-            let inset = sv.adjustedContentInset
-            let maxY = max(-inset.top, sv.contentSize.height + inset.bottom - sv.bounds.height)
-            let y = min(max(top - inset.top, -inset.top), maxY)
-            if abs(sv.contentOffset.y - y) > 0.5 { sv.setContentOffset(CGPoint(x: sv.contentOffset.x, y: y), animated: false) }
-            // Si aún no cabe (la lista no tiene todavía su alto), se espera a la siguiente vez que se coloque.
-            guard final || top - inset.top <= maxY + 0.5 else { return }
-        } else if !final {
-            return
-        }
-        // (Si al final sigue siendo la misma lista, no se ha vuelto a crear: está donde estaba.)
-        top = nil
-        old = nil
-        done = nil
-        anchor.onLayout = nil
-        then()
-    }
+    func updateUIView(_ v: UIView, context: Context) { anchor.view = v }
 }
 
 /// Desplaza un `UIScrollView` solo mientras el dedo esté cerca de su borde (en el eje que se le diga), más rápido
@@ -269,6 +208,56 @@ struct OrderHole: View {
     }
 }
 
+/// El temblor del modo «Ordenar» (prompt 2-0 del bloque 2): todas las portadas que se pueden mover tiemblan, como los
+/// iconos del iPhone al reordenar las apps. Suave (poco ángulo, como el de «Tu música») y cada portada con su desfase y
+/// su ritmo, para que no vayan todas a la vez. La cogida no tiembla. Con «Reducir movimiento» no tiembla ninguna: cada
+/// portada lleva un borde fino del color del texto (`OrderMark`). Sin shu. Igual que `orderWiggle` en Android.
+enum OrderWiggle {
+    /// Cuánto se inclina a cada lado, en grados.
+    static let degrees: Double = 1.1
+    /// Una ida y vuelta, en segundos: de `period` a `period + spread` según la portada.
+    static let period: Double = 0.52
+    static let spread: Double = 0.12
+    /// El borde de «Reducir movimiento», en puntos.
+    static let border: CGFloat = 1
+
+    /// «Reducir movimiento» del sistema o, sólo en las capturas y los tests, el del escenario (`Demo`).
+    static func reduced(_ system: Bool) -> Bool { system || Demo.current?.reduceMotion == true }
+
+    /// El ángulo de una portada en un momento: un seno con el desfase y el ritmo que salen de `seed` (su id).
+    static func angle(at date: Date, seed: Int) -> Double {
+        let bits = UInt(bitPattern: seed)
+        let phase = Double(bits % 997) / 997
+        let rate = period + spread * Double((bits / 997) % 101) / 100
+        let t = date.timeIntervalSinceReferenceDate / rate + phase
+        return degrees * sin(2 * .pi * t)
+    }
+}
+
+extension View {
+    /// Tiembla mientras `on` (en «Ordenar», no cogida y sin «Reducir movimiento»). Es un giro de dibujo: no cambia el
+    /// marco que mide el arrastre (`OrderFrameKey` se lee fuera). Con `on` apagado el reloj se para y se queda recta.
+    func orderWiggle(_ on: Bool, seed: Int) -> some View {
+        TimelineView(.animation(minimumInterval: nil, paused: !on)) { tl in
+            rotationEffect(.degrees(on ? OrderWiggle.angle(at: tl.date, seed: seed) : 0))
+        }
+    }
+}
+
+/// «Reducir movimiento» en «Ordenar»: en vez de temblar, un borde fino del color del texto alrededor de la portada.
+struct OrderMark: View {
+    var radius: CGFloat = Tokens.Radius.row
+    var side: CGFloat? = nil
+    var body: some View {
+        RoundedRectangle(cornerRadius: radius, style: .continuous)
+            .strokeBorder(Color.primary, lineWidth: OrderWiggle.border)
+            .aspectRatio(1, contentMode: .fit)
+            .frame(width: side, height: side)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+    }
+}
+
 extension View {
     /// La portada levantada: un poco más grande, inclinada y con sombra (con «Reducir movimiento», sólo la sombra).
     /// Se dibuja encima de la cuadrícula en el sitio del dedo, sin animación.
@@ -301,6 +290,21 @@ final class OrderLift<ID: Hashable>: ObservableObject {
     private var canSwap: (ID, ID) -> Bool = { _, _ in true }
     private var reduceMotion = false
     private var generation = 0
+    /// Sólo en los tests de interfaz y las capturas (`-screenshotScenario`): qué ha pasado con el último gesto, para
+    /// que un test que falla diga por qué (si el arrastre arrancó y con cuántas celdas medidas). `OrderDebugLabel` lo
+    /// enseña como texto invisible.
+    @Published private(set) var debug = ""
+    private var asked = 0, started = 0, moves = 0, ended = 0
+    private var lastFail = "-"
+
+    private func log(_ fail: String? = nil) {
+        guard Demo.current != nil else { return }
+        if let fail { lastFail = fail }
+        let text = "pedidos=\(asked) arrancados=\(started) fallo=\(lastFail) celdas=\(frames.count) orden=\(order.count) "
+            + "ancla=\(anchor.attached ? "si" : "no") listas=\(anchor.scrollViews.count) movimientos=\(moves) "
+            + "inicio=\(startLocal == nil ? "no" : "si") soltados=\(ended)"
+        if text != debug { debug = text }
+    }
 
     init() { scroller.onTick = { [weak self] in self?.follow() } }
 
@@ -308,10 +312,13 @@ final class OrderLift<ID: Hashable>: ObservableObject {
     func lift(_ id: ID, axis: Axis, reduceMotion: Bool,
               canDropInto: @escaping (ID, ID) -> Bool = { _, _ in false },
               canSwap: @escaping (ID, ID) -> Bool = { _, _ in true }) {
-        guard !holding, let start = order.firstIndex(of: id) else { return }
+        asked += 1
+        guard !holding else { log("ya-hay-una-cogida"); return }
+        guard let start = order.firstIndex(of: id) else { log("no-esta-en-el-orden"); return }
         var slots: [Int: CGRect] = [:]
         for (i, other) in order.enumerated() { if let f = frames[other] { slots[i] = f } }
-        guard slots[start] != nil else { return }
+        guard slots[start] != nil else { log("celda-sin-medir"); return }
+        started += 1
         generation += 1
         holding = true
         self.reduceMotion = reduceMotion
@@ -328,6 +335,7 @@ final class OrderLift<ID: Hashable>: ObservableObject {
         // Ni deslizar entre pestañas mientras se arrastra (en Fijados, a los lados, se lo quedaba también).
         TabSwipe.blockedUntil = .distantFuture
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        log("-")
     }
 
     /// El dedo se ha movido (coordenadas de la ventana): `start` es donde estaba al levantarse.
@@ -335,7 +343,9 @@ final class OrderLift<ID: Hashable>: ObservableObject {
         guard holding else { return }
         if startLocal == nil { startLocal = anchor.local(start); scroller.from = start }
         scroller.finger = now
+        moves += 1
         follow()
+        log()
     }
 
     /// Recoloca la copia levantada bajo el dedo y aparta las demás si ha cambiado el hueco. También en cada fotograma
@@ -362,6 +372,8 @@ final class OrderLift<ID: Hashable>: ObservableObject {
     func end() -> OrderDrag<ID>? {
         guard holding, let d = drag else { return nil }
         holding = false
+        ended += 1
+        log()
         TabSwipe.blockedUntil = Date().addingTimeInterval(0.4)
         scroller.stop()
         paused.forEach { $0.isScrollEnabled = true }
@@ -383,6 +395,21 @@ final class OrderLift<ID: Hashable>: ObservableObject {
         }
         if d.changed && d.into == nil { UIImpactFeedbackGenerator(style: .light).impactOccurred() }
         return d
+    }
+}
+
+/// Sólo en los tests de interfaz y las capturas: el registro de `OrderLift` como texto que no se ve (1 pt,
+/// transparente), para que el test lo lea (`orden-registro`). En la app normal no se dibuja nada.
+struct OrderDebugLabel: View {
+    let text: String
+    var id = "orden-registro"
+    var body: some View {
+        if Demo.current != nil {
+            Text(text.isEmpty ? "sin-gestos" : text)
+                .font(.system(size: 1)).foregroundStyle(.clear)
+                .accessibilityIdentifier(id)
+                .allowsHitTesting(false)
+        }
     }
 }
 
