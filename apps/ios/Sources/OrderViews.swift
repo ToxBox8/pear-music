@@ -98,48 +98,65 @@ struct OrderAnchorView: UIViewRepresentable {
     }
 }
 
-/// Conserva el desplazamiento de una lista cuando su vista se vuelve a crear. Al entrar y salir de «Ordenar», Playlists
-/// y Tus álbumes quitan y ponen el buscador (`orderSearchable`; iOS 16 no deja esconderlo de otra forma) y SwiftUI hace
-/// una lista nueva, que empezaría arriba del todo. Antes de cambiar, `remember()` apunta qué se veía arriba (el
-/// desplazamiento más lo que tapan las barras); en cuanto la lista nueva se coloca, `restore` deja eso mismo arriba,
-/// aunque las barras hayan cambiado de alto (con buscador o sin él). El ancla va de fondo del contenido de la lista.
+/// Conserva el desplazamiento de una lista cuando cambia por debajo. Al entrar y salir de «Ordenar», Playlists y Tus
+/// álbumes quitan y ponen el buscador (`orderSearchable`; iOS 16 no deja esconderlo de otra forma) y la lista acaba
+/// arriba del todo: unas veces SwiftUI hace una lista nueva y otras conserva el `UIScrollView` y le pone el
+/// desplazamiento a cero al recolocar la barra. Antes de cambiar, `remember()` apunta qué se veía arriba (el
+/// desplazamiento más lo que tapan las barras); después, `restore` deja eso mismo arriba cada vez que la lista se
+/// coloca y unas cuantas veces más durante 0,4 s, sea la lista nueva o la de antes y aunque las barras hayan cambiado
+/// de alto (con buscador o sin él). Si el dedo ya está desplazando, no insiste. El ancla va de fondo del contenido.
+/// (La primera versión sólo lo devolvía una vez y sólo a una lista nueva: en la CI 43881693489 la lista volvía arriba.)
 @MainActor
 final class ScrollKeeper {
     let anchor = OrderAnchor()
     private var top: CGFloat?
     private var done: (() -> Void)?
-    /// La lista de antes: también avisa al colocarse justo antes de irse, y no es la que hay que mover.
-    private weak var old: UIScrollView?
+    private var token = 0
+    /// Cuántas veces se puede corregir por recolocarse la lista (para no pelearse sin fin con SwiftUI).
+    private var layoutTries = 0
 
     func remember() {
         guard let sv = anchor.scrollViews.first else { top = nil; return }
-        old = sv
         top = sv.contentOffset.y + sv.adjustedContentInset.top
     }
 
     /// Devuelve la lista a donde estaba y después llama a `then` (para llevar a la vista una portada).
     func restore(then: @escaping () -> Void = {}) {
+        token += 1
+        let mine = token
         done = then
-        anchor.onLayout = { [weak self] in self?.apply(final: false) }
-        // Por si la lista nueva no llega a colocarse (o ya lo estaba): un último intento y se acaba.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak self] in self?.apply(final: true) }
+        layoutTries = 8
+        anchor.onLayout = { [weak self] in
+            guard let self, self.token == mine, self.layoutTries > 0 else { return }
+            self.layoutTries -= 1
+            self.apply()
+        }
+        for delay in [0.02, 0.08, 0.16, 0.28] {
+            DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+                guard let self, self.token == mine else { return }
+                self.apply()
+            }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) { [weak self] in
+            guard let self, self.token == mine else { return }
+            self.apply()
+            self.finish()
+        }
     }
 
-    private func apply(final: Bool) {
+    private func apply() {
+        guard done != nil, let top, let sv = anchor.scrollViews.first, sv.window != nil else { return }
+        // El dedo ya manda: no se le quita la lista.
+        if sv.isTracking || sv.isDecelerating { self.top = nil; return }
+        let inset = sv.adjustedContentInset
+        let maxY = max(-inset.top, sv.contentSize.height + inset.bottom - sv.bounds.height)
+        let y = min(max(top - inset.top, -inset.top), maxY)
+        if abs(sv.contentOffset.y - y) > 0.5 { sv.setContentOffset(CGPoint(x: sv.contentOffset.x, y: y), animated: false) }
+    }
+
+    private func finish() {
         guard let then = done else { return }
-        if let top, let sv = anchor.scrollViews.first, sv.window != nil, sv !== old {
-            let inset = sv.adjustedContentInset
-            let maxY = max(-inset.top, sv.contentSize.height + inset.bottom - sv.bounds.height)
-            let y = min(max(top - inset.top, -inset.top), maxY)
-            if abs(sv.contentOffset.y - y) > 0.5 { sv.setContentOffset(CGPoint(x: sv.contentOffset.x, y: y), animated: false) }
-            // Si aún no cabe (la lista no tiene todavía su alto), se espera a la siguiente vez que se coloque.
-            guard final || top - inset.top <= maxY + 0.5 else { return }
-        } else if !final {
-            return
-        }
-        // (Si al final sigue siendo la misma lista, no se ha vuelto a crear: está donde estaba.)
         top = nil
-        old = nil
         done = nil
         anchor.onLayout = nil
         then()
