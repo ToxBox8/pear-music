@@ -1147,7 +1147,9 @@ struct PinnedCarousel: View {
             if now.isEmpty { ordering = false }
         }
         .onChange(of: pressing) { on in if !on { finish() } }
-        .onChange(of: ordering) { on in if !on { lift.end() } }
+        // Salir de «Ordenar» (o irse la pantalla) con una portada cogida la suelta donde está y guarda el orden.
+        .onChange(of: ordering) { on in if !on { finish() } }
+        .onDisappear { finish() }
     }
 
     private func setOrdering(_ on: Bool) {
@@ -1174,7 +1176,7 @@ struct PinnedCarousel: View {
             .contentShape(Rectangle())
             .gesture(OrderGesture.lift(pressing: $pressing,
                                        onLift: { lift.lift(p.id, axis: .horizontal, reduceMotion: reduceMotion) },
-                                       onMove: { lift.move(start: $0, now: $1) },
+                                       onMove: { if lift.drag?.id == p.id { lift.move(start: $0, now: $1) } },
                                        onEnd: finish))
             .background(GeometryReader { g in
                 Color.clear.preference(key: OrderFrameKey<UUID>.self, value: [p.id: g.frame(in: .named(space))])

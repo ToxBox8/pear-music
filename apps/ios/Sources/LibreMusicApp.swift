@@ -337,8 +337,12 @@ extension RootView {
 enum TabSwipe {
     /// Pantallas abiertas con filas que se deslizan para quitar (las cuenta CollectionDetailV11).
     static var rowSwipeScreens = 0
+    /// Hasta cuándo no se cambia de pestaña: mientras hay una portada cogida en el modo «Ordenar» (`OrderLift`) y un
+    /// momento después de soltarla. Si no, arrastrar en Fijados a los lados también cambiaba de pestaña (paso C).
+    static var blockedUntil = Date.distantPast
 
     static func target(from tab: String, order: [String], drag v: DragGesture.Value) -> String? {
+        guard Date() >= blockedUntil else { return nil }
         let dx = v.translation.width, dy = v.translation.height
         let predicted = v.predictedEndTranslation.width
         guard abs(dx) > abs(dy) * 1.6, abs(dx) > 70 || abs(predicted) > 220,

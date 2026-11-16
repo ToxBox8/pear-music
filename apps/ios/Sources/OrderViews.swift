@@ -57,6 +57,9 @@ enum OrderGesture {
 @MainActor
 final class OrderAnchor {
     fileprivate weak var view: UIView?
+    /// Se llama cada vez que la vista se coloca (la usa `ScrollKeeper` para devolver el desplazamiento en cuanto la
+    /// lista nueva existe, sin esperar a otro fotograma).
+    var onLayout: (() -> Void)?
 
     /// El dedo en coordenadas de la cuadrícula.
     func local(_ window: CGPoint) -> CGPoint? { view.map { $0.convert(window, from: nil) } }
@@ -72,14 +75,75 @@ final class OrderAnchor {
 
 struct OrderAnchorView: UIViewRepresentable {
     let anchor: OrderAnchor
+
+    final class Probe: UIView {
+        weak var anchor: OrderAnchor?
+        override func layoutSubviews() {
+            super.layoutSubviews()
+            anchor?.onLayout?()
+        }
+    }
+
     func makeUIView(context: Context) -> UIView {
-        let v = UIView()
+        let v = Probe()
         v.isUserInteractionEnabled = false
         v.backgroundColor = .clear
+        v.anchor = anchor
         anchor.view = v
         return v
     }
-    func updateUIView(_ v: UIView, context: Context) { anchor.view = v }
+    func updateUIView(_ v: UIView, context: Context) {
+        (v as? Probe)?.anchor = anchor
+        anchor.view = v
+    }
+}
+
+/// Conserva el desplazamiento de una lista cuando su vista se vuelve a crear. Al entrar y salir de «Ordenar», Playlists
+/// y Tus álbumes quitan y ponen el buscador (`orderSearchable`; iOS 16 no deja esconderlo de otra forma) y SwiftUI hace
+/// una lista nueva, que empezaría arriba del todo. Antes de cambiar, `remember()` apunta qué se veía arriba (el
+/// desplazamiento más lo que tapan las barras); en cuanto la lista nueva se coloca, `restore` deja eso mismo arriba,
+/// aunque las barras hayan cambiado de alto (con buscador o sin él). El ancla va de fondo del contenido de la lista.
+@MainActor
+final class ScrollKeeper {
+    let anchor = OrderAnchor()
+    private var top: CGFloat?
+    private var done: (() -> Void)?
+    /// La lista de antes: también avisa al colocarse justo antes de irse, y no es la que hay que mover.
+    private weak var old: UIScrollView?
+
+    func remember() {
+        guard let sv = anchor.scrollViews.first else { top = nil; return }
+        old = sv
+        top = sv.contentOffset.y + sv.adjustedContentInset.top
+    }
+
+    /// Devuelve la lista a donde estaba y después llama a `then` (para llevar a la vista una portada).
+    func restore(then: @escaping () -> Void = {}) {
+        done = then
+        anchor.onLayout = { [weak self] in self?.apply(final: false) }
+        // Por si la lista nueva no llega a colocarse (o ya lo estaba): un último intento y se acaba.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { [weak self] in self?.apply(final: true) }
+    }
+
+    private func apply(final: Bool) {
+        guard let then = done else { return }
+        if let top, let sv = anchor.scrollViews.first, sv.window != nil, sv !== old {
+            let inset = sv.adjustedContentInset
+            let maxY = max(-inset.top, sv.contentSize.height + inset.bottom - sv.bounds.height)
+            let y = min(max(top - inset.top, -inset.top), maxY)
+            if abs(sv.contentOffset.y - y) > 0.5 { sv.setContentOffset(CGPoint(x: sv.contentOffset.x, y: y), animated: false) }
+            // Si aún no cabe (la lista no tiene todavía su alto), se espera a la siguiente vez que se coloque.
+            guard final || top - inset.top <= maxY + 0.5 else { return }
+        } else if !final {
+            return
+        }
+        // (Si al final sigue siendo la misma lista, no se ha vuelto a crear: está donde estaba.)
+        top = nil
+        old = nil
+        done = nil
+        anchor.onLayout = nil
+        then()
+    }
 }
 
 /// Desplaza un `UIScrollView` solo mientras el dedo esté cerca de su borde (en el eje que se le diga), más rápido
@@ -261,6 +325,8 @@ final class OrderLift<ID: Hashable>: ObservableObject {
         paused = Array(views.prefix(axis == .vertical ? 1 : 2)).filter(\.isScrollEnabled)
         paused.forEach { $0.isScrollEnabled = false }
         scroller.start(views.first, axis: axis)
+        // Ni deslizar entre pestañas mientras se arrastra (en Fijados, a los lados, se lo quedaba también).
+        TabSwipe.blockedUntil = .distantFuture
         UIImpactFeedbackGenerator(style: .medium).impactOccurred()
     }
 
@@ -296,6 +362,7 @@ final class OrderLift<ID: Hashable>: ObservableObject {
     func end() -> OrderDrag<ID>? {
         guard holding, let d = drag else { return nil }
         holding = false
+        TabSwipe.blockedUntil = Date().addingTimeInterval(0.4)
         scroller.stop()
         paused.forEach { $0.isScrollEnabled = true }
         paused = []

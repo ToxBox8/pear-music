@@ -398,7 +398,8 @@ final class BibliotecaUITests: XCTestCase {
     /// Modo «Ordenar» con muchas playlists: coger la primera y dejar el dedo cerca del borde de abajo desplaza la
     /// lista sola, y la portada llega a lo que no se veía.
     func testOrdenarDesplazamientoAlBorde() {
-        launch("ui_muchas_playlists", ready: "Lista 01")
+        // «Lista 01» está abajo, fuera de la pantalla (por eso sirve): se espera a la cuadrícula.
+        launch("ui_muchas_playlists", ready: "Descargadas")
         XCTAssertTrue(app.navigationBars["Playlists"].waitForExistence(timeout: 10), "No se abrió Playlists")
         startOrdering()
         let first = reading(lists + (1...24).map { String(format: "Lista %02d", $0) }).first ?? "Descargadas"
@@ -417,6 +418,59 @@ final class BibliotecaUITests: XCTestCase {
         XCTAssertFalse(any("Descargadas").isHittable && any("Favoritos").isHittable,
                        "Con el dedo cerca del borde de abajo, la lista no se desplaza sola")
         XCTAssertFalse(wasVisible, "«\(farName)» ya se veía al empezar: el test no prueba nada")
+    }
+
+    private var many: [String] { (1...24).map { String(format: "Lista %02d", $0) } }
+
+    /// La «Lista NN» que se ve más cerca del centro de la pantalla (o la más baja, con `lowest`).
+    private func visibleList(lowest: Bool = false) -> String? {
+        let mid = app.frame.midY
+        let seen = many.filter { any($0).exists && any($0).isHittable }
+        return lowest ? seen.max { any($0).frame.minY < any($1).frame.minY }
+                      : seen.min { abs(any($0).frame.midY - mid) < abs(any($1).frame.midY - mid) }
+    }
+
+    /// Entrar y salir de «Ordenar» con la lista bajada no la lleva arriba: lo que se veía sigue a la vista y casi en
+    /// el mismo sitio (cambia sólo lo que ocupan el buscador y la ayuda).
+    func testOrdenarNoLlevaLaListaArriba() {
+        launch("ui_muchas_playlists", ready: "Descargadas")
+        XCTAssertTrue(app.navigationBars["Playlists"].waitForExistence(timeout: 10), "No se abrió Playlists")
+        app.swipeUp()
+        app.swipeUp()
+        sleep(1)
+        guard let name = visibleList() else { return XCTFail("Tras desplazar no se ve ninguna «Lista NN»") }
+        let y0 = any(name).frame.minY
+        XCTAssertFalse(any("Descargadas").isHittable, "La lista no ha bajado: el test no prueba nada")
+        shot("1-bajada")
+        startOrdering()
+        sleep(1)
+        shot("2-ordenando")
+        XCTAssertTrue(any(name).exists && any(name).isHittable, "Al entrar en «Ordenar» «\(name)» ya no se ve: la lista ha vuelto arriba")
+        XCTAssertLessThan(abs(any(name).frame.minY - y0), 120, "Al entrar en «Ordenar» la lista salta (\(y0) → \(any(name).frame.minY))")
+        XCTAssertFalse(any("Descargadas").isHittable, "Al entrar en «Ordenar» la lista vuelve arriba")
+        app.buttons["Hecho"].tap()
+        XCTAssertTrue(app.navigationBars["Playlists"].waitForExistence(timeout: 5), "«Hecho» no sale del modo de ordenar")
+        sleep(1)
+        shot("3-fuera")
+        XCTAssertTrue(any(name).exists && any(name).isHittable, "Al salir de «Ordenar» «\(name)» ya no se ve: la lista ha vuelto arriba")
+        XCTAssertLessThan(abs(any(name).frame.minY - y0), 120, "Al salir de «Ordenar» la lista salta (\(y0) → \(any(name).frame.minY))")
+    }
+
+    /// «Ordenar» desde el menú de una portada de abajo: esa portada sigue a la vista.
+    func testOrdenarDesdeElMenuDejaLaPortadaALaVista() {
+        launch("ui_muchas_playlists", ready: "Descargadas")
+        XCTAssertTrue(app.navigationBars["Playlists"].waitForExistence(timeout: 10), "No se abrió Playlists")
+        app.swipeUp()
+        sleep(1)
+        guard let name = visibleList(lowest: true) else { return XCTFail("Tras desplazar no se ve ninguna «Lista NN»") }
+        any(name).press(forDuration: 1.2)
+        let item = app.buttons["Ordenar"]
+        XCTAssertTrue(item.waitForExistence(timeout: 3), "El menú de «\(name)» no ofrece «Ordenar»")
+        item.tap()
+        XCTAssertTrue(app.buttons["Hecho"].waitForExistence(timeout: 5), "«Ordenar» del menú no entra en el modo de ordenar")
+        sleep(1)
+        shot("1-ordenando")
+        XCTAssertTrue(any(name).exists && any(name).isHittable, "Al entrar en «Ordenar» desde su menú, «\(name)» no se ve")
     }
 
     /// Modo «Ordenar» con carpetas: soltar una playlist encima de una carpeta la mete dentro.
@@ -475,6 +529,8 @@ final class BibliotecaUITests: XCTestCase {
         let now = pinned.sorted { any($0).frame.minX < any($1).frame.minX }
         shot("4-movido")
         XCTAssertEqual(now, Array(before.reversed()), "Arrastrar no cambia el orden de Fijados")
+        // Arrastrar a los lados no puede cambiar de pestaña (lo hacía: el test acababa en Inicio).
+        XCTAssertTrue(any("Tu música").exists, "Arrastrar en Fijados ha cambiado de pestaña")
         done.tap()
         XCTAssertTrue(app.buttons["Ordenar"].waitForExistence(timeout: 5), "Al terminar no vuelve «Ordenar» de «Tu música»")
     }

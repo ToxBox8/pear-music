@@ -100,6 +100,10 @@ struct PlaylistsListView: View {
     @State private var created: UUID?
     /// La carpeta recién creada: la cuadrícula se desplaza hasta ella.
     @State private var reveal: String?
+    /// Al entrar y salir de «Ordenar» la lista no vuelve arriba (`ScrollKeeper`) y, si se entra desde el menú de una
+    /// portada, ésa se queda a la vista (`keepVisible`).
+    @State private var keeper = ScrollKeeper()
+    @State private var keepVisible: String?
 
     /// Una casilla de la cuadrícula: una playlist, una lista inteligente o una carpeta. `key` es su clave en
     /// `playlistOrder` (el id de la playlist o de la carpeta, o "downloads" / "favorites").
@@ -184,11 +188,18 @@ struct PlaylistsListView: View {
                                     }) { e in cell(e) }
                     }
                 }
+                .background(OrderAnchorView(anchor: keeper.anchor))
             }
             .onChange(of: reveal) { key in
                 guard let key else { return }
                 withAnimation(reduceMotion ? nil : .uiEaseOut(0.3)) { proxy.scrollTo(key, anchor: .center) }
                 reveal = nil
+            }
+            // Sin ancla: lo mínimo para que se vea entera (si ya se ve, no se mueve).
+            .onChange(of: keepVisible) { key in
+                guard let key else { return }
+                proxy.scrollTo(key)
+                keepVisible = nil
             }
         }
         .overlay {
@@ -277,7 +288,7 @@ struct PlaylistsListView: View {
                     Label(L("Sacar de «{0}»", f.name), systemImage: "arrow.up.forward.square")
                 }
             }
-            Button { startOrdering() } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
+            Button { startOrdering(e.key) } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
             Button { library.update(p.id) { $0.pinned = $0.pinned == true ? nil : true } } label: {
                 p.pinned == true ? Label(L("Soltar de arriba"), systemImage: "pin.slash") : Label(L("Fijar arriba"), systemImage: "pin")
             }
@@ -287,11 +298,11 @@ struct PlaylistsListView: View {
         } else if let f = e.folder {
             Button { rename(f) } label: { Label(L("Renombrar"), systemImage: "pencil") }
             Button { moving = .folder(f.id) } label: { Label(L("Mover carpeta a…"), systemImage: "folder") }
-            Button { startOrdering() } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
+            Button { startOrdering(e.key) } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
             Divider()
             Button(role: .destructive) { deleting = f } label: { Label(L("Eliminar carpeta…"), systemImage: "trash") }
         } else {
-            Button { startOrdering() } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
+            Button { startOrdering(e.key) } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
         }
     }
 
@@ -324,14 +335,19 @@ struct PlaylistsListView: View {
 
     // MARK: Modo «Ordenar»
 
-    private func setOrdering(_ on: Bool) {
-        withAnimation(reduceMotion ? nil : .uiEaseOut(0.25)) { ordering = on }
+    /// Entra o sale de «Ordenar» sin que la lista vuelva arriba; `keep`, la portada que tiene que quedar a la vista.
+    /// Sin animación: el buscador se quita y se pone, y la lista se vuelve a crear (un fundido enseñaría dos listas).
+    private func setOrdering(_ on: Bool, keep: String? = nil) {
+        keeper.remember()
+        ordering = on
+        keeper.restore { if let keep { keepVisible = keep } }
     }
 
-    /// Entra en el modo «Ordenar» (del ⋯ o del menú de una portada): se borra lo buscado y se ve el nivel entero.
-    private func startOrdering() {
+    /// Entra en el modo «Ordenar» (del ⋯ o, con `key`, del menú de esa portada): se borra lo buscado y se ve el nivel
+    /// entero.
+    private func startOrdering(_ key: String? = nil) {
         query = ""
-        setOrdering(true)
+        setOrdering(true, keep: key)
     }
 
     /// Guarda el orden de este nivel; al mover algo, Playlists pasa a ordenarse «A mano».
@@ -410,20 +426,33 @@ struct AlbumsListView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var query = ""
     @State private var ordering = false
+    /// Como en Playlists: entrar y salir de «Ordenar» no lleva la lista arriba; la portada del menú, a la vista.
+    @State private var keeper = ScrollKeeper()
+    @State private var keepVisible: UUID?
     @State private var deleting: Playlist?
     @State private var opened: Playlist?
 
     var body: some View {
         let albums = LibraryOrder.albums(library.albums, sort: albumSort, order: LibraryOrder.decode(albumOrder))
         let shown = ordering ? albums : LocalSearch.filter(albums, query) { "\($0.name) \($0.album?.artist ?? "")" }
-        ScrollView {
-            if !shown.isEmpty {
-                if ordering { OrderHint() }
-                ReorderGrid(items: shown, ordering: ordering, onMoved: save,
-                            menu: { AnyView(menu($0)) },
-                            destination: { p in PlaylistV11View(playlistID: p.id) }) { p in
-                    GridCover(playlist: p, subtitle: p.album?.line ?? songCount(p.songs.count))
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(spacing: 0) {
+                    if !shown.isEmpty {
+                        if ordering { OrderHint() }
+                        ReorderGrid(items: shown, ordering: ordering, onMoved: save,
+                                    menu: { AnyView(menu($0)) },
+                                    destination: { p in PlaylistV11View(playlistID: p.id) }) { p in
+                            GridCover(playlist: p, subtitle: p.album?.line ?? songCount(p.songs.count))
+                        }
+                    }
                 }
+                .background(OrderAnchorView(anchor: keeper.anchor))
+            }
+            .onChange(of: keepVisible) { id in
+                guard let id else { return }
+                proxy.scrollTo(id)
+                keepVisible = nil
             }
         }
         .overlay {
@@ -453,7 +482,7 @@ struct AlbumsListView: View {
 
     @ViewBuilder private func menu(_ p: Playlist) -> some View {
         Button { opened = p } label: { Label(L("Abrir"), systemImage: "arrow.up.right.square") }
-        Button { start() } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
+        Button { start(p.id) } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
         Button { library.update(p.id) { $0.pinned = $0.pinned == true ? nil : true } } label: {
             p.pinned == true ? Label(L("Soltar de arriba"), systemImage: "pin.slash") : Label(L("Fijar arriba"), systemImage: "pin")
         }
@@ -461,13 +490,15 @@ struct AlbumsListView: View {
         Button(role: .destructive) { deleting = p } label: { Label(L("Eliminar…"), systemImage: "trash") }
     }
 
-    private func setOrdering(_ on: Bool) {
-        withAnimation(reduceMotion ? nil : .uiEaseOut(0.25)) { ordering = on }
+    private func setOrdering(_ on: Bool, keep: UUID? = nil) {
+        keeper.remember()
+        ordering = on
+        keeper.restore { if let keep { keepVisible = keep } }
     }
 
-    private func start() {
+    private func start(_ keep: UUID? = nil) {
         query = ""
-        setOrdering(true)
+        setOrdering(true, keep: keep)
     }
 
     private func save(_ moved: [UUID]) {
@@ -567,7 +598,9 @@ struct ReorderGrid<Item: Identifiable, Destination: View, Cell: View>: View {
         .onAppear { lift.order = items.map(\.id) }
         .onChange(of: items.map(\.id)) { ids in if lift.drag == nil { lift.order = ids } }
         .onChange(of: pressing) { on in if !on { finish() } }
-        .onChange(of: ordering) { on in if !on { lift.end() } }
+        // Salir de «Ordenar» (o irse la pantalla) con una portada cogida la suelta donde está y guarda el orden.
+        .onChange(of: ordering) { on in if !on { finish() } }
+        .onDisappear { finish() }
     }
 
     /// Una celda en el modo «Ordenar»: no se toca; se coge con el dedo quieto y, mientras está levantada, en su sitio
@@ -582,7 +615,8 @@ struct ReorderGrid<Item: Identifiable, Destination: View, Cell: View>: View {
         .contentShape(Rectangle())
         .gesture(OrderGesture.lift(pressing: $pressing,
                                    onLift: { lift.lift(p.id, axis: .vertical, reduceMotion: reduceMotion, canDropInto: canDropInto, canSwap: canSwap) },
-                                   onMove: { lift.move(start: $0, now: $1) },
+                                   // Sólo manda el dedo que la cogió (un segundo dedo en otra portada no la mueve).
+                                   onMove: { if lift.drag?.id == p.id { lift.move(start: $0, now: $1) } },
                                    onEnd: finish))
         .background(GeometryReader { g in
             Color.clear.preference(key: OrderFrameKey<Item.ID>.self, value: [p.id: g.frame(in: .named(space))])
