@@ -93,8 +93,6 @@ struct PlaylistsListView: View {
     @State private var ordering = Demo.current?.playlistsOrdering == true
     @State private var moving: MoveItem?
     @State private var deleting: PlaylistFolder?
-    /// La carpeta cuyo icono se está eligiendo (prompt 2-0).
-    @State private var lookFolder: PlaylistFolder?
     @State private var deletingPlaylist: Playlist?
     @State private var editingPlaylist: Playlist?
     @State private var opened: Entry?
@@ -232,7 +230,6 @@ struct PlaylistsListView: View {
         }
         .sheet(item: $moving) { MoveToFolderSheet(item: $0) }
         .sheet(item: $editingPlaylist) { PlaylistEditor(playlistID: $0.id) }
-        .sheet(item: $lookFolder) { FolderLookEditor(folderID: $0.id) }
         .navigationDestination(isPresented: Binding(get: { opened != nil }, set: { if !$0 { opened = nil } })) {
             if let p = opened?.playlist { PlaylistV11View(playlistID: p.id) }
             else if let f = opened?.folder { PlaylistsListView(folderID: f.id) }
@@ -304,7 +301,6 @@ struct PlaylistsListView: View {
             Button(role: .destructive) { deletingPlaylist = p } label: { Label(L("Eliminar…"), systemImage: "trash") }
         } else if let f = e.folder {
             Button { rename(f) } label: { Label(L("Renombrar"), systemImage: "pencil") }
-            Button { lookFolder = f } label: { Label(L("Cambiar icono…"), systemImage: "paintpalette") }
             Button { moving = .folder(f.id) } label: { Label(L("Mover carpeta a…"), systemImage: "folder") }
             Button { startOrdering(e.key) } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
             Divider()
@@ -336,7 +332,6 @@ struct PlaylistsListView: View {
         if let folder {
             Divider()
             Button { rename(folder) } label: { Label(L("Renombrar"), systemImage: "pencil") }
-            Button { lookFolder = folder } label: { Label(L("Cambiar icono…"), systemImage: "paintpalette") }
             Button { moving = .folder(folder.id) } label: { Label(L("Mover carpeta a…"), systemImage: "folder") }
             Button(role: .destructive) { deleting = folder } label: { Label(L("Eliminar carpeta…"), systemImage: "trash") }
         }
@@ -439,12 +434,6 @@ struct AlbumsListView: View {
     @State private var deleting: Playlist?
     @State private var opened: Playlist?
 
-    /// Los criterios del ⋯, los mismos que Playlists.
-    private static var sorts: [(String, String)] { [
-        ("recent", L("Añadidos recientemente")), ("name", L("Nombre (A-Z)")), ("nameDesc", L("Nombre (Z-A)")),
-        ("count", L("Nº de canciones")), ("custom", L("A mano")),
-    ] }
-
     var body: some View {
         let albums = LibraryOrder.albums(library.albums, sort: albumSort, order: LibraryOrder.decode(albumOrder))
         let shown = ordering ? albums : LocalSearch.filter(albums, query) { "\($0.name) \($0.album?.artist ?? "")" }
@@ -484,15 +473,7 @@ struct AlbumsListView: View {
                 if ordering {
                     Button(L("Hecho")) { setOrdering(false) }.fontWeight(.semibold)
                 } else if albums.count > 1 {
-                    // El mismo ⋯ que Playlists: «Ordenar» y el criterio (prompt 2-0, lo pidió Toxbox).
-                    Menu {
-                        Button { start() } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
-                        Picker(L("Ordenar por"), selection: $albumSort) {
-                            ForEach(Self.sorts, id: \.0) { item in Text(item.1).tag(item.0) }
-                        }
-                        .pickerStyle(.inline)
-                    } label: { Image(systemName: "ellipsis.circle") }
-                        .accessibilityLabel(L("Más opciones"))
+                    Button(L("Ordenar")) { start() }
                 }
             }
         }
@@ -656,7 +637,6 @@ struct ReorderGrid<Item: Identifiable, Destination: View, Cell: View>: View {
         .onPreferenceChange(OrderFrameKey<Item.ID>.self) { lift.frames = $0 }
         .overlay(alignment: .topLeading) { liftedCopy(byID) }
         .overlay(alignment: .topLeading) { if ordering { OrderDebugLabel(text: lift.debug) } }
-        .overlay(alignment: .topLeading) { if ordering { OrderDebugLabel(text: wiggleLog(list.count), id: "orden-temblor") } }
         .padding(.horizontal, 16)
         .padding(.top, 8)
         .padding(.bottom, ordering ? 12 : 0)
@@ -672,11 +652,9 @@ struct ReorderGrid<Item: Identifiable, Destination: View, Cell: View>: View {
     /// queda el hueco.
     private func orderCell(_ p: Item) -> some View {
         let lifted = lift.drag?.id == p.id
-        let still = OrderWiggle.reduced(reduceMotion)
         return ZStack(alignment: .top) {
-            // Tiemblan todas menos la cogida; con «Reducir movimiento», un borde en vez del temblor.
-            cell(p).orderWiggle(!lifted && !still, seed: p.id.hashValue).opacity(lifted ? 0 : 1)
-            if lifted { OrderHole() } else if still { OrderMark() }
+            cell(p).opacity(lifted ? 0 : 1)
+            if lifted { OrderHole() }
         }
         .environment(\.dropInto, lift.drag?.into == p.id)
         .contentShape(Rectangle())
@@ -700,12 +678,6 @@ struct ReorderGrid<Item: Identifiable, Destination: View, Cell: View>: View {
                 .offset(x: r.minX + lift.shift.width, y: r.minY + lift.shift.height)
                 .accessibilityHidden(true)
         }
-    }
-
-    /// Para los tests de interfaz (`orden-temblor`): cuántas portadas tiemblan y cuántas llevan el borde.
-    private func wiggleLog(_ count: Int) -> String {
-        let moving = count - (lift.drag == nil ? 0 : 1)
-        return OrderLog.wiggle(moving: moving, reduced: OrderWiggle.reduced(reduceMotion))
     }
 
     private func finish() {
@@ -1025,9 +997,8 @@ struct ImportView: View {
                     } footer: { Text(L("Puedes cerrar la app: al volver, la importación sigue donde se quedó.")) }
                 case .finished(let title, let detail):
                     Section {
-                        // Éxito: icono verde y texto del color del texto (docs/COLOR.md).
-                        Label { Text(title).foregroundStyle(.primary) } icon: { Image(systemName: "checkmark.circle.fill").foregroundStyle(.green) }
-                            .font(.headline)
+                        Label(title, systemImage: "checkmark.circle.fill")
+                            .font(.headline).foregroundStyle(.green)
                         Text(detail).font(.subheadline)
                         Button(L("Listo")) { dismiss() }
                     }
@@ -1110,7 +1081,7 @@ struct ImportView: View {
                 .disabled(busy)
 
                 if let notice {
-                    Section { Label { Text(notice).foregroundStyle(.primary) } icon: { Image(systemName: "checkmark.circle.fill").foregroundStyle(.green) } }
+                    Section { Label(notice, systemImage: "checkmark.circle.fill").foregroundStyle(.green) }
                 }
                 if let errorText {
                     Section { Label(errorText, systemImage: "exclamationmark.triangle.fill").foregroundStyle(.orange) }

@@ -1134,13 +1134,6 @@ struct PinnedCarousel: View {
                     .onPreferenceChange(OrderFrameKey<UUID>.self) { lift.frames = $0 }
                     .overlay(alignment: .topLeading) { liftedCopy(byID) }
                     .overlay(alignment: .topLeading) { if ordering { OrderDebugLabel(text: lift.debug, id: "orden-registro-fijados") } }
-                    .overlay(alignment: .topLeading) {
-                        if ordering {
-                            let moving = shown.count - (lift.drag == nil ? 0 : 1)
-                            OrderDebugLabel(text: OrderLog.wiggle(moving: moving, reduced: OrderWiggle.reduced(reduceMotion)),
-                                            id: "orden-temblor-fijados")
-                        }
-                    }
                     .carouselLayout()
                     .padding(.horizontal, carouselUsesMargins ? 0 : inset)
                     // Sitio para la sombra de la portada levantada.
@@ -1177,12 +1170,9 @@ struct PinnedCarousel: View {
         if ordering {
             // No se toca: se coge con el dedo quieto y en su sitio queda el hueco.
             let lifted = lift.drag?.id == p.id
-            let still = OrderWiggle.reduced(reduceMotion)
             ZStack(alignment: .top) {
-                // Tiemblan todas menos la cogida; con «Reducir movimiento», un borde en vez del temblor (prompt 2-0).
-                label(p).orderWiggle(!lifted && !still, seed: p.id.hashValue).opacity(lifted ? 0 : 1)
+                label(p).opacity(lifted ? 0 : 1)
                 if lifted { OrderHole(radius: PlaylistCardV11.corner, side: PlaylistCardV11.side) }
-                else if still { OrderMark(radius: PlaylistCardV11.corner, side: PlaylistCardV11.side) }
             }
             .contentShape(Rectangle())
             .gesture(OrderGesture.lift(pressing: $pressing,

@@ -157,7 +157,7 @@ private var settingsIndex: [SettingEntry] { [
 ] }
 
 struct SettingsView: View {
-    @ObservedObject private var account = Account.shared
+    @ObservedObject private var cuenta = CuentaPear.shared
     /// Guía de Ajustes y recorrido de novedades (1.1): abren las pantallas por su ruta.
     @ObservedObject private var guide = Guide.shared
     @AppStorage("theme") private var themeID = AppTheme.glass.rawValue
@@ -226,7 +226,7 @@ struct SettingsView: View {
         Section {
             NavigationLink { AccountView() } label: {
                 SettingsRow(icon: "person.crop.circle.fill", palette: 4, title: L("Cuenta"), value: nil,
-                            subtitle: account.state.email ?? L("Opcional · guarda tu biblioteca cifrada en la nube"))
+                            subtitle: cuenta.tieneCuenta ? L("Tu cuenta está en este móvil") : L("Opcional · guarda tu biblioteca cifrada en la nube"))
             }
         }
         .glassRow()

@@ -40,10 +40,6 @@ enum Demo {
         /// Sólo los tests de interfaz: 24 playlists más, para que la cuadrícula pase de la pantalla (desplazamiento al
         /// borde en el modo «Ordenar»). No es una captura.
         var manyPlaylists = false
-        /// «Reducir movimiento» para el temblor del modo «Ordenar» (prompt 2-0): las portadas llevan el borde en vez de
-        /// temblar. Lo llevan las capturas de «Ordenar», como en Android (`ScreenshotTest` lo fuerza en todas), para
-        /// que la pantalla se quede quieta y salga recta.
-        var reduceMotion = false
     }
 
     /// Los mismos nombres que las PNG de Android (shared/design/compare_shots.py los empareja).
@@ -84,12 +80,10 @@ enum Demo {
         // «Tu música» ordenando: «Hecho», flechas y asa (revisión del bloque 1).
         "53_tu_musica_ordenar": Scenario(playing: false, tab: .library, musicEditing: true),
         // Modo «Ordenar» de Playlists (paso C de menús y gestos): sin barra, asas ni buscador.
-        "54_playlists_ordenar": Scenario(playing: false, tab: .library, route: .playlists, folders: true, playlistsOrdering: true, reduceMotion: true),
-        "55_playlists_ordenar_oscuro": Scenario(appearance: "dark", playing: false, tab: .library, route: .playlists, folders: true, playlistsOrdering: true, reduceMotion: true),
+        "54_playlists_ordenar": Scenario(playing: false, tab: .library, route: .playlists, folders: true, playlistsOrdering: true),
+        "55_playlists_ordenar_oscuro": Scenario(appearance: "dark", playing: false, tab: .library, route: .playlists, folders: true, playlistsOrdering: true),
         // Sólo tests de interfaz (BibliotecaUITests): Playlists con 24 playlists más, para el desplazamiento al borde.
         "ui_muchas_playlists": Scenario(playing: false, tab: .library, route: .playlists, manyPlaylists: true),
-        // Sólo tests de interfaz: la Biblioteca con «Reducir movimiento», para ver que en «Ordenar» nada tiembla.
-        "ui_reducir_movimiento": Scenario(playing: false, tab: .library, reduceMotion: true),
         // Tráiler v2 (4-11-2026): con `-demoCatalog YES` (DemoCatalog.swift), todo con canciones de Michael Bennet.
         "v2_01_inicio": Scenario(tab: .home),
         "v2_02_busqueda": Scenario(tab: .home, query: "Michael Bennet"),

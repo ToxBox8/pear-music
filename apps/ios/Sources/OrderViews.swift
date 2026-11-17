@@ -208,56 +208,6 @@ struct OrderHole: View {
     }
 }
 
-/// El temblor del modo «Ordenar» (prompt 2-0 del bloque 2): todas las portadas que se pueden mover tiemblan, como los
-/// iconos del iPhone al reordenar las apps. Suave (poco ángulo, como el de «Tu música») y cada portada con su desfase y
-/// su ritmo, para que no vayan todas a la vez. La cogida no tiembla. Con «Reducir movimiento» no tiembla ninguna: cada
-/// portada lleva un borde fino del color del texto (`OrderMark`). Sin shu. Igual que `orderWiggle` en Android.
-enum OrderWiggle {
-    /// Cuánto se inclina a cada lado, en grados.
-    static let degrees: Double = 1.1
-    /// Una ida y vuelta, en segundos: de `period` a `period + spread` según la portada.
-    static let period: Double = 0.52
-    static let spread: Double = 0.12
-    /// El borde de «Reducir movimiento», en puntos.
-    static let border: CGFloat = 1
-
-    /// «Reducir movimiento» del sistema o, sólo en las capturas y los tests, el del escenario (`Demo`).
-    static func reduced(_ system: Bool) -> Bool { system || Demo.current?.reduceMotion == true }
-
-    /// El ángulo de una portada en un momento: un seno con el desfase y el ritmo que salen de `seed` (su id).
-    static func angle(at date: Date, seed: Int) -> Double {
-        let bits = UInt(bitPattern: seed)
-        let phase = Double(bits % 997) / 997
-        let rate = period + spread * Double((bits / 997) % 101) / 100
-        let t = date.timeIntervalSinceReferenceDate / rate + phase
-        return degrees * sin(2 * .pi * t)
-    }
-}
-
-extension View {
-    /// Tiembla mientras `on` (en «Ordenar», no cogida y sin «Reducir movimiento»). Es un giro de dibujo: no cambia el
-    /// marco que mide el arrastre (`OrderFrameKey` se lee fuera). Con `on` apagado el reloj se para y se queda recta.
-    func orderWiggle(_ on: Bool, seed: Int) -> some View {
-        TimelineView(.animation(minimumInterval: nil, paused: !on)) { tl in
-            rotationEffect(.degrees(on ? OrderWiggle.angle(at: tl.date, seed: seed) : 0))
-        }
-    }
-}
-
-/// «Reducir movimiento» en «Ordenar»: en vez de temblar, un borde fino del color del texto alrededor de la portada.
-struct OrderMark: View {
-    var radius: CGFloat = Tokens.Radius.row
-    var side: CGFloat? = nil
-    var body: some View {
-        RoundedRectangle(cornerRadius: radius, style: .continuous)
-            .strokeBorder(Color.primary, lineWidth: OrderWiggle.border)
-            .aspectRatio(1, contentMode: .fit)
-            .frame(width: side, height: side)
-            .allowsHitTesting(false)
-            .accessibilityHidden(true)
-    }
-}
-
 extension View {
     /// La portada levantada: un poco más grande, inclinada y con sombra (con «Reducir movimiento», sólo la sombra).
     /// Se dibuja encima de la cuadrícula en el sitio del dedo, sin animación.
@@ -300,7 +250,7 @@ final class OrderLift<ID: Hashable>: ObservableObject {
     private func log(_ fail: String? = nil) {
         guard Demo.current != nil else { return }
         if let fail { lastFail = fail }
-        let text = OrderLog.lift(asked: asked, started: started, fail: lastFail, cells: frames.count, order: order.count)
+        let text = "pedidos=\(asked) arrancados=\(started) fallo=\(lastFail) celdas=\(frames.count) orden=\(order.count) " // i18n: no
             + "ancla=\(anchor.attached ? "si" : "no") listas=\(anchor.scrollViews.count) movimientos=\(moves) "
             + "inicio=\(startLocal == nil ? "no" : "si") soltados=\(ended)"
         if text != debug { debug = text }
@@ -354,16 +304,7 @@ final class OrderLift<ID: Hashable>: ObservableObject {
         guard holding, var d = drag, let w = scroller.finger, let p = anchor.local(w), let s = startLocal else { return }
         let moved = CGSize(width: p.x - s.x, height: p.y - s.y)
         let before = d.into
-        let next = d.move(to: p, translation: moved, order: order, now: CACurrentMediaTime(), canDropInto: canDropInto, canSwap: canSwap)
-        // En el centro de una carpeta pero aún sin el tiempo: con el dedo quieto no llega ningún movimiento, así que se
-        // vuelve a mirar al cumplirse (prompt 2-0).
-        if d.into == nil, d.pendingInto != nil {
-            let token = generation
-            DispatchQueue.main.asyncAfter(deadline: .now() + OrderDrag<ID>.intoDwell + 0.02) { [weak self] in
-                guard let self, self.generation == token else { return }
-                self.follow()
-            }
-        }
+        let next = d.move(to: p, translation: moved, order: order, canDropInto: canDropInto, canSwap: canSwap)
         if next != order {
             UISelectionFeedbackGenerator().selectionChanged()
             // Sólo se animan las que se apartan; la levantada va con el dedo (`shift`, fuera de la animación).

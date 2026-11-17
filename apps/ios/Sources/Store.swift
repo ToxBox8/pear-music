@@ -269,13 +269,6 @@ final class Library: ObservableObject {
         guard !n.isEmpty, let i = folders.firstIndex(where: { $0.id == id }) else { return }
         folders[i].name = n
     }
-    /// Icono y color de una carpeta (prompt 2-0; reglas en docs/LIBRARY_FORMAT.md › «Icono y color de carpeta»). Sin
-    /// icono vuelve el mosaico; el color se guarda igual, aunque sin icono no se pinte.
-    func setFolderLook(_ id: String, icon: String?, tint: Int?) {
-        guard let i = folders.firstIndex(where: { $0.id == id }) else { return }
-        folders[i].icon = icon.flatMap { PlaylistIcons.names.contains($0) ? $0 : nil }
-        folders[i].tint = tint.flatMap { PlaylistIcons.paletteRange.contains($0) ? $0 : nil }
-    }
     /// Mueve una carpeta (con todo lo suyo) dentro de `target` (nil = arriba del todo). false si no cabe.
     @discardableResult
     func moveFolder(_ id: String, to target: String?) -> Bool {
