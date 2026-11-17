@@ -791,7 +791,7 @@ struct OrderDrag<ID: Hashable> {
     var into: ID?
     /// La carpeta en cuyo centro está el dedo, aún sin el tiempo, y desde cuándo (`now` de `move`).
     private(set) var pendingInto: ID?
-    private var pendingSince: TimeInterval = 0
+    private(set) var pendingSince: TimeInterval = 0
     /// Ha cambiado de puesto alguna vez (aunque vuelva al suyo).
     var changed = false
 
