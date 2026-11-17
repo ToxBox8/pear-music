@@ -369,7 +369,15 @@ enum LibraryOrder {
 
     /// «Tus álbumes»: como se guardaron o, con «custom», el orden propio; lo nuevo va al final.
     static func albums(_ albums: [Playlist], sort: String, order: [String]) -> [Playlist] {
-        guard sort == "custom" else { return albums }
+        // Los mismos criterios que Playlists en el ⋯ de Tus álbumes (prompt 2-0); «recent» es el orden guardado.
+        let byName: (Playlist, Playlist) -> Bool = { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+        switch sort {
+        case "name": return albums.sorted(by: byName)
+        case "nameDesc": return albums.sorted { byName($1, $0) }
+        case "count": return albums.sorted { $0.songs.count > $1.songs.count }
+        case "custom": break
+        default: return albums
+        }
         let byID = Dictionary(albums.map { ($0.id.uuidString, $0) }, uniquingKeysWith: { a, _ in a })
         var seen = Set<String>()
         let kept = order.filter { byID[$0] != nil && seen.insert($0).inserted }
@@ -779,21 +787,43 @@ struct OrderDrag<ID: Hashable> {
     let start: Int
     /// Lo que se ha movido el dedo desde que la cogió.
     var translation: CGSize = .zero
-    /// Carpeta marcada para soltarla dentro, si el dedo está encima de una que la admite.
+    /// Carpeta marcada para soltarla dentro: el dedo lleva `intoDwell` en el centro de su portada.
     var into: ID?
+    /// La carpeta en cuyo centro está el dedo, aún sin el tiempo, y desde cuándo (`now` de `move`).
+    private(set) var pendingInto: ID?
+    private var pendingSince: TimeInterval = 0
     /// Ha cambiado de puesto alguna vez (aunque vuelva al suyo).
     var changed = false
 
-    /// El dedo se mueve a `location`. Devuelve el orden nuevo (el mismo si no cambia nada) y apunta `into`.
-    mutating func move(to location: CGPoint, translation: CGSize, order: [ID],
+    /// Para meterla en una carpeta (prompt 2-0, lo pidió Toxbox: que no la meta si sólo se quiere mover al lado): el
+    /// dedo tiene que estar en el centro de la portada de la carpeta (sin este margen a cada lado, en fracción de su
+    /// ancho) y quedarse ahí este tiempo. Pasar por encima o por el borde no la marca.
+    static var intoInset: CGFloat { 0.2 }
+    static var intoDwell: TimeInterval { 0.3 }
+
+    /// ¿Está `p` en el centro de la portada de `slot`? La portada es el cuadrado de arriba de la celda.
+    static func inCore(_ p: CGPoint, of slot: CGRect) -> Bool {
+        let side = min(slot.width, slot.height), m = side * intoInset
+        return CGRect(x: slot.minX + m, y: slot.minY + m, width: slot.width - 2 * m, height: side - 2 * m).contains(p)
+    }
+
+    /// El dedo se mueve a `location` (en el momento `now`, en segundos). Devuelve el orden nuevo (el mismo si no
+    /// cambia nada) y apunta `into`.
+    mutating func move(to location: CGPoint, translation: CGSize, order: [ID], now: TimeInterval = 0,
                        canDropInto: (ID, ID) -> Bool = { _, _ in false },
                        canSwap: (ID, ID) -> Bool = { _, _ in true }) -> [ID] {
         self.translation = translation
         guard let index = slots.first(where: { $0.value.contains(location) })?.key, order.indices.contains(index),
-              order[index] != id else { into = nil; return order }
+              order[index] != id else { into = nil; pendingInto = nil; return order }
         let target = order[index]
-        if canDropInto(id, target) { into = target; return order }
+        if canDropInto(id, target) {
+            guard let slot = slots[index], Self.inCore(location, of: slot) else { into = nil; pendingInto = nil; return order }
+            if pendingInto != target { pendingInto = target; pendingSince = now }
+            into = now - pendingSince >= Self.intoDwell ? target : nil
+            return order
+        }
         into = nil
+        pendingInto = nil
         guard canSwap(id, target) else { return order }
         changed = true
         return GridOrder.moved(id, to: index, in: order)
@@ -804,5 +834,19 @@ struct OrderDrag<ID: Hashable> {
     func offset(in order: [ID]) -> CGSize {
         guard let now = order.firstIndex(of: id), let a = slots[start], let b = slots[now] else { return translation }
         return CGSize(width: translation.width - (b.minX - a.minX), height: translation.height - (b.minY - a.minY))
+    }
+}
+
+/// El registro del modo «Ordenar» que leen los tests de interfaz (`OrderDebugLabel`, sólo con `-screenshotScenario`).
+/// Está aquí, con los modelos, porque no es texto de la interfaz: no se traduce.
+enum OrderLog {
+    /// El arrastre: gestos pedidos y arrancados, por qué no, celdas medidas y portadas en el orden.
+    static func lift(asked: Int, started: Int, fail: String, cells: Int, order: Int) -> String {
+        "pedidos=\(asked) arrancados=\(started) fallo=\(fail) celdas=\(cells) orden=\(order) "
+    }
+
+    /// El temblor (prompt 2-0): cuántas portadas tiemblan y cuántas llevan el borde de «Reducir movimiento».
+    static func wiggle(moving: Int, reduced: Bool) -> String {
+        reduced ? "tiemblan=0 bordes=\(moving)" : "tiemblan=\(moving) bordes=0"
     }
 }

@@ -1137,7 +1137,7 @@ struct PinnedCarousel: View {
                     .overlay(alignment: .topLeading) {
                         if ordering {
                             let moving = shown.count - (lift.drag == nil ? 0 : 1)
-                            OrderDebugLabel(text: OrderWiggle.reduced(reduceMotion) ? "tiemblan=0 bordes=\(moving)" : "tiemblan=\(moving) bordes=0",
+                            OrderDebugLabel(text: OrderLog.wiggle(moving: moving, reduced: OrderWiggle.reduced(reduceMotion)),
                                             id: "orden-temblor-fijados")
                         }
                     }

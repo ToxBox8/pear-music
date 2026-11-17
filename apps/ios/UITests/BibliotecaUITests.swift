@@ -571,7 +571,6 @@ final class BibliotecaUITests: XCTestCase {
         let wiggle = orderLog("orden-temblor-fijados")
         note("temblor", wiggle)
         XCTAssertTrue(wiggle.contains("tiemblan=2 bordes=0"), "En «Ordenar» de Fijados no tiemblan las dos portadas; \(wiggle)")
-        XCTAssertTrue(moves(before[0]), "La portada de «\(before[0])» no tiembla en «Ordenar» de Fijados")
         holdAndDrag(before[0], to: center(before[1]))
         let now = pinned.sorted { any($0).frame.minX < any($1).frame.minX }
         shot("4-movido")
@@ -585,39 +584,24 @@ final class BibliotecaUITests: XCTestCase {
     }
     // MARK: Prompt 2-0 del bloque 2: temblor, arrastrar a los cuatro lados y Tus álbumes
 
-    /// ¿Se mueve lo que se ve de `name`? Cuatro capturas de la celda seguidas: si alguna cambia, se mueve. (Cuatro,
-    /// porque dos tomas justo a los dos lados del punto más alto del giro saldrían iguales.)
-    private func moves(_ name: String) -> Bool {
-        let e = any(name)
-        guard e.exists else { return false }
-        let first = e.screenshot().pngRepresentation
-        for _ in 0..<4 {
-            usleep(110_000)
-            if e.screenshot().pngRepresentation != first { return true }
-        }
-        return false
-    }
-
-    /// En «Ordenar» de Playlists tiemblan todas las portadas (también Descargadas y Favoritos), sin borde. Fuera de
-    /// «Ordenar» nada se mueve (si no, el test no probaría nada).
+    /// En «Ordenar» de Playlists tiemblan todas las portadas (también Descargadas y Favoritos), sin borde. Se lee el
+    /// registro `orden-temblor`: comparar capturas no sirve, porque el fondo Cristal se mueve solo (CI 43959102005).
     func testOrdenarLasPortadasTiemblan() {
         launch("01_biblioteca_cristal")
         openPlaylists()
         XCTAssertTrue(any("Noche").waitForExistence(timeout: 5))
         sleep(1)
-        XCTAssertFalse(moves("Noche"), "Fuera de «Ordenar» la portada de «Noche» ya se mueve: el test no prueba nada")
         startOrdering()
         sleep(1)
         shot("1-ordenando")
         let log = orderLog("orden-temblor")
         note("temblor", log)
         XCTAssertTrue(log.contains("tiemblan=5 bordes=0"), "En «Ordenar» no tiemblan las cinco portadas; \(log)")
-        XCTAssertTrue(moves("Noche"), "La portada de «Noche» no tiembla en «Ordenar»")
-        XCTAssertTrue(moves("Descargadas"), "La portada de «Descargadas» no tiembla en «Ordenar»")
         app.buttons["Hecho"].tap()
         XCTAssertTrue(app.navigationBars["Playlists"].waitForExistence(timeout: 5))
         sleep(1)
-        XCTAssertFalse(moves("Noche"), "Al salir de «Ordenar» la portada de «Noche» sigue temblando")
+        XCTAssertFalse(app.descendants(matching: .any).matching(identifier: "orden-temblor").firstMatch.exists,
+                       "Al salir de «Ordenar» las portadas siguen temblando")
     }
 
     /// Con «Reducir movimiento» (escenario 54, como la captura) nada tiembla: cada portada lleva un borde.
@@ -630,7 +614,6 @@ final class BibliotecaUITests: XCTestCase {
         note("temblor", log)
         XCTAssertTrue(log.contains("tiemblan=0"), "Con «Reducir movimiento» las portadas tiemblan; \(log)")
         XCTAssertFalse(log.contains("bordes=0"), "Con «Reducir movimiento» las portadas no llevan el borde; \(log)")
-        XCTAssertFalse(moves("Carpeta Viajes"), "Con «Reducir movimiento» la carpeta «Viajes» se mueve")
     }
 
     /// Coge la portada que está en `from` (orden de lectura de la cuadrícula de Playlists) y la suelta en el sitio de la
@@ -711,7 +694,6 @@ final class BibliotecaUITests: XCTestCase {
         let wiggle = orderLog("orden-temblor")
         note("temblor", wiggle)
         XCTAssertTrue(wiggle.contains("tiemblan=3 bordes=0"), "En «Ordenar» de Tus álbumes no tiemblan los tres; \(wiggle)")
-        XCTAssertTrue(moves(before[1]), "La portada de «\(before[1])» no tiembla en «Ordenar»")
         holdAndDrag(before[0], to: center(before[1]))
         let log = orderLog()
         note("registro", log)
@@ -728,6 +710,8 @@ final class BibliotecaUITests: XCTestCase {
     func testAlbumesSinTemblorConReducirMovimiento() {
         launch("ui_reducir_movimiento")
         openAlbums()
+        app.buttons["Más opciones"].tap()
+        XCTAssertTrue(app.buttons["Ordenar"].waitForExistence(timeout: 5), "El ⋯ de Tus álbumes no ofrece «Ordenar»")
         app.buttons["Ordenar"].tap()
         XCTAssertTrue(app.buttons["Hecho"].waitForExistence(timeout: 5), "«Ordenar» de Tus álbumes no entra en el modo")
         sleep(1)
@@ -735,6 +719,64 @@ final class BibliotecaUITests: XCTestCase {
         let log = orderLog("orden-temblor")
         note("temblor", log)
         XCTAssertTrue(log.contains("tiemblan=0 bordes=3"), "Con «Reducir movimiento» los álbumes tiemblan o no llevan el borde; \(log)")
-        XCTAssertFalse(moves(albums[0]), "Con «Reducir movimiento» la portada de «\(albums[0])» se mueve")
+    }
+    // MARK: Prompt 2-0 (segunda tanda): el ⋯ de Tus álbumes, el icono de carpeta y soltar junto a una carpeta
+
+    /// Tus álbumes tiene el mismo ⋯ que Playlists: «Ordenar» y «Ordenar por»; «Nombre (A-Z)» los ordena.
+    func testAlbumesConElMismoMenuQuePlaylists() {
+        launch("01_biblioteca_cristal")
+        openAlbums()
+        app.buttons["Más opciones"].tap()
+        let sort = app.buttons["Nombre (A-Z)"]
+        XCTAssertTrue(sort.waitForExistence(timeout: 5), "El ⋯ de Tus álbumes no ofrece «Nombre (A-Z)»")
+        for item in ["Ordenar", "Añadidos recientemente", "Nombre (Z-A)", "Nº de canciones", "A mano"] {
+            XCTAssertTrue(app.buttons[item].exists, "Al ⋯ de Tus álbumes le falta «\(item)»")
+        }
+        shot("1-menu")
+        sort.tap()
+        sleep(1)
+        let now = reading(albums)
+        shot("2-a-z")
+        XCTAssertEqual(now, albums.sorted(), "«Nombre (A-Z)» no ordena los álbumes por nombre")
+    }
+
+    /// Menú de una carpeta › Cambiar icono…: elegir un icono y un color los deja elegidos; «Mosaico» vuelve atrás.
+    func testCambiarElIconoDeUnaCarpeta() {
+        launch("43_carpetas", ready: "Viajes")
+        XCTAssertTrue(app.navigationBars["Playlists"].waitForExistence(timeout: 10), "No se abrió Playlists")
+        any("Carpeta Viajes").press(forDuration: 1.2)
+        let item = app.buttons["Cambiar icono…"]
+        XCTAssertTrue(item.waitForExistence(timeout: 3), "El menú de una carpeta no ofrece «Cambiar icono…»")
+        item.tap()
+        XCTAssertTrue(app.navigationBars["Icono de la carpeta"].waitForExistence(timeout: 5), "No se abre «Icono de la carpeta»")
+        let color = app.buttons["color-2"]
+        XCTAssertFalse(color.isEnabled, "Sin icono, el color tiene que estar apagado")
+        app.buttons["icono-airplane"].tap()
+        XCTAssertTrue(color.isEnabled, "Con icono, el color tiene que poder elegirse")
+        color.tap()
+        sleep(1)
+        shot("1-elegido")
+        XCTAssertTrue(app.buttons["icono-airplane"].isSelected, "El icono elegido no queda marcado")
+        XCTAssertTrue(color.isSelected, "El color elegido no queda marcado")
+        XCTAssertFalse(app.buttons["icono-mosaico"].isSelected, "«Mosaico» sigue marcado con un icono elegido")
+        app.buttons["Listo"].tap()
+        sleep(1)
+        shot("2-cuadricula")
+        XCTAssertTrue(app.navigationBars["Playlists"].exists, "«Listo» no vuelve a Playlists")
+    }
+
+    /// Soltar una playlist en el borde de una carpeta (no en su centro) no la mete dentro.
+    func testSoltarEnElBordeDeUnaCarpetaNoLaMete() {
+        launch("43_carpetas", ready: "Viajes")
+        XCTAssertTrue(app.navigationBars["Playlists"].waitForExistence(timeout: 10), "No se abrió Playlists")
+        XCTAssertTrue(any("Domingo lento").waitForExistence(timeout: 5))
+        startOrdering()
+        let edge = any("Carpeta Viajes").coordinate(withNormalizedOffset: CGVector(dx: 0.06, dy: 0.3))
+        holdAndDrag("Domingo lento", to: edge)
+        sleep(1)
+        shot("1-soltada")
+        let log = orderLog()
+        note("registro", log)
+        XCTAssertTrue(any("Domingo lento").exists, "Soltar «Domingo lento» en el borde de «Viajes» la ha metido dentro; \(log)")
     }
 }

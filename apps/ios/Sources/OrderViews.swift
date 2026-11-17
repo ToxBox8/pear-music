@@ -300,7 +300,7 @@ final class OrderLift<ID: Hashable>: ObservableObject {
     private func log(_ fail: String? = nil) {
         guard Demo.current != nil else { return }
         if let fail { lastFail = fail }
-        let text = "pedidos=\(asked) arrancados=\(started) fallo=\(lastFail) celdas=\(frames.count) orden=\(order.count) "
+        let text = OrderLog.lift(asked: asked, started: started, fail: lastFail, cells: frames.count, order: order.count)
             + "ancla=\(anchor.attached ? "si" : "no") listas=\(anchor.scrollViews.count) movimientos=\(moves) "
             + "inicio=\(startLocal == nil ? "no" : "si") soltados=\(ended)"
         if text != debug { debug = text }
@@ -354,7 +354,16 @@ final class OrderLift<ID: Hashable>: ObservableObject {
         guard holding, var d = drag, let w = scroller.finger, let p = anchor.local(w), let s = startLocal else { return }
         let moved = CGSize(width: p.x - s.x, height: p.y - s.y)
         let before = d.into
-        let next = d.move(to: p, translation: moved, order: order, canDropInto: canDropInto, canSwap: canSwap)
+        let next = d.move(to: p, translation: moved, order: order, now: CACurrentMediaTime(), canDropInto: canDropInto, canSwap: canSwap)
+        // En el centro de una carpeta pero aún sin el tiempo: con el dedo quieto no llega ningún movimiento, así que se
+        // vuelve a mirar al cumplirse (prompt 2-0).
+        if d.into == nil, d.pendingInto != nil {
+            let token = generation
+            DispatchQueue.main.asyncAfter(deadline: .now() + OrderDrag<ID>.intoDwell + 0.02) { [weak self] in
+                guard let self, self.generation == token else { return }
+                self.follow()
+            }
+        }
         if next != order {
             UISelectionFeedbackGenerator().selectionChanged()
             // Sólo se animan las que se apartan; la levantada va con el dedo (`shift`, fuera de la animación).

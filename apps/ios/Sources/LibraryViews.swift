@@ -93,6 +93,8 @@ struct PlaylistsListView: View {
     @State private var ordering = Demo.current?.playlistsOrdering == true
     @State private var moving: MoveItem?
     @State private var deleting: PlaylistFolder?
+    /// La carpeta cuyo icono se está eligiendo (prompt 2-0).
+    @State private var lookFolder: PlaylistFolder?
     @State private var deletingPlaylist: Playlist?
     @State private var editingPlaylist: Playlist?
     @State private var opened: Entry?
@@ -230,6 +232,7 @@ struct PlaylistsListView: View {
         }
         .sheet(item: $moving) { MoveToFolderSheet(item: $0) }
         .sheet(item: $editingPlaylist) { PlaylistEditor(playlistID: $0.id) }
+        .sheet(item: $lookFolder) { FolderLookEditor(folderID: $0.id) }
         .navigationDestination(isPresented: Binding(get: { opened != nil }, set: { if !$0 { opened = nil } })) {
             if let p = opened?.playlist { PlaylistV11View(playlistID: p.id) }
             else if let f = opened?.folder { PlaylistsListView(folderID: f.id) }
@@ -301,6 +304,7 @@ struct PlaylistsListView: View {
             Button(role: .destructive) { deletingPlaylist = p } label: { Label(L("Eliminar…"), systemImage: "trash") }
         } else if let f = e.folder {
             Button { rename(f) } label: { Label(L("Renombrar"), systemImage: "pencil") }
+            Button { lookFolder = f } label: { Label(L("Cambiar icono…"), systemImage: "paintpalette") }
             Button { moving = .folder(f.id) } label: { Label(L("Mover carpeta a…"), systemImage: "folder") }
             Button { startOrdering(e.key) } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
             Divider()
@@ -332,6 +336,7 @@ struct PlaylistsListView: View {
         if let folder {
             Divider()
             Button { rename(folder) } label: { Label(L("Renombrar"), systemImage: "pencil") }
+            Button { lookFolder = folder } label: { Label(L("Cambiar icono…"), systemImage: "paintpalette") }
             Button { moving = .folder(folder.id) } label: { Label(L("Mover carpeta a…"), systemImage: "folder") }
             Button(role: .destructive) { deleting = folder } label: { Label(L("Eliminar carpeta…"), systemImage: "trash") }
         }
@@ -434,6 +439,12 @@ struct AlbumsListView: View {
     @State private var deleting: Playlist?
     @State private var opened: Playlist?
 
+    /// Los criterios del ⋯, los mismos que Playlists.
+    private static var sorts: [(String, String)] { [
+        ("recent", L("Añadidos recientemente")), ("name", L("Nombre (A-Z)")), ("nameDesc", L("Nombre (Z-A)")),
+        ("count", L("Nº de canciones")), ("custom", L("A mano")),
+    ] }
+
     var body: some View {
         let albums = LibraryOrder.albums(library.albums, sort: albumSort, order: LibraryOrder.decode(albumOrder))
         let shown = ordering ? albums : LocalSearch.filter(albums, query) { "\($0.name) \($0.album?.artist ?? "")" }
@@ -473,7 +484,15 @@ struct AlbumsListView: View {
                 if ordering {
                     Button(L("Hecho")) { setOrdering(false) }.fontWeight(.semibold)
                 } else if albums.count > 1 {
-                    Button(L("Ordenar")) { start() }
+                    // El mismo ⋯ que Playlists: «Ordenar» y el criterio (prompt 2-0, lo pidió Toxbox).
+                    Menu {
+                        Button { start() } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
+                        Picker(L("Ordenar por"), selection: $albumSort) {
+                            ForEach(Self.sorts, id: \.0) { item in Text(item.1).tag(item.0) }
+                        }
+                        .pickerStyle(.inline)
+                    } label: { Image(systemName: "ellipsis.circle") }
+                        .accessibilityLabel(L("Más opciones"))
                 }
             }
         }
@@ -686,7 +705,7 @@ struct ReorderGrid<Item: Identifiable, Destination: View, Cell: View>: View {
     /// Para los tests de interfaz (`orden-temblor`): cuántas portadas tiemblan y cuántas llevan el borde.
     private func wiggleLog(_ count: Int) -> String {
         let moving = count - (lift.drag == nil ? 0 : 1)
-        return OrderWiggle.reduced(reduceMotion) ? "tiemblan=0 bordes=\(moving)" : "tiemblan=\(moving) bordes=0"
+        return OrderLog.wiggle(moving: moving, reduced: OrderWiggle.reduced(reduceMotion))
     }
 
     private func finish() {
