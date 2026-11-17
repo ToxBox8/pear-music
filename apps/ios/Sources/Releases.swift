@@ -6,8 +6,9 @@ import Foundation
 enum Releases {
     static let artistsCount = ReleaseMix.artists
 
-    /// Los `n` artistas que más escuchas: escuchas de las estadísticas (×2) + canciones guardadas.
-    @MainActor static func topArtists(saved: [Song], n: Int = artistsCount) -> [String] {
+    /// Los `n` artistas que más escuchas (16 candidatos para 8 huecos, T7): escuchas de las estadísticas (×2) + canciones
+    /// guardadas.
+    @MainActor static func topArtists(saved: [Song], n: Int = ReleaseMix.candidates) -> [String] {
         var score: [String: Int] = [:]
         saved.forEach { score[primaryArtist($0.artist), default: 0] += 1 }
         let stats = PlayStats.shared

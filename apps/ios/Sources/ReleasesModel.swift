@@ -59,12 +59,16 @@ enum ReleaseMix {
     /// «Nuevo» dura 7 días desde que se ve por primera vez.
     static let newFor: Int64 = 7 * 24 * 3600 * 1000
     static let namePrefix = "name:"
+    /// Cuántos de los más escuchados se miran como candidatos: más que `artists`, para que, si alguno no está en YouTube
+    /// Music, el hueco lo ocupe el siguiente (T7).
+    static let candidates = 16
 
     /// Año mínimo que cuenta como novedad: este año, o también el pasado en enero y febrero.
     static func minYear(year: Int, month: Int) -> Int { year - (month <= 2 ? 1 : 0) }
 
     /// Qué artistas salen: todos los seguidos (en su orden) y, si son menos de 8, los más escuchados que no sigues
-    /// hasta llegar a 8. `top` va de más a menos escuchado, con su nombre plegado (`LocalSearch.fold`).
+    /// hasta llegar a 8. `top` va de más a menos escuchado, con su nombre plegado (`LocalSearch.fold`). Los que ya se
+    /// buscaron por nombre y no están (`resolved` vacío) se saltan.
     static func sources(followed: [FollowedArtist], top: [(name: String, folded: String)],
                         resolved: [String: String], fold: (String) -> String) -> [ReleaseSource] {
         var out = followed.map { ReleaseSource(key: $0.browseId, browseId: $0.browseId, name: $0.name, followed: true) }
@@ -72,6 +76,8 @@ enum ReleaseMix {
         let followedNames = Set(followed.map { fold($0.name) })
         for t in top where out.count < artists {
             guard !followedNames.contains(t.folded) else { continue }
+            // Buscado y no encontrado (T7): no ocupa hueco ni se vuelve a buscar mientras siga entre los más escuchados.
+            if resolved[t.folded] == "" { continue }
             let id = resolved[t.folded].flatMap { $0.isEmpty ? nil : $0 }
             if let id, followedIDs.contains(id) { continue }
             let key = id ?? namePrefix + t.folded

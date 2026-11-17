@@ -1025,8 +1025,9 @@ struct ImportView: View {
                     } footer: { Text(L("Puedes cerrar la app: al volver, la importación sigue donde se quedó.")) }
                 case .finished(let title, let detail):
                     Section {
-                        Label(title, systemImage: "checkmark.circle.fill")
-                            .font(.headline).foregroundStyle(.green)
+                        // Éxito: icono verde y texto del color del texto (docs/COLOR.md).
+                        Label { Text(title).foregroundStyle(.primary) } icon: { Image(systemName: "checkmark.circle.fill").foregroundStyle(.green) }
+                            .font(.headline)
                         Text(detail).font(.subheadline)
                         Button(L("Listo")) { dismiss() }
                     }
@@ -1109,7 +1110,7 @@ struct ImportView: View {
                 .disabled(busy)
 
                 if let notice {
-                    Section { Label(notice, systemImage: "checkmark.circle.fill").foregroundStyle(.green) }
+                    Section { Label { Text(notice).foregroundStyle(.primary) } icon: { Image(systemName: "checkmark.circle.fill").foregroundStyle(.green) } }
                 }
                 if let errorText {
                     Section { Label(errorText, systemImage: "exclamationmark.triangle.fill").foregroundStyle(.orange) }
