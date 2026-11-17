@@ -33,6 +33,19 @@ final class CuentaPear: ObservableObject {
 
     private var token: String?
     private var tokenExp = 0
+    private var deMentira = false
+
+    /// Sólo capturas (`-screenshotScenario`): una cuenta de mentira, sin red ni claves (como `estadoDePrueba` de Android).
+    func estadoDePrueba() {
+        deMentira = true
+        cuentaId = "1X99P4D412HRCSNX9XJZYP85GR"
+        dispositivos = [
+            Dispositivo(id: "WR85D13CWP6P3DAEZ6QB9H13HR", nombre: "iPhone 16", plataforma: "ios", visto: 1763400000, este: true),
+            Dispositivo(id: "1X99P4D412HRCSNX9XJZYP85GR", nombre: "Pixel de Ana", plataforma: "android", visto: 1763390000, este: false),
+        ]
+        // La pub_rec de shared/spec/vectores/hkdf.json: su clave es TN2T-D4WT-QT75-ZFCX-H5W9-QQTJ-2W (CuentaUITests).
+        meta.pubRec = "dIKLJHcIXwRQ7QUYY9Ec7so6OaW2UtKdC3gPfYwcW7o"
+    }
     private var meta = Meta()
 
     struct Meta: Codable {
@@ -137,7 +150,7 @@ final class CuentaPear: ObservableObject {
     /// La cuenta (pub_rec, borrar_en) y los dispositivos con sus altas (avisos).
     func cargar() async throws {
         try abierta()
-        guard tieneCuenta else { return }
+        guard tieneCuenta, !deMentira else { return }
         let c = try await json(try await conToken("GET", "/v1/id/cuenta"))
         if let pr = c["pub_rec"] as? String { meta.pubRec = pr }
         borrarEn = c["borrar_en"] as? Int

@@ -209,6 +209,13 @@ struct SettingsView: View {
             .themed()
             .demoRoute(.themePicker) { AppearanceSettings() }
             .demoRoute(.manage) { ManagePlaylistsView() }
+            .demoRoute(.cuenta) { AccountView() }
+            .demoRoute(.cuentaCrear) { CrearCuentaView() }
+            .demoRoute(.cuentaClave) { ClaveNuevaView(borrador: CuentaPear.shared.borrador()) }
+            .demoRoute(.cuentaEntrar) { EntrarConClaveView() }
+            .demoRoute(.cuentaDispositivos) { let _ = CuentaPear.shared.estadoDePrueba(); DispositivosView() }
+            .demoRoute(.cuentaComprobar) { let _ = CuentaPear.shared.estadoDePrueba(); ComprobarClaveView() }
+            .demoRoute(.cuentaBorrar) { let _ = CuentaPear.shared.estadoDePrueba(); BorrarCuentaView() }
             .miniPlayer()
         }
         .overlay {

@@ -52,6 +52,31 @@ private struct CampoClave: View {
     }
 }
 
+/// Casilla sin marcar por defecto, como las de la bienvenida (`ConsentBox`): cuadrado en `.tint` (texto, no relleno:
+/// no gasta el shu de la pantalla).
+private struct Casilla: View {
+    @Binding var marcada: Bool
+    let titulo: String
+    var enlace: (String, URL)? = nil
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: marcada ? "checkmark.square.fill" : "square").font(.title3)
+                .foregroundStyle(marcada ? AnyShapeStyle(.tint) : AnyShapeStyle(.tertiary))
+            VStack(alignment: .leading, spacing: 4) {
+                Text(titulo).fixedSize(horizontal: false, vertical: true)
+                if let enlace { Link(enlace.0, destination: enlace.1).font(.footnote.weight(.semibold)) }
+            }
+            Spacer(minLength: 0)
+        }
+        .frame(minHeight: 44)
+        .contentShape(Rectangle())
+        .onTapGesture { marcada.toggle() }
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isButton)
+        .accessibilityValue(marcada ? L("Marcada") : L("Sin marcar"))
+    }
+}
+
 // MARK: Raíz
 
 struct CuentaView: View {
@@ -97,16 +122,12 @@ struct CrearCuentaView: View {
             Cabecera(pose: "saltando", titulo: L("Tu cuenta, sin contraseña"),
                      texto: L("Nada que recordar ni que te puedan robar. Tu biblioteca viaja cifrada: sólo tus móviles pueden leerla."))
             Section {
-                Toggle(isOn: $terminos) {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(L("Acepto los Términos de uso y la Política de privacidad"))
-                        Link(L("Leer los textos"), destination: legal).font(.footnote)
-                    }
-                }.accessibilityIdentifier("casillaTerminos")
-                Toggle(L("Tengo 14 años o más"), isOn: $edad).accessibilityIdentifier("casillaEdad")
+                Casilla(marcada: $terminos, titulo: L("Acepto los Términos de uso y la Política de privacidad"), enlace: (L("Leer los textos"), legal))
+                    .accessibilityIdentifier("casillaTerminos")
+                Casilla(marcada: $edad, titulo: L("Tengo 14 años o más")).accessibilityIdentifier("casillaEdad")
             }
             Section {
-                Toggle(L("Enviar estadísticas de uso anónimas"), isOn: $telemetria).accessibilityIdentifier("casillaTelemetria")
+                Casilla(marcada: $telemetria, titulo: L("Enviar estadísticas de uso anónimas")).accessibilityIdentifier("casillaTelemetria")
             } footer: { Text(L("Opcional. Puedes crear la cuenta sin marcarla y cambiarlo cuando quieras en Tus datos.")) }
             Section {
                 Button(L("Crear cuenta")) {
@@ -145,7 +166,7 @@ struct ClaveNuevaView: View {
                      texto: L("Apúntala en papel y guárdala bien. Sin ella y sin tu móvil no se puede recuperar nada, y si la pierdes no se puede poner otra."))
             Section {
                 Text(CuentaCripto.mostrarClave(borrador.clave))
-                    .font(.system(.title3, design: .monospaced).weight(.semibold))
+                    .font(.system(.headline, design: .monospaced)).lineLimit(1).minimumScaleFactor(0.7)
                     .textSelection(.enabled).frame(maxWidth: .infinity).padding(.vertical, 6)
                     .accessibilityIdentifier("claveMostrada")
                 Button { UIPasteboard.general.string = borrador.clave; copiada = true } label: {
@@ -318,13 +339,9 @@ private struct TerminosNuevosView: View {
         NavigationStack {
             Form {
                 Section {
-                    Toggle(isOn: $terminos) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(L("Acepto los Términos de uso y la Política de privacidad"))
-                            Link(L("Leer los textos"), destination: URL(string: "https://pearmusic-by-toxbox.8toxbox8-69a.workers.dev/legal")!).font(.footnote)
-                        }
-                    }
-                    Toggle(L("Tengo 14 años o más"), isOn: $edad)
+                    Casilla(marcada: $terminos, titulo: L("Acepto los Términos de uso y la Política de privacidad"),
+                            enlace: (L("Leer los textos"), URL(string: "https://pearmusic-by-toxbox.8toxbox8-69a.workers.dev/legal")!))
+                    Casilla(marcada: $edad, titulo: L("Tengo 14 años o más"))
                     if let error { Estado(ok: false, texto: error) }
                 }
                 Section {
