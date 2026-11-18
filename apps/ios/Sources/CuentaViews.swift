@@ -92,11 +92,13 @@ struct CuentaView: View {
 }
 
 private struct CuentaSinCrear: View {
+    @State private var crear = false
     var body: some View {
         Form {
             Section { AccountPitch().listRowInsets(EdgeInsets()).listRowBackground(Color.clear) }
             Section {
-                NavigationLink(destination: CrearCuentaView()) { Text(L("Crear cuenta")) }
+                // Un NavigationLink dentro de un Form se pinta como fila y pierde el botón shu: botón + destino.
+                Button(L("Crear cuenta")) { crear = true }
                     .buttonStyle(PillButtonStyle(prominent: true)).listRowBackground(Color.clear).listRowInsets(EdgeInsets())
                     .accessibilityIdentifier("crearCuenta")
             }
@@ -105,6 +107,7 @@ private struct CuentaSinCrear: View {
                     .accessibilityIdentifier("entrarConClave")
             } footer: { Text(L("Si ya tienes cuenta en otro móvil y has perdido el móvil, entra con la clave que apuntaste.")) }
         }
+        .navigationDestination(isPresented: $crear) { CrearCuentaView() }
     }
 }
 
@@ -139,7 +142,7 @@ struct CrearCuentaView: View {
                 .accessibilityIdentifier("botonCrear")
             }
         }
-        .navigationTitle(L("Crear cuenta"))
+        .navigationTitle(L("Crear cuenta")).navigationBarTitleDisplayMode(.inline)
         .navigationDestination(isPresented: Binding(get: { borrador != nil }, set: { if !$0 { borrador = nil } })) {
             if let b = borrador { ClaveNuevaView(borrador: b) }
         }
@@ -196,7 +199,7 @@ struct ClaveNuevaView: View {
                     .accessibilityIdentifier("botonClave")
             }
         }
-        .navigationTitle(L("Tu clave"))
+        .navigationTitle(L("Tu clave")).navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(creando)
         .alert(L("Cuenta creada"), isPresented: $hecho) {
             Button(L("Vale"), role: .cancel) { dismiss() }
@@ -246,7 +249,7 @@ struct EntrarConClaveView: View {
                     .accessibilityIdentifier("botonEntrar")
             }
         }
-        .navigationTitle(L("Entrar"))
+        .navigationTitle(L("Entrar")).navigationBarTitleDisplayMode(.inline)
     }
 
     private func entrar() {
@@ -397,7 +400,7 @@ struct DispositivosView: View {
                 } footer: { Text(L("Si te han robado un móvil: sale todo de golpe menos este. Hace falta tu clave de recuperación.")) }
             }
         }
-        .navigationTitle(L("Dispositivos"))
+        .navigationTitle(L("Dispositivos")).navigationBarTitleDisplayMode(.inline)
         .task { try? await cuenta.cargar() }
         .confirmationDialog(L("¿Quitar \"{0}\"?", quitar?.nombre ?? ""), isPresented: Binding(get: { quitar != nil }, set: { if !$0 { quitar = nil } }), titleVisibility: .visible) {
             Button(L("Quitar"), role: .destructive) {
@@ -451,7 +454,7 @@ struct ComprobarClaveView: View {
                 .accessibilityIdentifier("botonComprobar")
             }
         }
-        .navigationTitle(L("Comprobar mi clave"))
+        .navigationTitle(L("Comprobar mi clave")).navigationBarTitleDisplayMode(.inline)
         .onChange(of: clave) { _ in resultado = nil }
     }
 }
@@ -481,7 +484,7 @@ struct BorrarCuentaView: View {
                     .accessibilityIdentifier("botonBorrar")
             }
         }
-        .navigationTitle(L("Borrar cuenta"))
+        .navigationTitle(L("Borrar cuenta")).navigationBarTitleDisplayMode(.inline)
         .confirmationDialog(L("¿Borrar tu cuenta?"), isPresented: $confirmar, titleVisibility: .visible) {
             Button(L("Borrar la cuenta"), role: .destructive) {
                 let c = clave
