@@ -226,6 +226,9 @@ struct RootView: View {
         .sheet(isPresented: $demoImport) { ImportView() }
         .task {
             Demo.apply(player: player, jam: jam)
+            // Al abrir: la biblioteca de la cuenta (2-D).
+            SyncBiblioteca.shared.conectar(library)
+            SyncBiblioteca.shared.alAbrir()
             // Hasta 1.4.1 se podía elegir el icono violeta («logo antiguo»). Ya no viene en la app: quien lo
             // tuviera vuelve al de encendido (iOS enseña su aviso de cambio de icono una vez).
             if UIApplication.shared.alternateIconName != nil { try? await UIApplication.shared.setAlternateIconName(nil) }
@@ -283,6 +286,9 @@ struct RootView: View {
             // Telemetría, sólo con consentimiento: mide mientras la app está a la vista y manda un resumen a la semana (Fase 4b).
             if phase == .active { Telemetry.shared.foreground() }
             if phase == .background { Telemetry.shared.background() }
+            // Biblioteca de la cuenta (2-D, sync.md §4): bajar al volver (si hace más de 5 min) y subir lo pendiente al salir.
+            if phase == .active { SyncBiblioteca.shared.conectar(library); SyncBiblioteca.shared.alAbrir() }
+            if phase == .background { SyncBiblioteca.shared.alSegundoPlano() }
         }
         .onChange(of: player.current?.id) { _ in
             if let s = player.current { library.markPlayed(s); FirstSteps.mark("play") }

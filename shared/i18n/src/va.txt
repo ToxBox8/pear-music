@@ -1192,3 +1192,86 @@
 1192	Llista o carpeta nova
 1193	Llista nova…
 1194	Mantín un moment una portada i arrossega-la.
+1195	Accepta
+1196	Accepto les Condicions d'ús i la Política de privadesa
+1197	Alguna cosa ha fallat. Torna-ho a provar
+1198	Apunta-la en paper i guarda-la bé. Sense ella i sense el teu mòbil no es pot recuperar res, i si la perds no se'n pot posar una altra.
+1199	Esborra ara
+1200	Esborra el compte
+1201	Esborra d'aquí a 14 dies
+1202	Esborra el teu compte
+1203	Cancel·la l'esborrat
+1204	Comprova
+1205	Comprova-la ara
+1206	Comprova la meua clau
+1207	Amb la teua clau s'esborra al moment. Sense ella, s'esborra d'aquí a 14 dies i ho veuràs a tots els teus mòbils, per si no has estat tu.
+1208	Connexió bloquejada temporalment. La música continua sonant
+1209	Copiada
+1210	Crea un compte
+1211	Massa intents. Torna-ho a provar d'aquí a una estona
+1212	Dispositius
+1213	D'acord
+1214	Entra amb la teua clau
+1215	Entra amb la teua clau de recuperació
+1216	Envia estadístiques d'ús anònimes
+1217	Esta clau no és vàlida
+1218	Esta no és la teua clau
+1219	Escriu el grup {0} de la teua clau
+1220	Escriu la clau de recuperació que vas apuntar en crear el compte. Tant és majúscules, espais o guions.
+1221	Escriu la teua clau de recuperació per confirmar-ho.
+1222	Escriu-la sencera. Es comprova en este mòbil: no s'envia a cap lloc.
+1223	Este mòbil ja no podrà entrar al teu compte.
+1224	Este mòbil sortirà del teu compte.
+1225	Este mòbil ja no és al teu compte
+1226	És correcta
+1227	Grup {0}
+1228	Guarda-la en un gestor de contrasenyes
+1229	Cal Face ID, l'empremta o el codi del mòbil
+1230	Hi ha condicions noves per acceptar
+1231	Hi ha condicions noves. Per continuar fent servir el compte, llegeix-les i accepta-les.
+1232	He estat jo
+1233	El compte no està disponible ara; pots continuar escoltant
+1234	Llegeix els textos
+1235	Els mòbils que poden entrar al teu compte. Si no en reconeixes algun, treu-lo.
+1236	Res per recordar ni que et puguin robar. La teua biblioteca viatja xifrada: només els teus mòbils la poden llegir.
+1237	No és este grup. Prova-ho amb un altre
+1238	No hi ha cap compte amb esta clau
+1239	No s'ha pogut obrir el teu compte amb esta clau
+1240	No es pot desfer.
+1241	Opcional. Pots crear el compte sense marcar-la i canviar-ho quan vulguis a Les teues dades.
+1242	Treu-los tots
+1243	Treu tots els altres mòbils
+1244	Treure un mòbil del teu compte
+1245	Revisa l'hora del mòbil
+1246	S'ha afegit «{0}» al teu compte i ja s'ha tret. No has estat tu? Revisa els teus mòbils
+1247	S'esborren el teu compte i tot el que hi ha al núvol. El que tens als teus mòbils es queda.
+1248	S'ha afegit «{0}» al teu compte. No has estat tu? Treu-lo
+1249	El teu compte s'esborrarà el {0}
+1250	Si algú sap el codi del teu mòbil, també podrà veure esta clau. El més segur és apuntar-la en paper.
+1251	Si t'han robat un mòbil: surt tot de cop menys este. Cal la teua clau de recuperació.
+1252	Si ja tens compte en un altre mòbil i l'has perdut, entra amb la clau que vas apuntar.
+1253	Només tens este mòbil al teu compte. Si el perds, només podràs entrar amb la teua clau de recuperació.
+1254	Tinc 14 anys o més
+1255	La teua biblioteca viatja xifrada: el servidor no la pot llegir.
+1256	La teua clau
+1257	La teua clau de recuperació (opcional)
+1258	El teu compte és en este mòbil
+1259	El teu compte, sense contrasenya
+1260	Els teus mòbils
+1261	Condicions noves
+1262	Mira les condicions noves
+1263	Vist {0}
+1264	Ja hi ha 10 mòbils al teu compte. Treu-ne un abans
+1265	Ja l'he apuntada
+1266	Vols treure «{0}»?
+1267	Encara tens la teua clau de recuperació? Comprova-la un moment.
+1268	Així el voràs als teus mòbils. D'1 a 40 caràcters.
+1269	Canviar el nom
+1270	Eixe mòbil ja no està en el teu compte
+1271	Nom del mòbil
+1272	Pixel de l'Ana
+1273	Posa un nom d'1 a 40 caràcters
+1274	iPhone 16
+1275	Feia molt que este mòbil no se sincronitzava: s'ha posat al dia amb el teu compte
+1276	La teua biblioteca del núvol estava incompleta: l'hem completada amb la d'este mòbil
+1277	La teua biblioteca és massa gran per al núvol

@@ -53,7 +53,7 @@ final class Library: ObservableObject {
     /// Carpetas de álbumes (3.0, T15). Sin pantalla todavía: se leen, se conservan y se exportan.
     @Published private(set) var albumFolders: [PlaylistFolder] = [] { didSet { save() } }
     /// Últimas canciones reproducidas (la más reciente primero).
-    @Published private(set) var recents: [Song] = [] { didSet { save() } }
+    @Published private(set) var recents: [Song] = [] { didSet { save(sync: false) } }
     /// Artistas seguidos (3.0, bloque 1), el último que sigues primero. Como mucho 500.
     @Published private(set) var followedArtists: [FollowedArtist] = [] { didSet { save() } }
 
@@ -72,10 +72,14 @@ final class Library: ObservableObject {
         unreadableCopy = disk.unreadableCopy
         if unreadableCopy != nil { Logs.e("library", "library.json no se puede leer; copia guardada y escritura parada") }
     }
-    private func save() {
+    /// `sync: false`: lo que no cambia la biblioteca de la cuenta (los recientes son de cada móvil, sync.md §5.5).
+    private func save(sync: Bool = true) {
         guard !Demo.isActive, !DemoCatalog.isActive else { return }
         disk.save(snapshot)
+        if sync && !adoptando { SyncBiblioteca.shared.alCambiar() }
     }
+    /// Mientras se pone la biblioteca unida (sync), los cambios no vuelven a pedir otra sincronización.
+    private var adoptando = false
     /// «Empezar de cero» del aviso: la copia del archivo ilegible se queda y lo que hay ahora en pantalla se guarda.
     func startOver() {
         disk.startOver()
@@ -182,6 +186,35 @@ final class Library: ObservableObject {
         let music = MusicOrder.decode(d.string(forKey: "musicOrder"))
         if music != MusicOrder.defaults { dict["musicOrder"] = music }
         return (try? JSONSerialization.data(withJSONObject: dict, options: [.prettyPrinted, .sortedKeys])) ?? base
+    }
+
+    /// Sync (2-D): pone la biblioteca ya unida con la de la cuenta (no vuelve a unir). La unión guarda playlists y
+    /// carpetas de la más nueva a la más antigua (sync.md §5.5 paso 7) y aquí van de la más antigua a la más nueva,
+    /// como al crearlas. Las portadas que trae, donde falten o sean otras; los órdenes, a sus ajustes. Los recientes no
+    /// se tocan (son de cada móvil). Igual que `Library.adoptarSync` en Android.
+    func adoptarSync(_ data: Data) throws {
+        let f = try LibraryFile.decode(data)
+        adoptando = true
+        defer { adoptando = false }
+        favorites = f.favorites
+        folders = (f.folders ?? []).reversed()
+        albumFolders = (f.albumFolders ?? []).reversed()
+        playlists = f.playlists.reversed()
+        followedArtists = f.followedArtists ?? []
+        guard let extra = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] else { return }
+        if let covers = extra["covers"] as? [String: String] {
+            for p in playlists {
+                guard let b64 = covers[p.id.uuidString], let jpeg = Data(base64Encoded: b64) else { continue }
+                if (try? Data(contentsOf: PlaylistArt.url(p.id))) == jpeg { continue }
+                try? FileManager.default.createDirectory(at: PlaylistArt.url(p.id).deletingLastPathComponent(), withIntermediateDirectories: true)
+                try? jpeg.write(to: PlaylistArt.url(p.id), options: .atomic)
+            }
+            objectWillChange.send()
+        }
+        let d = UserDefaults.standard
+        for k in ["playlistOrder", "albumOrder"] { if let o = extra[k] as? [String] { d.set(o.joined(separator: "\n"), forKey: k) } }
+        for k in ["playlistSort", "albumSort"] { if let v = extra[k] as? String { d.set(v, forKey: k) } }
+        if let music = extra["musicOrder"] as? [String] { d.set(MusicOrder.decode(music.joined(separator: ",")).joined(separator: ","), forKey: "musicOrder") }
     }
 
     /// Une una copia sin borrar nada: favoritas y recientes por id de canción, playlists por id.

@@ -1,0 +1,81 @@
+{
+  "aviso": "Aceptada por Toxbox el 17-11-2026 (ADR 0003 y 0004 ACEPTADOS, DECISIONS 56). Falta la revisión independiente (sesión nueva). Generado por tools/spec/generar.mjs.",
+  "descripcion": "Envoltura de recuperación (cuenta.md §4.1): AES-256-GCM(KEK_rec, R, aad).",
+  "entrada": {
+    "kek_hex": "bb4f1aaf1fbff8e65ea491ea1473ef74382cfccc1e6b69e2c79e1e88589430d8",
+    "R_hex": "bc0916f49178f3963d3aec73711b4a5e03c1f2df1f60fb77a6e864be49ad4148",
+    "account_id": "1X99P4D412HRCSNX9XJZYP85GR",
+    "tipo": "recovery",
+    "nonce_hex": "e82dde546af575ea5dcac4d3"
+  },
+  "aad": "pear-wrap/v1|1X99P4D412HRCSNX9XJZYP85GR|recovery",
+  "envoltura": "{\"v\":1,\"tipo\":\"recovery\",\"nonce\":\"6C3eVGr1depdysTT\",\"ct\":\"40DvRuDirlFSK_7a3t-Jtz_HfgDg-x02HTas4U7OG7t4J39oznGi9YcAh1OZLv3-\"}",
+  "debe_fallar": [
+    {
+      "nombre": "aad de otra cuenta",
+      "kek_hex": "bb4f1aaf1fbff8e65ea491ea1473ef74382cfccc1e6b69e2c79e1e88589430d8",
+      "account_id": "AR1QTSZAX67A3F3488ET6RWGWM",
+      "envoltura": "{\"v\":1,\"tipo\":\"recovery\",\"nonce\":\"6C3eVGr1depdysTT\",\"ct\":\"40DvRuDirlFSK_7a3t-Jtz_HfgDg-x02HTas4U7OG7t4J39oznGi9YcAh1OZLv3-\"}"
+    },
+    {
+      "nombre": "tipo cambiado",
+      "kek_hex": "bb4f1aaf1fbff8e65ea491ea1473ef74382cfccc1e6b69e2c79e1e88589430d8",
+      "account_id": "1X99P4D412HRCSNX9XJZYP85GR",
+      "envoltura": "{\"v\":1,\"tipo\":\"passkey\",\"nonce\":\"6C3eVGr1depdysTT\",\"ct\":\"40DvRuDirlFSK_7a3t-Jtz_HfgDg-x02HTas4U7OG7t4J39oznGi9YcAh1OZLv3-\"}"
+    },
+    {
+      "nombre": "cifrado alterado",
+      "kek_hex": "bb4f1aaf1fbff8e65ea491ea1473ef74382cfccc1e6b69e2c79e1e88589430d8",
+      "account_id": "1X99P4D412HRCSNX9XJZYP85GR",
+      "envoltura": "{\"v\":1,\"tipo\":\"recovery\",\"nonce\":\"6C3eVGr1depdysTT\",\"ct\":\"40DvRuDjrlFSK_7a3t-Jtz_HfgDg-x02HTas4U7OG7t4J39oznGi9YcAh1OZLv3-\"}"
+    },
+    {
+      "nombre": "otra clave de recuperación",
+      "kek_hex": "f089e97d2d4f28aac0d8b178e4d9e2147b251772ad4b6be5c4d4a93b5fec4789",
+      "account_id": "1X99P4D412HRCSNX9XJZYP85GR",
+      "envoltura": "{\"v\":1,\"tipo\":\"recovery\",\"nonce\":\"6C3eVGr1depdysTT\",\"ct\":\"40DvRuDirlFSK_7a3t-Jtz_HfgDg-x02HTas4U7OG7t4J39oznGi9YcAh1OZLv3-\"}"
+    },
+    {
+      "nombre": "versión 2",
+      "kek_hex": "bb4f1aaf1fbff8e65ea491ea1473ef74382cfccc1e6b69e2c79e1e88589430d8",
+      "account_id": "1X99P4D412HRCSNX9XJZYP85GR",
+      "envoltura": "{\"v\":2,\"tipo\":\"recovery\",\"nonce\":\"6C3eVGr1depdysTT\",\"ct\":\"40DvRuDirlFSK_7a3t-Jtz_HfgDg-x02HTas4U7OG7t4J39oznGi9YcAh1OZLv3-\"}"
+    },
+    {
+      "nombre": "nonce con relleno base64",
+      "kek_hex": "bb4f1aaf1fbff8e65ea491ea1473ef74382cfccc1e6b69e2c79e1e88589430d8",
+      "account_id": "1X99P4D412HRCSNX9XJZYP85GR",
+      "envoltura": "{\"v\":1,\"tipo\":\"recovery\",\"nonce\":\"6C3eVGr1depdysTT=\",\"ct\":\"40DvRuDirlFSK_7a3t-Jtz_HfgDg-x02HTas4U7OG7t4J39oznGi9YcAh1OZLv3-\"}"
+    },
+    {
+      "nombre": "clave ct repetida (la primera, basura)",
+      "kek_hex": "bb4f1aaf1fbff8e65ea491ea1473ef74382cfccc1e6b69e2c79e1e88589430d8",
+      "account_id": "1X99P4D412HRCSNX9XJZYP85GR",
+      "envoltura": "{\"v\":1,\"tipo\":\"recovery\",\"nonce\":\"6C3eVGr1depdysTT\",\"ct\":\"AAAA\",\"ct\":\"40DvRuDirlFSK_7a3t-Jtz_HfgDg-x02HTas4U7OG7t4J39oznGi9YcAh1OZLv3-\"}"
+    },
+    {
+      "nombre": "v escrito como 1.0",
+      "kek_hex": "bb4f1aaf1fbff8e65ea491ea1473ef74382cfccc1e6b69e2c79e1e88589430d8",
+      "account_id": "1X99P4D412HRCSNX9XJZYP85GR",
+      "envoltura": "{\"v\":1.0,\"tipo\":\"recovery\",\"nonce\":\"6C3eVGr1depdysTT\",\"ct\":\"40DvRuDirlFSK_7a3t-Jtz_HfgDg-x02HTas4U7OG7t4J39oznGi9YcAh1OZLv3-\"}"
+    },
+    {
+      "nombre": "v escrito como true",
+      "kek_hex": "bb4f1aaf1fbff8e65ea491ea1473ef74382cfccc1e6b69e2c79e1e88589430d8",
+      "account_id": "1X99P4D412HRCSNX9XJZYP85GR",
+      "envoltura": "{\"v\":true,\"tipo\":\"recovery\",\"nonce\":\"6C3eVGr1depdysTT\",\"ct\":\"40DvRuDirlFSK_7a3t-Jtz_HfgDg-x02HTas4U7OG7t4J39oznGi9YcAh1OZLv3-\"}"
+    },
+    {
+      "nombre": "con un espacio",
+      "kek_hex": "bb4f1aaf1fbff8e65ea491ea1473ef74382cfccc1e6b69e2c79e1e88589430d8",
+      "account_id": "1X99P4D412HRCSNX9XJZYP85GR",
+      "envoltura": "{\"v\":1, \"tipo\":\"recovery\",\"nonce\":\"6C3eVGr1depdysTT\",\"ct\":\"40DvRuDirlFSK_7a3t-Jtz_HfgDg-x02HTas4U7OG7t4J39oznGi9YcAh1OZLv3-\"}"
+    },
+    {
+      "nombre": "claves en otro orden",
+      "kek_hex": "bb4f1aaf1fbff8e65ea491ea1473ef74382cfccc1e6b69e2c79e1e88589430d8",
+      "account_id": "1X99P4D412HRCSNX9XJZYP85GR",
+      "envoltura": "{\"tipo\":\"recovery\",\"v\":1,\"nonce\":\"6C3eVGr1depdysTT\",\"ct\":\"40DvRuDirlFSK_7a3t-Jtz_HfgDg-x02HTas4U7OG7t4J39oznGi9YcAh1OZLv3-\"}"
+    }
+  ]
+}

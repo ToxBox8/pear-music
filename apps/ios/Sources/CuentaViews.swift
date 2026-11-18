@@ -175,7 +175,7 @@ struct ClaveNuevaView: View {
                 Button { UIPasteboard.general.string = borrador.clave; copiada = true } label: {
                     Label(copiada ? L("Copiada") : L("Copiar"), systemImage: copiada ? "checkmark" : "doc.on.doc")
                 }
-                // PROVISIONAL (PREGUNTAS #6): iOS no deja guardar una contraseña sin dominio en el gestor del sistema;
+                // Lo decidió Toxbox (orden 6, 18-11): iOS no deja guardar una contraseña sin dominio en el gestor del sistema;
                 // se ofrece compartirla con el gestor que tenga (Contraseñas, 1Password…), sin marcar por defecto.
                 ShareLink(item: CuentaCripto.mostrarClave(borrador.clave)) {
                     Label(L("Guardar en un gestor de contraseñas"), systemImage: "key")
@@ -269,6 +269,7 @@ struct EntrarConClaveView: View {
 
 private struct CuentaConectada: View {
     @ObservedObject private var cuenta = CuentaPear.shared
+    @ObservedObject private var sync = SyncBiblioteca.shared
     @State private var error: String?
     @State private var terminos = false
 
@@ -285,6 +286,13 @@ private struct CuentaConectada: View {
                 Section {
                     Text(L("Hay términos nuevos. Para seguir usando la cuenta, léelos y acéptalos."))
                     Button(L("Ver los términos nuevos")) { terminos = true }
+                }
+            }
+            // La biblioteca de la cuenta (2-D, sync.md §4 y §5.4): lo que hay que contar una vez.
+            if let aviso = sync.aviso {
+                Section {
+                    Text(aviso)
+                    Button(L("Entendido")) { sync.avisoVisto() }
                 }
             }
             ForEach(cuenta.avisos) { a in
@@ -370,6 +378,8 @@ private struct TerminosNuevosView: View {
 struct DispositivosView: View {
     @ObservedObject private var cuenta = CuentaPear.shared
     @State private var quitar: CuentaPear.Dispositivo?
+    @State private var renombrar: CuentaPear.Dispositivo?
+    @State private var nombreNuevo = ""
     @State private var losDemas = false
     @State private var clave = ""
     @State private var error: String?
@@ -381,11 +391,21 @@ struct DispositivosView: View {
                 ForEach(cuenta.dispositivos) { d in
                     HStack(spacing: 12) {
                         Image(systemName: d.plataforma == "ios" ? "iphone" : "smartphone").foregroundStyle(.secondary).frame(width: 28)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(d.nombre)
-                            Text(d.este ? L("Este móvil") : visto(d)).font(.footnote).foregroundStyle(.secondary)
+                        // Tocar el nombre lo cambia (orden 6 del 18-11): sirve para este móvil y para los demás.
+                        Button { nombreNuevo = d.nombre; renombrar = d } label: {
+                            HStack(spacing: 6) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(d.nombre).foregroundStyle(.primary)
+                                    Text(d.este ? L("Este móvil") : visto(d)).font(.footnote).foregroundStyle(.secondary)
+                                }
+                                Spacer(minLength: 0)
+                                Image(systemName: "pencil").font(.footnote).foregroundStyle(.secondary).accessibilityHidden(true)
+                            }
+                            .contentShape(Rectangle())
                         }
-                        Spacer()
+                        .buttonStyle(.borderless)
+                        .accessibilityHint(L("Cambiar nombre"))
+                        .accessibilityIdentifier("renombrar-\(d.id)")
                         Button(L("Quitar"), role: .destructive) { quitar = d }.buttonStyle(.borderless)
                     }
                     .frame(minHeight: 44)
@@ -408,6 +428,14 @@ struct DispositivosView: View {
             }
             Button(L("Cancelar"), role: .cancel) {}
         } message: { Text(quitar?.este == true ? L("Este móvil saldrá de tu cuenta.") : L("Ese móvil ya no podrá entrar en tu cuenta.")) }
+        .alert(L("Cambiar nombre"), isPresented: Binding(get: { renombrar != nil }, set: { if !$0 { renombrar = nil } })) {
+            TextField(L("Nombre del móvil"), text: $nombreNuevo).accessibilityIdentifier("nombre-movil")
+            Button(L("Guardar")) {
+                if let d = renombrar { let n = nombreNuevo; hacer { try await cuenta.renombrar(d.id, a: n) } }
+            }
+            .disabled(CuentaCripto.nombreValido(nombreNuevo) == nil)
+            Button(L("Cancelar"), role: .cancel) {}
+        } message: { Text(L("Así lo verás en tus móviles. De 1 a 40 caracteres.")) }
         .alert(L("Quitar todos los demás móviles"), isPresented: $losDemas) {
             TextField(L("Tu clave de recuperación"), text: $clave).textInputAutocapitalization(.characters).autocorrectionDisabled()
             Button(L("Quitar todos"), role: .destructive) { let c = clave; clave = ""; hacer { try await cuenta.quitarLosDemas(clave: c) } }

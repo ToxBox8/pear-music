@@ -40,8 +40,8 @@ final class CuentaPear: ObservableObject {
         deMentira = true
         cuentaId = "1X99P4D412HRCSNX9XJZYP85GR"
         dispositivos = [
-            Dispositivo(id: "WR85D13CWP6P3DAEZ6QB9H13HR", nombre: "iPhone 16", plataforma: "ios", visto: 1763400000, este: true),
-            Dispositivo(id: "1X99P4D412HRCSNX9XJZYP85GR", nombre: "Pixel de Ana", plataforma: "android", visto: 1763390000, este: false),
+            Dispositivo(id: "WR85D13CWP6P3DAEZ6QB9H13HR", nombre: L("iPhone 16"), plataforma: "ios", visto: 1763400000, este: true),
+            Dispositivo(id: "1X99P4D412HRCSNX9XJZYP85GR", nombre: L("Pixel de Ana"), plataforma: "android", visto: 1763390000, este: false),
         ]
         // La pub_rec de shared/spec/vectores/hkdf.json: su clave es TN2T-D4WT-QT75-ZFCX-H5W9-QQTJ-2W (CuentaUITests).
         meta.pubRec = "dIKLJHcIXwRQ7QUYY9Ec7so6OaW2UtKdC3gPfYwcW7o"
@@ -87,6 +87,8 @@ final class CuentaPear: ObservableObject {
             case "ya_existe": return L("Ya hay 10 móviles en tu cuenta. Quita uno antes")
             case "no_es_la_cuenta": return L("No se ha podido abrir tu cuenta con esa clave")
             case "presencia": return L("Hace falta Face ID, huella o el código del móvil")
+            case "nombre_invalido": return L("Pon un nombre de 1 a 40 caracteres")
+            case "movil_no_encontrado": return L("Ese móvil ya no está en tu cuenta")
             default: return L("Algo ha fallado. Prueba otra vez")
             }
         }
@@ -188,6 +190,17 @@ final class CuentaPear: ObservableObject {
         if id == meta.dispositivo { olvidar() } else { try await cargar() }
     }
 
+    /// Cambiar el nombre de este móvil o de otro de la cuenta (`PUT …/{id}/nombre`, token + D + C; orden 6 del 18-11).
+    func renombrar(_ id: String, a nombre: String) async throws {
+        guard let n = CuentaCripto.nombreValido(nombre) else { throw ErrorCuenta(codigo: "nombre_invalido") }
+        do {
+            _ = try await firmada("PUT", "/v1/id/dispositivos/\(id)/nombre", ["nombre": n], cuentaFirma: true)
+        } catch let e as ErrorCuenta where e.codigo == "no_encontrado" {
+            throw ErrorCuenta(codigo: "movil_no_encontrado")
+        }
+        try await cargar()
+    }
+
     /// «Quitar todos los demás móviles»: con C y presencia.
     func quitarLosDemas(clave: String) async throws {
         guard let c = CuentaCripto.leerClave(clave) else { throw ErrorCuenta(codigo: "clave_invalida") }
@@ -258,6 +271,7 @@ final class CuentaPear: ObservableObject {
     /// Este móvil sale de la cuenta (lo han quitado o lo ha quitado él): fuera R, D y la sesión.
     func olvidar() {
         for k in ["R", "D", "meta"] { Llavero.borrar(k) }
+        SyncBiblioteca.shared.olvidar()
         let desfase = meta.desfase
         meta = Meta()
         meta.desfase = desfase
@@ -284,13 +298,40 @@ final class CuentaPear: ObservableObject {
         } catch { disponible = false }
     }
 
-    private func conToken(_ metodo: String, _ ruta: String) async throws -> (Data, HTTPURLResponse) {
+    private func conToken(_ metodo: String, _ ruta: String, cabeceras: [String: String] = [:]) async throws -> (Data, HTTPURLResponse) {
         try await renovarSiHaceFalta()
-        do { return try await pedir(metodo, ruta, token: token) } catch let e as ErrorCuenta where e.codigo == "token_caducado" || e.codigo == "token_invalido" {
+        do { return try await pedir(metodo, ruta, token: token, cabeceras: cabeceras) } catch let e as ErrorCuenta where e.codigo == "token_caducado" || e.codigo == "token_invalido" {
             tokenExp = 0
             try await renovarSiHaceFalta()
-            return try await pedir(metodo, ruta, token: token)
+            return try await pedir(metodo, ruta, token: token, cabeceras: cabeceras)
         }
+    }
+
+    // MARK: Sync (sync.md §3): sólo el transporte de los bloques; lo de dentro lo hace SyncBiblioteca
+
+    enum Bajada { case igual, bloque(Data, etag: String), noHay }
+    /// Los 8 primeros caracteres del device_id (la `d` de las marcas, sync.md §5.1).
+    var dispositivoCorto: String? { deMentira ? nil : meta.dispositivo.map { String($0.prefix(8)) } }
+    var kMusic: Data? { deMentira ? nil : Llavero.leer("R").flatMap { try? CuentaCripto.derivarDeR($0).kMusic } }
+    /// Milisegundos del reloj de la app (para las marcas).
+    func ahoraMs() -> Double { (Date().timeIntervalSince1970 + Double(meta.desfase)) * 1000 }
+
+    func bajarBloque(_ clave: String, etag: String?) async throws -> Bajada {
+        try abierta()
+        guard !deMentira, meta.cuenta != nil else { throw ErrorCuenta(codigo: "sin_cuenta") }
+        do {
+            let r = try await conToken("GET", "/v1/sync/music/\(clave)", cabeceras: etag.map { ["If-None-Match": $0] } ?? [:]) // i18n: no
+            if r.1.statusCode == 304 { return .igual }
+            return .bloque(r.0, etag: r.1.value(forHTTPHeaderField: "ETag") ?? "") // i18n: no
+        } catch let e as ErrorCuenta where e.codigo == "no_encontrado" { return .noHay }
+    }
+
+    /// Sube con If-Match (o If-None-Match: * si es la primera vez). 409 → ErrorCuenta("version_cambiada"). Da el ETag nuevo.
+    func subirBloque(_ clave: String, _ bloque: Data, etag: String?) async throws -> String {
+        guard !deMentira else { throw ErrorCuenta(codigo: "sin_cuenta") }
+        let r = try await firmada("PUT", "/v1/sync/music/\(clave)", nil, crudo: bloque, extra: etag.map { ["If-Match": $0] } ?? ["If-None-Match": "*"]) // i18n: no
+        if let e = r.1.value(forHTTPHeaderField: "ETag") { return e } // i18n: no
+        return (try await json(r))["etag"] as? String ?? ""
     }
 
     /// 5 min antes de `exp`, o si no hay: POST /v1/id/sesion, sin enseñar nada (lo decidió Toxbox).
@@ -318,14 +359,16 @@ final class CuentaPear: ObservableObject {
     }
 
     /// Petición firmada con D (§5.2); `cuentaFirma` añade la de la cuenta (de R) y `rec`, la de recuperación (de C).
+    /// `crudo`: un cuerpo binario (los bloques de la sync), en vez de `cuerpo` en JSON. `extra`: más cabeceras.
     private func firmada(_ metodo: String, _ ruta: String, _ cuerpo: [String: Any]?, cuenta: String? = nil, disp: ClaveDispositivo? = nil,
-                         dispId: String? = nil, cuentaFirma: Bool = false, rec: Data? = nil, conToken: Bool = true) async throws -> (Data, HTTPURLResponse) {
+                         dispId: String? = nil, cuentaFirma: Bool = false, rec: Data? = nil, conToken: Bool = true,
+                         crudo: Data? = nil, extra: [String: String] = [:]) async throws -> (Data, HTTPURLResponse) {
         try abierta()
         if conToken { try await renovarSiHaceFalta() }
         guard let cuentaId = cuenta ?? meta.cuenta, let dispId = dispId ?? meta.dispositivo, let d = disp ?? ClaveDispositivo.guardada() else {
             throw ErrorCuenta(codigo: "sin_cuenta")
         }
-        let bytes = try cuerpo.map(datos) ?? Data()
+        let bytes = try crudo ?? cuerpo.map(datos) ?? Data()
         var repetida = false
         while true {
             let ts = ahora(), nonce = CuentaCripto.b64u(CuentaCripto.aleatorio(16))
@@ -336,8 +379,10 @@ final class CuentaPear: ObservableObject {
                 h["X-Pear-Firma-Cuenta"] = CuentaCripto.b64u(try CuentaCripto.edFirmar(try CuentaCripto.derivarDeR(r).semillaCuenta, cadena))
             }
             if let rec { h["X-Pear-Firma-Rec"] = CuentaCripto.b64u(try CuentaCripto.edFirmar(rec, cadena)) }
+            h.merge(extra) { _, b in b }
             do {
-                return try await pedir(metodo, ruta, cuerpo: cuerpo == nil ? nil : bytes, token: conToken ? token : nil, cabeceras: h)
+                return try await pedir(metodo, ruta, cuerpo: cuerpo == nil && crudo == nil ? nil : bytes, token: conToken ? token : nil, cabeceras: h,
+                                       tipo: crudo == nil ? "application/json" : "application/octet-stream")
             } catch let e as ErrorCuenta where e.codigo == "reloj_desfasado" && !repetida {
                 repetida = true // el desfase ya se ha corregido con la Date de esa respuesta: una vez más
             } catch let e as ErrorCuenta where e.codigo == "terminos_pendientes" {
@@ -347,10 +392,11 @@ final class CuentaPear: ObservableObject {
         }
     }
 
-    private func pedir(_ metodo: String, _ ruta: String, cuerpo: Data? = nil, token: String? = nil, cabeceras: [String: String] = [:]) async throws -> (Data, HTTPURLResponse) {
-        var req = URLRequest(url: Self.base.appendingPathComponent(String(ruta.dropFirst())), timeoutInterval: 20)
+    private func pedir(_ metodo: String, _ ruta: String, cuerpo: Data? = nil, token: String? = nil, cabeceras: [String: String] = [:],
+                       tipo: String = "application/json") async throws -> (Data, HTTPURLResponse) {
+        var req = URLRequest(url: Self.base.appendingPathComponent(String(ruta.dropFirst())), cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 20)
         req.httpMethod = metodo
-        if let cuerpo { req.httpBody = cuerpo; req.setValue("application/json", forHTTPHeaderField: "Content-Type") }
+        if let cuerpo { req.httpBody = cuerpo; req.setValue(tipo, forHTTPHeaderField: "Content-Type") } // i18n: no
         if let token { req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization") } // i18n: no
         for (k, v) in cabeceras { req.setValue(v, forHTTPHeaderField: k) }
         let data: Data, res: URLResponse

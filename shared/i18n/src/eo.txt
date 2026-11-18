@@ -1192,3 +1192,86 @@
 1192	Nova ludlisto aŭ dosierujo
 1193	Nova ludlisto…
 1194	Tenu kovrilon dum momento kaj trenu ĝin.
+1195	Akcepti
+1196	Mi akceptas la Uzkondiĉojn kaj la Privatecan politikon
+1197	Io fiaskis. Provu denove
+1198	Notu ĝin sur papero kaj gardu ĝin bone. Sen ĝi kaj sen via poŝtelefono nenio reakireblas, kaj se vi perdas ĝin, vi ne povas meti alian.
+1199	Forigi nun
+1200	Forigi la konton
+1201	Forigi post 14 tagoj
+1202	Forigi vian konton
+1203	Nuligi la forigon
+1204	Kontroli
+1205	Kontroli nun
+1206	Kontroli mian ŝlosilon
+1207	Kun via ŝlosilo ĝi foriĝas tuj. Sen ĝi, ĝi foriĝas post 14 tagoj kaj vi vidos tion en ĉiuj viaj poŝtelefonoj, se ne estis vi.
+1208	Konekto provizore blokita. La muziko daŭre sonas
+1209	Kopiita
+1210	Krei konton
+1211	Tro da provoj. Provu denove post iom
+1212	Aparatoj
+1213	Komprenite
+1214	Ensaluti per via ŝlosilo
+1215	Ensaluti per via restaŭra ŝlosilo
+1216	Sendi anonimajn uzstatistikojn
+1217	Tiu ŝlosilo ne validas
+1218	Tio ne estas via ŝlosilo
+1219	Tajpu la grupon {0} de via ŝlosilo
+1220	Tajpu la restaŭran ŝlosilon, kiun vi notis kreante la konton. Ne gravas majuskloj, spacoj aŭ streketoj.
+1221	Tajpu vian restaŭran ŝlosilon por konfirmi.
+1222	Tajpu ĝin tuta. Ĝi kontroliĝas en ĉi tiu poŝtelefono: ĝi estas sendata nenien.
+1223	Tiu poŝtelefono ne plu povos eniri vian konton.
+1224	Ĉi tiu poŝtelefono eliros el via konto.
+1225	Ĉi tiu poŝtelefono ne plu estas en via konto
+1226	Ĝi ĝustas
+1227	Grupo {0}
+1228	Konservi en pasvorta administrilo
+1229	Necesas Face ID, fingrospuro aŭ la kodo de la poŝtelefono
+1230	Estas novaj kondiĉoj por akcepti
+1231	Estas novaj kondiĉoj. Por plu uzi la konton, legu kaj akceptu ilin.
+1232	Estis mi
+1233	La konto ne disponeblas nun; vi povas plu aŭskulti
+1234	Legi la tekstojn
+1235	La poŝtelefonoj, kiuj povas eniri vian konton. Se vi ne rekonas iun, forigu ĝin.
+1236	Nenio por memori nek por ŝteli. Via biblioteko vojaĝas ĉifrita: nur viaj poŝtelefonoj povas legi ĝin.
+1237	Ne estas tiu grupo. Provu alian
+1238	Ne estas konto kun tiu ŝlosilo
+1239	Ne eblis malfermi vian konton per tiu ŝlosilo
+1240	Ne malfareblas.
+1241	Nedeviga. Vi povas krei la konton sen marki ĝin kaj ŝanĝi tion kiam ajn en Viaj datumoj.
+1242	Forigi ĉiujn
+1243	Forigi ĉiujn aliajn poŝtelefonojn
+1244	Forigi poŝtelefonon el via konto
+1245	Kontrolu la horon de la poŝtelefono
+1246	«{0}» aldoniĝis al via konto kaj jam estas forigita. Ĉu ne estis vi? Kontrolu viajn poŝtelefonojn
+1247	Via konto kaj ĉio en la nubo foriĝas. Kio estas en viaj poŝtelefonoj restas.
+1248	«{0}» aldoniĝis al via konto. Ĉu ne estis vi? Forigu ĝin
+1249	Via konto foriĝos je {0}
+1250	Se iu scias la kodon de via poŝtelefono, tiu ankaŭ povos vidi ĉi tiun ŝlosilon. Plej sekure estas noti ĝin sur papero.
+1251	Se oni ŝtelis poŝtelefonon: ĉio krom ĉi tiu eliras samtempe. Necesas via restaŭra ŝlosilo.
+1252	Se vi jam havas konton en alia poŝtelefono kaj perdis ĝin, ensalutu per la ŝlosilo, kiun vi notis.
+1253	Vi havas nur ĉi tiun poŝtelefonon en via konto. Se vi perdas ĝin, vi povos eniri nur per via restaŭra ŝlosilo.
+1254	Mi havas 14 jarojn aŭ pli
+1255	Via biblioteko vojaĝas ĉifrita: la servilo ne povas legi ĝin.
+1256	Via ŝlosilo
+1257	Via restaŭra ŝlosilo (nedeviga)
+1258	Via konto estas en ĉi tiu poŝtelefono
+1259	Via konto, sen pasvorto
+1260	Viaj poŝtelefonoj
+1261	Novaj kondiĉoj
+1262	Vidi la novajn kondiĉojn
+1263	Vidita {0}
+1264	Jam estas 10 poŝtelefonoj en via konto. Unue forigu unu
+1265	Mi jam notis ĝin
+1266	Ĉu forigi «{0}»?
+1267	Ĉu vi ankoraŭ havas vian restaŭran ŝlosilon? Kontrolu ĝin momenton.
+1268	Tiel vi vidos ĝin en viaj poŝtelefonoj. De 1 ĝis 40 signoj.
+1269	Ŝanĝi la nomon
+1270	Tiu poŝtelefono ne plu estas en via konto
+1271	Nomo de la poŝtelefono
+1272	Pixel de Ana
+1273	Uzu nomon de 1 ĝis 40 signoj
+1274	iPhone 16
+1275	Ĉi tiu poŝtelefono delonge ne sinkroniĝis: ĝi nun estas ĝisdata kun via konto
+1276	Via biblioteko en la nubo estis nekompleta: ni kompletigis ĝin per tiu de ĉi tiu poŝtelefono
+1277	Via biblioteko estas tro granda por la nubo

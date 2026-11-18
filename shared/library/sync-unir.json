@@ -1,0 +1,1952 @@
+{
+  "descripcion": "Unir dos versiones de library.json (docs/spec/sync.md §5, con H3–H8 de docs/revision/v3-spec-cuenta.md). Generado por tools/spec/generar-sync.mjs con la referencia tools/spec/sync.mjs. Para cada caso: si hay «sellar», primero sellarSinMarca(local, sellar); después unir(local, nube, {ahora, ultimaSync, tope}) tiene que dar «esperado» y «aviso»; si «conmutativo», unir(nube, local) da lo mismo. Las colecciones salen ordenadas por «a» de mayor a menor.",
+  "ahora": 1763400000000,
+  "retencion_ms": 15552000000,
+  "tope_por_defecto": 5000,
+  "casos": [
+    {
+      "nombre": "una baja más nueva que el alta la quita; volver a añadir después la recupera",
+      "regla": "§5.3",
+      "conmutativo": true,
+      "local": {
+        "favorites": [
+          {
+            "id": "X",
+            "title": "Canción X",
+            "artist": "Artista",
+            "a": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ]
+          },
+          {
+            "id": "Z",
+            "title": "Canción Z",
+            "artist": "Artista",
+            "a": [
+              1763399000000,
+              3,
+              "TJJTHK2B"
+            ]
+          }
+        ]
+      },
+      "nube": {
+        "favorites": [
+          {
+            "id": "Y",
+            "title": "Canción Y",
+            "artist": "Artista",
+            "a": [
+              1763392000000,
+              2,
+              "WR85D13C"
+            ]
+          }
+        ],
+        "deleted": [
+          {
+            "k": "favorite",
+            "id": "X",
+            "m": [
+              1763395000000,
+              7,
+              "WR85D13C"
+            ]
+          },
+          {
+            "k": "favorite",
+            "id": "Z",
+            "m": [
+              1763396000000,
+              8,
+              "WR85D13C"
+            ]
+          }
+        ]
+      },
+      "esperado": {
+        "favorites": [
+          {
+            "id": "Z",
+            "title": "Canción Z",
+            "artist": "Artista",
+            "a": [
+              1763399000000,
+              3,
+              "TJJTHK2B"
+            ]
+          },
+          {
+            "id": "Y",
+            "title": "Canción Y",
+            "artist": "Artista",
+            "a": [
+              1763392000000,
+              2,
+              "WR85D13C"
+            ]
+          }
+        ],
+        "deleted": [
+          {
+            "k": "favorite",
+            "id": "X",
+            "m": [
+              1763395000000,
+              7,
+              "WR85D13C"
+            ]
+          },
+          {
+            "k": "favorite",
+            "id": "Z",
+            "m": [
+              1763396000000,
+              8,
+              "WR85D13C"
+            ]
+          }
+        ]
+      },
+      "aviso": null,
+      "comprobar": {
+        "queda": [
+          "favorites:Y",
+          "favorites:Z"
+        ],
+        "no_queda": [
+          "favorites:X"
+        ]
+      }
+    },
+    {
+      "nombre": "H5: reordenar las canciones gana aunque la v de la playlist sea la misma",
+      "regla": "§5.2 vCanciones",
+      "conmutativo": true,
+      "local": {
+        "playlists": [
+          {
+            "id": "P",
+            "name": "Viaje",
+            "v": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "a": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "vCanciones": [
+              1763399000000,
+              9,
+              "TJJTHK2B"
+            ],
+            "songs": [
+              {
+                "id": "s1",
+                "title": "Canción s1",
+                "artist": "Artista",
+                "a": [
+                  1763391000000,
+                  2,
+                  "TJJTHK2B"
+                ]
+              },
+              {
+                "id": "s2",
+                "title": "Canción s2",
+                "artist": "Artista",
+                "a": [
+                  1763391000000,
+                  3,
+                  "TJJTHK2B"
+                ]
+              },
+              {
+                "id": "s3",
+                "title": "Canción s3",
+                "artist": "Artista",
+                "a": [
+                  1763391000000,
+                  4,
+                  "TJJTHK2B"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "nube": {
+        "playlists": [
+          {
+            "id": "P",
+            "name": "Viaje",
+            "v": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "a": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "vCanciones": [
+              1763391000000,
+              4,
+              "TJJTHK2B"
+            ],
+            "songs": [
+              {
+                "id": "s3",
+                "title": "Canción s3",
+                "artist": "Artista",
+                "a": [
+                  1763391000000,
+                  4,
+                  "TJJTHK2B"
+                ]
+              },
+              {
+                "id": "s1",
+                "title": "Canción s1",
+                "artist": "Artista",
+                "a": [
+                  1763391000000,
+                  2,
+                  "TJJTHK2B"
+                ]
+              },
+              {
+                "id": "s2",
+                "title": "Canción s2",
+                "artist": "Artista",
+                "a": [
+                  1763391000000,
+                  3,
+                  "TJJTHK2B"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "esperado": {
+        "playlists": [
+          {
+            "id": "P",
+            "name": "Viaje",
+            "a": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "v": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "songs": [
+              {
+                "id": "s1",
+                "title": "Canción s1",
+                "artist": "Artista",
+                "a": [
+                  1763391000000,
+                  2,
+                  "TJJTHK2B"
+                ]
+              },
+              {
+                "id": "s2",
+                "title": "Canción s2",
+                "artist": "Artista",
+                "a": [
+                  1763391000000,
+                  3,
+                  "TJJTHK2B"
+                ]
+              },
+              {
+                "id": "s3",
+                "title": "Canción s3",
+                "artist": "Artista",
+                "a": [
+                  1763391000000,
+                  4,
+                  "TJJTHK2B"
+                ]
+              }
+            ],
+            "vCanciones": [
+              1763399000000,
+              9,
+              "TJJTHK2B"
+            ]
+          }
+        ]
+      },
+      "aviso": null,
+      "comprobar": {
+        "orden": {
+          "playlists:P": [
+            "s1",
+            "s2",
+            "s3"
+          ]
+        }
+      }
+    },
+    {
+      "nombre": "H5: renombrar en un móvil y reordenar en el otro: se quedan los dos cambios",
+      "regla": "§5.5 pasos 2 y 3",
+      "conmutativo": true,
+      "local": {
+        "playlists": [
+          {
+            "id": "P",
+            "name": "Viaje",
+            "v": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "a": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "vCanciones": [
+              1763397000000,
+              5,
+              "TJJTHK2B"
+            ],
+            "songs": [
+              {
+                "id": "s2",
+                "title": "Canción s2",
+                "artist": "Artista",
+                "a": [
+                  1763391000000,
+                  3,
+                  "TJJTHK2B"
+                ]
+              },
+              {
+                "id": "s1",
+                "title": "Canción s1",
+                "artist": "Artista",
+                "a": [
+                  1763391000000,
+                  2,
+                  "TJJTHK2B"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "nube": {
+        "playlists": [
+          {
+            "id": "P",
+            "name": "Viaje 2026",
+            "v": [
+              1763398000000,
+              6,
+              "WR85D13C"
+            ],
+            "a": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "vCanciones": [
+              1763391000000,
+              3,
+              "TJJTHK2B"
+            ],
+            "songs": [
+              {
+                "id": "s1",
+                "title": "Canción s1",
+                "artist": "Artista",
+                "a": [
+                  1763391000000,
+                  2,
+                  "TJJTHK2B"
+                ]
+              },
+              {
+                "id": "s2",
+                "title": "Canción s2",
+                "artist": "Artista",
+                "a": [
+                  1763391000000,
+                  3,
+                  "TJJTHK2B"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "esperado": {
+        "playlists": [
+          {
+            "id": "P",
+            "name": "Viaje 2026",
+            "a": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "v": [
+              1763398000000,
+              6,
+              "WR85D13C"
+            ],
+            "songs": [
+              {
+                "id": "s2",
+                "title": "Canción s2",
+                "artist": "Artista",
+                "a": [
+                  1763391000000,
+                  3,
+                  "TJJTHK2B"
+                ]
+              },
+              {
+                "id": "s1",
+                "title": "Canción s1",
+                "artist": "Artista",
+                "a": [
+                  1763391000000,
+                  2,
+                  "TJJTHK2B"
+                ]
+              }
+            ],
+            "vCanciones": [
+              1763397000000,
+              5,
+              "TJJTHK2B"
+            ]
+          }
+        ]
+      },
+      "aviso": null,
+      "comprobar": {
+        "nombre": {
+          "playlists:P": "Viaje 2026"
+        },
+        "orden": {
+          "playlists:P": [
+            "s2",
+            "s1"
+          ]
+        }
+      }
+    },
+    {
+      "nombre": "canción quitada en otro móvil (baja «song») y otra añadida aquí sin red: se quita una y se queda la otra",
+      "regla": "§5.5 paso 3",
+      "conmutativo": true,
+      "local": {
+        "playlists": [
+          {
+            "id": "P",
+            "name": "Viaje",
+            "v": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "a": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "vCanciones": [
+              1763399000000,
+              9,
+              "TJJTHK2B"
+            ],
+            "songs": [
+              {
+                "id": "s1",
+                "title": "Canción s1",
+                "artist": "Artista",
+                "a": [
+                  1763391000000,
+                  2,
+                  "TJJTHK2B"
+                ]
+              },
+              {
+                "id": "s2",
+                "title": "Canción s2",
+                "artist": "Artista",
+                "a": [
+                  1763391000000,
+                  3,
+                  "TJJTHK2B"
+                ]
+              },
+              {
+                "id": "s4",
+                "title": "Canción s4",
+                "artist": "Artista",
+                "a": [
+                  1763399000000,
+                  9,
+                  "TJJTHK2B"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "nube": {
+        "playlists": [
+          {
+            "id": "P",
+            "name": "Viaje",
+            "v": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "a": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "vCanciones": [
+              1763398000000,
+              8,
+              "WR85D13C"
+            ],
+            "songs": [
+              {
+                "id": "s1",
+                "title": "Canción s1",
+                "artist": "Artista",
+                "a": [
+                  1763391000000,
+                  2,
+                  "TJJTHK2B"
+                ]
+              }
+            ]
+          }
+        ],
+        "deleted": [
+          {
+            "k": "song",
+            "id": "s2",
+            "p": "P",
+            "m": [
+              1763398000000,
+              8,
+              "WR85D13C"
+            ]
+          }
+        ]
+      },
+      "esperado": {
+        "playlists": [
+          {
+            "id": "P",
+            "name": "Viaje",
+            "a": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "v": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "songs": [
+              {
+                "id": "s1",
+                "title": "Canción s1",
+                "artist": "Artista",
+                "a": [
+                  1763391000000,
+                  2,
+                  "TJJTHK2B"
+                ]
+              },
+              {
+                "id": "s4",
+                "title": "Canción s4",
+                "artist": "Artista",
+                "a": [
+                  1763399000000,
+                  9,
+                  "TJJTHK2B"
+                ]
+              }
+            ],
+            "vCanciones": [
+              1763399000000,
+              9,
+              "TJJTHK2B"
+            ]
+          }
+        ],
+        "deleted": [
+          {
+            "k": "song",
+            "id": "s2",
+            "p": "P",
+            "m": [
+              1763398000000,
+              8,
+              "WR85D13C"
+            ]
+          }
+        ]
+      },
+      "aviso": null,
+      "comprobar": {
+        "orden": {
+          "playlists:P": [
+            "s1",
+            "s4"
+          ]
+        }
+      }
+    },
+    {
+      "nombre": "H3: lo creado sin red después de la última sync buena se conserva aunque la nube haya purgado bajas",
+      "regla": "§5.4",
+      "conmutativo": false,
+      "ultimaSync": [
+        1746120000000,
+        20,
+        "TJJTHK2B"
+      ],
+      "local": {
+        "playlists": [
+          {
+            "id": "P",
+            "name": "Hecha sin red",
+            "v": [
+              1746984000000,
+              21,
+              "TJJTHK2B"
+            ],
+            "a": [
+              1746984000000,
+              21,
+              "TJJTHK2B"
+            ],
+            "vCanciones": [
+              1746984000000,
+              21,
+              "TJJTHK2B"
+            ],
+            "songs": []
+          },
+          {
+            "id": "Q",
+            "name": "Borrada en otro móvil",
+            "v": [
+              1741800000000,
+              5,
+              "TJJTHK2B"
+            ],
+            "a": [
+              1741800000000,
+              5,
+              "TJJTHK2B"
+            ],
+            "vCanciones": [
+              1741800000000,
+              5,
+              "TJJTHK2B"
+            ],
+            "songs": []
+          }
+        ]
+      },
+      "nube": {
+        "playlists": [],
+        "favorites": [
+          {
+            "id": "Y",
+            "title": "Canción Y",
+            "artist": "Artista",
+            "a": [
+              1762536000000,
+              40,
+              "WR85D13C"
+            ]
+          }
+        ],
+        "deletedHorizon": [
+          1750440000000,
+          30,
+          "WR85D13C"
+        ]
+      },
+      "esperado": {
+        "favorites": [
+          {
+            "id": "Y",
+            "title": "Canción Y",
+            "artist": "Artista",
+            "a": [
+              1762536000000,
+              40,
+              "WR85D13C"
+            ]
+          }
+        ],
+        "playlists": [
+          {
+            "id": "P",
+            "name": "Hecha sin red",
+            "v": [
+              1746984000000,
+              21,
+              "TJJTHK2B"
+            ],
+            "a": [
+              1746984000000,
+              21,
+              "TJJTHK2B"
+            ],
+            "vCanciones": [
+              1746984000000,
+              21,
+              "TJJTHK2B"
+            ],
+            "songs": []
+          }
+        ],
+        "deletedHorizon": [
+          1750440000000,
+          30,
+          "WR85D13C"
+        ]
+      },
+      "aviso": "puesta_al_dia",
+      "comprobar": {
+        "queda": [
+          "playlists:P"
+        ],
+        "no_queda": [
+          "playlists:Q"
+        ],
+        "aviso": "puesta_al_dia"
+      }
+    },
+    {
+      "nombre": "H3: la nube es más antigua que lo último que vio este móvil (copia restaurada): no se borra nada",
+      "regla": "§5.4",
+      "conmutativo": false,
+      "ultimaSync": [
+        1746120000000,
+        20,
+        "TJJTHK2B"
+      ],
+      "local": {
+        "playlists": [
+          {
+            "id": "Q",
+            "name": "Sólo aquí",
+            "v": [
+              1741800000000,
+              5,
+              "TJJTHK2B"
+            ],
+            "a": [
+              1741800000000,
+              5,
+              "TJJTHK2B"
+            ],
+            "vCanciones": [
+              1741800000000,
+              5,
+              "TJJTHK2B"
+            ],
+            "songs": []
+          }
+        ],
+        "deletedHorizon": [
+          1750440000000,
+          30,
+          "WR85D13C"
+        ]
+      },
+      "nube": {
+        "playlists": [],
+        "favorites": [
+          {
+            "id": "Y",
+            "title": "Canción Y",
+            "artist": "Artista",
+            "a": [
+              1737480000000,
+              2,
+              "WR85D13C"
+            ]
+          }
+        ]
+      },
+      "esperado": {
+        "favorites": [
+          {
+            "id": "Y",
+            "title": "Canción Y",
+            "artist": "Artista",
+            "a": [
+              1737480000000,
+              2,
+              "WR85D13C"
+            ]
+          }
+        ],
+        "playlists": [
+          {
+            "id": "Q",
+            "name": "Sólo aquí",
+            "v": [
+              1741800000000,
+              5,
+              "TJJTHK2B"
+            ],
+            "a": [
+              1741800000000,
+              5,
+              "TJJTHK2B"
+            ],
+            "vCanciones": [
+              1741800000000,
+              5,
+              "TJJTHK2B"
+            ],
+            "songs": []
+          }
+        ],
+        "deletedHorizon": [
+          1750440000000,
+          30,
+          "WR85D13C"
+        ]
+      },
+      "aviso": "nube_antigua",
+      "comprobar": {
+        "queda": [
+          "playlists:Q",
+          "favorites:Y"
+        ],
+        "aviso": "nube_antigua"
+      }
+    },
+    {
+      "nombre": "H3: nube más antigua sin horizonte por medio: se une sin borrar y también se avisa (revisión del 17-11 noche)",
+      "regla": "§5.4",
+      "conmutativo": false,
+      "ultimaSync": [
+        1761672000000,
+        20,
+        "TJJTHK2B"
+      ],
+      "local": {
+        "favorites": [
+          {
+            "id": "X",
+            "title": "Canción X",
+            "artist": "Artista",
+            "a": [
+              1760808000000,
+              3,
+              "TJJTHK2B"
+            ]
+          }
+        ]
+      },
+      "nube": {
+        "favorites": [
+          {
+            "id": "Y",
+            "title": "Canción Y",
+            "artist": "Artista",
+            "a": [
+              1759944000000,
+              2,
+              "WR85D13C"
+            ]
+          }
+        ]
+      },
+      "esperado": {
+        "favorites": [
+          {
+            "id": "X",
+            "title": "Canción X",
+            "artist": "Artista",
+            "a": [
+              1760808000000,
+              3,
+              "TJJTHK2B"
+            ]
+          },
+          {
+            "id": "Y",
+            "title": "Canción Y",
+            "artist": "Artista",
+            "a": [
+              1759944000000,
+              2,
+              "WR85D13C"
+            ]
+          }
+        ]
+      },
+      "aviso": "nube_antigua",
+      "comprobar": {
+        "queda": [
+          "favorites:X",
+          "favorites:Y"
+        ],
+        "aviso": "nube_antigua"
+      }
+    },
+    {
+      "nombre": "H3: no hay bloque en la nube (404) y el móvil ya se había sincronizado: no se borra nada",
+      "regla": "§5.4",
+      "conmutativo": false,
+      "ultimaSync": [
+        1746120000000,
+        20,
+        "TJJTHK2B"
+      ],
+      "local": {
+        "favorites": [
+          {
+            "id": "X",
+            "title": "Canción X",
+            "artist": "Artista",
+            "a": [
+              1741800000000,
+              3,
+              "TJJTHK2B"
+            ]
+          }
+        ],
+        "deletedHorizon": [
+          1750440000000,
+          30,
+          "WR85D13C"
+        ]
+      },
+      "nube": null,
+      "esperado": {
+        "favorites": [
+          {
+            "id": "X",
+            "title": "Canción X",
+            "artist": "Artista",
+            "a": [
+              1741800000000,
+              3,
+              "TJJTHK2B"
+            ]
+          }
+        ],
+        "deletedHorizon": [
+          1750440000000,
+          30,
+          "WR85D13C"
+        ]
+      },
+      "aviso": "nube_vacia",
+      "comprobar": {
+        "queda": [
+          "favorites:X"
+        ],
+        "aviso": "nube_vacia"
+      }
+    },
+    {
+      "nombre": "H4: con más bajas que el tope se van las más viejas y el horizonte sube a la mayor que se fue (tope 3 en este caso; en la app, 5.000)",
+      "regla": "§5.3",
+      "conmutativo": true,
+      "tope": 3,
+      "local": {
+        "deleted": [
+          {
+            "k": "favorite",
+            "id": "f1",
+            "m": [
+              1762622400000,
+              1,
+              "TJJTHK2B"
+            ]
+          },
+          {
+            "k": "favorite",
+            "id": "f2",
+            "m": [
+              1762708800000,
+              2,
+              "TJJTHK2B"
+            ]
+          },
+          {
+            "k": "favorite",
+            "id": "f3",
+            "m": [
+              1762795200000,
+              3,
+              "TJJTHK2B"
+            ]
+          }
+        ]
+      },
+      "nube": {
+        "deleted": [
+          {
+            "k": "favorite",
+            "id": "f4",
+            "m": [
+              1762881600000,
+              4,
+              "WR85D13C"
+            ]
+          },
+          {
+            "k": "favorite",
+            "id": "f5",
+            "m": [
+              1762968000000,
+              5,
+              "WR85D13C"
+            ]
+          }
+        ]
+      },
+      "esperado": {
+        "deleted": [
+          {
+            "k": "favorite",
+            "id": "f3",
+            "m": [
+              1762795200000,
+              3,
+              "TJJTHK2B"
+            ]
+          },
+          {
+            "k": "favorite",
+            "id": "f4",
+            "m": [
+              1762881600000,
+              4,
+              "WR85D13C"
+            ]
+          },
+          {
+            "k": "favorite",
+            "id": "f5",
+            "m": [
+              1762968000000,
+              5,
+              "WR85D13C"
+            ]
+          }
+        ],
+        "deletedHorizon": [
+          1762708800000,
+          2,
+          "TJJTHK2B"
+        ]
+      },
+      "aviso": null,
+      "comprobar": {
+        "bajas": [
+          "f3",
+          "f4",
+          "f5"
+        ],
+        "horizonte": [
+          1762708800000,
+          2,
+          "TJJTHK2B"
+        ]
+      }
+    },
+    {
+      "nombre": "H4: una baja de hace más de 180 días se purga y sube el horizonte",
+      "regla": "§5.3",
+      "conmutativo": true,
+      "local": {
+        "deleted": [
+          {
+            "k": "playlist",
+            "id": "V",
+            "m": [
+              1747761600000,
+              3,
+              "TJJTHK2B"
+            ]
+          },
+          {
+            "k": "playlist",
+            "id": "W",
+            "m": [
+              1747934400000,
+              4,
+              "TJJTHK2B"
+            ]
+          }
+        ]
+      },
+      "nube": {},
+      "esperado": {
+        "deleted": [
+          {
+            "k": "playlist",
+            "id": "W",
+            "m": [
+              1747934400000,
+              4,
+              "TJJTHK2B"
+            ]
+          }
+        ],
+        "deletedHorizon": [
+          1747761600000,
+          3,
+          "TJJTHK2B"
+        ]
+      },
+      "aviso": null,
+      "comprobar": {
+        "bajas": [
+          "W"
+        ],
+        "horizonte": [
+          1747761600000,
+          3,
+          "TJJTHK2B"
+        ]
+      }
+    },
+    {
+      "nombre": "H6: una marca del futuro (hora del móvil mal) se recorta a ahora + 1 día",
+      "regla": "§5.1",
+      "conmutativo": true,
+      "local": {
+        "playlists": [
+          {
+            "id": "P",
+            "name": "Hora mal",
+            "v": [
+              2078760000000,
+              9,
+              "TJJTHK2B"
+            ],
+            "a": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "vCanciones": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "songs": []
+          }
+        ]
+      },
+      "nube": {
+        "playlists": [
+          {
+            "id": "P",
+            "name": "Bien",
+            "v": [
+              1763399000000,
+              10,
+              "WR85D13C"
+            ],
+            "a": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "vCanciones": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "songs": []
+          }
+        ]
+      },
+      "esperado": {
+        "playlists": [
+          {
+            "id": "P",
+            "name": "Hora mal",
+            "a": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "v": [
+              1763486400000,
+              9,
+              "TJJTHK2B"
+            ],
+            "songs": [],
+            "vCanciones": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ]
+          }
+        ]
+      },
+      "aviso": null,
+      "comprobar": {
+        "nombre": {
+          "playlists:P": "Hora mal"
+        },
+        "marca_v": {
+          "playlists:P": [
+            1763486400000,
+            9,
+            "TJJTHK2B"
+          ]
+        }
+      }
+    },
+    {
+      "nombre": "empate entre copias viejas sin marca: el resultado no depende de qué lado sea el local",
+      "regla": "§5.5",
+      "conmutativo": true,
+      "local": {
+        "playlists": [
+          {
+            "id": "P",
+            "name": "Alfa",
+            "songs": [
+              {
+                "id": "s1",
+                "title": "Canción s1",
+                "artist": "Artista"
+              }
+            ]
+          }
+        ]
+      },
+      "nube": {
+        "playlists": [
+          {
+            "id": "P",
+            "name": "Beta",
+            "songs": [
+              {
+                "id": "s1",
+                "title": "Canción s1",
+                "artist": "Artista"
+              },
+              {
+                "id": "s2",
+                "title": "Canción s2",
+                "artist": "Artista"
+              }
+            ]
+          }
+        ]
+      },
+      "esperado": {
+        "playlists": [
+          {
+            "id": "P",
+            "name": "Beta",
+            "songs": [
+              {
+                "id": "s1",
+                "title": "Canción s1",
+                "artist": "Artista"
+              },
+              {
+                "id": "s2",
+                "title": "Canción s2",
+                "artist": "Artista"
+              }
+            ]
+          }
+        ]
+      },
+      "aviso": null,
+      "comprobar": {
+        "nombre": {
+          "playlists:P": "Beta"
+        }
+      }
+    },
+    {
+      "nombre": "H8, sin sellar (lo de antes): una favorita de siempre del móvil nuevo desaparece por una baja vieja de la cuenta",
+      "regla": "§5.2",
+      "conmutativo": false,
+      "local": {
+        "favorites": [
+          {
+            "id": "X",
+            "title": "Canción X",
+            "artist": "Artista"
+          }
+        ]
+      },
+      "nube": {
+        "favorites": [],
+        "deleted": [
+          {
+            "k": "favorite",
+            "id": "X",
+            "m": [
+              1760808000000,
+              4,
+              "WR85D13C"
+            ]
+          }
+        ]
+      },
+      "esperado": {
+        "favorites": [],
+        "deleted": [
+          {
+            "k": "favorite",
+            "id": "X",
+            "m": [
+              1760808000000,
+              4,
+              "WR85D13C"
+            ]
+          }
+        ]
+      },
+      "aviso": null,
+      "comprobar": {
+        "no_queda": [
+          "favorites:X"
+        ]
+      }
+    },
+    {
+      "nombre": "H8, sellando lo local sin marca al entrar por primera vez: se queda",
+      "regla": "§5.2",
+      "conmutativo": false,
+      "sellar": {
+        "t": 1763400000000,
+        "c": 1,
+        "d": "TJJTHK2B"
+      },
+      "local": {
+        "favorites": [
+          {
+            "id": "X",
+            "title": "Canción X",
+            "artist": "Artista"
+          },
+          {
+            "id": "W",
+            "title": "Canción W",
+            "artist": "Artista"
+          }
+        ]
+      },
+      "nube": {
+        "favorites": [],
+        "deleted": [
+          {
+            "k": "favorite",
+            "id": "X",
+            "m": [
+              1760808000000,
+              4,
+              "WR85D13C"
+            ]
+          }
+        ]
+      },
+      "esperado": {
+        "favorites": [
+          {
+            "id": "X",
+            "title": "Canción X",
+            "artist": "Artista",
+            "a": [
+              1763400000000,
+              2,
+              "TJJTHK2B"
+            ]
+          },
+          {
+            "id": "W",
+            "title": "Canción W",
+            "artist": "Artista",
+            "a": [
+              1763400000000,
+              1,
+              "TJJTHK2B"
+            ]
+          }
+        ],
+        "deleted": [
+          {
+            "k": "favorite",
+            "id": "X",
+            "m": [
+              1760808000000,
+              4,
+              "WR85D13C"
+            ]
+          }
+        ]
+      },
+      "aviso": null,
+      "comprobar": {
+        "queda": [
+          "favorites:X",
+          "favorites:W"
+        ],
+        "orden_lista": {
+          "favorites": [
+            "X",
+            "W"
+          ]
+        }
+      }
+    },
+    {
+      "nombre": "carpetas de álbumes y álbumes guardados: se unen como las de playlists (v, a y bajas)",
+      "regla": "§5.5 paso 4",
+      "conmutativo": true,
+      "local": {
+        "albumFolders": [
+          {
+            "id": "AF1",
+            "name": "Años 70",
+            "icon": "guitars.fill",
+            "tint": 6,
+            "a": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "v": [
+              1763399000000,
+              5,
+              "TJJTHK2B"
+            ]
+          }
+        ],
+        "playlists": [
+          {
+            "id": "AL",
+            "name": "Currents",
+            "album": {
+              "browseId": "MPREb_x",
+              "artist": "Tame Impala"
+            },
+            "folder": "AF1",
+            "a": [
+              1763391000000,
+              2,
+              "TJJTHK2B"
+            ],
+            "v": [
+              1763391000000,
+              2,
+              "TJJTHK2B"
+            ],
+            "vCanciones": [
+              1763391000000,
+              2,
+              "TJJTHK2B"
+            ],
+            "songs": [
+              {
+                "id": "t1",
+                "title": "Canción t1",
+                "artist": "Artista",
+                "a": [
+                  1763391000000,
+                  3,
+                  "TJJTHK2B"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "nube": {
+        "albumFolders": [
+          {
+            "id": "AF1",
+            "name": "Setenta",
+            "a": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "v": [
+              1763398000000,
+              4,
+              "WR85D13C"
+            ]
+          },
+          {
+            "id": "AF2",
+            "name": "Directos",
+            "a": [
+              1763397000000,
+              6,
+              "WR85D13C"
+            ],
+            "v": [
+              1763397000000,
+              6,
+              "WR85D13C"
+            ]
+          }
+        ],
+        "deleted": [
+          {
+            "k": "albumFolder",
+            "id": "AF3",
+            "m": [
+              1763399000000,
+              7,
+              "WR85D13C"
+            ]
+          }
+        ]
+      },
+      "esperado": {
+        "albumFolders": [
+          {
+            "id": "AF2",
+            "name": "Directos",
+            "a": [
+              1763397000000,
+              6,
+              "WR85D13C"
+            ],
+            "v": [
+              1763397000000,
+              6,
+              "WR85D13C"
+            ]
+          },
+          {
+            "id": "AF1",
+            "name": "Años 70",
+            "icon": "guitars.fill",
+            "tint": 6,
+            "a": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "v": [
+              1763399000000,
+              5,
+              "TJJTHK2B"
+            ]
+          }
+        ],
+        "playlists": [
+          {
+            "id": "AL",
+            "name": "Currents",
+            "album": {
+              "browseId": "MPREb_x",
+              "artist": "Tame Impala"
+            },
+            "folder": "AF1",
+            "a": [
+              1763391000000,
+              2,
+              "TJJTHK2B"
+            ],
+            "v": [
+              1763391000000,
+              2,
+              "TJJTHK2B"
+            ],
+            "vCanciones": [
+              1763391000000,
+              2,
+              "TJJTHK2B"
+            ],
+            "songs": [
+              {
+                "id": "t1",
+                "title": "Canción t1",
+                "artist": "Artista",
+                "a": [
+                  1763391000000,
+                  3,
+                  "TJJTHK2B"
+                ]
+              }
+            ]
+          }
+        ],
+        "deleted": [
+          {
+            "k": "albumFolder",
+            "id": "AF3",
+            "m": [
+              1763399000000,
+              7,
+              "WR85D13C"
+            ]
+          }
+        ]
+      },
+      "aviso": null,
+      "comprobar": {
+        "queda": [
+          "albumFolders:AF1",
+          "albumFolders:AF2",
+          "playlists:AL"
+        ],
+        "nombre": {
+          "albumFolders:AF1": "Años 70"
+        }
+      }
+    },
+    {
+      "nombre": "los cinco órdenes: cada uno con su vOrden; en las listas, lo del otro que falte va detrás",
+      "regla": "§5.5 paso 6",
+      "conmutativo": true,
+      "local": {
+        "albumOrder": [
+          "folder:AF1",
+          "A1",
+          "A2"
+        ],
+        "musicOrder": [
+          "playlists",
+          "songs",
+          "albums"
+        ],
+        "playlistSort": "manual",
+        "albumSort": "recent",
+        "vOrden": {
+          "albumOrder": [
+            1763399000000,
+            3,
+            "TJJTHK2B"
+          ],
+          "musicOrder": [
+            1763391000000,
+            1,
+            "TJJTHK2B"
+          ],
+          "playlistSort": [
+            1763391000000,
+            2,
+            "TJJTHK2B"
+          ],
+          "albumSort": [
+            1763391000000,
+            2,
+            "TJJTHK2B"
+          ]
+        }
+      },
+      "nube": {
+        "albumOrder": [
+          "A2",
+          "A3"
+        ],
+        "musicOrder": [
+          "songs",
+          "playlists",
+          "albums",
+          "stats"
+        ],
+        "playlistSort": "name",
+        "albumSort": "custom",
+        "vOrden": {
+          "albumOrder": [
+            1763398000000,
+            4,
+            "WR85D13C"
+          ],
+          "musicOrder": [
+            1763395000000,
+            5,
+            "WR85D13C"
+          ],
+          "playlistSort": [
+            1763395000000,
+            6,
+            "WR85D13C"
+          ],
+          "albumSort": [
+            1763391000000,
+            1,
+            "WR85D13C"
+          ]
+        }
+      },
+      "esperado": {
+        "albumOrder": [
+          "folder:AF1",
+          "A1",
+          "A2",
+          "A3"
+        ],
+        "vOrden": {
+          "albumOrder": [
+            1763399000000,
+            3,
+            "TJJTHK2B"
+          ],
+          "musicOrder": [
+            1763395000000,
+            5,
+            "WR85D13C"
+          ],
+          "playlistSort": [
+            1763395000000,
+            6,
+            "WR85D13C"
+          ],
+          "albumSort": [
+            1763391000000,
+            2,
+            "TJJTHK2B"
+          ]
+        },
+        "musicOrder": [
+          "songs",
+          "playlists",
+          "albums",
+          "stats"
+        ],
+        "playlistSort": "name",
+        "albumSort": "recent"
+      },
+      "aviso": null,
+      "comprobar": {
+        "ordenes": {
+          "albumOrder": [
+            "folder:AF1",
+            "A1",
+            "A2",
+            "A3"
+          ],
+          "musicOrder": [
+            "songs",
+            "playlists",
+            "albums",
+            "stats"
+          ],
+          "playlistSort": "name",
+          "albumSort": "recent"
+        }
+      }
+    },
+    {
+      "nombre": "portadas: las de la playlist que gana (o la del otro si ésa no tiene); recientes, los del móvil",
+      "regla": "§5.5 paso 6 y §1",
+      "conmutativo": false,
+      "local": {
+        "playlists": [
+          {
+            "id": "P",
+            "name": "Viaje",
+            "a": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "v": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "vCanciones": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "songs": []
+          },
+          {
+            "id": "Q",
+            "name": "Gym",
+            "a": [
+              1763391000000,
+              2,
+              "TJJTHK2B"
+            ],
+            "v": [
+              1763399000000,
+              9,
+              "TJJTHK2B"
+            ],
+            "vCanciones": [
+              1763391000000,
+              2,
+              "TJJTHK2B"
+            ],
+            "songs": []
+          }
+        ],
+        "covers": {
+          "P": "cG9ydGFkYS1sb2NhbA",
+          "Q": "Z3ltLWxvY2Fs"
+        },
+        "recents": [
+          {
+            "id": "r1",
+            "title": "Canción r1",
+            "artist": "Artista"
+          }
+        ]
+      },
+      "nube": {
+        "playlists": [
+          {
+            "id": "P",
+            "name": "Viaje",
+            "a": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "v": [
+              1763398000000,
+              8,
+              "WR85D13C"
+            ],
+            "vCanciones": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "songs": []
+          },
+          {
+            "id": "Q",
+            "name": "Gym",
+            "a": [
+              1763391000000,
+              2,
+              "TJJTHK2B"
+            ],
+            "v": [
+              1763391000000,
+              2,
+              "TJJTHK2B"
+            ],
+            "vCanciones": [
+              1763391000000,
+              2,
+              "TJJTHK2B"
+            ],
+            "songs": []
+          }
+        ],
+        "covers": {
+          "P": "cG9ydGFkYS1udWJl"
+        },
+        "recents": [
+          {
+            "id": "r9",
+            "title": "Canción r9",
+            "artist": "Artista"
+          }
+        ]
+      },
+      "esperado": {
+        "playlists": [
+          {
+            "id": "Q",
+            "name": "Gym",
+            "a": [
+              1763391000000,
+              2,
+              "TJJTHK2B"
+            ],
+            "v": [
+              1763399000000,
+              9,
+              "TJJTHK2B"
+            ],
+            "songs": [],
+            "vCanciones": [
+              1763391000000,
+              2,
+              "TJJTHK2B"
+            ]
+          },
+          {
+            "id": "P",
+            "name": "Viaje",
+            "a": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "v": [
+              1763398000000,
+              8,
+              "WR85D13C"
+            ],
+            "songs": [],
+            "vCanciones": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ]
+          }
+        ],
+        "covers": {
+          "Q": "Z3ltLWxvY2Fs",
+          "P": "cG9ydGFkYS1udWJl"
+        },
+        "recents": [
+          {
+            "id": "r1",
+            "title": "Canción r1",
+            "artist": "Artista"
+          }
+        ]
+      },
+      "aviso": null,
+      "comprobar": {
+        "portadas": {
+          "P": "cG9ydGFkYS1udWJl",
+          "Q": "Z3ltLWxvY2Fs"
+        },
+        "recientes": [
+          "r1"
+        ]
+      }
+    }
+  ]
+}

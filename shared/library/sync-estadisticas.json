@@ -1,0 +1,236 @@
+{
+  "descripcion": "Unir dos stats.json (docs/spec/sync.md §6). Generado por tools/spec/generar-sync.mjs con la referencia tools/spec/sync.mjs: unirEstadisticas(local, nube, {ahora, tope}) tiene que dar «esperado».",
+  "ahora": 1763400000000,
+  "tope_por_defecto": 50000,
+  "casos": [
+    {
+      "nombre": "la misma escucha desde los dos lados cuenta una vez; songs: unión, gana la local",
+      "local": {
+        "version": 1,
+        "songs": {
+          "a": {
+            "title": "A local",
+            "artist": "Artista",
+            "thumbnail": null
+          },
+          "b": {
+            "title": "B",
+            "artist": "Artista",
+            "thumbnail": null
+          }
+        },
+        "plays": [
+          [
+            "a",
+            1763399970
+          ],
+          [
+            "b",
+            1763399980
+          ]
+        ]
+      },
+      "nube": {
+        "version": 1,
+        "songs": {
+          "a": {
+            "title": "A nube",
+            "artist": "Artista",
+            "thumbnail": null
+          },
+          "c": {
+            "title": "C",
+            "artist": "Artista",
+            "thumbnail": null
+          }
+        },
+        "plays": [
+          [
+            "a",
+            1763399970
+          ],
+          [
+            "c",
+            1763399975
+          ],
+          [
+            "a",
+            1763399990
+          ]
+        ]
+      },
+      "esperado": {
+        "version": 1,
+        "songs": {
+          "a": {
+            "title": "A local",
+            "artist": "Artista",
+            "thumbnail": null
+          },
+          "c": {
+            "title": "C",
+            "artist": "Artista",
+            "thumbnail": null
+          },
+          "b": {
+            "title": "B",
+            "artist": "Artista",
+            "thumbnail": null
+          }
+        },
+        "plays": [
+          [
+            "a",
+            1763399970
+          ],
+          [
+            "c",
+            1763399975
+          ],
+          [
+            "b",
+            1763399980
+          ],
+          [
+            "a",
+            1763399990
+          ]
+        ]
+      }
+    },
+    {
+      "nombre": "«Borrar estadísticas» en un móvil: el clearedAt mayor quita las escuchas de antes en los dos",
+      "local": {
+        "version": 1,
+        "songs": {
+          "a": {
+            "title": "A",
+            "artist": "Artista",
+            "thumbnail": null
+          }
+        },
+        "plays": [
+          [
+            "a",
+            1763399500
+          ],
+          [
+            "a",
+            1763399900
+          ]
+        ]
+      },
+      "nube": {
+        "version": 1,
+        "songs": {},
+        "plays": [
+          [
+            "b",
+            1763399950
+          ]
+        ],
+        "clearedAt": 1763399800
+      },
+      "esperado": {
+        "version": 1,
+        "songs": {
+          "a": {
+            "title": "A",
+            "artist": "Artista",
+            "thumbnail": null
+          }
+        },
+        "plays": [
+          [
+            "a",
+            1763399900
+          ],
+          [
+            "b",
+            1763399950
+          ]
+        ],
+        "clearedAt": 1763399800
+      }
+    },
+    {
+      "nombre": "H6: un clearedAt del futuro (hora mal) se recorta a ahora + 1 día",
+      "local": {
+        "version": 1,
+        "songs": {},
+        "plays": [
+          [
+            "a",
+            1763399990
+          ]
+        ],
+        "clearedAt": 1772400000
+      },
+      "nube": {
+        "version": 1,
+        "songs": {},
+        "plays": []
+      },
+      "esperado": {
+        "version": 1,
+        "songs": {},
+        "plays": [],
+        "clearedAt": 1763486400
+      }
+    },
+    {
+      "nombre": "tope de escuchas: se quedan las más recientes (tope 3 en este caso; en la app, 50.000)",
+      "tope": 3,
+      "local": {
+        "version": 1,
+        "songs": {},
+        "plays": [
+          [
+            "a",
+            1763399995
+          ],
+          [
+            "b",
+            1763399996
+          ],
+          [
+            "a",
+            1763399999
+          ]
+        ]
+      },
+      "nube": {
+        "version": 1,
+        "songs": {},
+        "plays": [
+          [
+            "c",
+            1763399997
+          ],
+          [
+            "d",
+            1763399998
+          ]
+        ]
+      },
+      "esperado": {
+        "version": 1,
+        "songs": {},
+        "plays": [
+          [
+            "c",
+            1763399997
+          ],
+          [
+            "d",
+            1763399998
+          ],
+          [
+            "a",
+            1763399999
+          ]
+        ]
+      }
+    }
+  ]
+}
