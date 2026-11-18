@@ -132,10 +132,12 @@ final class FingerTracker: UIGestureRecognizer, UIGestureRecognizerDelegate {
             let pa = a.location(in: nil), pb = b.location(in: nil)
             return hypot(pa.x - point.x, pa.y - point.y) < hypot(pb.x - point.x, pb.y - point.y)
         }
-        guard let touch = near, hypot(touch.location(in: nil).x - point.x, touch.location(in: nil).y - point.y) < 120 else { return false }
+        guard let touch = near, hypot(touch.location(in: nil).x - point.x, touch.location(in: nil).y - point.y) < 300 else { return false }
         followed = touch
         self.onMove = onMove
         self.onEnd = onEnd
+        // El dedo puede haberse movido desde `point` (mientras la pantalla de debajo vuelve): se coloca ya donde está.
+        onMove(touch.location(in: nil))
         return true
     }
 
@@ -420,6 +422,8 @@ extension View {
 @MainActor
 final class OrderLift<ID: Hashable>: ObservableObject {
     @Published var order: [ID] = []
+    /// El último relevo recogido (`OrderAdopt.token`): una portada que llega de una carpeta se recoge una sola vez.
+    var adoptedToken: Int?
     @Published private(set) var drag: OrderDrag<ID>?
     @Published private(set) var shift: CGSize = .zero
     /// El dedo sigue puesto (la copia levantada aún no ha vuelto a su hueco).
@@ -492,10 +496,13 @@ final class OrderLift<ID: Hashable>: ObservableObject {
     @discardableResult
     func adopt(_ id: ID, finger: CGPoint, grab: CGSize, reduceMotion: Bool,
                canDropInto: @escaping (ID, ID) -> Bool, canSwap: @escaping (ID, ID) -> Bool) -> Bool {
-        guard !holding, anchor.attached, let start = order.firstIndex(of: id) else { return false }
+        guard !holding else { return false }
+        // La pantalla de debajo no está en la ventana mientras la carpeta la tapa: se vuelve a intentar.
+        guard anchor.attached else { log("recoger-sin-ancla"); return false }
+        guard let start = order.firstIndex(of: id) else { log("recoger-sin-portada"); return false }
         var slots: [Int: CGRect] = [:]
         for (i, other) in order.enumerated() { if let f = frames[other] { slots[i] = f } }
-        guard let slot = slots[start] else { return false }
+        guard let slot = slots[start] else { log("recoger-sin-medir"); return false }
         asked += 1
         started += 1
         generation += 1

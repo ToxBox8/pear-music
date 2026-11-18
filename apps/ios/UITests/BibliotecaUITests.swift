@@ -890,12 +890,14 @@ final class BibliotecaUITests: XCTestCase {
         tapPencil("una carpeta")
         shot("2-carpeta")
         app.buttons["Hecho"].tap()
-        sleep(1)
-        back()
-        back()
+    }
+
+    /// El lápiz de Tus álbumes.
+    func testElLapizDeTusAlbumes() {
+        launch("01_biblioteca_cristal")
         openAlbums()
         tapPencil("Tus álbumes")
-        shot("3-albumes")
+        shot("1-albumes")
     }
 
     /// El lápiz de Fijados: entra en «Ordenar» de Fijados y, mientras tanto, no queda «Ordenar» de «Tu música».

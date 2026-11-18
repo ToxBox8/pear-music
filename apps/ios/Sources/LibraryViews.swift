@@ -808,10 +808,15 @@ struct ReorderGrid<Item: Identifiable, Destination: View, Cell: View>: View {
 
     /// La portada que llega cogida desde una carpeta (prompt 2-0b): en cuanto está medida, se levanta bajo el dedo y
     /// sus movimientos llegan de `FingerTracker` (el gesto de SwiftUI empezó en la pantalla que se ha ido).
-    private func tryAdopt() {
-        guard ordering, let a = adopt, lift.drag == nil else { return }
+    private func tryAdopt(retries: Int = 40) {
+        guard ordering, let a = adopt, lift.drag == nil, lift.adoptedToken != a.token else { return }
         guard lift.adopt(a.key, finger: a.finger, grab: a.grab, reduceMotion: OrderWiggle.reduced(reduceMotion),
-                         canDropInto: canDropInto, canSwap: canSwap) else { return }
+                         canDropInto: canDropInto, canSwap: canSwap) else {
+            // Aún no está en la ventana o sin medir (la carpeta se está cerrando): otra vez dentro de un momento.
+            if retries > 0 { DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { tryAdopt(retries: retries - 1) } }
+            return
+        }
+        lift.adoptedToken = a.token
         onAdopted()
         let grid = lift
         let following = FingerTracker.shared.follow(near: a.finger, onMove: { p in grid.move(start: .zero, now: p) },
