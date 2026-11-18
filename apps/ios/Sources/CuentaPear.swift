@@ -61,6 +61,9 @@ final class CuentaPear: ObservableObject {
     private init() {
         if let d = Llavero.leer("meta"), let m = try? JSONDecoder().decode(Meta.self, from: d) { meta = m }
         cuentaId = meta.cuenta
+        // Capturas: la cuenta de mentira sólo en los escenarios que la necesitan. (No en el cierre de `.demoRoute`:
+        // SwiftUI construye el destino aunque no sea la ruta del escenario, y la ponía en todos.)
+        if let r = Demo.current?.route, [.cuentaDispositivos, .cuentaComprobar, .cuentaBorrar].contains(r) { estadoDePrueba() }
     }
 
     // MARK: Errores (cuenta.md §7.1 y ADR 0004 §9)

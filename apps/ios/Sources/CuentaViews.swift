@@ -273,7 +273,8 @@ private struct CuentaConectada: View {
         Form {
             if let fecha = cuenta.borrarEn {
                 Section {
-                    Estado(ok: false, texto: L("Se va a borrar tu cuenta el {0}", Date(timeIntervalSince1970: TimeInterval(fecha)).formatted(date: .long, time: .omitted)))
+                    Estado(ok: false, texto: L("Se va a borrar tu cuenta el {0}", Date(timeIntervalSince1970: TimeInterval(fecha))
+                        .formatted(.dateTime.day().month(.wide).year().locale(Locale(identifier: I18n.current == "va" ? "ca" : I18n.current)))))
                     Button(L("Cancelar el borrado")) { hacer { try await cuenta.cancelarBorrado() } }
                 }
             }
@@ -413,7 +414,10 @@ struct DispositivosView: View {
 
     private func visto(_ d: CuentaPear.Dispositivo) -> String {
         guard let v = d.visto else { return L("Nunca") }
-        return L("Visto {0}", Date(timeIntervalSince1970: TimeInterval(v)).formatted(.relative(presentation: .named)))
+        // Fecha en el idioma de la app (no en el del sistema), igual que Android: «Visto 17 nov 2025».
+        let idioma = I18n.current == "va" ? "ca" : I18n.current
+        return L("Visto {0}", Date(timeIntervalSince1970: TimeInterval(v))
+            .formatted(.dateTime.day().month(.abbreviated).year().locale(Locale(identifier: idioma))))
     }
     private func hacer(_ trabajo: @escaping () async throws -> Void) {
         Task {

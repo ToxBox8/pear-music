@@ -213,9 +213,9 @@ struct SettingsView: View {
             .demoRoute(.cuentaCrear) { CrearCuentaView() }
             .demoRoute(.cuentaClave) { ClaveNuevaView(borrador: CuentaPear.shared.borrador()) }
             .demoRoute(.cuentaEntrar) { EntrarConClaveView() }
-            .demoRoute(.cuentaDispositivos) { let _ = CuentaPear.shared.estadoDePrueba(); DispositivosView() }
-            .demoRoute(.cuentaComprobar) { let _ = CuentaPear.shared.estadoDePrueba(); ComprobarClaveView() }
-            .demoRoute(.cuentaBorrar) { let _ = CuentaPear.shared.estadoDePrueba(); BorrarCuentaView() }
+            .demoRoute(.cuentaDispositivos) { DispositivosView() }
+            .demoRoute(.cuentaComprobar) { ComprobarClaveView() }
+            .demoRoute(.cuentaBorrar) { BorrarCuentaView() }
             .miniPlayer()
         }
         .overlay {
