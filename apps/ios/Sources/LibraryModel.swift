@@ -827,7 +827,8 @@ struct OrderDrag<ID: Hashable> {
     /// El borde de la carpeta en el que está el dedo, aún sin `swapDwell`, y desde cuándo (prompt 2-0b).
     private(set) var pendingSwap: ID?
     private(set) var pendingSwapSince: TimeInterval = 0
-    private var pendingSwapAt: CGPoint = .zero
+    // private(set), no private: un `private var` vuelve privado el init de la estructura (como en 7c4dcaf).
+    private(set) var pendingSwapAt: CGPoint = .zero
     /// Ha cambiado de puesto alguna vez (aunque vuelva al suyo).
     var changed = false
 
