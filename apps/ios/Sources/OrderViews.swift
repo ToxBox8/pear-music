@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import UIKit.UIGestureRecognizerSubclass
 
 // MARK: - Menús y gestos de la Biblioteca (pasos B y C de la revisión del bloque 1; DECISIONS 40, 42 y 43)
 // Regla: mantener pulsado abre el menú; arrastrar sólo existe en el modo «Ordenar», y en él sólo se arrastra (sin
@@ -32,6 +33,10 @@ enum OrderGesture {
     /// La portada levantada: un 4 % más grande e inclinada como en el boceto (con «Reducir movimiento», nada).
     static let liftScale: CGFloat = 1.04
     static let liftTilt: Double = -3
+    /// Sacar de una carpeta (prompt 2-0b): el dedo quieto este tiempo en la zona «Sacar de …» sube al nivel de arriba
+    /// con la portada cogida. La zona mide esto de alto, bajo la barra de navegación (y cuenta la barra entera).
+    static let leaveSeconds = 0.5
+    static let leaveBand: CGFloat = 60
 
     /// Dedo quieto 0,2 s y luego arrastrar. `onLift` cuando se levanta (aún sin mover) y `onMove` con el dedo en
     /// coordenadas de la ventana cada vez que se mueve. `pressing` vuelve a false si el gesto acaba o se cancela.
@@ -76,13 +81,150 @@ struct OrderAnchorView: UIViewRepresentable {
     let anchor: OrderAnchor
 
     func makeUIView(context: Context) -> UIView {
-        let v = UIView()
+        let v = TrackerInstaller()
         v.isUserInteractionEnabled = false
         v.backgroundColor = .clear
         anchor.view = v
         return v
     }
     func updateUIView(_ v: UIView, context: Context) { anchor.view = v }
+
+    /// Pone `FingerTracker` en la ventana en cuanto la cuadrícula está en pantalla, antes de que nadie la toque.
+    private final class TrackerInstaller: UIView {
+        override func didMoveToWindow() {
+            super.didMoveToWindow()
+            if let window { FingerTracker.install(on: window) }
+        }
+    }
+}
+
+/// Sigue un dedo por toda la ventana (prompt 2-0b): al sacar una playlist de una carpeta, la pantalla de la carpeta
+/// se va y con ella el gesto de SwiftUI que la sujetaba (no se puede pasar un gesto a medias a otra vista). Este
+/// reconocedor está en la ventana desde antes de tocar, nunca se reconoce ni corta nada (`.possible` todo el rato,
+/// sin retrasar toques) y así sigue recibiendo los movimientos de ese dedo aunque la vista que tocó ya no exista.
+@MainActor
+final class FingerTracker: UIGestureRecognizer, UIGestureRecognizerDelegate {
+    static let shared = FingerTracker()
+    private var live = Set<UITouch>()
+    private weak var followed: UITouch?
+    private var onMove: ((CGPoint) -> Void)?
+    /// `cancelled`: el sistema canceló el toque (no se levantó el dedo).
+    private var onEnd: ((_ cancelled: Bool) -> Void)?
+
+    private init() {
+        super.init(target: nil, action: nil)
+        cancelsTouchesInView = false
+        delaysTouchesBegan = false
+        delaysTouchesEnded = false
+        delegate = self
+    }
+
+    static func install(on window: UIWindow) {
+        guard shared.view !== window else { return }
+        shared.view?.removeGestureRecognizer(shared)
+        window.addGestureRecognizer(shared)
+    }
+
+    /// Empieza a seguir el dedo que está cerca de `point` (ventana). false si no hay ninguno puesto.
+    @discardableResult
+    func follow(near point: CGPoint, onMove: @escaping (CGPoint) -> Void, onEnd: @escaping (_ cancelled: Bool) -> Void) -> Bool {
+        let near = live.min { a, b in
+            let pa = a.location(in: nil), pb = b.location(in: nil)
+            return hypot(pa.x - point.x, pa.y - point.y) < hypot(pb.x - point.x, pb.y - point.y)
+        }
+        guard let touch = near, hypot(touch.location(in: nil).x - point.x, touch.location(in: nil).y - point.y) < 120 else { return false }
+        followed = touch
+        self.onMove = onMove
+        self.onEnd = onEnd
+        return true
+    }
+
+    private func release(cancelled: Bool) {
+        let end = onEnd
+        followed = nil; onMove = nil; onEnd = nil
+        end?(cancelled)
+    }
+
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent) { live.formUnion(touches) }
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent) {
+        if let f = followed, touches.contains(f) { onMove?(f.location(in: nil)) }
+    }
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent) { lift(touches, cancelled: false) }
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent) { lift(touches, cancelled: true) }
+    private func lift(_ touches: Set<UITouch>, cancelled: Bool) {
+        live.subtract(touches)
+        if let f = followed, touches.contains(f) { release(cancelled: cancelled) }
+        // Sin dedos puestos, se reinicia para el siguiente toque.
+        if live.isEmpty { state = .failed }
+    }
+    override func reset() {
+        super.reset()
+        live.removeAll()
+        if followed != nil { release(cancelled: true) }
+    }
+
+    func gestureRecognizer(_ g: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith other: UIGestureRecognizer) -> Bool { true }
+}
+
+/// Sacar de una carpeta arrastrando (prompt 2-0b): la playlist que sale y el dedo que la lleva, para que la pantalla
+/// de arriba la recoja (`OrderAdopt`) en cuanto la carpeta se cierra. Sólo se usa en el hilo principal.
+final class OrderHandoff: ObservableObject {
+    static let shared = OrderHandoff()
+    struct Pending: Equatable {
+        let token: Int
+        let key: String
+        /// El nivel que la recoge (nil = arriba del todo).
+        let level: String?
+        let finger: CGPoint
+        /// Dónde tenía cogida la portada el dedo, desde su esquina de arriba a la izquierda.
+        let grab: CGSize
+    }
+    @Published var pending: Pending?
+    /// Cuántas se han sacado (sólo para el registro de los tests).
+    private(set) var count = 0
+
+    func send(key: String, level: String?, finger: CGPoint, grab: CGSize) {
+        count += 1
+        pending = Pending(token: count, key: key, level: level, finger: finger, grab: grab)
+    }
+}
+
+/// La zona de arriba de una carpeta mientras se arrastra una playlist: `rect` (ventana) y qué hacer al cumplirse el
+/// tiempo. `canLeave` dice qué portadas pueden salir (las playlists; las carpetas se mueven con «Mover carpeta a…»).
+struct OrderLeave<ID> {
+    let rect: CGRect
+    let canLeave: (ID) -> Bool
+    let onLeave: (_ id: ID, _ finger: CGPoint, _ grab: CGSize) -> Void
+}
+
+/// Una portada que llega cogida desde la carpeta de la que ha salido.
+struct OrderAdopt<ID: Hashable>: Equatable {
+    let token: Int
+    let key: ID
+    let finger: CGPoint
+    let grab: CGSize
+}
+
+/// La zona «Sacar de «…»» (prompt 2-0b): aparece arriba mientras se arrastra una playlist dentro de una carpeta. Con
+/// el dedo encima, pasa a cápsula sumi con texto washi (como «Soltar en …»): está contando. Sin shu.
+struct OrderLeaveZone: View {
+    let title: String
+    let active: Bool
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "arrow.up.forward.square")
+            Text(title).lineLimit(1)
+        }
+        .font(.subheadline.weight(.semibold))
+        .foregroundStyle(active ? Tokens.Brand.washi : Color.primary)
+        .padding(.horizontal, 18)
+        .frame(minHeight: 44)
+        .background(Capsule().fill(active ? AnyShapeStyle(Tokens.Brand.sumi) : AnyShapeStyle(Color(.systemFill))))
+        .overlay(Capsule().strokeBorder(active ? Tokens.Brand.washi.opacity(0.35) : Color(.separator), lineWidth: 1))
+        .shadow(color: .black.opacity(0.16), radius: 10, y: 4)
+        .accessibilityHidden(true)
+        .allowsHitTesting(false)
+    }
 }
 
 /// Desplaza un `UIScrollView` solo mientras el dedo esté cerca de su borde (en el eje que se le diga), más rápido
@@ -104,6 +246,8 @@ final class EdgeScroller: NSObject {
     var from: CGPoint?
     private var lowOK = false
     private var highOK = false
+    /// Lo que tapa el borde de arriba (la zona «Sacar de …» de una carpeta): el borde empieza debajo.
+    var topInset: CGFloat = 0
     var onTick: () -> Void = {}
 
     func start(_ scroll: UIScrollView?, axis: Axis) {
@@ -135,7 +279,7 @@ final class EdgeScroller: NSObject {
         let inset = sv.adjustedContentInset
         let vertical = axis == .vertical
         // Lo que se ve: en vertical, sin las barras de arriba y abajo; en horizontal, la pantalla de lado a lado.
-        let lo = vertical ? frame.minY + max(inset.top, sv.safeAreaInsets.top) : frame.minX
+        let lo = vertical ? frame.minY + max(inset.top, sv.safeAreaInsets.top) + topInset : frame.minX
         let hi = vertical ? frame.maxY - max(inset.bottom, sv.safeAreaInsets.bottom) : frame.maxX
         let pos = vertical ? p.y : p.x
         let start = from.map { vertical ? $0.y : $0.x } ?? pos
@@ -208,6 +352,56 @@ struct OrderHole: View {
     }
 }
 
+/// El temblor del modo «Ordenar» (prompt 2-0 del bloque 2): todas las portadas que se pueden mover tiemblan, como los
+/// iconos del iPhone al reordenar las apps. Suave (poco ángulo, como el de «Tu música») y cada portada con su desfase y
+/// su ritmo, para que no vayan todas a la vez. La cogida no tiembla. Con «Reducir movimiento» no tiembla ninguna: cada
+/// portada lleva un borde fino del color del texto (`OrderMark`). Sin shu. Igual que `orderWiggle` en Android.
+enum OrderWiggle {
+    /// Cuánto se inclina a cada lado, en grados.
+    static let degrees: Double = 1.1
+    /// Una ida y vuelta, en segundos: de `period` a `period + spread` según la portada.
+    static let period: Double = 0.52
+    static let spread: Double = 0.12
+    /// El borde de «Reducir movimiento», en puntos.
+    static let border: CGFloat = 1
+
+    /// «Reducir movimiento» del sistema o, sólo en las capturas y los tests, el del escenario (`Demo`).
+    static func reduced(_ system: Bool) -> Bool { system || Demo.current?.reduceMotion == true }
+
+    /// El ángulo de una portada en un momento: un seno con el desfase y el ritmo que salen de `seed` (su id).
+    static func angle(at date: Date, seed: Int) -> Double {
+        let bits = UInt(bitPattern: seed)
+        let phase = Double(bits % 997) / 997
+        let rate = period + spread * Double((bits / 997) % 101) / 100
+        let t = date.timeIntervalSinceReferenceDate / rate + phase
+        return degrees * sin(2 * .pi * t)
+    }
+}
+
+extension View {
+    /// Tiembla mientras `on` (en «Ordenar», no cogida y sin «Reducir movimiento»). Es un giro de dibujo: no cambia el
+    /// marco que mide el arrastre (`OrderFrameKey` se lee fuera). Con `on` apagado el reloj se para y se queda recta.
+    func orderWiggle(_ on: Bool, seed: Int) -> some View {
+        TimelineView(.animation(minimumInterval: nil, paused: !on)) { tl in
+            rotationEffect(.degrees(on ? OrderWiggle.angle(at: tl.date, seed: seed) : 0))
+        }
+    }
+}
+
+/// «Reducir movimiento» en «Ordenar»: en vez de temblar, un borde fino del color del texto alrededor de la portada.
+struct OrderMark: View {
+    var radius: CGFloat = Tokens.Radius.row
+    var side: CGFloat? = nil
+    var body: some View {
+        RoundedRectangle(cornerRadius: radius, style: .continuous)
+            .strokeBorder(Color.primary, lineWidth: OrderWiggle.border)
+            .aspectRatio(1, contentMode: .fit)
+            .frame(width: side, height: side)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+    }
+}
+
 extension View {
     /// La portada levantada: un poco más grande, inclinada y con sombra (con «Reducir movimiento», sólo la sombra).
     /// Se dibuja encima de la cuadrícula en el sitio del dedo, sin animación.
@@ -240,6 +434,10 @@ final class OrderLift<ID: Hashable>: ObservableObject {
     private var canSwap: (ID, ID) -> Bool = { _, _ in true }
     private var reduceMotion = false
     private var generation = 0
+    /// Sacar de una carpeta (prompt 2-0b): la zona de arriba, si la hay, y desde cuándo está el dedo en ella.
+    var leave: OrderLeave<ID>? { didSet { scroller.topInset = leave == nil ? 0 : OrderGesture.leaveBand } }
+    @Published private(set) var leaving = false
+    private var leaveSince: CFTimeInterval?
     /// Sólo en los tests de interfaz y las capturas (`-screenshotScenario`): qué ha pasado con el último gesto, para
     /// que un test que falla diga por qué (si el arrastre arrancó y con cuántas celdas medidas). `OrderDebugLabel` lo
     /// enseña como texto invisible.
@@ -250,7 +448,7 @@ final class OrderLift<ID: Hashable>: ObservableObject {
     private func log(_ fail: String? = nil) {
         guard Demo.current != nil else { return }
         if let fail { lastFail = fail }
-        let text = "pedidos=\(asked) arrancados=\(started) fallo=\(lastFail) celdas=\(frames.count) orden=\(order.count) " // i18n: no
+        let text = OrderLog.lift(asked: asked, started: started, fail: lastFail, cells: frames.count, order: order.count)
             + "ancla=\(anchor.attached ? "si" : "no") listas=\(anchor.scrollViews.count) movimientos=\(moves) "
             + "inicio=\(startLocal == nil ? "no" : "si") soltados=\(ended)"
         if text != debug { debug = text }
@@ -288,6 +486,40 @@ final class OrderLift<ID: Hashable>: ObservableObject {
         log("-")
     }
 
+    /// Una portada llega cogida desde una carpeta (prompt 2-0b): se levanta sin gesto, bajo `finger` (ventana) y
+    /// cogida por el mismo sitio (`grab`). Los movimientos llegan después de `FingerTracker`. false si aún no está
+    /// medida (se vuelve a intentar al medirse).
+    @discardableResult
+    func adopt(_ id: ID, finger: CGPoint, grab: CGSize, reduceMotion: Bool,
+               canDropInto: @escaping (ID, ID) -> Bool, canSwap: @escaping (ID, ID) -> Bool) -> Bool {
+        guard !holding, anchor.attached, let start = order.firstIndex(of: id) else { return false }
+        var slots: [Int: CGRect] = [:]
+        for (i, other) in order.enumerated() { if let f = frames[other] { slots[i] = f } }
+        guard let slot = slots[start] else { return false }
+        asked += 1
+        started += 1
+        generation += 1
+        holding = true
+        self.reduceMotion = reduceMotion
+        self.canDropInto = canDropInto
+        self.canSwap = canSwap
+        startLocal = CGPoint(x: slot.minX + grab.width, y: slot.minY + grab.height)
+        drag = OrderDrag(id: id, slots: slots, start: start)
+        let views = anchor.scrollViews
+        paused = Array(views.prefix(1)).filter(\.isScrollEnabled)
+        paused.forEach { $0.isScrollEnabled = false }
+        scroller.start(views.first, axis: .vertical)
+        scroller.from = finger
+        scroller.finger = finger
+        TabSwipe.blockedUntil = .distantFuture
+        follow()
+        log("-")
+        return true
+    }
+
+    /// Para el registro de los tests: por qué se soltó una portada recogida (`sin-dedo`, `dedo-cancelado`).
+    func note(_ fail: String) { log(fail) }
+
     /// El dedo se ha movido (coordenadas de la ventana): `start` es donde estaba al levantarse.
     func move(start: CGPoint, now: CGPoint) {
         guard holding else { return }
@@ -304,7 +536,16 @@ final class OrderLift<ID: Hashable>: ObservableObject {
         guard holding, var d = drag, let w = scroller.finger, let p = anchor.local(w), let s = startLocal else { return }
         let moved = CGSize(width: p.x - s.x, height: p.y - s.y)
         let before = d.into
-        let next = d.move(to: p, translation: moved, order: order, canDropInto: canDropInto, canSwap: canSwap)
+        let next = d.move(to: p, translation: moved, order: order, now: CACurrentMediaTime(), canDropInto: canDropInto, canSwap: canSwap)
+        // En el centro de una carpeta (o en su borde, prompt 2-0b) pero aún sin el tiempo: con el dedo quieto no llega
+        // ningún movimiento, así que se vuelve a mirar al cumplirse (prompt 2-0).
+        if let wait = d.recheckAfter {
+            let token = generation
+            DispatchQueue.main.asyncAfter(deadline: .now() + wait + 0.02) { [weak self] in
+                guard let self, self.generation == token else { return }
+                self.follow()
+            }
+        }
         if next != order {
             UISelectionFeedbackGenerator().selectionChanged()
             // Sólo se animan las que se apartan; la levantada va con el dedo (`shift`, fuera de la animación).
@@ -314,6 +555,49 @@ final class OrderLift<ID: Hashable>: ObservableObject {
         }
         drag = d
         shift = moved
+        checkLeave(finger: w, id: d.id)
+    }
+
+    /// La zona «Sacar de …»: con el dedo quieto `leaveSeconds` en ella, la portada sale al nivel de arriba.
+    private func checkLeave(finger: CGPoint, id: ID) {
+        guard let lv = leave, lv.canLeave(id), lv.rect.contains(finger) || finger.y < lv.rect.minY else {
+            leaveSince = nil
+            if leaving { leaving = false }
+            return
+        }
+        let now = CACurrentMediaTime()
+        guard let since = leaveSince else {
+            leaveSince = now
+            leaving = true
+            UISelectionFeedbackGenerator().selectionChanged()
+            let token = generation
+            DispatchQueue.main.asyncAfter(deadline: .now() + OrderGesture.leaveSeconds + 0.02) { [weak self] in
+                guard let self, self.generation == token else { return }
+                self.follow()
+            }
+            return
+        }
+        guard now - since >= OrderGesture.leaveSeconds else { return }
+        handOff(lv)
+    }
+
+    /// Suelta la portada sin guardar nada aquí y se la pasa a `onLeave` (la carpeta se cerrará).
+    private func handOff(_ lv: OrderLeave<ID>) {
+        guard holding, let d = drag, let s = startLocal, let slot = d.slots[d.start], let finger = scroller.finger else { return }
+        let grab = CGSize(width: s.x - slot.minX, height: s.y - slot.minY)
+        holding = false
+        generation += 1
+        leaveSince = nil
+        leaving = false
+        scroller.stop()
+        paused.forEach { $0.isScrollEnabled = true }
+        paused = []
+        TabSwipe.blockedUntil = Date().addingTimeInterval(0.4)
+        drag = nil
+        shift = .zero
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        log("sacada")
+        lv.onLeave(d.id, finger, grab)
     }
 
     /// El dedo se ha levantado (o el gesto se ha cortado). Devuelve cómo acabó, para guardar el orden o meterla en una
@@ -322,6 +606,8 @@ final class OrderLift<ID: Hashable>: ObservableObject {
     func end() -> OrderDrag<ID>? {
         guard holding, let d = drag else { return nil }
         holding = false
+        leaveSince = nil
+        leaving = false
         ended += 1
         log()
         TabSwipe.blockedUntil = Date().addingTimeInterval(0.4)
@@ -360,6 +646,22 @@ struct OrderDebugLabel: View {
                 .accessibilityIdentifier(id)
                 .allowsHitTesting(false)
         }
+    }
+}
+
+/// El lápiz junto al ⋯ (prompt 2-0b, lo pidió Toxbox): un toque entra directo en «Ordenar». Del color del texto, sin
+/// shu; para VoiceOver se llama «Ordenar». Playlists, cada carpeta, Tus álbumes y Fijados. Igual que `OrderPencil` en
+/// Android.
+struct OrderPencil: View {
+    let action: () -> Void
+    var body: some View {
+        Button(action: action) { Image(systemName: "pencil") }
+            .tint(Color.primary)
+            .foregroundStyle(Color.primary)
+            .frame(minWidth: 44, minHeight: 44)
+            .contentShape(Rectangle())
+            .accessibilityLabel(L("Ordenar"))
+            .accessibilityIdentifier("lapiz-ordenar")
     }
 }
 

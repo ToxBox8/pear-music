@@ -232,12 +232,57 @@ igual(LibraryOrder.level(gym, playlists: propias, folders: fs, sort: "custom", o
 // Arrastrar dentro de una carpeta (donde Descargadas y Favoritos no se ven) con otro orden puesto: arriba del todo
 // siguen delante, no saltan al final (revisión del bloque 1).
 let dentro = LibraryOrder.reorder(level: [b001, kF002], playlists: propias, folders: fs, sort: "recent", order: [])
-igual(LibraryOrder.level(gym, playlists: propias, folders: fs, sort: "custom", order: dentro, smartInPlaylists: true), [kF002, b001],
-      "a mano dentro de una carpeta: las carpetas siguen delante")
+igual(LibraryOrder.level(gym, playlists: propias, folders: fs, sort: "custom", order: dentro, smartInPlaylists: true), [b001, kF002],
+      "a mano dentro de una carpeta: carpetas y playlists mezcladas (2-0b)")
 igual(LibraryOrder.level(nil, playlists: propias, folders: fs, sort: "custom", order: dentro, smartInPlaylists: true),
       ["downloads", "favorites", kViajes, kGym, b004], "a mano dentro de una carpeta: Descargadas y Favoritos no saltan al final")
 igual(LibraryOrder.level(nil, playlists: propias, folders: fs, sort: "custom", order: dentro, smartInPlaylists: false),
       [kViajes, kGym, b004], "a mano dentro de una carpeta: con Descargadas y Favoritos en Tu música, no salen")
+
+// MARK: Carpetas y playlists mezcladas «A mano» (prompt 2-0b; mismos casos que PlaylistFoldersTest.kt)
+let mezclado = ["downloads", kGym, b004, "favorites", kViajes]
+let ordenMezclado = LibraryOrder.reorder(level: mezclado, playlists: propias, folders: fs, sort: "recent", order: [])
+igual(LibraryOrder.level(nil, playlists: propias, folders: fs, sort: "custom", order: ordenMezclado, smartInPlaylists: true),
+      mezclado, "mezcladas: el nivel queda como se dejó")
+igual(LibraryOrder.level(nil, playlists: propias, folders: fs, sort: "custom", order: ordenMezclado, smartInPlaylists: false),
+      [kGym, b004, kViajes], "mezcladas, con Descargadas y Favoritos en Tu música")
+igual(LibraryOrder.level(nil, playlists: propias, folders: fs, sort: "name", order: ordenMezclado, smartInPlaylists: false),
+      [kGym, kViajes, b004], "con otro criterio las carpetas siguen delante")
+igual(LibraryOrder.level(nil, playlists: propias, folders: fs, sort: "custom", order: ["downloads", "favorites", kGym, b004], smartInPlaylists: true),
+      ["downloads", "favorites", kGym, kViajes, b004], "una carpeta que no está en el orden: detrás de la última que sí")
+igual(LibraryOrder.level(nil, playlists: propias, folders: fs, sort: "custom", order: ["favorites", b004, "downloads"], smartInPlaylists: true),
+      ["favorites", kGym, kViajes, b004, "downloads"], "ninguna carpeta en el orden: delante de la primera playlist")
+igual(LibraryOrder.level(nil, playlists: propias, folders: fs, sort: "custom", order: [b004], smartInPlaylists: true),
+      [kGym, kViajes, b004, "downloads", "favorites"], "lo que falta del orden va detrás, como siempre")
+// Un orden de antes del 2-0b (carpetas seguidas y delante en cada nivel) se ve igual que antes.
+let ordenViejo = LibraryOrder.materialize(playlists: propias, folders: fs, sort: "recent", order: [], smartInPlaylists: true)
+igual(LibraryOrder.level(nil, playlists: propias, folders: fs, sort: "custom", order: ordenViejo, smartInPlaylists: true),
+      ["downloads", "favorites", kViajes, kGym, b004], "orden de antes: igual que antes")
+// El lector de la 3.0 anterior (congelado: carpetas delante en el orden de `order`, después las playlists) lee el
+// orden mezclado sin perder nada: el formato es el mismo, sólo cambia dónde se pintan las carpetas.
+func nivelViejo(_ order: [String]) -> [String] {
+    let listas = LibraryOrder.keys(propias.filter { $0.folder == nil }, sort: "custom", order: order, smartInPlaylists: true)
+    let mias = fs.filter { $0.parent == nil }.map { LibraryOrder.key(folder: $0.id) }
+    let guardadas = order.filter { mias.contains($0) }
+    let carpetasViejas = guardadas + mias.filter { !guardadas.contains($0) }
+    let at = listas.firstIndex { $0 != "downloads" && $0 != "favorites" } ?? listas.endIndex
+    return Array(listas[..<at]) + carpetasViejas + Array(listas[at...])
+}
+igual(nivelViejo(ordenMezclado), ["downloads", kGym, kViajes, b004, "favorites"], "la 3.0 anterior lo lee: carpetas delante, nada se pierde")
+igual(Set(nivelViejo(ordenMezclado)), Set(mezclado), "la 3.0 anterior: las mismas portadas")
+// iOS 2.2 / Android 1.2 sólo conocen las playlists: las claves `folder:` se saltan.
+igual(LibraryOrder.keys(propias.filter { $0.folder == nil }, sort: "custom", order: ordenMezclado, smartInPlaylists: true),
+      ["downloads", b004, "favorites"], "versiones sin carpetas: se saltan las claves folder:")
+
+// MARK: Sacar de una carpeta arrastrando (prompt 2-0b; mismos casos que PlaylistFoldersTest.kt)
+igual(PlaylistFolders.ancestor(of: lunes, at: nil, in: fs), gym, "desde Lunes, arriba del todo: Gimnasio")
+igual(PlaylistFolders.ancestor(of: lunes, at: gym, in: fs), pierna, "desde Lunes, en Gimnasio: Pierna")
+igual(PlaylistFolders.ancestor(of: lunes, at: pierna, in: fs), lunes, "desde Lunes, en Pierna: ella misma")
+igual(PlaylistFolders.ancestor(of: lunes, at: viajes, in: fs), nil, "Viajes no tiene a Lunes debajo")
+igual(PlaylistFolders.ancestor(of: lunes, at: lunes, in: fs), nil, "en su propio nivel no hay carpeta de la que salga")
+igual(LibraryOrder.placing(b004, after: kGym, in: [kViajes, kGym, "downloads", b004]), [kViajes, kGym, b004, "downloads"],
+      "sale justo detrás de su carpeta")
+igual(LibraryOrder.placing(b004, after: kGym, in: [kViajes]), [kViajes, b004], "si la carpeta no está en el orden, al final")
 
 // MARK: «Nueva carpeta» de «Mover a…»: una carpeta con 3 niveles dentro no cabe en ninguna
 cierto(!PlaylistFolders.canMoveIntoNew(gym, folders: fs), "Gimnasio (3 niveles) no cabe en una carpeta nueva")

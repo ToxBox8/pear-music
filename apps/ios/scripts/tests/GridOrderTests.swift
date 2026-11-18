@@ -48,13 +48,34 @@ do {
     igual(d.offset(in: orden), CGSize(width: 3, height: 3), "sigue al dedo desde su hueco nuevo")
 }
 do {
-    // Encima de una carpeta: se marca para soltarla dentro y no se reordena.
+    // Encima de una carpeta: en el centro de su portada y 0,3 s quieto se marca para soltarla dentro; no se reordena.
     var d = OrderDrag(id: "Noche", slots: huecos, start: 2)
-    let orden = d.move(to: centro(1), translation: CGSize(width: 110, height: -130), order: ids, canDropInto: admite, canSwap: mismoTipo)
+    let orden = d.move(to: centro(1), translation: CGSize(width: 110, height: -130), order: ids, now: 10, canDropInto: admite, canSwap: mismoTipo)
     igual(orden, ids, "sobre una carpeta no cambia el orden")
-    igual(d.into, "f:Via", "la carpeta queda marcada")
-    _ = d.move(to: CGPoint(x: 105, y: 60), translation: .zero, order: ids, canDropInto: admite, canSwap: mismoTipo)
+    igual(d.into, nil, "recién llegada al centro aún no se marca")
+    _ = d.move(to: CGPoint(x: 162, y: 58), translation: .zero, order: ids, now: 10.2, canDropInto: admite, canSwap: mismoTipo)
+    igual(d.into, nil, "a los 0,2 s todavía no")
+    _ = d.move(to: centro(1), translation: .zero, order: ids, now: 10.31, canDropInto: admite, canSwap: mismoTipo)
+    igual(d.into, "f:Via", "a los 0,3 s en el centro, la carpeta queda marcada")
+    _ = d.move(to: CGPoint(x: 105, y: 60), translation: .zero, order: ids, now: 10.4, canDropInto: admite, canSwap: mismoTipo)
     igual(d.into, nil, "entre dos celdas no hay nada marcado")
+}
+do {
+    // Prompt 2-0: en el borde de la carpeta o en su nombre no se marca nunca (es mover al lado, no meter dentro), y
+    // salir del centro y volver empieza a contar otra vez.
+    var d = OrderDrag(id: "Noche", slots: huecos, start: 2)
+    _ = d.move(to: CGPoint(x: 115, y: 60), translation: .zero, order: ids, now: 0, canDropInto: admite, canSwap: mismoTipo)
+    _ = d.move(to: CGPoint(x: 116, y: 60), translation: .zero, order: ids, now: 5, canDropInto: admite, canSwap: mismoTipo)
+    igual(d.into, nil, "en el borde de la portada no se marca aunque se quede")
+    _ = d.move(to: CGPoint(x: 160, y: 110), translation: .zero, order: ids, now: 6, canDropInto: admite, canSwap: mismoTipo)
+    _ = d.move(to: CGPoint(x: 160, y: 111), translation: .zero, order: ids, now: 7, canDropInto: admite, canSwap: mismoTipo)
+    igual(d.into, nil, "en el nombre de la carpeta no se marca")
+    _ = d.move(to: centro(1), translation: .zero, order: ids, now: 10, canDropInto: admite, canSwap: mismoTipo)
+    _ = d.move(to: CGPoint(x: 115, y: 60), translation: .zero, order: ids, now: 10.2, canDropInto: admite, canSwap: mismoTipo)
+    _ = d.move(to: centro(1), translation: .zero, order: ids, now: 10.4, canDropInto: admite, canSwap: mismoTipo)
+    igual(d.into, nil, "al volver al centro el tiempo empieza de nuevo")
+    _ = d.move(to: centro(1), translation: .zero, order: ids, now: 10.71, canDropInto: admite, canSwap: mismoTipo)
+    igual(d.into, "f:Via", "y a los 0,3 s se marca")
 }
 do {
     // Una carpeta sobre una playlist: ni entra ni se apartan.
@@ -62,6 +83,55 @@ do {
     igual(d.move(to: centro(3), translation: .zero, order: ids, canDropInto: admite, canSwap: mismoTipo), ids, "carpeta sobre playlist")
     igual(d.into, nil, "nada marcado")
     igual(d.move(to: centro(1), translation: .zero, order: ids, canDropInto: admite, canSwap: mismoTipo), ["f:Via", "f:Gim", "Noche", "Playa", "Correr"], "carpeta sobre carpeta: se ordenan")
+}
+
+// MARK: Prompt 2-0b: carpetas y playlists mezcladas (se cambian el sitio todas con todas)
+let todas: (String, String) -> Bool = { _, _ in true }
+do {
+    // «Noche» (puesto 2) al borde de la carpeta «Via» (puesto 1): sólo se cambian el sitio si el dedo se para 0,15 s.
+    var d = OrderDrag(id: "Noche", slots: huecos, start: 2)
+    let borde = CGPoint(x: 115, y: 60)
+    igual(d.move(to: borde, translation: .zero, order: ids, now: 0, canDropInto: admite, canSwap: todas), ids, "al llegar al borde no se mueve aún")
+    igual(d.recheckAfter, OrderDrag<String>.swapDwell, "y pide volver a mirar")
+    igual(d.move(to: borde, translation: .zero, order: ids, now: 0.1, canDropInto: admite, canSwap: todas), ids, "a los 0,1 s, aún no")
+    igual(d.move(to: borde, translation: .zero, order: ids, now: 0.16, canDropInto: admite, canSwap: todas),
+          ["f:Gim", "Noche", "f:Via", "Playa", "Correr"], "a los 0,15 s en el borde se cambian el sitio")
+    igual(d.changed, true, "cuenta como movida")
+}
+do {
+    // Moverse por el borde (al llegar desde abajo se cruza el nombre y el margen) no cuenta: sólo el dedo parado.
+    var d = OrderDrag(id: "Noche", slots: huecos, start: 2)
+    for (i, y) in stride(from: 118.0, through: 90.0, by: -7.0).enumerated() {
+        igual(d.move(to: CGPoint(x: 160, y: y), translation: .zero, order: ids, now: 0.1 * Double(i), canDropInto: admite, canSwap: todas), ids, "moviéndose por el borde (\(y))")
+    }
+    igual(d.move(to: CGPoint(x: 160, y: 90), translation: .zero, order: ids, now: 0.56, canDropInto: admite, canSwap: todas),
+          ["f:Gim", "Noche", "f:Via", "Playa", "Correr"], "parado 0,15 s: se cambian el sitio")
+}
+do {
+    // Pasar por el borde sin pararse y llegar al centro: no se cambia el sitio; 0,3 s en el centro la marca.
+    var d = OrderDrag(id: "Noche", slots: huecos, start: 2)
+    _ = d.move(to: CGPoint(x: 115, y: 60), translation: .zero, order: ids, now: 0, canDropInto: admite, canSwap: todas)
+    igual(d.move(to: centro(1), translation: .zero, order: ids, now: 0.1, canDropInto: admite, canSwap: todas), ids, "de paso hacia el centro: nada")
+    igual(d.move(to: centro(1), translation: .zero, order: ids, now: 0.3, canDropInto: admite, canSwap: todas), ids, "en el centro no se cambia el sitio")
+    igual(d.into, nil, "aún sin el tiempo")
+    _ = d.move(to: centro(1), translation: .zero, order: ids, now: 0.41, canDropInto: admite, canSwap: todas)
+    igual(d.into, "f:Via", "0,3 s en el centro: dentro")
+    // Volver al borde: se desmarca y empieza a contar el cambio de sitio.
+    _ = d.move(to: CGPoint(x: 115, y: 60), translation: .zero, order: ids, now: 0.5, canDropInto: admite, canSwap: todas)
+    igual(d.into, nil, "en el borde ya no está marcada")
+}
+do {
+    // Entre playlists, al momento; una carpeta arrastrada se cambia con playlists al momento y nunca entra en otra.
+    var d = OrderDrag(id: "Noche", slots: huecos, start: 2)
+    igual(d.move(to: centro(3), translation: .zero, order: ids, now: 0, canDropInto: admite, canSwap: todas),
+          ["f:Gim", "f:Via", "Playa", "Noche", "Correr"], "playlist con playlist: al momento")
+    var f = OrderDrag(id: "f:Gim", slots: huecos, start: 0)
+    igual(f.move(to: centro(2), translation: .zero, order: ids, now: 0, canDropInto: admite, canSwap: todas),
+          ["f:Via", "Noche", "f:Gim", "Playa", "Correr"], "carpeta sobre playlist: se cambian")
+    var g = OrderDrag(id: "f:Gim", slots: huecos, start: 0)
+    _ = g.move(to: centro(1), translation: .zero, order: ids, now: 0, canDropInto: admite, canSwap: todas)
+    _ = g.move(to: centro(1), translation: .zero, order: ids, now: 1, canDropInto: admite, canSwap: todas)
+    igual(g.into, nil, "una carpeta nunca entra en otra")
 }
 
 print(fallos == 0 ? "✅ Modo «Ordenar»: todo bien" : "❌ \(fallos) fallos")

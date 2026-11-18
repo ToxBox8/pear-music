@@ -81,6 +81,10 @@ struct NoMatchesView: View {
 /// en Android.
 struct PlaylistsListView: View {
     var folderID: String? = nil
+    /// El nivel de la pantalla de debajo (la que abrió ésta), si es otra de Playlists: a él se sube al sacar una
+    /// playlist arrastrando (prompt 2-0b). nil si no se sabe (p. ej. el escenario de capturas que abre la carpeta
+    /// directamente): entonces no hay zona «Sacar de …».
+    var below: PlaylistLevel? = nil
     @EnvironmentObject var library: Library
     @EnvironmentObject var downloads: DownloadStore
     @AppStorage("playlistSort") private var sort = "recent"
@@ -93,9 +97,18 @@ struct PlaylistsListView: View {
     @State private var ordering = Demo.current?.playlistsOrdering == true
     @State private var moving: MoveItem?
     @State private var deleting: PlaylistFolder?
+    /// La carpeta cuyo icono se está eligiendo (prompt 2-0).
+    @State private var lookFolder: PlaylistFolder?
     @State private var deletingPlaylist: Playlist?
     @State private var editingPlaylist: Playlist?
     @State private var opened: Entry?
+    /// Sacar de una carpeta (prompt 2-0b): la portada cogida, si el dedo está en la zona de arriba, dónde está la zona
+    /// (ventana) y la portada que llega cogida desde una carpeta de debajo.
+    @State private var lifted: String?
+    @State private var overLeave = false
+    @State private var listTop: CGFloat = 0
+    @State private var adopting: OrderAdopt<String>?
+    @ObservedObject private var handoff = OrderHandoff.shared
     /// La playlist recién creada: se abre para que se vea que existe y añadirle canciones.
     @State private var created: UUID?
     /// La carpeta recién creada: la cuadrícula se desplaza hasta ella.
@@ -183,10 +196,12 @@ struct PlaylistsListView: View {
                         if ordering { OrderHint() }
                         ReorderGrid(items: shown, ordering: ordering, onMoved: saveOrder,
                                     canDropInto: canDropInto, canSwap: canSwap, onDropInto: dropInto,
+                                    leave: leaveZone, adopt: adopting, onAdopted: { adopting = nil },
+                                    onLiftState: { key, over in lifted = key; overLeave = over },
                                     menu: { AnyView(menu($0)) },
                                     destination: { e in
                                         if let p = e.playlist { PlaylistV11View(playlistID: p.id) }
-                                        else if let f = e.folder { PlaylistsListView(folderID: f.id) }
+                                        else if let f = e.folder { PlaylistsListView(folderID: f.id, below: PlaylistLevel(folder: folderID)) }
                                         else if let k = e.smart { SmartListV11View(kind: k) }
                                     }) { e in cell(e) }
                             // Al entrar y salir de «Ordenar» se vuelve a crear sólo la cuadrícula (no la lista, que
@@ -196,6 +211,23 @@ struct PlaylistsListView: View {
                 }
             }
             .scrollDismissesKeyboard(.interactively)
+            .background(GeometryReader { g in
+                Color.clear.onAppear { listTop = g.frame(in: .global).minY }
+                    .onChange(of: g.frame(in: .global).minY) { listTop = $0 }
+            })
+            // Sacar de la carpeta (prompt 2-0b): mientras se arrastra una playlist aquí dentro.
+            .overlay(alignment: .top) {
+                if let title = leaveTitle, let key = lifted, canLeave(key) {
+                    OrderLeaveZone(title: title, active: overLeave)
+                        .padding(.top, 8)
+                        .transition(OrderWiggle.reduced(reduceMotion) ? AnyTransition.identity : AnyTransition.opacity.combined(with: .offset(y: -8)))
+                }
+            }
+            .animation(OrderWiggle.reduced(reduceMotion) ? nil : .uiEaseOut(0.2), value: lifted.map(canLeave) == true)
+            .animation(OrderWiggle.reduced(reduceMotion) ? nil : .uiEaseOut(0.15), value: overLeave)
+            .overlay(alignment: .topLeading) {
+                if ordering { OrderDebugLabel(text: leaveLog, id: "orden-sacar") }
+            }
             .onChange(of: reveal) { key in
                 guard let key else { return }
                 withAnimation(reduceMotion ? nil : .uiEaseOut(0.3)) { proxy.scrollTo(key, anchor: .center) }
@@ -223,6 +255,7 @@ struct PlaylistsListView: View {
                 } else {
                     Menu { addMenu } label: { Image(systemName: "plus") }
                         .accessibilityLabel(L("Nueva playlist o carpeta"))
+                    if !keys.isEmpty { OrderPencil { startOrdering() } }
                     Menu { toolbarMenu } label: { Image(systemName: "ellipsis.circle") }
                         .accessibilityLabel(L("Más opciones"))
                 }
@@ -230,9 +263,10 @@ struct PlaylistsListView: View {
         }
         .sheet(item: $moving) { MoveToFolderSheet(item: $0) }
         .sheet(item: $editingPlaylist) { PlaylistEditor(playlistID: $0.id) }
+        .sheet(item: $lookFolder) { FolderLookEditor(folderID: $0.id) }
         .navigationDestination(isPresented: Binding(get: { opened != nil }, set: { if !$0 { opened = nil } })) {
             if let p = opened?.playlist { PlaylistV11View(playlistID: p.id) }
-            else if let f = opened?.folder { PlaylistsListView(folderID: f.id) }
+            else if let f = opened?.folder { PlaylistsListView(folderID: f.id, below: PlaylistLevel(folder: folderID)) }
             else if let k = opened?.smart { SmartListV11View(kind: k) }
         }
         .navigationDestination(isPresented: Binding(get: { created != nil }, set: { if !$0 { created = nil } })) {
@@ -253,6 +287,14 @@ struct PlaylistsListView: View {
         }
         // La carpeta abierta ya no existe (borrada desde otro sitio o al importar): se vuelve atrás.
         .onChange(of: library.folders.map(\.id)) { ids in if let folderID, !ids.contains(folderID) { dismiss() } }
+        // Una playlist sacada arrastrando de una carpeta de encima llega aquí cogida (prompt 2-0b).
+        .onReceive(handoff.$pending) { p in
+            guard let p, p.level == folderID else { return }
+            handoff.pending = nil
+            query = ""
+            setOrdering(true)
+            adopting = OrderAdopt(token: p.token, key: p.key, finger: p.finger, grab: p.grab)
+        }
         // Escribir en el buscador sale del modo «Ordenar».
         .onChange(of: query) { q in if !q.isEmpty && ordering { setOrdering(false) } }
         .task { if Demo.current?.showMove == true, folderID != nil, let p = library.userPlaylists.first(where: { $0.folder == folderID }) { moving = .playlist(p.id) } }
@@ -301,6 +343,7 @@ struct PlaylistsListView: View {
             Button(role: .destructive) { deletingPlaylist = p } label: { Label(L("Eliminar…"), systemImage: "trash") }
         } else if let f = e.folder {
             Button { rename(f) } label: { Label(L("Renombrar"), systemImage: "pencil") }
+            Button { lookFolder = f } label: { Label(L("Cambiar icono…"), systemImage: "paintpalette") }
             Button { moving = .folder(f.id) } label: { Label(L("Mover carpeta a…"), systemImage: "folder") }
             Button { startOrdering(e.key) } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
             Divider()
@@ -332,6 +375,7 @@ struct PlaylistsListView: View {
         if let folder {
             Divider()
             Button { rename(folder) } label: { Label(L("Renombrar"), systemImage: "pencil") }
+            Button { lookFolder = folder } label: { Label(L("Cambiar icono…"), systemImage: "paintpalette") }
             Button { moving = .folder(folder.id) } label: { Label(L("Mover carpeta a…"), systemImage: "folder") }
             Button(role: .destructive) { deleting = folder } label: { Label(L("Eliminar carpeta…"), systemImage: "trash") }
         }
@@ -369,8 +413,51 @@ struct PlaylistsListView: View {
         return library.userPlaylists.contains { $0.id.uuidString == dragged }
     }
 
-    /// Las carpetas se ordenan entre ellas y las playlists entre ellas (las carpetas van siempre delante).
-    private func canSwap(_ dragged: String, _ target: String) -> Bool { isFolder(dragged) == isFolder(target) }
+    /// Carpetas y playlists se ordenan juntas, como las apps y carpetas del iPhone (prompt 2-0b, lo decidió Toxbox).
+    private func canSwap(_ dragged: String, _ target: String) -> Bool { true }
+
+    // MARK: Sacar de la carpeta (prompt 2-0b)
+
+    /// «Sacar de «Gimnasio»»: sólo dentro de una carpeta abierta desde otra pantalla de Playlists.
+    private var leaveTitle: String? {
+        guard below != nil, let folder else { return nil }
+        return L("Sacar de «{0}»", folder.name)
+    }
+
+    /// Sólo salen las playlists (las carpetas se mueven con «Mover carpeta a…»).
+    private func canLeave(_ key: String) -> Bool {
+        leaveTitle != nil && library.userPlaylists.contains { $0.id.uuidString == key && $0.folder == folderID }
+    }
+
+    /// La zona, en la ventana: de arriba de la pantalla hasta `leaveBand` por debajo de la barra de navegación.
+    private var leaveZone: OrderLeave<String>? {
+        guard leaveTitle != nil else { return nil }
+        return OrderLeave(rect: CGRect(x: 0, y: 0, width: 10_000, height: listTop + OrderGesture.leaveBand),
+                          canLeave: canLeave, onLeave: leave)
+    }
+
+    /// Para los tests de interfaz (`orden-sacar`): si hay zona, si el dedo está en ella, si se anima y cuántas han salido.
+    private var leaveLog: String {
+        OrderLog.leave(zone: leaveTitle != nil && lifted.map(canLeave) == true, over: overLeave,
+                       animated: !OrderWiggle.reduced(reduceMotion), count: handoff.count)
+    }
+
+    /// El dedo lleva `leaveSeconds` en la zona: la playlist pasa al nivel de debajo, justo detrás de la carpeta de la
+    /// que sale (con «A mano»), esa pantalla la recoge cogida y ésta se cierra sin animación.
+    private func leave(_ key: String, finger: CGPoint, grab: CGSize) {
+        guard let below, let folderID, let id = UUID(uuidString: key) else { return }
+        var t = Transaction()
+        t.disablesAnimations = true
+        withTransaction(t) {
+            library.movePlaylist(id, to: below.folder)
+            if sort == "custom", let anchor = PlaylistFolders.ancestor(of: folderID, at: below.folder, in: library.folders) {
+                orderRaw = LibraryOrder.placing(key, after: LibraryOrder.key(folder: anchor), in: LibraryOrder.decode(orderRaw))
+                    .joined(separator: "\n")
+            }
+            handoff.send(key: key, level: below.folder, finger: finger, grab: grab)
+            dismiss()
+        }
+    }
 
     private func dropInto(_ dragged: String, _ target: String) {
         guard let id = UUID(uuidString: dragged), let folder = LibraryOrder.folderID(target) else { return }
@@ -396,6 +483,11 @@ struct PlaylistsListView: View {
     private func destinationName(_ f: PlaylistFolder?) -> String {
         f?.parent.flatMap { p in library.folders.first { $0.id == p }?.name } ?? L("Playlists")
     }
+}
+
+/// Un nivel de Tu música › Playlists (`folder` nil = arriba del todo).
+struct PlaylistLevel: Hashable {
+    let folder: String?
 }
 
 /// Sin nada todavía (Playlists o una carpeta): qué es y un botón para empezar.
@@ -434,6 +526,12 @@ struct AlbumsListView: View {
     @State private var deleting: Playlist?
     @State private var opened: Playlist?
 
+    /// Los criterios del ⋯, los mismos que Playlists.
+    private static var sorts: [(String, String)] { [
+        ("recent", L("Añadidos recientemente")), ("name", L("Nombre (A-Z)")), ("nameDesc", L("Nombre (Z-A)")),
+        ("count", L("Nº de canciones")), ("custom", L("A mano")),
+    ] }
+
     var body: some View {
         let albums = LibraryOrder.albums(library.albums, sort: albumSort, order: LibraryOrder.decode(albumOrder))
         let shown = ordering ? albums : LocalSearch.filter(albums, query) { "\($0.name) \($0.album?.artist ?? "")" }
@@ -469,11 +567,20 @@ struct AlbumsListView: View {
         .navigationTitle(ordering ? L("Ordenar") : L("Tus álbumes"))
         .navigationBarBackButtonHidden(ordering)
         .toolbar {
-            ToolbarItem(placement: .primaryAction) {
+            ToolbarItemGroup(placement: .primaryAction) {
                 if ordering {
                     Button(L("Hecho")) { setOrdering(false) }.fontWeight(.semibold)
                 } else if albums.count > 1 {
-                    Button(L("Ordenar")) { start() }
+                    OrderPencil { start() }
+                    // El mismo ⋯ que Playlists: «Ordenar» y el criterio (prompt 2-0, lo pidió Toxbox).
+                    Menu {
+                        Button { start() } label: { Label(L("Ordenar"), systemImage: "arrow.up.arrow.down") }
+                        Picker(L("Ordenar por"), selection: $albumSort) {
+                            ForEach(Self.sorts, id: \.0) { item in Text(item.1).tag(item.0) }
+                        }
+                        .pickerStyle(.inline)
+                    } label: { Image(systemName: "ellipsis.circle") }
+                        .accessibilityLabel(L("Más opciones"))
                 }
             }
         }
@@ -603,6 +710,12 @@ struct ReorderGrid<Item: Identifiable, Destination: View, Cell: View>: View {
     /// ¿Se aparta `celda` al pasar `arrastrado` por encima? (las carpetas van siempre delante de las playlists).
     var canSwap: (Item.ID, Item.ID) -> Bool = { _, _ in true }
     var onDropInto: (Item.ID, Item.ID) -> Void = { _, _ in }
+    /// Sacar de una carpeta (prompt 2-0b): la zona de arriba (sólo dentro de una carpeta), la portada que llega
+    /// cogida desde una carpeta de debajo y a quién avisar de qué está cogido y si el dedo está en la zona.
+    var leave: OrderLeave<Item.ID>? = nil
+    var adopt: OrderAdopt<Item.ID>? = nil
+    var onAdopted: () -> Void = {}
+    var onLiftState: (_ lifted: Item.ID?, _ leaving: Bool) -> Void = { _, _ in }
     /// Menú al mantener pulsado (si no se da, nada).
     var menu: ((Item) -> AnyView)? = nil
     @ViewBuilder let destination: (Item) -> Destination
@@ -634,14 +747,19 @@ struct ReorderGrid<Item: Identifiable, Destination: View, Cell: View>: View {
         }
         .coordinateSpace(name: space)
         .background(OrderAnchorView(anchor: lift.anchor))
-        .onPreferenceChange(OrderFrameKey<Item.ID>.self) { lift.frames = $0 }
+        .onPreferenceChange(OrderFrameKey<Item.ID>.self) { lift.frames = $0; tryAdopt() }
         .overlay(alignment: .topLeading) { liftedCopy(byID) }
         .overlay(alignment: .topLeading) { if ordering { OrderDebugLabel(text: lift.debug) } }
+        .overlay(alignment: .topLeading) { if ordering { OrderDebugLabel(text: wiggleLog(list.count), id: "orden-temblor") } }
         .padding(.horizontal, 16)
         .padding(.top, 8)
         .padding(.bottom, ordering ? 12 : 0)
-        .onAppear { lift.order = items.map(\.id) }
-        .onChange(of: items.map(\.id)) { ids in if lift.drag == nil { lift.order = ids } }
+        .onAppear { lift.order = items.map(\.id); lift.leave = ordering ? leave : nil; tryAdopt() }
+        .onChange(of: items.map(\.id)) { ids in if lift.drag == nil { lift.order = ids }; tryAdopt() }
+        .onChange(of: leave?.rect) { _ in lift.leave = ordering ? leave : nil }
+        .onChange(of: adopt) { _ in tryAdopt() }
+        .onChange(of: lift.drag?.id) { id in onLiftState(id, lift.leaving) }
+        .onChange(of: lift.leaving) { on in onLiftState(lift.drag?.id, on) }
         .onChange(of: pressing) { on in if !on { finish() } }
         // Salir de «Ordenar» (o irse la pantalla) con una portada cogida la suelta donde está y guarda el orden.
         .onChange(of: ordering) { on in if !on { finish() } }
@@ -652,9 +770,11 @@ struct ReorderGrid<Item: Identifiable, Destination: View, Cell: View>: View {
     /// queda el hueco.
     private func orderCell(_ p: Item) -> some View {
         let lifted = lift.drag?.id == p.id
+        let still = OrderWiggle.reduced(reduceMotion)
         return ZStack(alignment: .top) {
-            cell(p).opacity(lifted ? 0 : 1)
-            if lifted { OrderHole() }
+            // Tiemblan todas menos la cogida; con «Reducir movimiento», un borde en vez del temblor.
+            cell(p).orderWiggle(!lifted && !still, seed: p.id.hashValue).opacity(lifted ? 0 : 1)
+            if lifted { OrderHole() } else if still { OrderMark() }
         }
         .environment(\.dropInto, lift.drag?.into == p.id)
         .contentShape(Rectangle())
@@ -678,6 +798,29 @@ struct ReorderGrid<Item: Identifiable, Destination: View, Cell: View>: View {
                 .offset(x: r.minX + lift.shift.width, y: r.minY + lift.shift.height)
                 .accessibilityHidden(true)
         }
+    }
+
+    /// Para los tests de interfaz (`orden-temblor`): cuántas portadas tiemblan y cuántas llevan el borde.
+    private func wiggleLog(_ count: Int) -> String {
+        let moving = count - (lift.drag == nil ? 0 : 1)
+        return OrderLog.wiggle(moving: moving, reduced: OrderWiggle.reduced(reduceMotion))
+    }
+
+    /// La portada que llega cogida desde una carpeta (prompt 2-0b): en cuanto está medida, se levanta bajo el dedo y
+    /// sus movimientos llegan de `FingerTracker` (el gesto de SwiftUI empezó en la pantalla que se ha ido).
+    private func tryAdopt() {
+        guard ordering, let a = adopt, lift.drag == nil else { return }
+        guard lift.adopt(a.key, finger: a.finger, grab: a.grab, reduceMotion: OrderWiggle.reduced(reduceMotion),
+                         canDropInto: canDropInto, canSwap: canSwap) else { return }
+        onAdopted()
+        let grid = lift
+        let following = FingerTracker.shared.follow(near: a.finger, onMove: { p in grid.move(start: .zero, now: p) },
+                                                    onEnd: { cancelled in
+                                                        if cancelled { grid.note("dedo-cancelado") }
+                                                        finish()
+                                                    })
+        // El dedo ya se había levantado (o el sistema canceló el toque): se suelta donde ha quedado.
+        if !following { lift.note("sin-dedo"); finish() }
     }
 
     private func finish() {
@@ -997,8 +1140,9 @@ struct ImportView: View {
                     } footer: { Text(L("Puedes cerrar la app: al volver, la importación sigue donde se quedó.")) }
                 case .finished(let title, let detail):
                     Section {
-                        Label(title, systemImage: "checkmark.circle.fill")
-                            .font(.headline).foregroundStyle(.green)
+                        // Éxito: icono verde y texto del color del texto (docs/COLOR.md).
+                        Label { Text(title).foregroundStyle(.primary) } icon: { Image(systemName: "checkmark.circle.fill").foregroundStyle(.green) }
+                            .font(.headline)
                         Text(detail).font(.subheadline)
                         Button(L("Listo")) { dismiss() }
                     }
@@ -1081,7 +1225,7 @@ struct ImportView: View {
                 .disabled(busy)
 
                 if let notice {
-                    Section { Label(notice, systemImage: "checkmark.circle.fill").foregroundStyle(.green) }
+                    Section { Label { Text(notice).foregroundStyle(.primary) } icon: { Image(systemName: "checkmark.circle.fill").foregroundStyle(.green) } }
                 }
                 if let errorText {
                     Section { Label(errorText, systemImage: "exclamationmark.triangle.fill").foregroundStyle(.orange) }

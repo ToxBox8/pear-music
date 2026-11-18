@@ -32,8 +32,6 @@ final class PlayStats: ObservableObject {
 
     @Published private(set) var songs: [String: Song] = [:]
     @Published private(set) var plays: [Play] = []
-    /// «Borrar estadísticas» (segundos): para que no vuelvan desde otro móvil de la cuenta (sync.md §6).
-    private(set) var clearedAt: Int64?
     private let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("stats.json")
 
     private init() { load() }
@@ -48,24 +46,9 @@ final class PlayStats: ObservableObject {
         plays.append(Play(id: song.id, at: at))
         if plays.count > Self.maxPlays { plays.removeFirst(plays.count - Self.maxPlays) }
         save()
-        Task { @MainActor in SyncBiblioteca.shared.alCambiarEstadisticas() }
     }
 
-    func clear() {
-        songs = [:]; plays = []; clearedAt = Int64(Date().timeIntervalSince1970)
-        save()
-        Task { @MainActor in SyncBiblioteca.shared.alCambiarEstadisticas() }
-    }
-
-    /// stats.json tal cual (para la sync, sync.md §6).
-    func exportJSON() -> Data { (try? JSONSerialization.data(withJSONObject: objeto)) ?? Data() }
-
-    /// Sync: pone las estadísticas ya unidas con las de la cuenta.
-    func adoptar(_ data: Data) {
-        guard let o = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return }
-        leer(o)
-        save()
-    }
+    func clear() { songs = [:]; plays = []; save() }
 
     /// Inicio del periodo en segundos epoch (hora local), o 0 para «Siempre».
     static func since(_ p: Period, now: Date = Date()) -> Int64 {
@@ -94,12 +77,6 @@ final class PlayStats: ObservableObject {
     private func load() {
         guard let data = try? Data(contentsOf: url),
               let o = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else { return }
-        leer(o)
-    }
-
-    private func leer(_ o: [String: Any]) {
-        songs = [:]
-        clearedAt = (o["clearedAt"] as? NSNumber)?.int64Value
         for (id, v) in (o["songs"] as? [String: [String: Any]]) ?? [:] {
             songs[id] = Song(id: id, title: v["title"] as? String ?? "", artist: v["artist"] as? String ?? "", thumbnail: (v["thumbnail"] as? String).flatMap(URL.init(string:)))
         }
@@ -109,19 +86,14 @@ final class PlayStats: ObservableObject {
         }
     }
 
-    private var objeto: [String: Any] {
-        var o: [String: Any] = [
+    private func save() {
+        let o: [String: Any] = [
             "version": 1,
             "songs": songs.mapValues { s -> [String: Any] in ["title": s.title, "artist": s.artist, "thumbnail": s.thumbnail.map { $0.absoluteString as Any } ?? NSNull()] },
             "plays": plays.map { [$0.id, $0.at] as [Any] },
         ]
-        if let clearedAt { o["clearedAt"] = clearedAt }
-        return o
-    }
-
-    private func save() {
         let url = self.url
-        guard let data = try? JSONSerialization.data(withJSONObject: objeto) else { return }
+        guard let data = try? JSONSerialization.data(withJSONObject: o) else { return }
         DispatchQueue.global(qos: .utility).async { try? data.write(to: url, options: .atomic) }
     }
 }

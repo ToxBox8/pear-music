@@ -80,8 +80,21 @@ struct FolderCover: View {
                         FolderBackShape().fill(tab)
                         RoundedRectangle(cornerRadius: Tokens.Radius.row, style: .continuous)
                             .fill(paper)
+                            .overlay {
+                                // Con icono propio (prompt 2-0; LIBRARY_FORMAT › «Icono y color de carpeta»): el icono
+                                // sobre el degradado de su color, o sobre el washi si no tiene.
+                                if let t = folder.shownTint {
+                                    RoundedRectangle(cornerRadius: Tokens.Radius.row, style: .continuous).fill(PlaylistStyle.gradient(t))
+                                }
+                            }
                             .overlay(RoundedRectangle(cornerRadius: Tokens.Radius.row, style: .continuous).strokeBorder(edge, lineWidth: 1))
                             .overlay {
+                                if let icon = folder.shownIcon {
+                                    Image(systemName: icon)
+                                        .font(.system(size: (side - top) * 0.36, weight: .semibold))
+                                        .foregroundStyle(folder.shownTint != nil ? Color.white : Color.secondary)
+                                        .shadow(color: .black.opacity(folder.shownTint != nil ? 0.2 : 0), radius: 2, y: 1)
+                                } else {
                                 VStack(spacing: gap) {
                                     ForEach(0..<2, id: \.self) { row in
                                         HStack(spacing: gap) {
@@ -95,6 +108,7 @@ struct FolderCover: View {
                                             }
                                         }
                                     }
+                                }
                                 }
                             }
                             .frame(height: side - top)
@@ -274,4 +288,88 @@ struct MoveToFolderSheet: View {
 extension String {
     /// nil si está vacío (para elegir un texto por defecto).
     var nilIfEmpty: String? { isEmpty ? nil : self }
+}
+
+/// Elegir el icono y el color de una carpeta (prompt 2-0, lo pidió Toxbox). Los mismos 24 iconos y 8 paletas que las
+/// playlists; «Mosaico» vuelve a la portada de siempre. El color sólo se pinta con icono, así que sin él se apaga.
+/// Igual que `FolderLookEditor` en Android.
+struct FolderLookEditor: View {
+    let folderID: String
+    @EnvironmentObject var library: Library
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var scheme
+
+    private var folder: PlaylistFolder? { library.folders.first { $0.id == folderID } }
+
+    var body: some View {
+        NavigationStack {
+            if let f = folder {
+                Form {
+                    Section {
+                        HStack { Spacer(); FolderCover(folder: f).frame(width: 150); Spacer() }
+                            .listRowBackground(Color.clear)
+                            .accessibilityHidden(true)
+                    }
+                    Section(L("Icono")) {
+                        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 8), count: 6), spacing: 10) {
+                            choice(L("Mosaico"), symbol: "square.grid.2x2", on: f.shownIcon == nil) {
+                                library.setFolderLook(f.id, icon: nil, tint: f.tint)
+                            }
+                            ForEach(PlaylistStyle.icons, id: \.self) { icon in
+                                choice(nil, symbol: icon, on: f.shownIcon == icon) {
+                                    library.setFolderLook(f.id, icon: icon, tint: f.tint)
+                                }
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .font(.title3)
+                    }
+                    Section {
+                        HStack(spacing: 10) {
+                            Button { library.setFolderLook(f.id, icon: f.icon, tint: nil) } label: {
+                                Circle().fill(scheme == .dark ? Tokens.FolderDark.paper : Tokens.FolderLight.paper)
+                                    .overlay(Circle().strokeBorder(Color(.separator), lineWidth: 1))
+                                    .frame(width: 30, height: 30)
+                                    .overlay(Circle().strokeBorder(.primary, lineWidth: f.tint == nil ? 2.5 : 0).padding(-3))
+                            }
+                            .accessibilityLabel(L("Sin color"))
+                            .accessibilityIdentifier("color-ninguno")
+                            .accessibilityAddTraits(f.tint == nil ? .isSelected : [])
+                            ForEach(PlaylistStyle.palettes.indices, id: \.self) { i in
+                                Button { library.setFolderLook(f.id, icon: f.icon, tint: i) } label: {
+                                    Circle().fill(PlaylistStyle.gradient(i))
+                                        .frame(width: 30, height: 30)
+                                        .overlay(Circle().strokeBorder(.primary, lineWidth: f.tint == i ? 2.5 : 0))
+                                }
+                                .accessibilityLabel(L("Color {0}", "\(i + 1)"))
+                                .accessibilityIdentifier("color-\(i)")
+                                .accessibilityAddTraits(f.tint == i ? .isSelected : [])
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(f.shownIcon == nil)
+                        .opacity(f.shownIcon == nil ? 0.4 : 1)
+                    } header: { Text(L("Color")) } footer: {
+                        if f.shownIcon == nil { Text(L("El color se ve cuando la carpeta tiene icono.")) }
+                    }
+                }
+                .navigationTitle(L("Icono de la carpeta"))
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar { Button(L("Listo")) { dismiss() }.fontWeight(.semibold) }
+            }
+        }
+    }
+
+    /// `label`: sólo para «Mosaico»; los iconos los lee VoiceOver con el nombre del sistema. El identificador es el
+    /// nombre del icono, para los tests.
+    private func choice(_ label: String?, symbol: String, on: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: symbol)
+                .frame(width: 44, height: 44)
+                .background(Circle().fill(.tint).opacity(on ? 0.25 : 0))
+        }
+        .accessibilityLabel(label.map { Text($0) } ?? Text(Image(systemName: symbol)))
+        .accessibilityIdentifier("icono-\(label == nil ? symbol : "mosaico")")
+        .accessibilityAddTraits(on ? .isSelected : [])
+    }
 }

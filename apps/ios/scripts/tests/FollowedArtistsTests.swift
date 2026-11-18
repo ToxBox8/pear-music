@@ -111,6 +111,18 @@ igual(pocos[2].key, "name:" + fold("Bad Bunny"), "fuentes: el que no se sabe su 
 let muchos = (0..<9).map { seg("UC\($0)", "Seguido \($0)") }
 igual(ReleaseMix.sources(followed: muchos, top: top, resolved: [:], fold: fold).count, 9, "fuentes: con 9 seguidos, todos y ninguno más")
 
+// T7: uno de los más escuchados que se buscó y no está («Tyler» de «Tyler, The Creator») no ocupa hueco: entra el
+// siguiente, y no se vuelve a pedir aunque pasen 6 h.
+let sinTyler = ReleaseMix.sources(followed: [], top: [("Tyler", fold("Tyler"))] + top, resolved: [fold("Tyler"): ""], fold: fold)
+igual(sinTyler.map(\.name), ["Bad Bunny", "Rosalía", "Quevedo", "Aitana", "Bizarrap", "Karol G", "Mora", "Feid"],
+      "fuentes: el no encontrado se salta y entra el siguiente")
+var conTyler = ReleaseMix.record(ReleaseMix.resolve(ReleasesCache(), folded: fold("Tyler"), browseId: nil),
+                                 key: "name:" + fold("Tyler"), name: "Tyler", items: [], now: ahora - 7 * H)
+conTyler = ReleaseMix.prune(conTyler, followed: [], topFolded: ([("Tyler", fold("Tyler"))] + top).map(\.1))
+igual(ReleaseMix.toRefresh(ReleaseMix.sources(followed: [], top: [("Tyler", fold("Tyler"))] + top, resolved: conTyler.resolved, fold: fold),
+                           cache: conTyler, now: ahora).contains { $0.name == "Tyler" }, false,
+      "pedir: el no encontrado no se vuelve a buscar a las 6 h")
+
 // Qué se vuelve a pedir: nunca pedidos primero, luego los más antiguos; los de menos de 6 h no; como mucho 8.
 var cache = ReleasesCache()
 for (i, s) in muchos.enumerated() where i < 6 {

@@ -374,7 +374,13 @@ private struct AvisoRow: View {
         }
     }
     private var highlighted: Bool { aviso.importante || aviso.personal != nil }
-    private var tint: Color { aviso.personal == "fiesta" ? .green : highlighted ? .accentColor : .secondary }
+    /// Icono: verde en los de fiesta (éxito), acento en texto en los importantes y los personales (docs/COLOR.md; nunca
+    /// `.accentColor`, que es el azul del sistema).
+    private var tint: AnyShapeStyle {
+        aviso.personal == "fiesta" ? AnyShapeStyle(Color.green) : highlighted ? AnyShapeStyle(.tint) : AnyShapeStyle(.secondary)
+    }
+    /// El rótulo: el verde no vale como texto pequeño (2,2:1), así que en los de fiesta va del color del texto.
+    private var labelStyle: AnyShapeStyle { aviso.personal == "fiesta" ? AnyShapeStyle(.primary) : tint }
     private var label: String {
         if aviso.personal != nil { return L("Sólo para ti") + (aviso.ticket.map { L(" · ticket #{0}", $0) } ?? "") }
         return aviso.importante ? L("Importante") : L("Aviso")
@@ -386,12 +392,12 @@ private struct AvisoRow: View {
                 .font(.system(size: 17, weight: .semibold))
                 .foregroundStyle(tint)
                 .frame(width: 40, height: 40)
-                .background(Circle().fill(tint.opacity(highlighted ? 0.16 : 0.12)))
+                .background(Circle().fill(tint).opacity(highlighted ? 0.16 : 0.12))
             VStack(alignment: .leading, spacing: 3) {
                 HStack {
                     Text(label)
                         .font(.footnote.weight(.semibold))
-                        .foregroundStyle(tint)
+                        .foregroundStyle(labelStyle)
                     Spacer()
                     Text(haceCuanto(aviso.fecha)).font(.footnote).foregroundStyle(.secondary)
                 }

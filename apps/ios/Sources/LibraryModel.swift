@@ -322,6 +322,14 @@ enum PlaylistFolders {
         return out
     }
 
+    /// Sacar de una carpeta arrastrando (prompt 2-0b): la carpeta del nivel `level` (nil = arriba del todo) que
+    /// contiene a `id` (ella misma si está justo en ese nivel). nil si `id` no está debajo de `level`.
+    static func ancestor(of id: String, at level: String?, in folders: [PlaylistFolder]) -> String? {
+        let chain = path(id, in: folders)
+        guard let i = level.map({ l in chain.firstIndex { $0.id == l }.map { $0 + 1 } }) ?? 0, chain.indices.contains(i) else { return nil }
+        return chain[i].id
+    }
+
     /// Lo que suena con «Reproducir» en una carpeta: sus playlists y las de sus subcarpetas, en el orden de la lista.
     static func members<M: FolderMember>(of id: String, folders: [PlaylistFolder], in all: [M]) -> [M] {
         let inside = subtree(id, in: folders)
@@ -369,7 +377,15 @@ enum LibraryOrder {
 
     /// «Tus álbumes»: como se guardaron o, con «custom», el orden propio; lo nuevo va al final.
     static func albums(_ albums: [Playlist], sort: String, order: [String]) -> [Playlist] {
-        guard sort == "custom" else { return albums }
+        // Los mismos criterios que Playlists en el ⋯ de Tus álbumes (prompt 2-0); «recent» es el orden guardado.
+        let byName: (Playlist, Playlist) -> Bool = { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+        switch sort {
+        case "name": return albums.sorted(by: byName)
+        case "nameDesc": return albums.sorted { byName($1, $0) }
+        case "count": return albums.sorted { $0.songs.count > $1.songs.count }
+        case "custom": break
+        default: return albums
+        }
         let byID = Dictionary(albums.map { ($0.id.uuidString, $0) }, uniquingKeysWith: { a, _ in a })
         var seen = Set<String>()
         let kept = order.filter { byID[$0] != nil && seen.insert($0).inserted }
@@ -412,22 +428,18 @@ extension LibraryOrder {
 
     /// Las claves de un nivel de Tu música › Playlists (`folder` nil = arriba del todo), en el orden en que se ven:
     /// Descargadas y Favoritos (sólo arriba del todo y si van «en Playlists»), las carpetas (`folder:<id>`) y las
-    /// playlists. Las
-    /// carpetas se ordenan con el mismo criterio que las playlists («count»: canciones de todo lo que tienen dentro;
-    /// «custom»: su sitio en `order`, lo nuevo al final). Igual que `LibraryOrder.level` en Android.
+    /// playlists. Las carpetas se ordenan con el mismo criterio que las playlists («count»: canciones de todo lo que
+    /// tienen dentro) y van delante; con «custom» (a mano) se mezclan con las playlists (`mixed`). Igual que
+    /// `LibraryOrder.level` en Android.
     static func level(_ folder: String?, playlists: [Playlist], folders: [PlaylistFolder], sort: String, order: [String],
                       smartInPlaylists: Bool) -> [String] {
         let here = playlists.filter { $0.folder == folder }
         let keys = Self.keys(here, sort: sort, order: order, smartInPlaylists: folder == nil && smartInPlaylists)
         let mine = folders.filter { $0.parent == folder }
+        if sort == "custom" { return mixed(keys, mine, order: order) }
         let byName: (PlaylistFolder, PlaylistFolder) -> Bool = { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
         let sorted: [PlaylistFolder]
         switch sort {
-        case "custom":
-            var seen = Set<String>()
-            let byID = Dictionary(mine.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
-            let kept = order.compactMap(folderID).filter { byID[$0] != nil && seen.insert($0).inserted }
-            sorted = kept.compactMap { byID[$0] } + mine.filter { !seen.contains($0.id) }
         case "name": sorted = mine.sorted(by: byName)
         case "nameDesc": sorted = mine.sorted { byName($1, $0) }
         case "count":
@@ -440,6 +452,34 @@ extension LibraryOrder {
         // Detrás de las listas inteligentes que vayan delante y antes de la primera playlist.
         let at = keys.firstIndex { $0 != downloads && $0 != favorites } ?? keys.endIndex
         return Array(keys[..<at]) + sorted.map { key(folder: $0.id) } + Array(keys[at...])
+    }
+
+    /// «A mano» (prompt 2-0b, lo decidió Toxbox): carpetas y playlists mezcladas, cada una en su sitio de `order`
+    /// (`keys`: Descargadas, Favoritos y las playlists del nivel, ya en su orden propio). Lo que no está en `order`: una
+    /// playlist nueva va al final, como siempre; una carpeta nueva, detrás de la última carpeta que sí está (o, si no
+    /// hay ninguna, delante de la primera playlist, donde iban las carpetas). Un `order` de antes del 2-0b tiene las
+    /// carpetas de cada nivel seguidas y delante, así que se ve igual que antes. El formato no cambia.
+    private static func mixed(_ keys: [String], _ mine: [PlaylistFolder], order: [String]) -> [String] {
+        let here = Set(keys + mine.map { key(folder: $0.id) })
+        var seen = Set<String>()
+        var out = order.filter { here.contains($0) && seen.insert($0).inserted }
+        // Lo de `keys` que no estaba en `order` (playlists o listas nuevas) va al final, en el orden de `keys`.
+        out += keys.filter { !seen.contains($0) }
+        seen.formUnion(keys)
+        let newFolders = mine.map { key(folder: $0.id) }.filter { !seen.contains($0) }
+        guard !newFolders.isEmpty else { return out }
+        let at = out.lastIndex { folderID($0) != nil }.map { $0 + 1 }
+            ?? out.firstIndex { $0 != downloads && $0 != favorites } ?? out.endIndex
+        out.insert(contentsOf: newFolders, at: at)
+        return out
+    }
+
+    /// Sacar de una carpeta arrastrando (prompt 2-0b): `key` pasa a ir justo detrás de `anchor` (la carpeta de la
+    /// que sale) en el orden «A mano». Si `anchor` no está en el orden, `key` va al final.
+    static func placing(_ key: String, after anchor: String, in order: [String]) -> [String] {
+        var out = order.filter { $0 != key }
+        if let i = out.firstIndex(of: anchor) { out.insert(key, at: i + 1) } else { out.append(key) }
+        return out
     }
 
     /// El orden de todos los niveles seguidos, tal como se ven con `sort`. Al pasar a «A mano» arrastrando en un
@@ -779,21 +819,76 @@ struct OrderDrag<ID: Hashable> {
     let start: Int
     /// Lo que se ha movido el dedo desde que la cogió.
     var translation: CGSize = .zero
-    /// Carpeta marcada para soltarla dentro, si el dedo está encima de una que la admite.
+    /// Carpeta marcada para soltarla dentro: el dedo lleva `intoDwell` en el centro de su portada.
     var into: ID?
+    /// La carpeta en cuyo centro está el dedo, aún sin el tiempo, y desde cuándo (`now` de `move`).
+    private(set) var pendingInto: ID?
+    private(set) var pendingSince: TimeInterval = 0
+    /// El borde de la carpeta en el que está el dedo, aún sin `swapDwell`, y desde cuándo (prompt 2-0b).
+    private(set) var pendingSwap: ID?
+    private(set) var pendingSwapSince: TimeInterval = 0
+    private var pendingSwapAt: CGPoint = .zero
     /// Ha cambiado de puesto alguna vez (aunque vuelva al suyo).
     var changed = false
 
-    /// El dedo se mueve a `location`. Devuelve el orden nuevo (el mismo si no cambia nada) y apunta `into`.
-    mutating func move(to location: CGPoint, translation: CGSize, order: [ID],
+    /// Para meterla en una carpeta (prompt 2-0, lo pidió Toxbox: que no la meta si sólo se quiere mover al lado): el
+    /// dedo tiene que estar en el centro de la portada de la carpeta (sin este margen a cada lado, en fracción de su
+    /// ancho) y quedarse ahí este tiempo. Pasar por encima o por el borde no la marca.
+    static var intoInset: CGFloat { 0.2 }
+    static var intoDwell: TimeInterval { 0.3 }
+    /// Prompt 2-0b (lo decidió Toxbox): carpetas y playlists se mezclan, y en el borde de una carpeta se cambian el
+    /// sitio si el dedo se para ahí este tiempo. Sin la pausa, la carpeta se iría al sitio de donde viene el dedo y
+    /// nunca se llegaría a su centro. Entre playlists, el cambio es al momento.
+    static var swapDwell: TimeInterval { 0.15 }
+    /// «Parado» quiere decir que no se mueve más que esto (en fracción del ancho de la celda): al llegar a una carpeta
+    /// desde abajo se cruzan su nombre y el margen de la portada, y pasar por ahí no tiene que cambiarla de sitio.
+    static var swapStill: CGFloat { 0.05 }
+
+    /// Cuándo hay que volver a mirar con el dedo quieto (falta cumplir `intoDwell` o `swapDwell`); nil si no hace falta.
+    var recheckAfter: TimeInterval? {
+        if into == nil, pendingInto != nil { return Self.intoDwell }
+        if pendingSwap != nil { return Self.swapDwell }
+        return nil
+    }
+
+    /// ¿Está `p` en el centro de la portada de `slot`? La portada es el cuadrado de arriba de la celda.
+    static func inCore(_ p: CGPoint, of slot: CGRect) -> Bool {
+        let side = min(slot.width, slot.height), m = side * intoInset
+        return CGRect(x: slot.minX + m, y: slot.minY + m, width: slot.width - 2 * m, height: side - 2 * m).contains(p)
+    }
+
+    /// El dedo se mueve a `location` (en el momento `now`, en segundos). Devuelve el orden nuevo (el mismo si no
+    /// cambia nada) y apunta `into`.
+    mutating func move(to location: CGPoint, translation: CGSize, order: [ID], now: TimeInterval = 0,
                        canDropInto: (ID, ID) -> Bool = { _, _ in false },
                        canSwap: (ID, ID) -> Bool = { _, _ in true }) -> [ID] {
         self.translation = translation
         guard let index = slots.first(where: { $0.value.contains(location) })?.key, order.indices.contains(index),
-              order[index] != id else { into = nil; return order }
+              order[index] != id else { into = nil; pendingInto = nil; pendingSwap = nil; return order }
         let target = order[index]
-        if canDropInto(id, target) { into = target; return order }
+        if canDropInto(id, target) {
+            if let slot = slots[index], Self.inCore(location, of: slot) {
+                pendingSwap = nil
+                if pendingInto != target { pendingInto = target; pendingSince = now }
+                into = now - pendingSince >= Self.intoDwell ? target : nil
+                return order
+            }
+            // En el borde (o el nombre) de la carpeta: cambiarse el sitio, pero sólo con el dedo parado `swapDwell`.
+            into = nil
+            pendingInto = nil
+            guard canSwap(id, target) else { pendingSwap = nil; return order }
+            let still = (slots[index]?.width ?? 0) * Self.swapStill
+            if pendingSwap != target || hypot(location.x - pendingSwapAt.x, location.y - pendingSwapAt.y) > still {
+                pendingSwap = target; pendingSwapSince = now; pendingSwapAt = location
+            }
+            guard now - pendingSwapSince >= Self.swapDwell else { return order }
+            pendingSwap = nil
+            changed = true
+            return GridOrder.moved(id, to: index, in: order)
+        }
         into = nil
+        pendingInto = nil
+        pendingSwap = nil
         guard canSwap(id, target) else { return order }
         changed = true
         return GridOrder.moved(id, to: index, in: order)
@@ -804,5 +899,24 @@ struct OrderDrag<ID: Hashable> {
     func offset(in order: [ID]) -> CGSize {
         guard let now = order.firstIndex(of: id), let a = slots[start], let b = slots[now] else { return translation }
         return CGSize(width: translation.width - (b.minX - a.minX), height: translation.height - (b.minY - a.minY))
+    }
+}
+
+/// El registro del modo «Ordenar» que leen los tests de interfaz (`OrderDebugLabel`, sólo con `-screenshotScenario`).
+/// Está aquí, con los modelos, porque no es texto de la interfaz: no se traduce.
+enum OrderLog {
+    /// El arrastre: gestos pedidos y arrancados, por qué no, celdas medidas y portadas en el orden.
+    static func lift(asked: Int, started: Int, fail: String, cells: Int, order: Int) -> String {
+        "pedidos=\(asked) arrancados=\(started) fallo=\(fail) celdas=\(cells) orden=\(order) "
+    }
+
+    /// Sacar de una carpeta (prompt 2-0b): si se ve la zona, si el dedo está en ella, si se anima y cuántas han salido.
+    static func leave(zone: Bool, over: Bool, animated: Bool, count: Int) -> String {
+        "zona=\(zone ? "si" : "no") encima=\(over ? "si" : "no") animada=\(animated ? "si" : "no") sacadas=\(count)"
+    }
+
+    /// El temblor (prompt 2-0): cuántas portadas tiemblan y cuántas llevan el borde de «Reducir movimiento».
+    static func wiggle(moving: Int, reduced: Bool) -> String {
+        reduced ? "tiemblan=0 bordes=\(moving)" : "tiemblan=\(moving) bordes=0"
     }
 }

@@ -7,8 +7,7 @@ import SwiftUI
 // cada escenario en el simulador del iPhone 16 y guarda la captura con el mismo nombre.
 enum Demo {
     enum Tab: String { case home, reels, library, settings }
-    enum Route { case favorites, themePicker, artist, downloads, playlists, folder, artists, manage, badges,
-                 cuenta, cuentaCrear, cuentaClave, cuentaEntrar, cuentaDispositivos, cuentaComprobar, cuentaBorrar }
+    enum Route { case favorites, themePicker, artist, downloads, playlists, folder, artists, manage, badges }
 
     struct Scenario {
         var theme: AppTheme = .glass
@@ -41,6 +40,10 @@ enum Demo {
         /// Sólo los tests de interfaz: 24 playlists más, para que la cuadrícula pase de la pantalla (desplazamiento al
         /// borde en el modo «Ordenar»). No es una captura.
         var manyPlaylists = false
+        /// «Reducir movimiento» para el temblor del modo «Ordenar» (prompt 2-0): las portadas llevan el borde en vez de
+        /// temblar. Lo llevan las capturas de «Ordenar», como en Android (`ScreenshotTest` lo fuerza en todas), para
+        /// que la pantalla se quede quieta y salga recta.
+        var reduceMotion = false
     }
 
     /// Los mismos nombres que las PNG de Android (shared/design/compare_shots.py los empareja).
@@ -81,19 +84,14 @@ enum Demo {
         // «Tu música» ordenando: «Hecho», flechas y asa (revisión del bloque 1).
         "53_tu_musica_ordenar": Scenario(playing: false, tab: .library, musicEditing: true),
         // Modo «Ordenar» de Playlists (paso C de menús y gestos): sin barra, asas ni buscador.
-        "54_playlists_ordenar": Scenario(playing: false, tab: .library, route: .playlists, folders: true, playlistsOrdering: true),
-        "55_playlists_ordenar_oscuro": Scenario(appearance: "dark", playing: false, tab: .library, route: .playlists, folders: true, playlistsOrdering: true),
-        // Cuenta 3.0 (bloque 2, 2-C paso 3): Ajustes › Cuenta, como ScreenshotTest.cuenta_* de Android.
-        "56_cuenta_sin_crear": Scenario(tab: .settings, route: .cuenta),
-        "57_cuenta_crear": Scenario(tab: .settings, route: .cuentaCrear),
-        "58_cuenta_tu_clave": Scenario(tab: .settings, route: .cuentaClave),
-        "58_cuenta_tu_clave_oscuro": Scenario(appearance: "dark", tab: .settings, route: .cuentaClave),
-        "59_cuenta_entrar": Scenario(tab: .settings, route: .cuentaEntrar),
-        "60_cuenta_dispositivos": Scenario(tab: .settings, route: .cuentaDispositivos),
-        "61_cuenta_comprobar": Scenario(tab: .settings, route: .cuentaComprobar),
-        "62_cuenta_borrar": Scenario(tab: .settings, route: .cuentaBorrar),
+        "54_playlists_ordenar": Scenario(playing: false, tab: .library, route: .playlists, folders: true, playlistsOrdering: true, reduceMotion: true),
+        "55_playlists_ordenar_oscuro": Scenario(appearance: "dark", playing: false, tab: .library, route: .playlists, folders: true, playlistsOrdering: true, reduceMotion: true),
         // Sólo tests de interfaz (BibliotecaUITests): Playlists con 24 playlists más, para el desplazamiento al borde.
         "ui_muchas_playlists": Scenario(playing: false, tab: .library, route: .playlists, manyPlaylists: true),
+        // Sólo tests de interfaz: la Biblioteca con «Reducir movimiento», para ver que en «Ordenar» nada tiembla.
+        "ui_reducir_movimiento": Scenario(playing: false, tab: .library, reduceMotion: true),
+        // Sólo tests de interfaz (prompt 2-0b): Playlists con carpetas y «Reducir movimiento», para sacar de una carpeta.
+        "ui_carpetas_reducir_movimiento": Scenario(playing: false, tab: .library, route: .playlists, folders: true, reduceMotion: true),
         // Tráiler v2 (4-11-2026): con `-demoCatalog YES` (DemoCatalog.swift), todo con canciones de Michael Bennet.
         "v2_01_inicio": Scenario(tab: .home),
         "v2_02_busqueda": Scenario(tab: .home, query: "Michael Bennet"),

@@ -200,7 +200,7 @@ final class BibliotecaUITests: XCTestCase {
         launch("01_biblioteca_cristal")
         let before = vertical(sections)
         XCTAssertEqual(before.first, "Playlists")
-        let sort = app.buttons["Ordenar"]
+        let sort = sortButton
         XCTAssertTrue(sort.waitForExistence(timeout: 5), "No hay botón «Ordenar» en Tu música")
         sort.tap()
         let down = app.buttons["Bajar Playlists"]
@@ -217,13 +217,13 @@ final class BibliotecaUITests: XCTestCase {
         shot("2-despues")
         note("despues", after.joined(separator: "\n"))
         XCTAssertEqual(Array(after.prefix(2)), ["Tus álbumes", "Playlists"], "«Bajar Playlists» no la deja debajo de «Tus álbumes»; antes: \(before)")
-        XCTAssertTrue(app.buttons["Ordenar"].exists, "«Hecho» no sale del modo de ordenar")
+        XCTAssertTrue(sortButton.exists, "«Hecho» no sale del modo de ordenar")
     }
 
     /// Arrastrar el asa (≡) de «Playlists» hasta la fila de «Canciones» la baja dos puestos.
     func testOrdenarTuMusicaArrastrandoElAsa() {
         launch("01_biblioteca_cristal")
-        app.buttons["Ordenar"].tap()
+        sortButton.tap()
         let down = app.buttons["Bajar Playlists"]
         XCTAssertTrue(down.waitForExistence(timeout: 3), "No se entró en el modo de ordenar")
         // El asa va a la derecha de la flecha de bajar (44 pt) y no es un elemento de accesibilidad: por coordenadas.
@@ -242,10 +242,10 @@ final class BibliotecaUITests: XCTestCase {
     /// Mantener pulsado un apartado abre su menú, con «Ordenar», y no abre el apartado.
     func testOrdenarTuMusicaManteniendoPulsado() {
         launch("01_biblioteca_cristal")
-        XCTAssertEqual(app.buttons.matching(NSPredicate(format: "label == %@", "Ordenar")).count, 1)
+        XCTAssertEqual(app.buttons.matching(NSPredicate(format: "label == %@ AND identifier != %@", "Ordenar", "lapiz-ordenar")).count, 1)
         any("Playlists").press(forDuration: 1.2)
         // Con el menú abierto hay dos «Ordenar»: el de junto al título (tapado) y el del menú, que es el que se puede tocar.
-        let inMenu = app.buttons.matching(NSPredicate(format: "label == %@", "Ordenar"))
+        let inMenu = app.buttons.matching(NSPredicate(format: "label == %@ AND identifier != %@", "Ordenar", "lapiz-ordenar"))
         let shown = app.buttons["Hecho"].exists == false && inMenu.element(boundBy: 1).waitForExistence(timeout: 3)
         let menuItem = [inMenu.element(boundBy: 0), inMenu.element(boundBy: 1)].first { $0.exists && $0.isHittable } ?? inMenu.element(boundBy: 0)
         shot("1-menu")
@@ -289,10 +289,25 @@ final class BibliotecaUITests: XCTestCase {
         sleep(1)
     }
 
+    /// «Ordenar» de un menú o de junto al título de «Tu música», no el lápiz (prompt 2-0b), que se llama igual.
+    private var sortButton: XCUIElement {
+        app.buttons.matching(NSPredicate(format: "label == %@ AND identifier != %@", "Ordenar", "lapiz-ordenar")).firstMatch
+    }
+
+    /// El lápiz junto al ⋯ (o en Fijados): tiene que estar, llamarse «Ordenar» y entrar en el modo.
+    private func tapPencil(_ where_: String) {
+        let pencil = app.buttons["lapiz-ordenar"].firstMatch
+        XCTAssertTrue(pencil.waitForExistence(timeout: 5), "No hay lápiz en \(where_)")
+        XCTAssertEqual(pencil.label, "Ordenar", "El lápiz de \(where_) no se llama «Ordenar» para VoiceOver")
+        pencil.tap()
+        XCTAssertTrue(app.buttons["Hecho"].firstMatch.waitForExistence(timeout: 5), "El lápiz de \(where_) no entra en «Ordenar»")
+        XCTAssertFalse(app.buttons["lapiz-ordenar"].firstMatch.exists, "Ordenando, el lápiz de \(where_) tiene que irse")
+    }
+
     /// ⋯ › Ordenar. Tiene que salir «Hecho».
     private func startOrdering() {
         app.buttons["Más opciones"].tap()
-        let item = app.buttons["Ordenar"]
+        let item = sortButton
         XCTAssertTrue(item.waitForExistence(timeout: 5), "El menú ⋯ no ofrece «Ordenar»")
         item.tap()
         XCTAssertTrue(app.buttons["Hecho"].waitForExistence(timeout: 5), "«Ordenar» no entra en el modo de ordenar")
@@ -355,7 +370,7 @@ final class BibliotecaUITests: XCTestCase {
         openPlaylists()
         XCTAssertTrue(any("Noche").waitForExistence(timeout: 5))
         any("Noche").press(forDuration: 1.2)
-        let item = app.buttons["Ordenar"]
+        let item = sortButton
         XCTAssertTrue(item.waitForExistence(timeout: 3), "El menú de una playlist no ofrece «Ordenar»")
         item.tap()
         let editing = app.buttons["Hecho"].waitForExistence(timeout: 5)
@@ -494,7 +509,7 @@ final class BibliotecaUITests: XCTestCase {
         sleep(1)
         guard let name = visibleList(lowest: true) else { return XCTFail("Tras desplazar no se ve ninguna «Lista NN»") }
         any(name).press(forDuration: 1.2)
-        let item = app.buttons["Ordenar"]
+        let item = sortButton
         XCTAssertTrue(item.waitForExistence(timeout: 3), "El menú de «\(name)» no ofrece «Ordenar»")
         item.tap()
         XCTAssertTrue(app.buttons["Hecho"].waitForExistence(timeout: 5), "«Ordenar» del menú no entra en el modo de ordenar")
@@ -553,7 +568,7 @@ final class BibliotecaUITests: XCTestCase {
         shot("1-fijados")
         any(before[0]).press(forDuration: 1.2)
         // Con el menú abierto hay dos «Ordenar»: el de «Tu música» (tapado) y el del menú.
-        let sorts = app.buttons.matching(NSPredicate(format: "label == %@", "Ordenar"))
+        let sorts = app.buttons.matching(NSPredicate(format: "label == %@ AND identifier != %@", "Ordenar", "lapiz-ordenar"))
         XCTAssertTrue(app.buttons["Soltar de arriba"].waitForExistence(timeout: 3), "Mantener pulsado un fijado no abre su menú")
         let item = (0..<sorts.count).map { sorts.element(boundBy: $0) }.first { $0.isHittable }
         shot("2-menu")
@@ -565,8 +580,12 @@ final class BibliotecaUITests: XCTestCase {
         XCTAssertTrue(editing, "«Ordenar» de un fijado no entra en el modo de ordenar")
         guard editing else { return }
         XCTAssertFalse(app.buttons["Antes"].exists || app.buttons["Después"].exists, "Fijados sigue con «Antes» y «Después»")
-        XCTAssertEqual(app.buttons.matching(NSPredicate(format: "label == %@", "Ordenar")).count, 0,
+        XCTAssertEqual(app.buttons.matching(NSPredicate(format: "label == %@ AND identifier != %@", "Ordenar", "lapiz-ordenar")).count, 0,
                        "Con Fijados ordenándose, «Ordenar» de «Tu música» sigue ahí (dos shu)")
+        // Las dos portadas de Fijados tiemblan (prompt 2-0).
+        let wiggle = orderLog("orden-temblor-fijados")
+        note("temblor", wiggle)
+        XCTAssertTrue(wiggle.contains("tiemblan=2 bordes=0"), "En «Ordenar» de Fijados no tiemblan las dos portadas; \(wiggle)")
         holdAndDrag(before[0], to: center(before[1]))
         let now = pinned.sorted { any($0).frame.minX < any($1).frame.minX }
         shot("4-movido")
@@ -576,6 +595,327 @@ final class BibliotecaUITests: XCTestCase {
         // Arrastrar a los lados no puede cambiar de pestaña (lo hacía: el test acababa en Inicio).
         XCTAssertTrue(any("Tu música").exists, "Arrastrar en Fijados ha cambiado de pestaña")
         done.tap()
-        XCTAssertTrue(app.buttons["Ordenar"].waitForExistence(timeout: 5), "Al terminar no vuelve «Ordenar» de «Tu música»")
+        XCTAssertTrue(sortButton.waitForExistence(timeout: 5), "Al terminar no vuelve «Ordenar» de «Tu música»")
+    }
+    // MARK: Prompt 2-0 del bloque 2: temblor, arrastrar a los cuatro lados y Tus álbumes
+
+    /// En «Ordenar» de Playlists tiemblan todas las portadas (también Descargadas y Favoritos), sin borde. Se lee el
+    /// registro `orden-temblor`: comparar capturas no sirve, porque el fondo Cristal se mueve solo (CI 43959102005).
+    func testOrdenarLasPortadasTiemblan() {
+        launch("01_biblioteca_cristal")
+        openPlaylists()
+        XCTAssertTrue(any("Noche").waitForExistence(timeout: 5))
+        sleep(1)
+        startOrdering()
+        sleep(1)
+        shot("1-ordenando")
+        let log = orderLog("orden-temblor")
+        note("temblor", log)
+        XCTAssertTrue(log.contains("tiemblan=5 bordes=0"), "En «Ordenar» no tiemblan las cinco portadas; \(log)")
+        app.buttons["Hecho"].tap()
+        XCTAssertTrue(app.navigationBars["Playlists"].waitForExistence(timeout: 5))
+        sleep(1)
+        XCTAssertFalse(app.descendants(matching: .any).matching(identifier: "orden-temblor").firstMatch.exists,
+                       "Al salir de «Ordenar» las portadas siguen temblando")
+    }
+
+    /// Con «Reducir movimiento» (escenario 54, como la captura) nada tiembla: cada portada lleva un borde.
+    func testOrdenarSinTemblorConReducirMovimiento() {
+        launch("54_playlists_ordenar", ready: "Viajes")
+        XCTAssertTrue(app.buttons["Hecho"].waitForExistence(timeout: 10), "El escenario no abre Playlists en «Ordenar»")
+        sleep(1)
+        shot("1-ordenando")
+        let log = orderLog("orden-temblor")
+        note("temblor", log)
+        XCTAssertTrue(log.contains("tiemblan=0"), "Con «Reducir movimiento» las portadas tiemblan; \(log)")
+        XCTAssertFalse(log.contains("bordes=0"), "Con «Reducir movimiento» las portadas no llevan el borde; \(log)")
+    }
+
+    /// Coge la portada que está en `from` (orden de lectura de la cuadrícula de Playlists) y la suelta en el sitio de la
+    /// que está en `to`: tiene que quedarse ahí, con todas las demás, y el arrastre tiene que haber arrancado con las
+    /// celdas medidas aunque las portadas tiemblen.
+    private func dragInGrid(from: Int, to: Int) {
+        launch("01_biblioteca_cristal")
+        openPlaylists()
+        XCTAssertTrue(any("Noche").waitForExistence(timeout: 5))
+        // La tercera fila, por encima del mini reproductor y de la barra de pestañas.
+        liftAboveBars(reading(lists).last ?? "Para correr")
+        startOrdering()
+        sleep(1)
+        let before = reading(lists)
+        guard before.count == lists.count else { return XCTFail("No se ven las cinco portadas: \(before)") }
+        let (a, b) = (before[from], before[to])
+        shot("1-antes")
+        holdAndDrag(a, to: center(b))
+        shot("2-soltada")
+        let log = orderLog()
+        note("registro", log)
+        app.buttons["Hecho"].tap()
+        sleep(1)
+        let after = reading(lists)
+        note("orden", "antes: \(before)\ndespués: \(after)")
+        XCTAssertEqual(after.firstIndex(of: a), to, "Arrastrar «\(a)» al sitio de «\(b)» no la deja ahí; antes \(before), después \(after); \(log)")
+        XCTAssertEqual(Set(after), Set(before), "Al ordenar se ha perdido alguna portada")
+        XCTAssertTrue(log.contains("arrancados=1") && log.contains("fallo=-") && log.contains("celdas=5"),
+                      "El arrastre no arrancó con las cinco celdas medidas; \(log)")
+    }
+
+    /// Fila del medio: de la izquierda a la derecha.
+    func testOrdenarArrastrandoALaDerecha() { dragInGrid(from: 2, to: 3) }
+    /// Fila del medio: de la derecha a la izquierda.
+    func testOrdenarArrastrandoALaIzquierda() { dragInGrid(from: 3, to: 2) }
+    /// De la tercera fila a la segunda.
+    func testOrdenarArrastrandoHaciaArriba() { dragInGrid(from: 4, to: 2) }
+    /// De la segunda fila a la tercera.
+    func testOrdenarArrastrandoHaciaAbajo() { dragInGrid(from: 2, to: 4) }
+
+    private let albums = ["After Hours", "Un Verano Sin Ti", "Future Nostalgia"]
+
+    private func openAlbums() {
+        let row = button("Tus álbumes")
+        XCTAssertTrue(row.waitForExistence(timeout: 5), "No está la fila «Tus álbumes» de Tu música")
+        row.tap()
+        XCTAssertTrue(app.navigationBars["Tus álbumes"].waitForExistence(timeout: 5), "No se abrió Tu música › Tus álbumes")
+        XCTAssertTrue(any(albums[0]).waitForExistence(timeout: 5))
+    }
+
+    /// Mantener pulsado un álbum abre su menú: lo que tiene sentido para un álbum (Abrir, Ordenar, Fijar arriba,
+    /// Eliminar…) y no lo de las playlists que no (Editar, Mover a…). «Ordenar» entra en el modo, las portadas
+    /// tiemblan y arrastrar un álbum al sitio de otro cambia el orden.
+    func testMenuDeUnAlbumYOrdenar() {
+        launch("01_biblioteca_cristal")
+        openAlbums()
+        let before = reading(albums)
+        note("1-antes", before.joined(separator: "\n"))
+        any(before[0]).press(forDuration: 1.2)
+        let menu = app.buttons["Fijar arriba"].waitForExistence(timeout: 3)
+        shot("1-menu")
+        XCTAssertTrue(menu, "Mantener pulsado un álbum no abre su menú")
+        for item in ["Abrir", "Ordenar", "Fijar arriba", "Eliminar…"] {
+            XCTAssertTrue(app.buttons[item].exists, "Al menú de un álbum le falta «\(item)»")
+        }
+        for item in ["Editar", "Mover a…"] {
+            XCTAssertFalse(app.buttons[item].exists, "El menú de un álbum ofrece «\(item)»")
+        }
+        // Con el menú abierto hay dos «Ordenar»: el de la barra (tapado) y el del menú.
+        let sorts = app.buttons.matching(NSPredicate(format: "label == %@ AND identifier != %@", "Ordenar", "lapiz-ordenar"))
+        let item = (0..<sorts.count).map { sorts.element(boundBy: $0) }.last { $0.isHittable }
+        XCTAssertNotNil(item, "El menú de un álbum no ofrece «Ordenar»")
+        item?.tap()
+        XCTAssertTrue(app.buttons["Hecho"].waitForExistence(timeout: 5), "«Ordenar» del menú de un álbum no entra en el modo")
+        XCTAssertTrue(app.navigationBars["Ordenar"].exists, "El título del modo no es «Ordenar»")
+        sleep(1)
+        shot("2-ordenando")
+        let wiggle = orderLog("orden-temblor")
+        note("temblor", wiggle)
+        XCTAssertTrue(wiggle.contains("tiemblan=3 bordes=0"), "En «Ordenar» de Tus álbumes no tiemblan los tres; \(wiggle)")
+        holdAndDrag(before[0], to: center(before[1]))
+        let log = orderLog()
+        note("registro", log)
+        app.buttons["Hecho"].tap()
+        sleep(1)
+        let after = reading(albums)
+        shot("3-despues")
+        note("2-despues", after.joined(separator: "\n"))
+        XCTAssertEqual(after.firstIndex(of: before[0]), 1, "Arrastrar «\(before[0])» al sitio de «\(before[1])» no la deja ahí; antes \(before), después \(after); \(log)")
+        XCTAssertTrue(log.contains("arrancados=1") && log.contains("fallo=-"), "El arrastre de Tus álbumes no arrancó; \(log)")
+    }
+
+    /// Tus álbumes con «Reducir movimiento»: en «Ordenar» nada tiembla y cada portada lleva el borde.
+    func testAlbumesSinTemblorConReducirMovimiento() {
+        launch("ui_reducir_movimiento")
+        openAlbums()
+        app.buttons["Más opciones"].tap()
+        XCTAssertTrue(sortButton.waitForExistence(timeout: 5), "El ⋯ de Tus álbumes no ofrece «Ordenar»")
+        sortButton.tap()
+        XCTAssertTrue(app.buttons["Hecho"].waitForExistence(timeout: 5), "«Ordenar» de Tus álbumes no entra en el modo")
+        sleep(1)
+        shot("1-ordenando")
+        let log = orderLog("orden-temblor")
+        note("temblor", log)
+        XCTAssertTrue(log.contains("tiemblan=0 bordes=3"), "Con «Reducir movimiento» los álbumes tiemblan o no llevan el borde; \(log)")
+    }
+    // MARK: Prompt 2-0 (segunda tanda): el ⋯ de Tus álbumes, el icono de carpeta y soltar junto a una carpeta
+
+    /// Tus álbumes tiene el mismo ⋯ que Playlists: «Ordenar» y «Ordenar por»; «Nombre (A-Z)» los ordena.
+    func testAlbumesConElMismoMenuQuePlaylists() {
+        launch("01_biblioteca_cristal")
+        openAlbums()
+        app.buttons["Más opciones"].tap()
+        let sort = app.buttons["Nombre (A-Z)"]
+        XCTAssertTrue(sort.waitForExistence(timeout: 5), "El ⋯ de Tus álbumes no ofrece «Nombre (A-Z)»")
+        for item in ["Ordenar", "Añadidos recientemente", "Nombre (Z-A)", "Nº de canciones", "A mano"] {
+            XCTAssertTrue(app.buttons[item].exists, "Al ⋯ de Tus álbumes le falta «\(item)»")
+        }
+        shot("1-menu")
+        sort.tap()
+        sleep(1)
+        let now = reading(albums)
+        shot("2-a-z")
+        XCTAssertEqual(now, albums.sorted(), "«Nombre (A-Z)» no ordena los álbumes por nombre")
+    }
+
+    /// Menú de una carpeta › Cambiar icono…: elegir un icono y un color los deja elegidos; «Mosaico» vuelve atrás.
+    func testCambiarElIconoDeUnaCarpeta() {
+        launch("43_carpetas", ready: "Viajes")
+        XCTAssertTrue(app.navigationBars["Playlists"].waitForExistence(timeout: 10), "No se abrió Playlists")
+        any("Carpeta Viajes").press(forDuration: 1.2)
+        let item = app.buttons["Cambiar icono…"]
+        XCTAssertTrue(item.waitForExistence(timeout: 3), "El menú de una carpeta no ofrece «Cambiar icono…»")
+        item.tap()
+        XCTAssertTrue(app.navigationBars["Icono de la carpeta"].waitForExistence(timeout: 5), "No se abre «Icono de la carpeta»")
+        let color = app.buttons["color-2"]
+        XCTAssertFalse(color.isEnabled, "Sin icono, el color tiene que estar apagado")
+        app.buttons["icono-airplane"].tap()
+        XCTAssertTrue(color.isEnabled, "Con icono, el color tiene que poder elegirse")
+        color.tap()
+        sleep(1)
+        shot("1-elegido")
+        XCTAssertTrue(app.buttons["icono-airplane"].isSelected, "El icono elegido no queda marcado")
+        XCTAssertTrue(color.isSelected, "El color elegido no queda marcado")
+        XCTAssertFalse(app.buttons["icono-mosaico"].isSelected, "«Mosaico» sigue marcado con un icono elegido")
+        app.buttons["Listo"].tap()
+        sleep(1)
+        shot("2-cuadricula")
+        XCTAssertTrue(app.navigationBars["Playlists"].exists, "«Listo» no vuelve a Playlists")
+    }
+
+    /// Soltar una playlist en el borde de una carpeta (no en su centro) no la mete dentro.
+    func testSoltarEnElBordeDeUnaCarpetaNoLaMete() {
+        launch("43_carpetas", ready: "Viajes")
+        XCTAssertTrue(app.navigationBars["Playlists"].waitForExistence(timeout: 10), "No se abrió Playlists")
+        XCTAssertTrue(any("Domingo lento").waitForExistence(timeout: 5))
+        startOrdering()
+        let edge = any("Carpeta Viajes").coordinate(withNormalizedOffset: CGVector(dx: 0.06, dy: 0.3))
+        holdAndDrag("Domingo lento", to: edge)
+        sleep(1)
+        shot("1-soltada")
+        let log = orderLog()
+        note("registro", log)
+        XCTAssertTrue(any("Domingo lento").exists, "Soltar «Domingo lento» en el borde de «Viajes» la ha metido dentro; \(log)")
+    }
+
+    // MARK: Prompt 2-0b: carpetas y playlists mezcladas, sacar de una carpeta y el lápiz
+
+    /// Carpetas y playlists se ordenan juntas: «Domingo lento» parada en el borde de «Viajes» se cambia el sitio con
+    /// ella (antes las carpetas iban siempre delante) y, tras «Hecho», queda delante de la carpeta.
+    func testCarpetasYPlaylistsSeMezclan() {
+        launch("43_carpetas", ready: "Viajes")
+        XCTAssertTrue(app.navigationBars["Playlists"].waitForExistence(timeout: 10), "No se abrió Playlists")
+        let cells = ["Descargadas", "Favoritos", "Carpeta Viajes", "Carpeta Gimnasio", "Domingo lento"]
+        XCTAssertTrue(any("Domingo lento").waitForExistence(timeout: 5))
+        startOrdering()
+        let before = reading(cells)
+        note("1-antes", before.joined(separator: "\n"))
+        let edge = any("Carpeta Viajes").coordinate(withNormalizedOffset: CGVector(dx: 0.06, dy: 0.3))
+        holdAndDrag("Domingo lento", to: edge)
+        shot("1-soltada")
+        let log = orderLog()
+        note("registro", log)
+        app.buttons["Hecho"].tap()
+        sleep(1)
+        let after = reading(cells)
+        note("2-despues", after.joined(separator: "\n"))
+        shot("2-despues")
+        guard let dl = after.firstIndex(of: "Domingo lento"), let via = after.firstIndex(of: "Carpeta Viajes") else {
+            return XCTFail("Falta alguna portada: \(after)")
+        }
+        XCTAssertLessThan(dl, via, "«Domingo lento» parada en el borde de «Viajes» no se ha cambiado el sitio con ella; antes \(before), después \(after); \(log)")
+        XCTAssertEqual(Set(after), Set(before), "Al ordenar se ha perdido alguna portada")
+    }
+
+    /// Playlists › Gimnasio (abierta tocándola, para que debajo esté Playlists) y ⋯ › Ordenar.
+    private func openGimnasioOrdering(_ scenario: String) {
+        launch(scenario, ready: "Gimnasio")
+        XCTAssertTrue(app.navigationBars["Playlists"].waitForExistence(timeout: 10), "No se abrió Playlists")
+        any("Carpeta Gimnasio").tap()
+        XCTAssertTrue(app.navigationBars["Gimnasio"].waitForExistence(timeout: 5), "No se abrió la carpeta Gimnasio")
+        XCTAssertTrue(any("Fuerza").waitForExistence(timeout: 5), "En Gimnasio no está «Fuerza»")
+        startOrdering()
+    }
+
+    /// Coge «Fuerza», la lleva a la barra de arriba (zona «Sacar de «Gimnasio»») y la deja ahí más de 0,5 s: tiene
+    /// que subir a Playlists con la portada aún cogida, seguir en «Ordenar» y, al soltar, quedarse en Playlists.
+    private func dragOutOfGimnasio() {
+        let top = app.navigationBars.firstMatch.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+        center("Fuerza").press(forDuration: 0.5, thenDragTo: top, withVelocity: .slow, thenHoldForDuration: 1.4)
+        sleep(1)
+        shot("1-soltada-arriba")
+        let log = orderLog("orden-sacar") + "; " + orderLog()
+        note("registro", log)
+        XCTAssertTrue(any("Carpeta Gimnasio").waitForExistence(timeout: 5), "No ha subido a Playlists; \(log)")
+        XCTAssertTrue(log.contains("sacadas=1"), "La playlist no ha salido de la carpeta; \(log)")
+        XCTAssertTrue(app.buttons["Hecho"].exists, "Arriba tiene que seguir en «Ordenar»")
+        XCTAssertTrue(any("Fuerza").exists, "«Fuerza» no está en Playlists; \(log)")
+        // Arriba la recogió cogida y siguió con el mismo dedo hasta soltarla (no se soltó sola al cambiar de pantalla).
+        XCTAssertTrue(log.contains("arrancados=1") && log.contains("soltados=1"), "Arriba no se recogió la portada cogida; \(log)")
+        XCTAssertFalse(log.contains("sin-dedo") || log.contains("dedo-cancelado"), "Al cambiar de pantalla se perdió el dedo; \(log)")
+        app.buttons["Hecho"].tap()
+        XCTAssertTrue(app.navigationBars["Playlists"].waitForExistence(timeout: 5), "«Hecho» no vuelve a Playlists")
+        XCTAssertTrue(any("Fuerza").exists, "Tras «Hecho», «Fuerza» no está en Playlists")
+        any("Carpeta Gimnasio").tap()
+        XCTAssertTrue(app.navigationBars["Gimnasio"].waitForExistence(timeout: 5))
+        sleep(1)
+        shot("2-gimnasio")
+        XCTAssertFalse(any("Fuerza").exists, "«Fuerza» sigue dentro de Gimnasio")
+    }
+
+    /// Sacar una playlist de una carpeta llevándola arriba (prompt 2-0b, punto 2a).
+    func testSacarDeUnaCarpetaArrastrandoArriba() {
+        openGimnasioOrdering("43_carpetas")
+        let log = orderLog("orden-sacar")
+        XCTAssertTrue(log.contains("animada=si") && log.contains("sacadas=0"), "Sin «Reducir movimiento» la zona se anima; \(log)")
+        dragOutOfGimnasio()
+    }
+
+    /// Lo mismo con «Reducir movimiento»: funciona igual y la zona no se anima.
+    func testSacarDeUnaCarpetaConReducirMovimiento() {
+        openGimnasioOrdering("ui_carpetas_reducir_movimiento")
+        let log = orderLog("orden-sacar")
+        XCTAssertTrue(log.contains("animada=no"), "Con «Reducir movimiento» la zona «Sacar de …» no tiene que animarse; \(log)")
+        dragOutOfGimnasio()
+    }
+
+    /// El lápiz (punto 3): un toque entra en «Ordenar» en Playlists, dentro de una carpeta y en Tus álbumes.
+    func testElLapizEntraEnOrdenar() {
+        launch("43_carpetas", ready: "Viajes")
+        XCTAssertTrue(app.navigationBars["Playlists"].waitForExistence(timeout: 10), "No se abrió Playlists")
+        tapPencil("Playlists")
+        XCTAssertTrue(app.navigationBars["Ordenar"].exists, "El título del modo no es «Ordenar»")
+        shot("1-playlists")
+        app.buttons["Hecho"].tap()
+        XCTAssertTrue(app.navigationBars["Playlists"].waitForExistence(timeout: 5))
+        any("Carpeta Gimnasio").tap()
+        XCTAssertTrue(app.navigationBars["Gimnasio"].waitForExistence(timeout: 5), "No se abrió Gimnasio")
+        tapPencil("una carpeta")
+        shot("2-carpeta")
+        app.buttons["Hecho"].tap()
+        sleep(1)
+        back()
+        back()
+        openAlbums()
+        tapPencil("Tus álbumes")
+        shot("3-albumes")
+    }
+
+    /// El lápiz de Fijados: entra en «Ordenar» de Fijados y, mientras tanto, no queda «Ordenar» de «Tu música».
+    func testElLapizDeFijados() {
+        launch("01_biblioteca_cristal")
+        openPlaylists()
+        XCTAssertTrue(any("Noche").waitForExistence(timeout: 5))
+        liftAboveBars("Noche")
+        any("Noche").press(forDuration: 1.2)
+        let pin = app.buttons["Fijar arriba"]
+        XCTAssertTrue(pin.waitForExistence(timeout: 3), "El menú de «Noche» no ofrece «Fijar arriba»")
+        pin.tap()
+        sleep(1)
+        back()
+        XCTAssertTrue(any("Fijados").waitForExistence(timeout: 5))
+        tapPencil("Fijados")
+        shot("1-fijados")
+        XCTAssertEqual(app.buttons.matching(NSPredicate(format: "label == %@ AND identifier != %@", "Ordenar", "lapiz-ordenar")).count, 0,
+                       "Con Fijados ordenándose, «Ordenar» de «Tu música» sigue ahí (dos shu)")
+        app.buttons["Hecho"].firstMatch.tap()
+        XCTAssertTrue(sortButton.waitForExistence(timeout: 5), "Al terminar no vuelve «Ordenar» de «Tu música»")
     }
 }

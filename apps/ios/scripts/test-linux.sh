@@ -32,8 +32,3 @@ mkdir "$OUT/ordenar"
 cp scripts/tests/GridOrderTests.swift "$OUT/ordenar/main.swift"
 "$SWIFT" -o "$OUT/ordenar/tests" Sources/LibraryModel.swift Sources/I18n.swift "$OUT/ordenar/main.swift"
 "$OUT/ordenar/tests"
-
-mkdir "$OUT/sync"
-cp scripts/tests/SyncModelTests.swift "$OUT/sync/main.swift"
-"$SWIFT" -o "$OUT/sync/tests" Sources/SyncModel.swift "$OUT/sync/main.swift"
-"$OUT/sync/tests" ../../shared/library
