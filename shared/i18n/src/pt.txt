@@ -1197,3 +1197,88 @@
 1197	A cor vê-se quando a pasta tem ícone.
 1198	Ícone da pasta
 1199	Sem cor
+1200	Aceitar
+1201	Aceito os Termos de utilização e a Política de privacidade
+1202	Algo correu mal. Tenta outra vez
+1203	Aponta-a em papel e guarda-a bem. Sem ela e sem o teu telemóvel não se pode recuperar nada, e se a perderes não se pode pôr outra.
+1204	Apagar agora
+1205	Apagar conta
+1206	Apagar dentro de 14 dias
+1207	Apagar a tua conta
+1208	Cancelar a eliminação
+1209	Verificar
+1210	Verificar agora
+1211	Verificar a minha chave
+1212	Com a tua chave é apagada de imediato. Sem ela, é apagada dentro de 14 dias e vais vê-lo em todos os teus telemóveis, caso não tenhas sido tu.
+1213	Ligação bloqueada temporariamente. A música continua a tocar
+1214	Copiada
+1215	Criar conta
+1216	Demasiadas tentativas. Tenta daqui a pouco
+1217	Dispositivos
+1218	Entendido
+1219	Entrar com a tua chave
+1220	Entrar com a tua chave de recuperação
+1221	Enviar estatísticas de utilização anónimas
+1222	Essa chave não é válida
+1223	Essa não é a tua chave
+1224	Escreve o grupo {0} da tua chave
+1225	Escreve a chave de recuperação que apontaste ao criar a conta. Tanto faz maiúsculas, espaços ou hífenes.
+1226	Escreve a tua chave de recuperação para confirmar.
+1227	Escreve-a inteira. É verificada neste telemóvel: não é enviada para lado nenhum.
+1228	Esse telemóvel já não vai poder entrar na tua conta.
+1229	Este telemóvel vai sair da tua conta.
+1230	Este telemóvel já não está na tua conta
+1231	Está certa
+1232	Grupo {0}
+1233	Guardar num gestor de palavras-passe
+1234	É preciso Face ID, impressão digital ou o código do telemóvel
+1235	Há termos novos para aceitar
+1236	Há termos novos. Para continuares a usar a conta, lê-os e aceita-os.
+1237	Fui eu
+1238	A conta não está disponível agora; podes continuar a ouvir
+1239	Ler os textos
+1240	Os telemóveis que podem entrar na tua conta. Se não reconheceres algum, retira-o.
+1241	Nada para lembrar nem para te roubarem. A tua biblioteca viaja cifrada: só os teus telemóveis a podem ler.
+1242	Não é esse grupo. Tenta com outro
+1243	Não há nenhuma conta com essa chave
+1244	Não foi possível abrir a tua conta com essa chave
+1245	Não se pode desfazer.
+1246	Opcional. Podes criar a conta sem a marcar e mudar isto quando quiseres em Os teus dados.
+1247	Retirar todos
+1248	Retirar todos os outros telemóveis
+1249	Retirar um telemóvel da tua conta
+1250	Verifica a hora do telemóvel
+1251	«{0}» foi adicionado à tua conta e já foi retirado. Não foste tu? Verifica os teus telemóveis
+1252	São apagados a tua conta e tudo o que está na nuvem. O que tens nos teus telemóveis fica.
+1253	«{0}» foi adicionado à tua conta. Não foste tu? Retira-o
+1254	A tua conta vai ser apagada a {0}
+1255	Se alguém souber o código do teu telemóvel, também vai poder ver esta chave. O mais seguro é apontá-la em papel.
+1256	Se te roubaram um telemóvel: sai tudo de uma vez menos este. É preciso a tua chave de recuperação.
+1257	Se já tens conta noutro telemóvel e o perdeste, entra com a chave que apontaste.
+1258	Só tens este telemóvel na tua conta. Se o perderes, só vais poder entrar com a tua chave de recuperação.
+1259	Tenho 14 anos ou mais
+1260	A tua biblioteca viaja cifrada: o servidor não a pode ler.
+1261	A tua chave
+1262	A tua chave de recuperação (opcional)
+1263	A tua conta está neste telemóvel
+1264	A tua conta, sem palavra-passe
+1265	Os teus telemóveis
+1266	Termos novos
+1267	Ver os termos novos
+1268	Visto {0}
+1269	Já há 10 telemóveis na tua conta. Retira um primeiro
+1270	Já a apontei
+1271	Retirar «{0}»?
+1272	Ainda tens a tua chave de recuperação? Verifica-a por um momento.
+1273	É assim que o vais ver nos teus telemóveis. De 1 a 40 caracteres.
+1274	Mudar o nome
+1275	Esse telemóvel já não está na tua conta
+1276	Nome do telemóvel
+1277	Pixel da Ana
+1278	Escreve um nome de 1 a 40 caracteres
+1279	iPhone 16
+1280	Há muito que este telemóvel não sincronizava: foi posto em dia com a tua conta
+1281	A tua biblioteca na nuvem estava incompleta: completámo-la com a deste telemóvel
+1282	A tua biblioteca é demasiado grande para a nuvem
+1283	Agora não se podem criar contas; tenta amanhã
+1284	Mudar o nome deste telemóvel

@@ -13,6 +13,7 @@ Copias de la biblioteca que leen los tests de las dos apps para comprobar que sa
 | `esperado.json` | Lo que tiene que salir de cada una (los dos árboles de carpetas, iconos y colores guardados y pintados, la carpeta de cada playlist y, en la de álbumes, las claves `folder:` que valen y el orden de «Tus álbumes»). |
 | `seguidos.json` | Artistas seguidos (3.0): repetido, sin `browseId`, id vacío o que no es texto, nombre vacío, `since` y foto de otro tipo. |
 | `esperado-seguidos.json` | Los seguidos que tienen que salir de cada copia, en orden. |
+| `sync-unir.json` | Unir dos versiones de la biblioteca entre móviles (`docs/spec/sync.md` §5): 14 casos con su entrada, su resultado y su aviso. Los escribe `node tools/spec/generar-sync.mjs` con la referencia `tools/spec/sync.mjs`; hoy sólo los pasa JS (`node --test tools/spec/vectores.test.mjs`); las dos apps, desde el 2-D. |
 
 - iOS: `apps/ios/scripts/test-linux.sh` (`scripts/tests/LibraryFoldersTests.swift`, en Linux).
 - Android: `PlaylistFoldersTest` (`gradle testUsrDebugUnitTest --tests '*PlaylistFoldersTest'`).

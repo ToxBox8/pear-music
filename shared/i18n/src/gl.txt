@@ -1197,3 +1197,88 @@
 1197	A cor vese cando o cartafol ten icona.
 1198	Icona do cartafol
 1199	Sen cor
+1200	Aceptar
+1201	Acepto os Termos de uso e a Política de privacidade
+1202	Algo fallou. Proba outra vez
+1203	Apúntaa nun papel e gárdaa ben. Sen ela e sen o teu móbil non se pode recuperar nada, e se a perdes non se pode poñer outra.
+1204	Borrar agora
+1205	Borrar a conta
+1206	Borrar dentro de 14 días
+1207	Borrar a túa conta
+1208	Cancelar o borrado
+1209	Comprobar
+1210	Comprobar agora
+1211	Comprobar a miña clave
+1212	Coa túa clave bórrase ao momento. Sen ela, bórrase dentro de 14 días e verás o aviso en todos os teus móbiles, por se non fuches ti.
+1213	Conexión bloqueada temporalmente. A música segue soando
+1214	Copiada
+1215	Crear conta
+1216	Demasiados intentos. Proba dentro dun anaco
+1217	Dispositivos
+1218	Entendido
+1219	Entrar coa túa clave
+1220	Entrar coa túa clave de recuperación
+1221	Enviar estatísticas de uso anónimas
+1222	Esa clave non é válida
+1223	Esa non é a túa clave
+1224	Escribe o grupo {0} da túa clave
+1225	Escribe a clave de recuperación que apuntaches ao crear a conta. Dá igual maiúsculas, espazos ou guións.
+1226	Escribe a túa clave de recuperación para confirmalo.
+1227	Escríbea enteira. Compróbase neste móbil: non se envía a ningures.
+1228	Ese móbil xa non poderá entrar na túa conta.
+1229	Este móbil sairá da túa conta.
+1230	Este móbil xa non está na túa conta
+1231	Está ben
+1232	Grupo {0}
+1233	Gardar nun xestor de contrasinais
+1234	Fai falla Face ID, a pegada ou o código do móbil
+1235	Hai termos novos que aceptar
+1236	Hai termos novos. Para seguir usando a conta, leos e acéptaos.
+1237	Fun eu
+1238	A conta non está dispoñible agora; podes seguir escoitando
+1239	Ler os textos
+1240	Os móbiles que poden entrar na túa conta. Se non recoñeces algún, quítao.
+1241	Nada que lembrar nin que che poidan roubar. A túa biblioteca viaxa cifrada: só os teus móbiles poden lela.
+1242	Non é ese grupo. Proba con outro
+1243	Non hai ningunha conta con esa clave
+1244	Non se puido abrir a túa conta con esa clave
+1245	Non se pode desfacer.
+1246	Opcional. Podes crear a conta sen marcala e cambialo cando queiras en Os teus datos.
+1247	Quitar todos
+1248	Quitar todos os demais móbiles
+1249	Quitar un móbil da túa conta
+1250	Revisa a hora do móbil
+1251	Engadiuse «{0}» á túa conta e xa se quitou. Non fuches ti? Revisa os teus móbiles
+1252	Bórranse a túa conta e todo o que hai na nube. O que tes nos teus móbiles queda.
+1253	Engadiuse «{0}» á túa conta. Non fuches ti? Quítao
+1254	A túa conta vaise borrar o {0}
+1255	Se alguén sabe o código do teu móbil, tamén poderá ver esta clave. O máis seguro é apuntala nun papel.
+1256	Se che roubaron un móbil: sae todo de golpe menos este. Fai falla a túa clave de recuperación.
+1257	Se xa tes conta noutro móbil e perdiches o móbil, entra coa clave que apuntaches.
+1258	Só tes este móbil na túa conta. Se o perdes, só poderás entrar coa túa clave de recuperación.
+1259	Teño 14 anos ou máis
+1260	A túa biblioteca viaxa cifrada: o servidor non pode lela.
+1261	A túa clave
+1262	A túa clave de recuperación (opcional)
+1263	A túa conta está neste móbil
+1264	A túa conta, sen contrasinal
+1265	Os teus móbiles
+1266	Termos novos
+1267	Ver os termos novos
+1268	Visto {0}
+1269	Xa hai 10 móbiles na túa conta. Quita un antes
+1270	Xa a apuntei
+1271	Quitar «{0}»?
+1272	Aínda tes a túa clave de recuperación? Compróbaa un momento.
+1273	Así o verás nos teus móbiles. De 1 a 40 caracteres.
+1274	Cambiar o nome
+1275	Ese móbil xa non está na túa conta
+1276	Nome do móbil
+1277	Pixel de Ana
+1278	Pon un nome de 1 a 40 caracteres
+1279	iPhone 16
+1280	Hai moito que este móbil non se sincronizaba: púxose ao día coa túa conta
+1281	A túa biblioteca da nube estaba incompleta: completámola coa deste móbil
+1282	A túa biblioteca é demasiado grande para a nube
+1283	Agora non se poden crear contas; proba mañá
+1284	Cambiar o nome deste móbil

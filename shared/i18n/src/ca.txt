@@ -1197,3 +1197,88 @@
 1197	El color es veu quan la carpeta té icona.
 1198	Icona de la carpeta
 1199	Sense color
+1200	Accepta
+1201	Accepto les Condicions d'ús i la Política de privadesa
+1202	Alguna cosa ha fallat. Torna-ho a provar
+1203	Apunta-la en paper i guarda-la bé. Sense ella i sense el teu mòbil no es pot recuperar res, i si la perds no se'n pot posar una altra.
+1204	Esborra ara
+1205	Esborra el compte
+1206	Esborra d'aquí a 14 dies
+1207	Esborra el teu compte
+1208	Cancel·la l'esborrat
+1209	Comprova
+1210	Comprova-la ara
+1211	Comprova la meva clau
+1212	Amb la teva clau s'esborra al moment. Sense ella, s'esborra d'aquí a 14 dies i ho veuràs a tots els teus mòbils, per si no has estat tu.
+1213	Connexió bloquejada temporalment. La música continua sonant
+1214	Copiada
+1215	Crea un compte
+1216	Massa intents. Torna-ho a provar d'aquí a una estona
+1217	Dispositius
+1218	Entesos
+1219	Entra amb la teva clau
+1220	Entra amb la teva clau de recuperació
+1221	Envia estadístiques d'ús anònimes
+1222	Aquesta clau no és vàlida
+1223	Aquesta no és la teva clau
+1224	Escriu el grup {0} de la teva clau
+1225	Escriu la clau de recuperació que vas apuntar en crear el compte. Tant és majúscules, espais o guions.
+1226	Escriu la teva clau de recuperació per confirmar-ho.
+1227	Escriu-la sencera. Es comprova en aquest mòbil: no s'envia enlloc.
+1228	Aquest mòbil ja no podrà entrar al teu compte.
+1229	Aquest mòbil sortirà del teu compte.
+1230	Aquest mòbil ja no és al teu compte
+1231	És correcta
+1232	Grup {0}
+1233	Desa-la en un gestor de contrasenyes
+1234	Cal Face ID, l'empremta o el codi del mòbil
+1235	Hi ha condicions noves per acceptar
+1236	Hi ha condicions noves. Per continuar fent servir el compte, llegeix-les i accepta-les.
+1237	He estat jo
+1238	El compte no està disponible ara; pots continuar escoltant
+1239	Llegeix els textos
+1240	Els mòbils que poden entrar al teu compte. Si no en reconeixes algun, treu-lo.
+1241	Res per recordar ni que et puguin robar. La teva biblioteca viatja xifrada: només els teus mòbils la poden llegir.
+1242	No és aquest grup. Prova-ho amb un altre
+1243	No hi ha cap compte amb aquesta clau
+1244	No s'ha pogut obrir el teu compte amb aquesta clau
+1245	No es pot desfer.
+1246	Opcional. Pots crear el compte sense marcar-la i canviar-ho quan vulguis a Les teves dades.
+1247	Treu-los tots
+1248	Treu tots els altres mòbils
+1249	Treure un mòbil del teu compte
+1250	Revisa l'hora del mòbil
+1251	S'ha afegit «{0}» al teu compte i ja s'ha tret. No has estat tu? Revisa els teus mòbils
+1252	S'esborren el teu compte i tot el que hi ha al núvol. El que tens als teus mòbils es queda.
+1253	S'ha afegit «{0}» al teu compte. No has estat tu? Treu-lo
+1254	El teu compte s'esborrarà el {0}
+1255	Si algú sap el codi del teu mòbil, també podrà veure aquesta clau. El més segur és apuntar-la en paper.
+1256	Si t'han robat un mòbil: surt tot de cop menys aquest. Cal la teva clau de recuperació.
+1257	Si ja tens compte en un altre mòbil i l'has perdut, entra amb la clau que vas apuntar.
+1258	Només tens aquest mòbil al teu compte. Si el perds, només podràs entrar amb la teva clau de recuperació.
+1259	Tinc 14 anys o més
+1260	La teva biblioteca viatja xifrada: el servidor no la pot llegir.
+1261	La teva clau
+1262	La teva clau de recuperació (opcional)
+1263	El teu compte és en aquest mòbil
+1264	El teu compte, sense contrasenya
+1265	Els teus mòbils
+1266	Condicions noves
+1267	Mira les condicions noves
+1268	Vist {0}
+1269	Ja hi ha 10 mòbils al teu compte. Treu-ne un abans
+1270	Ja l'he apuntada
+1271	Vols treure «{0}»?
+1272	Encara tens la teva clau de recuperació? Comprova-la un moment.
+1273	Així el veuràs als teus mòbils. D'1 a 40 caràcters.
+1274	Canviar el nom
+1275	Aquell mòbil ja no és al teu compte
+1276	Nom del mòbil
+1277	Pixel de l'Ana
+1278	Posa un nom d'1 a 40 caràcters
+1279	iPhone 16
+1280	Feia molt que aquest mòbil no se sincronitzava: s'ha posat al dia amb el teu compte
+1281	La teva biblioteca del núvol estava incompleta: l'hem completada amb la d'aquest mòbil
+1282	La teva biblioteca és massa gran per al núvol
+1283	Ara no es poden crear comptes; prova-ho demà
+1284	Canviar el nom d'aquest mòbil

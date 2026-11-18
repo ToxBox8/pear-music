@@ -1197,3 +1197,88 @@
 1197	Kolorea karpetak ikonoa duenean ikusten da.
 1198	Karpetaren ikonoa
 1199	Kolorerik gabe
+1200	Onartu
+1201	Erabilera-baldintzak eta Pribatutasun-politika onartzen ditut
+1202	Zerbaitek huts egin du. Saiatu berriro
+1203	Idatzi paperean eta gorde ondo. Hura gabe eta zure mugikorrik gabe ezin da ezer berreskuratu, eta galtzen baduzu ezin da beste bat jarri.
+1204	Ezabatu orain
+1205	Ezabatu kontua
+1206	Ezabatu 14 egun barru
+1207	Ezabatu zure kontua
+1208	Utzi ezabatzea
+1209	Egiaztatu
+1210	Egiaztatu orain
+1211	Egiaztatu nire gakoa
+1212	Zure gakoarekin berehala ezabatzen da. Hura gabe, 14 egun barru ezabatzen da eta zure mugikor guztietan ikusiko duzu, zu izan ez bazara ere.
+1213	Konexioa aldi baterako blokeatuta. Musikak jotzen jarraitzen du
+1214	Kopiatuta
+1215	Sortu kontua
+1216	Saiakera gehiegi. Saiatu berriro geroxeago
+1217	Gailuak
+1218	Ulertuta
+1219	Sartu zure gakoarekin
+1220	Sartu zure berreskuratze-gakoarekin
+1221	Bidali erabilera-estatistika anonimoak
+1222	Gako hori ez da baliozkoa
+1223	Hori ez da zure gakoa
+1224	Idatzi zure gakoaren {0}. taldea
+1225	Idatzi kontua sortzean idatzi zenuen berreskuratze-gakoa. Berdin dio maiuskulak, zuriuneak edo marratxoak.
+1226	Idatzi zure berreskuratze-gakoa berresteko.
+1227	Idatzi osorik. Mugikor honetan egiaztatzen da: ez da inora bidaltzen.
+1228	Mugikor hori ezingo da zure kontuan sartu.
+1229	Mugikor hau zure kontutik aterako da.
+1230	Mugikor hau jada ez dago zure kontuan
+1231	Ondo dago
+1232	{0}. taldea
+1233	Gorde pasahitz-kudeatzaile batean
+1234	Face ID, hatz-marka edo mugikorraren kodea behar da
+1235	Onartu beharreko baldintza berriak daude
+1236	Baldintza berriak daude. Kontua erabiltzen jarraitzeko, irakurri eta onartu.
+1237	Ni izan naiz
+1238	Kontua ez dago erabilgarri orain; entzuten jarrai dezakezu
+1239	Irakurri testuak
+1240	Zure kontuan sar daitezkeen mugikorrak. Bat ezagutzen ez baduzu, kendu.
+1241	Ez dago ezer gogoratu edo lapurtzeko. Zure liburutegia zifratuta doa: zure mugikorrek bakarrik irakur dezakete.
+1242	Ez da talde hori. Saiatu beste batekin
+1243	Ez dago gako hori duen konturik
+1244	Ezin izan da zure kontua ireki gako horrekin
+1245	Ezin da desegin.
+1246	Aukerakoa. Kontua markatu gabe sor dezakezu eta nahi duzunean aldatu Zure datuak atalean.
+1247	Kendu guztiak
+1248	Kendu beste mugikor guztiak
+1249	Kendu mugikor bat zure kontutik
+1250	Begiratu mugikorraren ordua
+1251	«{0}» zure kontuan gehitu zen eta dagoeneko kendu da. Ez zara zu izan? Begiratu zure mugikorrak
+1252	Zure kontua eta hodeian dagoen guztia ezabatzen dira. Zure mugikorretan duzuna geratu egiten da.
+1253	«{0}» zure kontuan gehitu da. Ez zara zu izan? Kendu
+1254	Zure kontua {0}(e)an ezabatuko da
+1255	Norbaitek zure mugikorraren kodea badaki, gako hau ere ikusi ahal izango du. Seguruena paperean idaztea da.
+1256	Mugikor bat lapurtu badizute: hau izan ezik dena ateratzen da batera. Zure berreskuratze-gakoa behar da.
+1257	Beste mugikor batean kontua baduzu eta mugikorra galdu baduzu, sartu idatzi zenuen gakoarekin.
+1258	Mugikor hau bakarrik duzu zure kontuan. Galtzen baduzu, zure berreskuratze-gakoarekin bakarrik sartu ahal izango zara.
+1259	14 urte edo gehiago ditut
+1260	Zure liburutegia zifratuta doa: zerbitzariak ezin du irakurri.
+1261	Zure gakoa
+1262	Zure berreskuratze-gakoa (aukerakoa)
+1263	Zure kontua mugikor honetan dago
+1264	Zure kontua, pasahitzik gabe
+1265	Zure mugikorrak
+1266	Baldintza berriak
+1267	Ikusi baldintza berriak
+1268	Ikusita: {0}
+1269	Dagoeneko 10 mugikor daude zure kontuan. Kendu bat lehenago
+1270	Idatzi dut jada
+1271	«{0}» kendu?
+1272	Oraindik baduzu zure berreskuratze-gakoa? Egiaztatu une batez.
+1273	Horrela ikusiko duzu zure mugikorretan. 1etik 40ra karaktere.
+1274	Izena aldatu
+1275	Mugikor hori ez dago jada zure kontuan
+1276	Mugikorraren izena
+1277	Anaren Pixela
+1278	Jarri 1etik 40ra karaktereko izena
+1279	iPhone 16
+1280	Aspaldi ez zen mugikor hau sinkronizatzen: zure kontuarekin eguneratu da
+1281	Hodeiko zure liburutegia osatu gabe zegoen: mugikor honetakoarekin osatu dugu
+1282	Zure liburutegia handiegia da hodeirako
+1283	Orain ezin da konturik sortu; saiatu bihar
+1284	Mugikor honen izena aldatu

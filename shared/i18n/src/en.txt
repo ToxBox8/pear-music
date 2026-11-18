@@ -1197,3 +1197,88 @@
 1197	The colour shows when the folder has an icon.
 1198	Folder icon
 1199	No colour
+1200	Accept
+1201	I accept the Terms of Use and the Privacy Policy
+1202	Something went wrong. Try again
+1203	Write it down on paper and keep it safe. Without it and without your phone nothing can be recovered, and if you lose it you can't set a new one.
+1204	Delete now
+1205	Delete account
+1206	Delete in 14 days
+1207	Delete your account
+1208	Cancel the deletion
+1209	Check
+1210	Check now
+1211	Check my key
+1212	With your key it's deleted right away. Without it, it's deleted in 14 days and you'll see it on all your phones, in case it wasn't you.
+1213	Connection temporarily blocked. Music keeps playing
+1214	Copied
+1215	Create account
+1216	Too many attempts. Try again in a while
+1217	Devices
+1218	Got it
+1219	Sign in with your key
+1220	Sign in with your recovery key
+1221	Send anonymous usage statistics
+1222	That key isn't valid
+1223	That isn't your key
+1224	Type group {0} of your key
+1225	Type the recovery key you wrote down when you created the account. Upper or lower case, spaces and dashes don't matter.
+1226	Type your recovery key to confirm.
+1227	Type it in full. It's checked on this phone: it isn't sent anywhere.
+1228	That phone won't be able to get into your account anymore.
+1229	This phone will leave your account.
+1230	This phone is no longer in your account
+1231	It's correct
+1232	Group {0}
+1233	Save in a password manager
+1234	Face ID, fingerprint or your phone's passcode is needed
+1235	There are new terms to accept
+1236	There are new terms. To keep using your account, read and accept them.
+1237	It was me
+1238	Your account isn't available right now; you can keep listening
+1239	Read the texts
+1240	The phones that can get into your account. If you don't recognise one, remove it.
+1241	Nothing to remember and nothing to steal. Your library travels encrypted: only your phones can read it.
+1242	That's not the group. Try another one
+1243	There's no account with that key
+1244	Your account couldn't be opened with that key
+1245	This can't be undone.
+1246	Optional. You can create the account without ticking it and change it whenever you want in Your data.
+1247	Remove all
+1248	Remove all other phones
+1249	Remove a phone from your account
+1250	Check your phone's time
+1251	"{0}" was added to your account and has already been removed. Wasn't it you? Check your phones
+1252	Your account and everything in the cloud will be deleted. What's on your phones stays.
+1253	"{0}" was added to your account. Wasn't it you? Remove it
+1254	Your account will be deleted on {0}
+1255	If someone knows your phone's passcode, they'll also be able to see this key. The safest is to write it down on paper.
+1256	If a phone was stolen: everything except this one is signed out at once. You need your recovery key.
+1257	If you already have an account on another phone and lost that phone, sign in with the key you wrote down.
+1258	This is the only phone in your account. If you lose it, you can only get in with your recovery key.
+1259	I'm 14 or older
+1260	Your library travels encrypted: the server can't read it.
+1261	Your key
+1262	Your recovery key (optional)
+1263	Your account is on this phone
+1264	Your account, without a password
+1265	Your phones
+1266	New terms
+1267	See the new terms
+1268	Seen {0}
+1269	Your account already has 10 phones. Remove one first
+1270	I've written it down
+1271	Remove "{0}"?
+1272	Do you still have your recovery key? Check it for a moment.
+1273	That's how you'll see it on your phones. 1 to 40 characters.
+1274	Rename
+1275	That phone is no longer in your account
+1276	Phone name
+1277	Ana's Pixel
+1278	Use a name of 1 to 40 characters
+1279	iPhone 16
+1280	This phone hadn't synced for a long time: it's now up to date with your account
+1281	Your library in the cloud was incomplete: we've completed it with this phone's
+1282	Your library is too big for the cloud
+1283	Accounts can't be created right now; try tomorrow
+1284	Rename this phone

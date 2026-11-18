@@ -1197,3 +1197,88 @@ Cambiar icono…
 El color se ve cuando la carpeta tiene icono.
 Icono de la carpeta
 Sin color
+Aceptar
+Acepto los Términos de uso y la Política de privacidad
+Algo ha fallado. Prueba otra vez
+Apúntala en papel y guárdala bien. Sin ella y sin tu móvil no se puede recuperar nada, y si la pierdes no se puede poner otra.
+Borrar ahora
+Borrar cuenta
+Borrar dentro de 14 días
+Borrar tu cuenta
+Cancelar el borrado
+Comprobar
+Comprobar ahora
+Comprobar mi clave
+Con tu clave se borra al momento. Sin ella, se borra dentro de 14 días y lo verás en todos tus móviles, por si no has sido tú.
+Conexión bloqueada temporalmente. La música sigue funcionando
+Copiada
+Crear cuenta
+Demasiados intentos. Prueba dentro de un rato
+Dispositivos
+Entendido
+Entrar con tu clave
+Entrar con tu clave de recuperación
+Enviar estadísticas de uso anónimas
+Esa clave no es válida
+Esa no es tu clave
+Escribe el grupo {0} de tu clave
+Escribe la clave de recuperación que apuntaste al crear la cuenta. Da igual mayúsculas, espacios o guiones.
+Escribe tu clave de recuperación para confirmarlo.
+Escríbela entera. Se comprueba en este móvil: no se envía a ningún sitio.
+Ese móvil ya no podrá entrar en tu cuenta.
+Este móvil saldrá de tu cuenta.
+Este móvil ya no está en tu cuenta
+Está bien
+Grupo {0}
+Guardar en un gestor de contraseñas
+Hace falta Face ID, huella o el código del móvil
+Hay términos nuevos que aceptar
+Hay términos nuevos. Para seguir usando la cuenta, léelos y acéptalos.
+He sido yo
+La cuenta no está disponible ahora; puedes seguir escuchando
+Leer los textos
+Los móviles que pueden entrar en tu cuenta. Si no reconoces alguno, quítalo.
+Nada que recordar ni que te puedan robar. Tu biblioteca viaja cifrada: sólo tus móviles pueden leerla.
+No es ese grupo. Prueba con otro
+No hay ninguna cuenta con esa clave
+No se ha podido abrir tu cuenta con esa clave
+No se puede deshacer.
+Opcional. Puedes crear la cuenta sin marcarla y cambiarlo cuando quieras en Tus datos.
+Quitar todos
+Quitar todos los demás móviles
+Quitar un móvil de tu cuenta
+Revisa la hora del móvil
+Se añadió "{0}" a tu cuenta y ya se ha quitado. ¿No has sido tú? Revisa tus móviles
+Se borran tu cuenta y todo lo que hay en la nube. Lo que tienes en tus móviles se queda.
+Se ha añadido "{0}" a tu cuenta. ¿No has sido tú? Quítalo
+Se va a borrar tu cuenta el {0}
+Si alguien conoce el código de tu móvil, también podrá ver esta clave. Lo más seguro es apuntarla en papel.
+Si te han robado un móvil: sale todo de golpe menos este. Hace falta tu clave de recuperación.
+Si ya tienes cuenta en otro móvil y has perdido el móvil, entra con la clave que apuntaste.
+Sólo tienes este móvil en tu cuenta. Si lo pierdes, sólo podrás entrar con tu clave de recuperación.
+Tengo 14 años o más
+Tu biblioteca viaja cifrada: el servidor no puede leerla.
+Tu clave
+Tu clave de recuperación (opcional)
+Tu cuenta está en este móvil
+Tu cuenta, sin contraseña
+Tus móviles
+Términos nuevos
+Ver los términos nuevos
+Visto {0}
+Ya hay 10 móviles en tu cuenta. Quita uno antes
+Ya la he apuntado
+¿Quitar "{0}"?
+¿Sigues teniendo tu clave de recuperación? Compruébala un momento.
+Así lo verás en tus móviles. De 1 a 40 caracteres.
+Cambiar nombre
+Ese móvil ya no está en tu cuenta
+Nombre del móvil
+Pixel de Ana
+Pon un nombre de 1 a 40 caracteres
+iPhone 16
+Hacía mucho que este móvil no se sincronizaba: se ha puesto al día con tu cuenta
+Tu biblioteca de la nube estaba incompleta: la hemos completado con la de este móvil
+Tu biblioteca es demasiado grande para la nube
+Ahora no se pueden crear cuentas; prueba mañana
+Cambiar el nombre de este móvil
