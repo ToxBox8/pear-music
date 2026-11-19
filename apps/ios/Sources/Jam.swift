@@ -533,19 +533,25 @@ enum QRCode {
 }
 
 // MARK: - Escáner de QR
+/// `onCode`: el del Jam (sólo códigos de Jam). `alTexto`: el texto tal cual, para otro uso (el QR de «Añadir un
+/// móvil», 2-E); devuelve si lo acepta (si no, sigue escaneando y no repite el mismo).
 struct QRScanner: UIViewControllerRepresentable {
-    var onCode: (String) -> Void
+    var onCode: (String) -> Void = { _ in }
+    var alTexto: ((String) -> Bool)? = nil
 
     func makeUIViewController(context: Context) -> ScannerController {
         let c = ScannerController()
         c.onCode = onCode
+        c.alTexto = alTexto
         return c
     }
-    func updateUIViewController(_ c: ScannerController, context: Context) { c.onCode = onCode }
+    func updateUIViewController(_ c: ScannerController, context: Context) { c.onCode = onCode; c.alTexto = alTexto }
 }
 
 final class ScannerController: UIViewController, AVCaptureMetadataOutputObjectsDelegate {
     var onCode: ((String) -> Void)?
+    var alTexto: ((String) -> Bool)?
+    private var rechazado: String?
     private let capture = AVCaptureSession()
     private var preview: AVCaptureVideoPreviewLayer?
     private var done = false
@@ -586,6 +592,11 @@ final class ScannerController: UIViewController, AVCaptureMetadataOutputObjectsD
     }
 
     func metadataOutput(_ output: AVCaptureMetadataOutput, didOutput objects: [AVMetadataObject], from connection: AVCaptureConnection) {
+        if let alTexto {
+            guard !done, let text = (objects.first as? AVMetadataMachineReadableCodeObject)?.stringValue, text != rechazado else { return }
+            if alTexto(text) { done = true; UINotificationFeedbackGenerator().notificationOccurred(.success) } else { rechazado = text }
+            return
+        }
         guard !done, let text = (objects.first as? AVMetadataMachineReadableCodeObject)?.stringValue,
               let code = JamService.code(from: text) else { return }
         JamService.DirectHints.shared.remember(text)

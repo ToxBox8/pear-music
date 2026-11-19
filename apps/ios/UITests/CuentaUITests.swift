@@ -69,4 +69,30 @@ final class CuentaUITests: XCTestCase {
         XCTAssertTrue(any("No es ese grupo").waitForExistence(timeout: 5))
         shot("grupo-equivocado")
     }
+
+    /// 2-E (§4.2 paso 10, §4.3): el móvil nuevo enseña los 6 emojis con su nombre para VoiceOver, y «No coinciden»
+    /// descarta lo recibido sin guardar nada.
+    func testQrEmojisYNoCoinciden() {
+        launch("64_cuenta_qr_emojis", ready: "¿Ves lo mismo en tu otro móvil?")
+        let emojis = id("emojisQr")
+        XCTAssertTrue(emojis.waitForExistence(timeout: 5))
+        // Los índices de los vectores (59, 29, 27, 61, 23, 38) con la tabla PROVISIONAL.
+        XCTAssertEqual(emojis.label, "Emojis: coche, zanahoria, piña, dado, manzana, trompeta")
+        shot("emojis")
+        app.buttons["noCoinciden"].tap()
+        XCTAssertTrue(any("No uses este código").waitForExistence(timeout: 5), "«No coinciden» tiene que decir qué hacer")
+        shot("no-coinciden")
+    }
+
+    /// 2-E: el QR del móvil nuevo sale con su cuenta atrás, y el viejo pregunta «¿Añadir…?» con el nombre del QR.
+    func testQrNuevoYAnadir() {
+        launch("63_cuenta_qr", ready: "Entrar desde otro móvil")
+        XCTAssertTrue(id("imagenQr").waitForExistence(timeout: 5), "Falta el código QR")
+        XCTAssertTrue(any("Caduca en 4:32").exists, "Falta la cuenta atrás")
+        shot("qr")
+        app.terminate()
+        launch("65_cuenta_anadir", ready: "¿Añadir \"Pixel de Ana\" a tu cuenta?")
+        XCTAssertTrue(app.buttons["anadirMovil"].exists)
+        shot("anadir")
+    }
 }

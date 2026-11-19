@@ -198,6 +198,129 @@ enum CuentaCripto {
         return o["exp"] as? Int
     }
 
+    // MARK: Emparejamiento por QR, v2 (cuenta.md §4.2 y §4.3; 2-E)
+
+    /// Par X25519 efímero (E_n o E_v): privada y pública de 32 bytes. Se olvida al acabar.
+    static func x25519Nueva() -> (priv: Data, pub: Data) {
+        let k = Curve25519.KeyAgreement.PrivateKey()
+        return (k.rawRepresentation, k.publicKey.rawRepresentation)
+    }
+    static func x25519Pub(_ priv: Data) throws -> Data {
+        try Curve25519.KeyAgreement.PrivateKey(rawRepresentation: priv).publicKey.rawRepresentation
+    }
+    /// Secreto compartido de 32 bytes; falla si sale todo ceros (pública de orden bajo, paso 5).
+    static func x25519(_ priv: Data, _ pubOtro: Data) throws -> Data {
+        guard pubOtro.count == 32 else { throw Fallo(codigo: "x25519") }
+        let k = try Curve25519.KeyAgreement.PrivateKey(rawRepresentation: priv)
+        let s = try k.sharedSecretFromKeyAgreement(with: Curve25519.KeyAgreement.PublicKey(rawRepresentation: pubOtro))
+            .withUnsafeBytes { Data($0) }
+        guard s.count == 32, s.contains(where: { $0 != 0 }) else { throw Fallo(codigo: "x25519") }
+        return s
+    }
+    /// k = HKDF(X25519, salt = s, info = "pear/pair/v2|" + b64u(E_n) + "|" + b64u(E_v)): la única HKDF con otra salt.
+    static func clavePar(_ privPropia: Data, _ pubOtro: Data, s: Data, eN: Data, eV: Data) throws -> Data {
+        guard s.count == 16 else { throw Fallo(codigo: "s") }
+        return hkdf(try x25519(privPropia, pubOtro), info: "pear/pair/v2|\(b64u(eN))|\(b64u(eV))", salt: s)
+    }
+    static func aadSobre(_ cuenta: String, _ idEmp: String, _ pubCuenta: Data) -> Data {
+        utf8("pear-pair/v2|\(cuenta)|\(idEmp)|\(b64u(pubCuenta))")
+    }
+    static func sellarSobre(_ k: Data, _ r: Data, cuenta: String, idEmp: String, pubCuenta: Data, nonce: Data = aleatorio(12)) throws -> String {
+        let ct = try sellar(k, nonce, r, aadSobre(cuenta, idEmp, pubCuenta))
+        return "{\"v\":2,\"nonce\":\"\(b64u(nonce))\",\"ct\":\"\(b64u(ct))\"}"
+    }
+    /// Abre el sobre sólo si es el texto canónico exacto (como la envoltura, §4.1).
+    static func abrirSobre(_ k: Data, _ texto: String, cuenta: String, idEmp: String, pubCuenta: Data) throws -> Data {
+        guard let o = try? JSONSerialization.jsonObject(with: utf8(texto)) as? [String: Any], o.count == 3,
+              let n = o["nonce"] as? String, let c = o["ct"] as? String,
+              texto == "{\"v\":2,\"nonce\":\"\(n)\",\"ct\":\"\(c)\"}" else { throw Fallo(codigo: "sobre") }
+        let nonce = try deB64u(n), ct = try deB64u(c)
+        guard nonce.count == 12, ct.count == 48 else { throw Fallo(codigo: "sobre") }
+        return try abrir(k, nonce, ct, aadSobre(cuenta, idEmp, pubCuenta))
+    }
+    static func cadenaAltaPorQr(_ cuenta: String, _ idEmp: String, _ pubDisp: Data) -> String {
+        "pear-pair-add/v1|\(cuenta)|\(idEmp)|\(b64u(pubDisp))"
+    }
+    static func cadenaFirmaEv(_ cuenta: String, _ idEmp: String, _ eV: Data) -> String {
+        "pear-pair-ev/v1|\(cuenta)|\(idEmp)|\(b64u(eV))"
+    }
+
+    /// Lo que hace el móvil nuevo con la respuesta `completado` (paso 9), por este orden: abrir el sobre con el aad de
+    /// la respuesta, que la clave de cuenta de R sea `pub_cuenta` y que `firma_ev` valga con ella. Devuelve R.
+    static func abrirEmparejamiento(ePriv: Data, eN: Data, s: Data, eV: Data, sobre: String, cuenta: String, idEmp: String,
+                                    pubCuenta: Data, firmaEv: Data) throws -> Data {
+        let k = try clavePar(ePriv, eV, s: s, eN: eN, eV: eV)
+        let r = try abrirSobre(k, sobre, cuenta: cuenta, idEmp: idEmp, pubCuenta: pubCuenta)
+        guard try derivarDeR(r).pubCuenta == pubCuenta else { throw Fallo(codigo: "pub_cuenta") }
+        guard edVerificar(pubCuenta, utf8(cadenaFirmaEv(cuenta, idEmp, eV)), firmaEv) else { throw Fallo(codigo: "firma_ev") }
+        return r
+    }
+
+    /// Emojis de comprobación (§4.3): 6 índices de 0 a 63 con los 36 primeros bits de SHA-256 de todo el intercambio.
+    static func emojis(cuenta: String, idEmp: String, pubCuenta: Data, eN: Data, eV: Data, s: Data) -> [Int] {
+        let d = [UInt8](sha256(utf8("pear-pair-sas/v2|\(cuenta)|\(idEmp)|\(b64u(pubCuenta))|\(b64u(eN))|\(b64u(eV))|\(b64u(s))")))
+        return (0..<6).map { i in
+            (0..<6).reduce(0) { v, b in let bit = 6 * i + b; return (v << 1) | Int((d[bit >> 3] >> (7 - (bit & 7))) & 1) }
+        }
+    }
+
+    /// La tabla fija de 64 emojis (§4.3), igual que en Android y que `shared/spec/emojis-qr.json` (PROVISIONAL, 2-E).
+    /// Sus nombres para VoiceOver, en `EmparejarViews.swift` (`EmojisQr.nombre`).
+    static let tablaEmojis: [String] = [
+        "🐘", "🦒", "🐢", "🐙", "🦋", "🐝", "🐧", "🦀", "🐌", "🐳", "🦉", "🐍", "🦄", "🌵", "🌻", "🍄", "🍀", "🌈", "⛄", "⚡", "🔥", "🌍", "⭐", "🍎", "🍌", "🍇", "🍉", "🍍", "🍒", "🥕", "🌽", "🍕", "🍩", "🧀", "🍦", "☕", "🎃", "🎸", "🎺", "🥁", "🔦", "🎁", "🔑", "🔔", "💡", "⏰", "📷", "☔", "⚓", "🔨", "📚", "🎩", "👓", "👑", "💎", "🧦", "🚲", "🚀", "⛵", "🚗", "🏠", "🎲", "⚽", "🎯",
+    ]
+
+    /// Por porcentajes según RFC 3986: todo salvo A-Z a-z 0-9 - . _ ~, en UTF-8 y con mayúsculas.
+    static func porcentaje(_ s: String) -> String {
+        var out = ""
+        for b in s.utf8 {
+            let c = Character(Unicode.Scalar(b))
+            if (b >= 0x41 && b <= 0x5a) || (b >= 0x61 && b <= 0x7a) || (b >= 0x30 && b <= 0x39) || "-._~".contains(c) { out.append(c) }
+            else { out += String(format: "%%%02X", b) }
+        }
+        return out
+    }
+
+    struct Qr: Equatable { let id: String; let eN: Data; let huella: Data; let s: Data; let nombre: String }
+
+    static func qr(_ q: Qr) -> String {
+        "libremusic://emparejar?v=2&id=\(q.id)&e=\(b64u(q.eN))&h=\(b64u(q.huella))&s=\(b64u(q.s))&n=\(porcentaje(q.nombre))"
+    }
+
+    /// Lee el QR (§4.2 paso 2): exactamente v, id, e, h, s y n, una vez cada uno y en cualquier orden; v = 2; id de la
+    /// spec; e y h de 32 bytes y s de 16 en base64url estricto; n con la regla del nombre. Si no, nil («Este código no
+    /// es válido»). Sólo lo llama el escáner de «Añadir un móvil».
+    static func leerQr(_ texto: String) -> Qr? {
+        let prefijo = "libremusic://emparejar?"
+        guard texto.hasPrefix(prefijo) else { return nil }
+        var p: [String: String] = [:]
+        for parte in texto.dropFirst(prefijo.count).split(separator: "&", omittingEmptySubsequences: false) {
+            guard let i = parte.firstIndex(of: "=") else { return nil }
+            let k = String(parte[..<i]), v = String(parte[parte.index(after: i)...])
+            guard ["v", "id", "e", "h", "s", "n"].contains(k), p[k] == nil else { return nil }
+            p[k] = v
+        }
+        guard p.count == 6, p["v"] == "2", let id = p["id"], esId(id),
+              let e = try? deB64u(p["e"]!), e.count == 32, let h = try? deB64u(p["h"]!), h.count == 32,
+              let s = try? deB64u(p["s"]!), s.count == 16,
+              let n = leerPorcentaje(p["n"]!), let nombre = nombreValido(n) else { return nil }
+        return Qr(id: id, eN: e, huella: h, s: s, nombre: nombre)
+    }
+
+    /// Cualquier codificación por porcentajes válida, en UTF-8 (un % suelto o bytes que no son UTF-8 → nil).
+    static func leerPorcentaje(_ s: String) -> String? {
+        var bytes = [UInt8](), u = Array(s.utf8), i = 0
+        while i < u.count {
+            if u[i] == 0x25 {
+                let hex: (UInt8) -> Bool = { (0x30...0x39).contains($0) || (0x41...0x46).contains($0) || (0x61...0x66).contains($0) }
+                guard i + 2 < u.count, hex(u[i + 1]), hex(u[i + 2]),
+                      let b = UInt8(String(decoding: u[(i + 1)...(i + 2)], as: UTF8.self), radix: 16) else { return nil }
+                bytes.append(b); i += 3
+            } else { bytes.append(u[i]); i += 1 }
+        }
+        return String(bytes: bytes, encoding: .utf8)
+    }
+
     // MARK: «Comprobar mi clave» y avisos de alta (§7.3 puntos 7 y 8)
 
     /// La clave entera, sin red: deriva la clave de recuperación y compara su pública con `pub_rec`.

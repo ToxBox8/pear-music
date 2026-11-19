@@ -40,7 +40,7 @@ targets:
           - _lm-jam2._tcp
         # Para que el aviso de versión nueva pueda abrir AltStore o SideStore (Updates.swift).
         LSApplicationQueriesSchemes: [altstore, sidestore]
-        NSCameraUsageDescription: Jiyu Pulse usa la cámara para escanear el código QR de un Jam.
+        NSCameraUsageDescription: Jiyu Pulse usa la cámara para escanear el código QR de un Jam o de un móvil nuevo de tu cuenta.
         CFBundleURLTypes:
           - CFBundleURLName: com.example.libremusic
             CFBundleURLSchemes: [libremusic]

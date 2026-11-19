@@ -103,9 +103,14 @@ private struct CuentaSinCrear: View {
                     .accessibilityIdentifier("crearCuenta")
             }
             Section {
+                // 2-E: «Entrar en una cuenta que ya tengo» desde otro móvil, con un QR.
+                NavigationLink(L("Entrar desde otro móvil"), destination: QrNuevoView())
+                    .accessibilityIdentifier("entrarDesdeOtro")
                 NavigationLink(L("Entrar con tu clave de recuperación"), destination: EntrarConClaveView())
                     .accessibilityIdentifier("entrarConClave")
-            } footer: { Text(L("Si ya tienes cuenta en otro móvil y has perdido el móvil, entra con la clave que apuntaste.")) }
+            } header: { Text(L("¿Ya tienes cuenta?")) } footer: {
+                Text(L("Con tu otro móvil a mano, entra con un código QR. Si lo has perdido, con la clave que apuntaste."))
+            }
         }
         .navigationDestination(isPresented: $crear) { CrearCuentaView() }
     }
@@ -415,6 +420,14 @@ struct DispositivosView: View {
                 }
             } footer: {
                 if cuenta.soloEsteMovil { Text(L("Sólo tienes este móvil en tu cuenta. Si lo pierdes, sólo podrás entrar con tu clave de recuperación.")) }
+            }
+            Section {
+                NavigationLink(destination: AnadirMovilView()) { Label(L("Añadir un móvil"), systemImage: "qrcode.viewfinder") }
+                    .disabled(cuenta.dispositivos.count >= 10)
+                    .accessibilityIdentifier("anadirUnMovil")
+            } footer: {
+                Text(cuenta.dispositivos.count >= 10 ? L("Ya hay 10 móviles en tu cuenta. Quita uno antes")
+                                                     : L("Escanea el código que enseña el móvil nuevo."))
             }
             if let error { Section { Estado(ok: false, texto: error) } }
             if cuenta.dispositivos.count > 1 {

@@ -216,6 +216,10 @@ struct SettingsView: View {
             .demoRoute(.cuentaDispositivos) { DispositivosView() }
             .demoRoute(.cuentaComprobar) { ComprobarClaveView() }
             .demoRoute(.cuentaBorrar) { BorrarCuentaView() }
+            .demoRoute(.cuentaQr) { QrNuevoView(prueba: .qr) }
+            .demoRoute(.cuentaQrEmojis) { QrNuevoView(prueba: .emojis) }
+            .demoRoute(.cuentaAnadir) { AnadirMovilView(prueba: .confirmar) }
+            .demoRoute(.cuentaAnadirEmojis) { AnadirMovilView(prueba: .emojis) }
             .miniPlayer()
         }
         .overlay {

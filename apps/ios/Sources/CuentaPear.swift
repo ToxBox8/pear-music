@@ -63,7 +63,7 @@ final class CuentaPear: ObservableObject {
         cuentaId = meta.cuenta
         // Capturas: la cuenta de mentira sólo en los escenarios que la necesitan. (No en el cierre de `.demoRoute`:
         // SwiftUI construye el destino aunque no sea la ruta del escenario, y la ponía en todos.)
-        if let r = Demo.current?.route, [.cuentaDispositivos, .cuentaComprobar, .cuentaBorrar].contains(r) { estadoDePrueba() }
+        if let r = Demo.current?.route, [.cuentaDispositivos, .cuentaComprobar, .cuentaBorrar, .cuentaAnadir, .cuentaAnadirEmojis].contains(r) { estadoDePrueba() }
     }
 
     // MARK: Errores (cuenta.md §7.1 y ADR 0004 §9)
@@ -90,6 +90,11 @@ final class CuentaPear: ObservableObject {
             case "nombre_invalido": return L("Pon un nombre de 1 a 40 caracteres")
             case "tope_altas": return L("Ahora no se pueden crear cuentas; prueba mañana")
             case "movil_no_encontrado": return L("Ese móvil ya no está en tu cuenta")
+            case "qr_invalido": return L("Este código no es válido")
+            case "emparejamiento_caducado": return L("El código ha caducado. Prueba otra vez")
+            case "emparejamiento_usado": return L("Este código ya se ha usado. Prueba otra vez")
+            case "qr_adelantado": return L("Otro móvil ha usado este código antes que tú. En el móvil nuevo, pulsa «No coinciden» y empieza otra vez")
+            case "no_anadido": return L("No se ha podido añadir este móvil")
             default: return L("Algo ha fallado. Prueba otra vez")
             }
         }
@@ -262,6 +267,114 @@ final class CuentaPear: ObservableObject {
         guardarMeta()
     }
 
+    // MARK: Móvil nuevo por QR (§4.2; 2-E)
+
+    /// Lo que crea el móvil nuevo (N) al enseñar el QR: D, E_n y s. `s` sólo va en el QR (nunca al servidor ni a un
+    /// registro). `inicio`, en el reloj monótono: a los 5 min deja de esperar, diga lo que diga el servidor.
+    struct QrNuevo {
+        let texto: String
+        let idEmp: String
+        fileprivate let d: ClaveDispositivo
+        fileprivate let ePriv: Data
+        fileprivate let eN: Data
+        fileprivate let s: Data
+        let inicio: TimeInterval
+        var quedan: TimeInterval { max(0, 300 - (ProcessInfo.processInfo.systemUptime - inicio)) }
+    }
+    /// Lo que le llega a N cuando el viejo completa: R ya comprobada (aún sin guardar) y los emojis.
+    struct QrRecibido { fileprivate let r: Data; let cuenta: String; let deviceId: String; let emojis: [Int] }
+
+    /// Paso 1: `POST /v1/id/emparejamientos` y el texto del QR.
+    func empezarQr() async throws -> QrNuevo {
+        try abierta()
+        let d = try ClaveDispositivo.nueva()
+        let e = CuentaCripto.x25519Nueva(), s = CuentaCripto.aleatorio(16)
+        let o = try await json(try await pedir("POST", "/v1/id/emparejamientos", cuerpo: try datos([
+            "pub_disp_nuevo": CuentaCripto.b64u(d.publica), "e_n": CuentaCripto.b64u(e.pub), "nombre": nombreMovil, "plataforma": "ios",
+        ])))
+        guard let id = o["id_emp"] as? String, CuentaCripto.esId(id) else { throw ErrorCuenta(codigo: "error_interno") }
+        let q = CuentaCripto.Qr(id: id, eN: e.pub, huella: CuentaCripto.sha256(d.publica), s: s, nombre: nombreMovil)
+        return QrNuevo(texto: CuentaCripto.qr(q), idEmp: id, d: d, ePriv: e.priv, eN: e.pub, s: s, inicio: ProcessInfo.processInfo.systemUptime)
+    }
+
+    /// Paso 8, una vez (la pantalla lo repite cada 2 s): nil mientras espera; con `completado`, abre el sobre y lo
+    /// comprueba (paso 9). Pasados los 5 min, «El código ha caducado».
+    func esperarQr(_ q: QrNuevo) async throws -> QrRecibido? {
+        guard q.quedan > 0 else { throw ErrorCuenta(codigo: "emparejamiento_caducado") }
+        let dispId = CuentaCripto.idDispositivo(q.d.publica)
+        let o = try await json(try await firmada("POST", "/v1/id/emparejamientos/estado", ["id_emp": q.idEmp], cuenta: "", disp: q.d,
+                                                 dispId: dispId, conToken: false, sinCuenta: true))
+        guard (o["estado"] as? String) == "completado" else { return nil }
+        do {
+            guard let cuenta = o["account_id"] as? String, CuentaCripto.esId(cuenta), (o["device_id"] as? String) == dispId,
+                  let ev = o["e_v"] as? String, let sobre = o["sobre"] as? String, let fe = o["firma_ev"] as? String,
+                  let pc = o["pub_cuenta"] as? String else { throw ErrorCuenta(codigo: "no_anadido") }
+            let eV = try CuentaCripto.deB64u(ev), pubCuenta = try CuentaCripto.deB64u(pc)
+            let r = try CuentaCripto.abrirEmparejamiento(ePriv: q.ePriv, eN: q.eN, s: q.s, eV: eV, sobre: sobre, cuenta: cuenta,
+                                                         idEmp: q.idEmp, pubCuenta: pubCuenta, firmaEv: try CuentaCripto.deB64u(fe))
+            return QrRecibido(r: r, cuenta: cuenta, deviceId: dispId,
+                              emojis: CuentaCripto.emojis(cuenta: cuenta, idEmp: q.idEmp, pubCuenta: pubCuenta, eN: q.eN, eV: eV, s: q.s))
+        } catch { throw ErrorCuenta(codigo: "no_anadido") } // R se descarta: no se ha guardado nada
+    }
+
+    /// Paso 10, «Sí, coinciden»: sólo ahora se guarda R y se pide el primer token (que gasta el emparejamiento).
+    func aceptarQr(_ q: QrNuevo, _ rec: QrRecibido) async throws {
+        try abierta()
+        try Llavero.guardar("R", rec.r)
+        try Llavero.guardar("D", q.d.guardable)
+        meta.cuenta = rec.cuenta
+        meta.dispositivo = rec.deviceId
+        meta.vistos = [rec.deviceId]
+        cuentaId = rec.cuenta
+        guardarMeta()
+        tokenExp = 0
+        try await renovarSiHaceFalta()
+        try await cargar() // trae pub_rec (el QR no la trae; R3) y los móviles
+        meta.vistos = Array(Set(meta.vistos + dispositivos.map(\.id) + altasVistas))
+        avisos = []
+        guardarMeta()
+    }
+
+    // MARK: Añadir un móvil desde el viejo (§4.2 pasos 3–7 y 11)
+
+    struct QrLeido { let qr: CuentaCripto.Qr; let plataforma: String; fileprivate let pubDispNuevo: Data }
+
+    /// Paso 3: lee el QR (sólo desde el escáner de «Añadir un móvil»), pide `estado` y comprueba la huella.
+    func leerQrDeOtro(_ texto: String) async throws -> QrLeido {
+        try abierta()
+        guard let q = CuentaCripto.leerQr(texto) else { throw ErrorCuenta(codigo: "qr_invalido") }
+        let o = try await json(try await firmada("POST", "/v1/id/emparejamientos/estado", ["id_emp": q.id]))
+        guard let pd = o["pub_disp_nuevo"] as? String, let pub = try? CuentaCripto.deB64u(pd), pub.count == 65,
+              CuentaCripto.sha256(pub) == q.huella else { throw ErrorCuenta(codigo: "qr_invalido") }
+        return QrLeido(qr: q, plataforma: o["plataforma"] as? String ?? "", pubDispNuevo: pub)
+    }
+
+    /// Pasos 5–7: tras «Añadir», presencia, sobre y firmas, `completar`; devuelve los emojis para comparar.
+    /// 410 emparejamiento_usado: otro se adelantó con el mismo QR (paso 11), sin emojis.
+    func completarQr(_ l: QrLeido) async throws -> [Int] {
+        try abierta()
+        try await presencia(L("Añadir un móvil a tu cuenta"))
+        guard let cuenta = meta.cuenta, let r = Llavero.leer("R") else { throw ErrorCuenta(codigo: "sin_cuenta") }
+        let deR = try CuentaCripto.derivarDeR(r)
+        let e = CuentaCripto.x25519Nueva()
+        let k = try CuentaCripto.clavePar(e.priv, l.qr.eN, s: l.qr.s, eN: l.qr.eN, eV: e.pub)
+        let cuerpo: [String: Any] = [
+            "id_emp": l.qr.id, "e_v": CuentaCripto.b64u(e.pub),
+            "sobre": try CuentaCripto.sellarSobre(k, r, cuenta: cuenta, idEmp: l.qr.id, pubCuenta: deR.pubCuenta),
+            "firma_alta": CuentaCripto.b64u(try CuentaCripto.edFirmar(deR.semillaCuenta, CuentaCripto.utf8(CuentaCripto.cadenaAltaPorQr(cuenta, l.qr.id, l.pubDispNuevo)))),
+            "firma_ev": CuentaCripto.b64u(try CuentaCripto.edFirmar(deR.semillaCuenta, CuentaCripto.utf8(CuentaCripto.cadenaFirmaEv(cuenta, l.qr.id, e.pub)))),
+        ]
+        do {
+            _ = try await firmada("POST", "/v1/id/emparejamientos/completar", cuerpo, cuentaFirma: true)
+        } catch let err as ErrorCuenta where err.codigo == "emparejamiento_usado" {
+            throw ErrorCuenta(codigo: "qr_adelantado")
+        }
+        meta.vistos.append(CuentaCripto.idDispositivo(l.pubDispNuevo)) // el aviso de alta no salta para el que acabas de añadir
+        guardarMeta()
+        try? await cargar()
+        return CuentaCripto.emojis(cuenta: cuenta, idEmp: l.qr.id, pubCuenta: deR.pubCuenta, eN: l.qr.eN, eV: e.pub, s: l.qr.s)
+    }
+
     // MARK: Guardado local
 
     private func guardar(r: Data, d: ClaveDispositivo, cuenta: String, dispositivo: String, pubRec: Data) throws {
@@ -370,7 +483,7 @@ final class CuentaPear: ObservableObject {
     /// `crudo`: un cuerpo binario (los bloques de la sync), en vez de `cuerpo` en JSON. `extra`: más cabeceras.
     private func firmada(_ metodo: String, _ ruta: String, _ cuerpo: [String: Any]?, cuenta: String? = nil, disp: ClaveDispositivo? = nil,
                          dispId: String? = nil, cuentaFirma: Bool = false, rec: Data? = nil, conToken: Bool = true,
-                         crudo: Data? = nil, extra: [String: String] = [:]) async throws -> (Data, HTTPURLResponse) {
+                         crudo: Data? = nil, extra: [String: String] = [:], sinCuenta: Bool = false) async throws -> (Data, HTTPURLResponse) {
         try abierta()
         if conToken { try await renovarSiHaceFalta() }
         guard let cuentaId = cuenta ?? meta.cuenta, let dispId = dispId ?? meta.dispositivo, let d = disp ?? ClaveDispositivo.guardada() else {
@@ -381,8 +494,10 @@ final class CuentaPear: ObservableObject {
         while true {
             let ts = ahora(), nonce = CuentaCripto.b64u(CuentaCripto.aleatorio(16))
             let cadena = CuentaCripto.utf8(CuentaCripto.cadenaPeticion(metodo, ruta, cuentaId, dispId, ts, nonce, bytes))
-            var h = ["X-Pear-Cuenta": cuentaId, "X-Pear-Disp": dispId, "X-Pear-Ts": String(ts), "X-Pear-Nonce": nonce,
+            // `sinCuenta`: el sondeo del QR del móvil nuevo, sin X-Pear-Cuenta y con la cuenta vacía en la cadena (§5.2).
+            var h = ["X-Pear-Disp": dispId, "X-Pear-Ts": String(ts), "X-Pear-Nonce": nonce,
                      "X-Pear-Firma-Disp": CuentaCripto.b64u(try d.firmar(cadena))]
+            if !sinCuenta { h["X-Pear-Cuenta"] = cuentaId }
             if cuentaFirma, let r = Llavero.leer("R") {
                 h["X-Pear-Firma-Cuenta"] = CuentaCripto.b64u(try CuentaCripto.edFirmar(try CuentaCripto.derivarDeR(r).semillaCuenta, cadena))
             }
