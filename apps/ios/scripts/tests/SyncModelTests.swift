@@ -107,5 +107,15 @@ let e = srv.etag
 _ = sincronizar(ma, enLaApp(finA), srv, 5000); _ = sincronizar(mb, enLaApp(finB), srv, 5000)
 comprobar(srv.etag == e, "dos móviles: después, nada que subir")
 
+// «No sincronizar esto» (sync.md §5.6): shared/library/sync-solo-aqui.json, como la referencia y Android.
+let soloJ = try JV.leer(try Data(contentsOf: URL(fileURLWithPath: "\(dir)/sync-solo-aqui.json")))
+for c in soloJ["casos"]!.lista! {
+    let n = c["nombre"]!.texto!
+    let claves = SyncModel.soloAquiEntero(c["lib"], c["marcadas"]!.lista!.map { $0.texto! })
+    comprobar(claves == c["claves"]!.lista!.map { $0.texto! }, "solo aquí: \(n): claves \(claves)")
+    comprobar(SyncModel.quitarSoloAqui(c["lib"], claves) == c["sinSoloAqui"], "solo aquí: \(n): quitar")
+    comprobar(SyncModel.ponerSoloAqui(c["unida"]!, c["lib"], claves) == c["enLaApp"], "solo aquí: \(n): poner")
+}
+
 print("SyncModel: \(total - fallos)/\(total) bien")
 exit(fallos == 0 ? 0 : 1)

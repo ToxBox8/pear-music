@@ -657,6 +657,45 @@ struct LibraryFile: Codable {
         favorites.count + (recents?.count ?? 0) + playlists.count + playlists.reduce(0) { $0 + $1.songs.count }
     }
 
+    /// Los órdenes, que viven en los ajustes, dentro de la copia (`Library.exportData`, también para la sync):
+    /// `playlistOrder` (con las claves `folder:`), `albumOrder`, `pinnedOrder`, `musicOrder` si no es el de fábrica y
+    /// los «Ordenar por» sólo si se han elegido alguna vez (PULIR #1: el «recent» de fábrica de un móvil recién llegado
+    /// a la cuenta pisaba, con su marca nueva, el orden del otro). Igual que `Library.exportJson` en Android.
+    static func ponerOrdenes(en dict: inout [String: Any], de d: UserDefaults) {
+        let order = LibraryOrder.decode(d.string(forKey: "playlistOrder") ?? "")
+        if !order.isEmpty { dict["playlistOrder"] = order }
+        if let s = d.string(forKey: "playlistSort") { dict["playlistSort"] = s }
+        // Orden de «Tus álbumes» (2.9 de x.1.1), como el de las playlists.
+        let albumOrder = LibraryOrder.decode(d.string(forKey: "albumOrder") ?? "")
+        if !albumOrder.isEmpty { dict["albumOrder"] = albumOrder }
+        if let s = d.string(forKey: "albumSort") { dict["albumSort"] = s }
+        // Nombre de la cuenta (PULIR #6), si se ha puesto alguna vez (también vacío: así borrarlo llega a los demás).
+        if let s = d.string(forKey: "accountName") { dict["accountName"] = s }
+        // Orden de «Fijados» (x.1.1).
+        let pinnedOrder = LibraryOrder.decode(d.string(forKey: "pinnedOrder") ?? "")
+        if !pinnedOrder.isEmpty { dict["pinnedOrder"] = pinnedOrder }
+        // Orden de las carpetas de «Tu música» (Cierre 1.0), sólo si no es el de fábrica.
+        let music = MusicOrder.decode(d.string(forKey: "musicOrder"))
+        if music != MusicOrder.defaults { dict["musicOrder"] = music }
+    }
+
+    /// Lo contrario, al poner la biblioteca unida de la sync (`Library.adoptarSync`): los órdenes que trae, a sus ajustes.
+    static func adoptarOrdenes(_ extra: [String: Any], en d: UserDefaults) {
+        for k in ["playlistOrder", "albumOrder"] { if let o = extra[k] as? [String] { d.set(o.joined(separator: "\n"), forKey: k) } }
+        for k in ["playlistSort", "albumSort"] { if let v = extra[k] as? String { d.set(v, forKey: k) } }
+        if let music = extra["musicOrder"] as? [String] { d.set(MusicOrder.decode(music.joined(separator: ",")).joined(separator: ","), forKey: "musicOrder") }
+        if let nombre = extra["accountName"] as? String { d.set(LibraryFile.nombreCuentaValido(nombre) ?? "", forKey: "accountName") }
+    }
+
+    /// Nombre de la cuenta (PULIR #6): de 0 a 40 puntos de código tras quitar los espacios de los lados y sin caracteres
+    /// de control; "" = sin nombre; nil si no vale. Igual que `CuentaPear.nombreCuentaValido` en Android.
+    static func nombreCuentaValido(_ texto: String) -> String? {
+        let t = texto.trimmingCharacters(in: .whitespacesAndNewlines)
+        if t.isEmpty { return "" }
+        guard t.unicodeScalars.count <= 40, !t.unicodeScalars.contains(where: { $0.properties.generalCategory == .control }) else { return nil }
+        return t
+    }
+
     /// Lee library.json (o una copia) y deja los dos árboles de carpetas listos: sin huérfanas, ciclos ni más de 3
     /// niveles, sin carpetas de álbumes que repitan el id de una de playlists, y sin carpeta en las playlists y los
     /// álbumes cuya carpeta no está en su árbol.

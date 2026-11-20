@@ -115,7 +115,7 @@ struct QrNuevoView: View {
                 Section { ProgressView().frame(maxWidth: .infinity) }
             case .qr:
                 CabeceraQr(pose: "corriendo", titulo: L("Entrar desde otro móvil"),
-                           texto: L("En tu otro móvil, abre Ajustes › Cuenta › Dispositivos › Añadir un móvil y escanea este código."))
+                           texto: L("En tu otro móvil, abre Ajustes › Cuenta › Añadir un móvil y escanea este código."))
                 Section {
                     ImagenQr(texto: texto).listRowBackground(Color.clear)
                 } footer: {
@@ -131,8 +131,13 @@ struct QrNuevoView: View {
                     Button(L("Sí, coinciden")) { aceptar() }
                         .buttonStyle(PillButtonStyle(prominent: true)).listRowBackground(Color.clear).listRowInsets(EdgeInsets())
                         .disabled(aceptando).accessibilityIdentifier("siCoinciden")
+                }
+                // Aparte y sin tarjeta, como el botón de texto de Android: en la misma sección, el botón shu (sin fondo de
+                // fila) quedaba pegado a la tarjeta de éste (PULIR #2).
+                Section {
                     Button(L("No coinciden"), role: .destructive) { recibido = nil; paso = .noCoinciden }
                         .frame(maxWidth: .infinity, minHeight: 44).accessibilityIdentifier("noCoinciden")
+                        .listRowBackground(Color.clear)
                 }
             case .noCoinciden:
                 CabeceraQr(pose: "brazos-cruzados", titulo: L("No coinciden"),
@@ -230,7 +235,10 @@ struct AnadirMovilView: View {
                     Button(L("Añadir")) { completar() }
                         .buttonStyle(PillButtonStyle(prominent: true)).listRowBackground(Color.clear).listRowInsets(EdgeInsets())
                         .disabled(completando).accessibilityIdentifier("anadirMovil")
-                    Button(L("Cancelar")) { dismiss() }.frame(maxWidth: .infinity, minHeight: 44)
+                }
+                // Aparte y sin tarjeta, como en comparar (y como Android): si no, el shu quedaba pegado a «Cancelar».
+                Section {
+                    Button(L("Cancelar")) { dismiss() }.frame(maxWidth: .infinity, minHeight: 44).listRowBackground(Color.clear)
                 }
             case .emojis:
                 CabeceraQr(pose: "victoria", titulo: L("Comprueba los emojis"), texto: L("Comprueba que el otro móvil enseña lo mismo."))

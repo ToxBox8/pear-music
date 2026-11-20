@@ -1282,3 +1282,174 @@
 1282	Zure liburutegia handiegia da hodeirako
 1283	Orain ezin da konturik sortu; saiatu bihar
 1284	Mugikor honen izena aldatu
+1285	Gehitu mugikor bat
+1286	Gehitu mugikor bat zure kontura
+1287	{0} barru iraungiko da
+1288	Egiaztatu emojiak
+1289	Egiaztatu beste mugikorrak gauza bera erakusten duela.
+1290	Beste mugikorra eskura baduzu, sartu QR kode batekin. Galdu baduzu, idatzi zenuen gakoarekin.
+1291	Kodea eskaneatzeko kamera
+1292	Mugikor hau gehitzeko QR kodea
+1293	Kodea iraungi da. Saiatu berriro
+1294	Emojiak: {0}
+1295	Hasi berriro
+1296	Mugikor berrian, ireki Ezarpenak › Kontua › Sartu beste mugikor batetik, eta jarri kamera haren kodearen aurrean.
+1297	Zure beste mugikorrean, ireki Ezarpenak › Kontua › Gailuak › Gehitu mugikor bat, eta eskaneatu kode hau.
+1298	Sartu beste mugikor batetik
+1299	Eskaneatu mugikor berriak erakusten duen kodea.
+1300	Eskaneatu berriro
+1301	Kode hau ez da baliozkoa
+1302	Kode hau erabili da jada. Saiatu berriro
+1303	Jiyu Pulse-k ezin du kamera erabili. Aktibatu iPhonearen ezarpenetan.
+1304	Bi mugikorrek emoji berak erakutsi behar dituzte, ordena berean.
+1305	Ez datoz bat
+1306	Ez erakutsi kode hau inori: zure kontuan sartzeko balio du.
+1307	Ez da ondo atera. Berriro saia zaitezke.
+1308	Ez da ezer gehitu zure kontura.
+1309	Ezin izan da mugikor hau gehitu
+1310	Ez erabili kode hau, eta kendu mugikorra zure kontutik bestetik.
+1311	Beste mugikor batek kode hau erabili du zu baino lehen. Mugikor berrian, sakatu «Ez datoz bat» eta hasi berriro
+1312	Zure kontua erabili eta zure liburutegia ikusi ahal izango du. Face ID, hatz-marka edo mugikorraren kodea eskatuko dizugu.
+1313	Kodea prestatzen…
+1314	Bat ez badatoz, kendu "{0}" zure kontutik Gailuak atalean.
+1315	Bai, bat datoz
+1316	erlea
+1317	aingura
+1318	ostadarra
+1319	balea
+1320	baloia
+1321	bizikleta
+1322	bonbilla
+1323	hontza
+1324	kaktusa
+1325	kafea
+1326	kalabaza
+1327	galtzerdiak
+1328	kanpaia
+1329	karramarroa
+1330	barraskiloa
+1331	etxea
+1332	gereziak
+1333	autoa
+1334	suziria
+1335	koroa
+1336	kamera
+1337	dadoa
+1338	iratzargailua
+1339	diamantea
+1340	itua
+1341	donuta
+1342	elefantea
+1343	izarra
+1344	sua
+1345	betaurrekoak
+1346	ekilorea
+1347	puxika
+1348	gitarra
+1349	izozkia
+1350	jirafa
+1351	liburuak
+1352	giltza
+1353	ilargia
+1354	sagarra
+1355	tximeleta
+1356	mailua
+1357	artoa
+1358	elur-panpina
+1359	aterkia
+1360	pinguinoa
+1361	pizza
+1362	anana
+1363	platanoa
+1364	olagarroa
+1365	gazta
+1366	tximista
+1367	oparia
+1368	angurria
+1369	sugea
+1370	perretxikoa
+1371	kapela altua
+1372	danborra
+1373	dortoka
+1374	tronpeta
+1375	hirustea
+1376	adarbakarra
+1377	mahatsa
+1378	belaontzia
+1379	azenarioa
+1380	"{0}" zure kontura gehitu?
+1381	Gauza bera ikusten duzu zure beste mugikorrean?
+1382	Baduzu konturik?
+1383	Jarri kamera mugikor berriaren kodearen aurrean
+1384	Eskaneatu kodea
+1385	Zure kontua erabili eta zure liburutegia ikusi ahal izango du. Hatz-marka edo mugikorraren kodea eskatuko dizugu.
+1386	linterna
+1387	mundua
+1388	Zure beste mugikorrean, ireki Ezarpenak › Kontua › Gehitu mugikor bat, eta eskaneatu kode hau.
+1389	Gakoa idatzi gabe beste mugikor batetik zure kontuan sartzeko: mugikor berrian, «Sartu beste mugikor batetik».
+1390	Eguneratu aplikazioa zure liburutegia ikusteko
+1391	Kopiatuta: minutu batean ezabatuko da
+1392	Zerbitzariak arazo bat izan du. Saiatu berriro pixka bat barru
+1393	Zerbitzariak ez du eskaera ulertu. Eguneratu Jiyu Pulse eta saiatu berriro
+1394	Zerbitzariak ez du mugikor hau ezagutzen. Berriro gertatzen bada, sartu berriro zure gakoarekin
+1395	Zerbitzariak ez du erantzuten orain. Saiatu berriro pixka bat barru
+1396	Handiegia da bidaltzeko
+1397	Zure kontuaren giltza da. Mugikor hau galtzen baduzu, beste batetik sartzeko balio du. Idatzi paperean eta gorde ondo: ezin da berriro ikusi ezta beste batengatik aldatu ere.
+1398	Eskaera hori bidalita zegoen. Saiatu berriro
+1399	Hori badago lehendik. Saiatu berriro
+1400	Itxaron pixka bat berriro saiatu aurretik
+1401	Mugikor hau kontu batean dago jada
+1402	{0}. taldea: {1}
+1403	Kontua mantentze-lanetan dago. Itzuli pixka bat barru; musikak berdin jarraitzen du
+1404	Kontuak gaurko muga gainditu du. Bihar berriro dabil; musikak berdin jarraitzen du
+1405	Mugikorraren ordua ez dago ondo. Jarri automatikoan eta saiatu berriro
+1406	Ez da ondo atera ({0}). Saiatu berriro pixka bat barru
+1407	Ez zegoen ezabatze zain zegoenik
+1408	Ez dago konturik mugikor honetan
+1409	Ezin izan dugu egiaztatu pertsona bat zarela. Saiatu berriro
+1410	Ez da aurkitu. Agian ez da existitzen jada
+1411	Beste mugikor batek gauza bera aldatu du aldi berean. Saiatu berriro
+1412	Konexiorik gabe. Itzultzen denean, saiatu berriro
+1413	26 karaktere dira 7 taldetan: 4ko sei eta 2ko bat. Biribila beti da zero bat: zure gakoan ez dago inoiz O letrarik (ezta I, L edo U ere).
+1414	Ezin da zure hodeiko liburutegia ireki
+1415	Zure kontuak gehienekoa betetzen du jada (20 MB)
+1416	Saioa iraungi da. Saiatu berriro
+1417	Talde bat elkarrekin doazen 4 karaktereak dira, zenbakia gainean dutela. Kontatu ezkerretik: {0}. taldea goian markatuta dagoena da.
+1418	Oraindik ez da sinkronizatu
+1419	Zure liburutegia jaisten…
+1420	Liburutegia egunean
+1421	Zure mugikorretakoa batzen…
+1422	Igotzeko zain
+1423	Konexiorik gabe: geroago igoko da
+1424	Sinkronizatuta: {0}
+1425	Zure liburutegia igotzen…
+1426	Ukitu orain sinkronizatzeko.
+1427	{0}
+1428	Orain mugikor honetan bakarrik dago. Berriro sinkronizatzen baduzu, zure beste mugikorretara pasatuko da.
+1429	Jarraitzen dituzun artistak
+1430	Karpetak
+1431	Gogokoa izateari uzten dio hemen eta zure beste mugikorretan.
+1432	Jarraitzeari uzten diozu hemen eta zure beste mugikorretan.
+1433	Hau zifratuta doa zure mugikorren artean. Ukitu zerbait mugikor honetan bakarrik uzteko edo guztietatik kentzeko.
+1434	Sinkronizatzen dena
+1435	Ez duzu artistarik jarraitzen.
+1436	Ez sinkronizatu hau
+1437	Ez duzu karpetarik.
+1438	Ez duzu gogokorik.
+1439	Ez duzu zerrendarik.
+1440	Ez duzu albumik gordeta.
+1441	Kendu nire mugikor guztietatik
+1442	Karpeta ezabatzen da hemen eta zure beste mugikorretan; barruan duena maila bat igotzen da. Ezin da desegin.
+1443	Zerrenda ezabatzen da hemen eta zure beste mugikorretan. Ezin da desegin.
+1444	Albuma zure liburutegitik kentzen da hemen eta zure beste mugikorretan.
+1445	Mugikor honetan bakarrik
+1446	Mugikor honetan bakarrik: bere karpetarekin doa
+1447	Bere karpetarekin doa, eta karpeta ez da sinkronizatzen. Berriro sinkronizatzeko, sinkronizatu berriro karpeta.
+1448	Ikusi guztiak ({0})
+1449	Sinkronizatu berriro
+1450	«Ez sinkronizatu hau»: mugikor honetan bakarrik uzten du (besteetan dagoen bezala geratzen da). «Kendu nire mugikor guztietatik»: hemen eta besteetan ezabatzen du.
+1451	«{0}» zure mugikor guztietatik kendu?
+1452	Kontuaren izena
+1453	Zure kontua zure mugikorretan ezagutzeko. 40 karaktere gehienez; hutsik, izenik gabe.
+1454	Adibidez, Nire musika
+1455	Zuretzat bakarrik: zifratuta doa eta zure mugikorrek bakarrik ikusten dute. Ez da erabiltzaile-izena: inork ezin zaitu horrekin bilatu.

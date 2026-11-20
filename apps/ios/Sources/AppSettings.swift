@@ -209,11 +209,16 @@ struct SettingsView: View {
             .themed()
             .demoRoute(.themePicker) { AppearanceSettings() }
             .demoRoute(.manage) { ManagePlaylistsView() }
-            .demoRoute(.cuenta) { AccountView() }
+            .demoRoute(.cuenta) { CuentaView() }
             .demoRoute(.cuentaCrear) { CrearCuentaView() }
             .demoRoute(.cuentaClave) { ClaveNuevaView(borrador: CuentaPear.shared.borrador()) }
             .demoRoute(.cuentaEntrar) { EntrarConClaveView() }
             .demoRoute(.cuentaDispositivos) { DispositivosView() }
+            .demoRoute(.cuentaSincronizado) { SincronizadoView() }
+            .demoRoute(.cuentaConectada) {
+                // La fila de la sincronización siempre igual en la captura 67: «Sincronizado hace 2 min» (como Android).
+                CuentaView().onAppear { SyncBiblioteca.shared.vistaDePrueba(VistaSync(ultimaOk: Date().timeIntervalSince1970 * 1000 - 120_000)) }
+            }
             .demoRoute(.cuentaComprobar) { ComprobarClaveView() }
             .demoRoute(.cuentaBorrar) { BorrarCuentaView() }
             .demoRoute(.cuentaQr) { QrNuevoView(prueba: .qr) }
@@ -235,7 +240,7 @@ struct SettingsView: View {
 
     @ViewBuilder private var sections: some View {
         Section {
-            NavigationLink { AccountView() } label: {
+            NavigationLink { CuentaView() } label: {
                 SettingsRow(icon: "person.crop.circle.fill", palette: 4, title: L("Cuenta"), value: nil,
                             subtitle: cuenta.tieneCuenta ? L("Tu cuenta está en este móvil") : L("Opcional · guarda tu biblioteca cifrada en la nube"))
             }
@@ -349,7 +354,7 @@ struct SettingsView: View {
         case .avisos: AvisosView()
         case .help, .advanced: HelpSettings()
         case .myData: MyDataView()
-        case .account: AccountView()
+        case .account: CuentaView()
         }
     }
 

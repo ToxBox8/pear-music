@@ -1,0 +1,57 @@
+{
+  "aviso": "Aceptada por Toxbox el 17-11-2026 (ADR 0003 y 0004 ACEPTADOS, DECISIONS 56). Falta la revisión independiente (sesión nueva). Generado por tools/spec/generar.mjs.",
+  "descripcion": "HKDF-SHA256 de cuenta.md §2. salt = \"pear-id/v1\", 32 bytes salvo el caso de la RFC.",
+  "rfc5869": {
+    "ikm_hex": "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b",
+    "salt_hex": "000102030405060708090a0b0c",
+    "info_hex": "f0f1f2f3f4f5f6f7f8f9",
+    "longitud": 42,
+    "okm_hex": "3cb25f25faacd57a90434f64d0362f2a2d2d0a90cf1a5a4c5db02d56ecc4c5bf34007208d5b887185865"
+  },
+  "casos": [
+    {
+      "nombre": "K_music",
+      "ikm_hex": "bc0916f49178f3963d3aec73711b4a5e03c1f2df1f60fb77a6e864be49ad4148",
+      "salt": "pear-id/v1",
+      "info": "pear/app/music/data/v1",
+      "okm_hex": "d3c6eb74112ec41d3bd48b0e90d353a353961829501256e459304fe787d73540"
+    },
+    {
+      "nombre": "semilla de la clave de cuenta",
+      "ikm_hex": "bc0916f49178f3963d3aec73711b4a5e03c1f2df1f60fb77a6e864be49ad4148",
+      "salt": "pear-id/v1",
+      "info": "pear/account/sign/v1",
+      "okm_hex": "749c6d2e28c9d5ac586bfc189d2d64c75eee27c6207d0b654d820708bb20c376"
+    },
+    {
+      "nombre": "KEK_rec",
+      "ikm_hex": "d545a6939abe8e5fbd9d89789bdf5217",
+      "salt": "pear-id/v1",
+      "info": "pear/recovery/wrap/v1",
+      "okm_hex": "bb4f1aaf1fbff8e65ea491ea1473ef74382cfccc1e6b69e2c79e1e88589430d8"
+    },
+    {
+      "nombre": "L",
+      "ikm_hex": "d545a6939abe8e5fbd9d89789bdf5217",
+      "salt": "pear-id/v1",
+      "info": "pear/recovery/lookup/v1",
+      "okm_hex": "a11a1f61f6ce980222415412044156cd0306a79fec6b88b0fa04b61de32ec3a2"
+    },
+    {
+      "nombre": "semilla de la clave de recuperación",
+      "ikm_hex": "d545a6939abe8e5fbd9d89789bdf5217",
+      "salt": "pear-id/v1",
+      "info": "pear/recovery/sign/v1",
+      "okm_hex": "3a644450cb2f0010f8fbf4ee8c5009b33d7f3185f6d57d2b8cc8ea433c13199d"
+    }
+  ],
+  "derivados": {
+    "R_hex": "bc0916f49178f3963d3aec73711b4a5e03c1f2df1f60fb77a6e864be49ad4148",
+    "C_hex": "d545a6939abe8e5fbd9d89789bdf5217",
+    "pub_cuenta_hex": "bad620f696d6d33c07e7a5efaf716a950a9d12305aaa1b2882c0df098c1ae32c",
+    "hash_l_hex": "c64d6072768d5218681c0070f619fefedeb037e9be2330bc432f2fef9e985360",
+    "pub_rec_hex": "74828b2477085f0450ed051863d11ceeca3a39a5b652d29d0b780f7d8c1c5bba",
+    "pub_disp_hex": "04bfb8e616f360ff23b9adfc7146da7c46715ef3d87372784b8465e4341479e4d49591084c09b30c7e6bd0e635aa932fc9badb359e4c40673946a9a0a9a29e628c",
+    "device_id": "WR85D13CWP6P3DAEZ6QB9H13HR"
+  }
+}

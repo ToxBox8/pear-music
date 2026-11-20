@@ -1,0 +1,901 @@
+{
+ "aviso": "PROVISIONAL (2-E, 19-11-2026): tabla elegida por Claude (Opus); Toxbox la revisa con builds/bloque-2/qr/emojis.png. El índice es el de cuenta.md §4.3 (0–63). Sólo emojis de Emoji 5.0 o antes con presentación de emoji por defecto (sin VS16), sin banderas ni caras de personas, sin dos del mismo color y forma. Al revisar la hoja, 🎈 (globo) pasó a 🔦 (linterna) y 🌙 (luna) a 🌍 (mundo): se confundían en pequeño con 🍎 y 🍌.",
+ "emojis": [
+  {
+   "i": 0,
+   "emoji": "🐘",
+   "nombre": {
+    "es": "elefante",
+    "ca": "elefant",
+    "va": "elefant",
+    "gl": "elefante",
+    "eu": "elefantea",
+    "en": "elephant",
+    "eo": "elefanto",
+    "pt": "elefante"
+   }
+  },
+  {
+   "i": 1,
+   "emoji": "🦒",
+   "nombre": {
+    "es": "jirafa",
+    "ca": "girafa",
+    "va": "girafa",
+    "gl": "xirafa",
+    "eu": "jirafa",
+    "en": "giraffe",
+    "eo": "ĝirafo",
+    "pt": "girafa"
+   }
+  },
+  {
+   "i": 2,
+   "emoji": "🐢",
+   "nombre": {
+    "es": "tortuga",
+    "ca": "tortuga",
+    "va": "tortuga",
+    "gl": "tartaruga",
+    "eu": "dortoka",
+    "en": "turtle",
+    "eo": "testudo",
+    "pt": "tartaruga"
+   }
+  },
+  {
+   "i": 3,
+   "emoji": "🐙",
+   "nombre": {
+    "es": "pulpo",
+    "ca": "pop",
+    "va": "polp",
+    "gl": "polbo",
+    "eu": "olagarroa",
+    "en": "octopus",
+    "eo": "polpo",
+    "pt": "polvo"
+   }
+  },
+  {
+   "i": 4,
+   "emoji": "🦋",
+   "nombre": {
+    "es": "mariposa",
+    "ca": "papallona",
+    "va": "papallona",
+    "gl": "bolboreta",
+    "eu": "tximeleta",
+    "en": "butterfly",
+    "eo": "papilio",
+    "pt": "borboleta"
+   }
+  },
+  {
+   "i": 5,
+   "emoji": "🐝",
+   "nombre": {
+    "es": "abeja",
+    "ca": "abella",
+    "va": "abella",
+    "gl": "abella",
+    "eu": "erlea",
+    "en": "bee",
+    "eo": "abelo",
+    "pt": "abelha"
+   }
+  },
+  {
+   "i": 6,
+   "emoji": "🐧",
+   "nombre": {
+    "es": "pingüino",
+    "ca": "pingüí",
+    "va": "pingüí",
+    "gl": "pingüín",
+    "eu": "pinguinoa",
+    "en": "penguin",
+    "eo": "pingveno",
+    "pt": "pinguim"
+   }
+  },
+  {
+   "i": 7,
+   "emoji": "🦀",
+   "nombre": {
+    "es": "cangrejo",
+    "ca": "cranc",
+    "va": "cranc",
+    "gl": "cangrexo",
+    "eu": "karramarroa",
+    "en": "crab",
+    "eo": "krabo",
+    "pt": "caranguejo"
+   }
+  },
+  {
+   "i": 8,
+   "emoji": "🐌",
+   "nombre": {
+    "es": "caracol",
+    "ca": "cargol",
+    "va": "caragol",
+    "gl": "caracol",
+    "eu": "barraskiloa",
+    "en": "snail",
+    "eo": "heliko",
+    "pt": "caracol"
+   }
+  },
+  {
+   "i": 9,
+   "emoji": "🐳",
+   "nombre": {
+    "es": "ballena",
+    "ca": "balena",
+    "va": "balena",
+    "gl": "balea",
+    "eu": "balea",
+    "en": "whale",
+    "eo": "baleno",
+    "pt": "baleia"
+   }
+  },
+  {
+   "i": 10,
+   "emoji": "🦉",
+   "nombre": {
+    "es": "búho",
+    "ca": "mussol",
+    "va": "mussol",
+    "gl": "moucho",
+    "eu": "hontza",
+    "en": "owl",
+    "eo": "strigo",
+    "pt": "coruja"
+   }
+  },
+  {
+   "i": 11,
+   "emoji": "🐍",
+   "nombre": {
+    "es": "serpiente",
+    "ca": "serp",
+    "va": "serp",
+    "gl": "serpe",
+    "eu": "sugea",
+    "en": "snake",
+    "eo": "serpento",
+    "pt": "cobra"
+   }
+  },
+  {
+   "i": 12,
+   "emoji": "🦄",
+   "nombre": {
+    "es": "unicornio",
+    "ca": "unicorn",
+    "va": "unicorn",
+    "gl": "unicornio",
+    "eu": "adarbakarra",
+    "en": "unicorn",
+    "eo": "unukorno",
+    "pt": "unicórnio"
+   }
+  },
+  {
+   "i": 13,
+   "emoji": "🌵",
+   "nombre": {
+    "es": "cactus",
+    "ca": "cactus",
+    "va": "cactus",
+    "gl": "cacto",
+    "eu": "kaktusa",
+    "en": "cactus",
+    "eo": "kakto",
+    "pt": "cacto"
+   }
+  },
+  {
+   "i": 14,
+   "emoji": "🌻",
+   "nombre": {
+    "es": "girasol",
+    "ca": "gira-sol",
+    "va": "gira-sol",
+    "gl": "xirasol",
+    "eu": "ekilorea",
+    "en": "sunflower",
+    "eo": "sunfloro",
+    "pt": "girassol"
+   }
+  },
+  {
+   "i": 15,
+   "emoji": "🍄",
+   "nombre": {
+    "es": "seta",
+    "ca": "bolet",
+    "va": "bolet",
+    "gl": "cogomelo",
+    "eu": "perretxikoa",
+    "en": "mushroom",
+    "eo": "fungo",
+    "pt": "cogumelo"
+   }
+  },
+  {
+   "i": 16,
+   "emoji": "🍀",
+   "nombre": {
+    "es": "trébol",
+    "ca": "trèvol",
+    "va": "trèvol",
+    "gl": "trevo",
+    "eu": "hirustea",
+    "en": "clover",
+    "eo": "trifolio",
+    "pt": "trevo"
+   }
+  },
+  {
+   "i": 17,
+   "emoji": "🌈",
+   "nombre": {
+    "es": "arcoíris",
+    "ca": "arc de Sant Martí",
+    "va": "arc de Sant Martí",
+    "gl": "arco da vella",
+    "eu": "ostadarra",
+    "en": "rainbow",
+    "eo": "ĉielarko",
+    "pt": "arco-íris"
+   }
+  },
+  {
+   "i": 18,
+   "emoji": "⛄",
+   "nombre": {
+    "es": "muñeco de nieve",
+    "ca": "ninot de neu",
+    "va": "ninot de neu",
+    "gl": "boneco de neve",
+    "eu": "elur-panpina",
+    "en": "snowman",
+    "eo": "neĝulo",
+    "pt": "boneco de neve"
+   }
+  },
+  {
+   "i": 19,
+   "emoji": "⚡",
+   "nombre": {
+    "es": "rayo",
+    "ca": "llamp",
+    "va": "llamp",
+    "gl": "raio",
+    "eu": "tximista",
+    "en": "lightning",
+    "eo": "fulmo",
+    "pt": "raio"
+   }
+  },
+  {
+   "i": 20,
+   "emoji": "🔥",
+   "nombre": {
+    "es": "fuego",
+    "ca": "foc",
+    "va": "foc",
+    "gl": "lume",
+    "eu": "sua",
+    "en": "fire",
+    "eo": "fajro",
+    "pt": "fogo"
+   }
+  },
+  {
+   "i": 21,
+   "emoji": "🌍",
+   "nombre": {
+    "es": "mundo",
+    "ca": "món",
+    "va": "món",
+    "gl": "mundo",
+    "eu": "mundua",
+    "en": "world",
+    "eo": "mondo",
+    "pt": "mundo"
+   }
+  },
+  {
+   "i": 22,
+   "emoji": "⭐",
+   "nombre": {
+    "es": "estrella",
+    "ca": "estrella",
+    "va": "estrella",
+    "gl": "estrela",
+    "eu": "izarra",
+    "en": "star",
+    "eo": "stelo",
+    "pt": "estrela"
+   }
+  },
+  {
+   "i": 23,
+   "emoji": "🍎",
+   "nombre": {
+    "es": "manzana",
+    "ca": "poma",
+    "va": "poma",
+    "gl": "mazá",
+    "eu": "sagarra",
+    "en": "apple",
+    "eo": "pomo",
+    "pt": "maçã"
+   }
+  },
+  {
+   "i": 24,
+   "emoji": "🍌",
+   "nombre": {
+    "es": "plátano",
+    "ca": "plàtan",
+    "va": "plàtan",
+    "gl": "plátano",
+    "eu": "platanoa",
+    "en": "banana",
+    "eo": "banano",
+    "pt": "banana"
+   }
+  },
+  {
+   "i": 25,
+   "emoji": "🍇",
+   "nombre": {
+    "es": "uvas",
+    "ca": "raïm",
+    "va": "raïm",
+    "gl": "uvas",
+    "eu": "mahatsa",
+    "en": "grapes",
+    "eo": "vinberoj",
+    "pt": "uvas"
+   }
+  },
+  {
+   "i": 26,
+   "emoji": "🍉",
+   "nombre": {
+    "es": "sandía",
+    "ca": "síndria",
+    "va": "meló d'aigua",
+    "gl": "sandía",
+    "eu": "angurria",
+    "en": "watermelon",
+    "eo": "akvomelono",
+    "pt": "melancia"
+   }
+  },
+  {
+   "i": 27,
+   "emoji": "🍍",
+   "nombre": {
+    "es": "piña",
+    "ca": "pinya",
+    "va": "pinya",
+    "gl": "ananás",
+    "eu": "anana",
+    "en": "pineapple",
+    "eo": "ananaso",
+    "pt": "abacaxi"
+   }
+  },
+  {
+   "i": 28,
+   "emoji": "🍒",
+   "nombre": {
+    "es": "cerezas",
+    "ca": "cireres",
+    "va": "cireres",
+    "gl": "cereixas",
+    "eu": "gereziak",
+    "en": "cherries",
+    "eo": "ĉerizoj",
+    "pt": "cerejas"
+   }
+  },
+  {
+   "i": 29,
+   "emoji": "🥕",
+   "nombre": {
+    "es": "zanahoria",
+    "ca": "pastanaga",
+    "va": "safanòria",
+    "gl": "cenoria",
+    "eu": "azenarioa",
+    "en": "carrot",
+    "eo": "karoto",
+    "pt": "cenoura"
+   }
+  },
+  {
+   "i": 30,
+   "emoji": "🌽",
+   "nombre": {
+    "es": "maíz",
+    "ca": "blat de moro",
+    "va": "dacsa",
+    "gl": "millo",
+    "eu": "artoa",
+    "en": "corn",
+    "eo": "maizo",
+    "pt": "milho"
+   }
+  },
+  {
+   "i": 31,
+   "emoji": "🍕",
+   "nombre": {
+    "es": "pizza",
+    "ca": "pizza",
+    "va": "pizza",
+    "gl": "pizza",
+    "eu": "pizza",
+    "en": "pizza",
+    "eo": "pico",
+    "pt": "pizza"
+   }
+  },
+  {
+   "i": 32,
+   "emoji": "🍩",
+   "nombre": {
+    "es": "dónut",
+    "ca": "dònut",
+    "va": "dònut",
+    "gl": "rosquilla",
+    "eu": "donuta",
+    "en": "doughnut",
+    "eo": "benjeto",
+    "pt": "donut"
+   }
+  },
+  {
+   "i": 33,
+   "emoji": "🧀",
+   "nombre": {
+    "es": "queso",
+    "ca": "formatge",
+    "va": "formatge",
+    "gl": "queixo",
+    "eu": "gazta",
+    "en": "cheese",
+    "eo": "fromaĝo",
+    "pt": "queijo"
+   }
+  },
+  {
+   "i": 34,
+   "emoji": "🍦",
+   "nombre": {
+    "es": "helado",
+    "ca": "gelat",
+    "va": "gelat",
+    "gl": "xeado",
+    "eu": "izozkia",
+    "en": "ice cream",
+    "eo": "glaciaĵo",
+    "pt": "sorvete"
+   }
+  },
+  {
+   "i": 35,
+   "emoji": "☕",
+   "nombre": {
+    "es": "café",
+    "ca": "cafè",
+    "va": "café",
+    "gl": "café",
+    "eu": "kafea",
+    "en": "coffee",
+    "eo": "kafo",
+    "pt": "café"
+   }
+  },
+  {
+   "i": 36,
+   "emoji": "🎃",
+   "nombre": {
+    "es": "calabaza",
+    "ca": "carbassa",
+    "va": "carabassa",
+    "gl": "cabaza",
+    "eu": "kalabaza",
+    "en": "pumpkin",
+    "eo": "kukurbo",
+    "pt": "abóbora"
+   }
+  },
+  {
+   "i": 37,
+   "emoji": "🎸",
+   "nombre": {
+    "es": "guitarra",
+    "ca": "guitarra",
+    "va": "guitarra",
+    "gl": "guitarra",
+    "eu": "gitarra",
+    "en": "guitar",
+    "eo": "gitaro",
+    "pt": "guitarra"
+   }
+  },
+  {
+   "i": 38,
+   "emoji": "🎺",
+   "nombre": {
+    "es": "trompeta",
+    "ca": "trompeta",
+    "va": "trompeta",
+    "gl": "trompeta",
+    "eu": "tronpeta",
+    "en": "trumpet",
+    "eo": "trumpeto",
+    "pt": "trompete"
+   }
+  },
+  {
+   "i": 39,
+   "emoji": "🥁",
+   "nombre": {
+    "es": "tambor",
+    "ca": "tambor",
+    "va": "tambor",
+    "gl": "tambor",
+    "eu": "danborra",
+    "en": "drum",
+    "eo": "tamburo",
+    "pt": "tambor"
+   }
+  },
+  {
+   "i": 40,
+   "emoji": "🔦",
+   "nombre": {
+    "es": "linterna",
+    "ca": "llanterna",
+    "va": "llanterna",
+    "gl": "lanterna",
+    "eu": "linterna",
+    "en": "flashlight",
+    "eo": "poŝlampo",
+    "pt": "lanterna"
+   }
+  },
+  {
+   "i": 41,
+   "emoji": "🎁",
+   "nombre": {
+    "es": "regalo",
+    "ca": "regal",
+    "va": "regal",
+    "gl": "agasallo",
+    "eu": "oparia",
+    "en": "gift",
+    "eo": "donaco",
+    "pt": "presente"
+   }
+  },
+  {
+   "i": 42,
+   "emoji": "🔑",
+   "nombre": {
+    "es": "llave",
+    "ca": "clau",
+    "va": "clau",
+    "gl": "chave",
+    "eu": "giltza",
+    "en": "key",
+    "eo": "ŝlosilo",
+    "pt": "chave"
+   }
+  },
+  {
+   "i": 43,
+   "emoji": "🔔",
+   "nombre": {
+    "es": "campana",
+    "ca": "campana",
+    "va": "campana",
+    "gl": "campá",
+    "eu": "kanpaia",
+    "en": "bell",
+    "eo": "sonorilo",
+    "pt": "sino"
+   }
+  },
+  {
+   "i": 44,
+   "emoji": "💡",
+   "nombre": {
+    "es": "bombilla",
+    "ca": "bombeta",
+    "va": "bombeta",
+    "gl": "lámpada",
+    "eu": "bonbilla",
+    "en": "light bulb",
+    "eo": "lampo",
+    "pt": "lâmpada"
+   }
+  },
+  {
+   "i": 45,
+   "emoji": "⏰",
+   "nombre": {
+    "es": "despertador",
+    "ca": "despertador",
+    "va": "despertador",
+    "gl": "espertador",
+    "eu": "iratzargailua",
+    "en": "alarm clock",
+    "eo": "vekhorloĝo",
+    "pt": "despertador"
+   }
+  },
+  {
+   "i": 46,
+   "emoji": "📷",
+   "nombre": {
+    "es": "cámara",
+    "ca": "càmera",
+    "va": "càmera",
+    "gl": "cámara",
+    "eu": "kamera",
+    "en": "camera",
+    "eo": "fotilo",
+    "pt": "câmara"
+   }
+  },
+  {
+   "i": 47,
+   "emoji": "☔",
+   "nombre": {
+    "es": "paraguas",
+    "ca": "paraigua",
+    "va": "paraigua",
+    "gl": "paraugas",
+    "eu": "aterkia",
+    "en": "umbrella",
+    "eo": "ombrelo",
+    "pt": "guarda-chuva"
+   }
+  },
+  {
+   "i": 48,
+   "emoji": "⚓",
+   "nombre": {
+    "es": "ancla",
+    "ca": "àncora",
+    "va": "àncora",
+    "gl": "áncora",
+    "eu": "aingura",
+    "en": "anchor",
+    "eo": "ankro",
+    "pt": "âncora"
+   }
+  },
+  {
+   "i": 49,
+   "emoji": "🔨",
+   "nombre": {
+    "es": "martillo",
+    "ca": "martell",
+    "va": "martell",
+    "gl": "martelo",
+    "eu": "mailua",
+    "en": "hammer",
+    "eo": "martelo",
+    "pt": "martelo"
+   }
+  },
+  {
+   "i": 50,
+   "emoji": "📚",
+   "nombre": {
+    "es": "libros",
+    "ca": "llibres",
+    "va": "llibres",
+    "gl": "libros",
+    "eu": "liburuak",
+    "en": "books",
+    "eo": "libroj",
+    "pt": "livros"
+   }
+  },
+  {
+   "i": 51,
+   "emoji": "🎩",
+   "nombre": {
+    "es": "sombrero de copa",
+    "ca": "barret de copa",
+    "va": "barret de copa",
+    "gl": "chisteira",
+    "eu": "kapela altua",
+    "en": "top hat",
+    "eo": "cilindra ĉapelo",
+    "pt": "cartola"
+   }
+  },
+  {
+   "i": 52,
+   "emoji": "👓",
+   "nombre": {
+    "es": "gafas",
+    "ca": "ulleres",
+    "va": "ulleres",
+    "gl": "lentes",
+    "eu": "betaurrekoak",
+    "en": "glasses",
+    "eo": "okulvitroj",
+    "pt": "óculos"
+   }
+  },
+  {
+   "i": 53,
+   "emoji": "👑",
+   "nombre": {
+    "es": "corona",
+    "ca": "corona",
+    "va": "corona",
+    "gl": "coroa",
+    "eu": "koroa",
+    "en": "crown",
+    "eo": "krono",
+    "pt": "coroa"
+   }
+  },
+  {
+   "i": 54,
+   "emoji": "💎",
+   "nombre": {
+    "es": "diamante",
+    "ca": "diamant",
+    "va": "diamant",
+    "gl": "diamante",
+    "eu": "diamantea",
+    "en": "diamond",
+    "eo": "diamanto",
+    "pt": "diamante"
+   }
+  },
+  {
+   "i": 55,
+   "emoji": "🧦",
+   "nombre": {
+    "es": "calcetines",
+    "ca": "mitjons",
+    "va": "calcetins",
+    "gl": "calcetíns",
+    "eu": "galtzerdiak",
+    "en": "socks",
+    "eo": "ŝtrumpetoj",
+    "pt": "meias"
+   }
+  },
+  {
+   "i": 56,
+   "emoji": "🚲",
+   "nombre": {
+    "es": "bicicleta",
+    "ca": "bicicleta",
+    "va": "bicicleta",
+    "gl": "bicicleta",
+    "eu": "bizikleta",
+    "en": "bicycle",
+    "eo": "biciklo",
+    "pt": "bicicleta"
+   }
+  },
+  {
+   "i": 57,
+   "emoji": "🚀",
+   "nombre": {
+    "es": "cohete",
+    "ca": "coet",
+    "va": "coet",
+    "gl": "foguete",
+    "eu": "suziria",
+    "en": "rocket",
+    "eo": "raketo",
+    "pt": "foguetão"
+   }
+  },
+  {
+   "i": 58,
+   "emoji": "⛵",
+   "nombre": {
+    "es": "velero",
+    "ca": "veler",
+    "va": "veler",
+    "gl": "veleiro",
+    "eu": "belaontzia",
+    "en": "sailboat",
+    "eo": "velboato",
+    "pt": "veleiro"
+   }
+  },
+  {
+   "i": 59,
+   "emoji": "🚗",
+   "nombre": {
+    "es": "coche",
+    "ca": "cotxe",
+    "va": "cotxe",
+    "gl": "coche",
+    "eu": "autoa",
+    "en": "car",
+    "eo": "aŭto",
+    "pt": "carro"
+   }
+  },
+  {
+   "i": 60,
+   "emoji": "🏠",
+   "nombre": {
+    "es": "casa",
+    "ca": "casa",
+    "va": "casa",
+    "gl": "casa",
+    "eu": "etxea",
+    "en": "house",
+    "eo": "domo",
+    "pt": "casa"
+   }
+  },
+  {
+   "i": 61,
+   "emoji": "🎲",
+   "nombre": {
+    "es": "dado",
+    "ca": "dau",
+    "va": "dau",
+    "gl": "dado",
+    "eu": "dadoa",
+    "en": "die",
+    "eo": "ĵetkubo",
+    "pt": "dado"
+   }
+  },
+  {
+   "i": 62,
+   "emoji": "⚽",
+   "nombre": {
+    "es": "balón",
+    "ca": "pilota",
+    "va": "pilota",
+    "gl": "balón",
+    "eu": "baloia",
+    "en": "ball",
+    "eo": "pilko",
+    "pt": "bola"
+   }
+  },
+  {
+   "i": 63,
+   "emoji": "🎯",
+   "nombre": {
+    "es": "diana",
+    "ca": "diana",
+    "va": "diana",
+    "gl": "diana",
+    "eu": "itua",
+    "en": "target",
+    "eo": "celtabulo",
+    "pt": "alvo"
+   }
+  }
+ ]
+}

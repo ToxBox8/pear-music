@@ -1282,3 +1282,174 @@
 1282	Via biblioteko estas tro granda por la nubo
 1283	Nun ne eblas krei kontojn; provu morgaŭ
 1284	Ŝanĝi la nomon de ĉi tiu poŝtelefono
+1285	Aldoni telefonon
+1286	Aldoni telefonon al via konto
+1287	Eksvalidiĝas post {0}
+1288	Kontrolu la emoĝiojn
+1289	Kontrolu, ke la alia telefono montras la samon.
+1290	Kun via alia telefono ĉemane, eniru per QR-kodo. Se vi perdis ĝin, per la ŝlosilo, kiun vi notis.
+1291	Fotilo por skani la kodon
+1292	QR-kodo por aldoni ĉi tiun telefonon
+1293	La kodo eksvalidiĝis. Provu denove
+1294	Emoĝioj: {0}
+1295	Rekomenci
+1296	En la nova telefono, malfermu Agordoj › Konto › Eniri de alia telefono kaj celu la fotilon al ĝia kodo.
+1297	En via alia telefono, malfermu Agordoj › Konto › Aparatoj › Aldoni telefonon kaj skanu ĉi tiun kodon.
+1298	Eniri de alia telefono
+1299	Skanu la kodon, kiun montras la nova telefono.
+1300	Skani denove
+1301	Ĉi tiu kodo ne validas
+1302	Ĉi tiu kodo jam estis uzita. Provu denove
+1303	Jiyu Pulse ne povas uzi la fotilon. Ŝaltu ĝin en la agordoj de la iPhone.
+1304	Ambaŭ telefonoj devas montri la samajn emoĝiojn, en la sama ordo.
+1305	Ili ne kongruas
+1306	Ne montru ĉi tiun kodon al iu ajn: ĝi ebligas eniri vian konton.
+1307	Ne sukcesis. Vi povas provi denove.
+1308	Nenio estis aldonita al via konto.
+1309	Ne eblis aldoni ĉi tiun telefonon
+1310	Ne uzu ĉi tiun kodon kaj forigu la telefonon el via konto per la alia.
+1311	Alia telefono uzis ĉi tiun kodon antaŭ vi. En la nova telefono, tuŝetu «Ili ne kongruas» kaj rekomencu
+1312	Ĝi povos uzi vian konton kaj vidi vian bibliotekon. Ni petos Face ID, fingrospuron aŭ la kodon de la telefono.
+1313	Preparante la kodon…
+1314	Se ili ne kongruas, forigu "{0}" el via konto en Aparatoj.
+1315	Jes, ili kongruas
+1316	abelo
+1317	ankro
+1318	ĉielarko
+1319	baleno
+1320	pilko
+1321	biciklo
+1322	lampo
+1323	strigo
+1324	kakto
+1325	kafo
+1326	kukurbo
+1327	ŝtrumpetoj
+1328	sonorilo
+1329	krabo
+1330	heliko
+1331	domo
+1332	ĉerizoj
+1333	aŭto
+1334	raketo
+1335	krono
+1336	fotilo
+1337	ĵetkubo
+1338	vekhorloĝo
+1339	diamanto
+1340	celtabulo
+1341	benjeto
+1342	elefanto
+1343	stelo
+1344	fajro
+1345	okulvitroj
+1346	sunfloro
+1347	balono
+1348	gitaro
+1349	glaciaĵo
+1350	ĝirafo
+1351	libroj
+1352	ŝlosilo
+1353	luno
+1354	pomo
+1355	papilio
+1356	martelo
+1357	maizo
+1358	neĝulo
+1359	ombrelo
+1360	pingveno
+1361	pico
+1362	ananaso
+1363	banano
+1364	polpo
+1365	fromaĝo
+1366	fulmo
+1367	donaco
+1368	akvomelono
+1369	serpento
+1370	fungo
+1371	cilindra ĉapelo
+1372	tamburo
+1373	testudo
+1374	trumpeto
+1375	trifolio
+1376	unukorno
+1377	vinberoj
+1378	velboato
+1379	karoto
+1380	Ĉu aldoni "{0}" al via konto?
+1381	Ĉu vi vidas la samon en via alia telefono?
+1382	Ĉu vi jam havas konton?
+1383	Celu la fotilon al la kodo de la nova telefono
+1384	Skani la kodon
+1385	Ĝi povos uzi vian konton kaj vidi vian bibliotekon. Ni petos fingrospuron aŭ la kodon de la telefono.
+1386	poŝlampo
+1387	mondo
+1388	En via alia telefono, malfermu Agordoj › Konto › Aldoni telefonon kaj skanu ĉi tiun kodon.
+1389	Por eniri vian konton de alia telefono sen tajpi la ŝlosilon: en la nova telefono, «Eniri de alia telefono».
+1390	Ĝisdatigu la aplikaĵon por vidi vian bibliotekon
+1391	Kopiita: ĝi foriĝos post 1 minuto
+1392	La servilo havis problemon. Provu denove post iom da tempo
+1393	La servilo ne komprenis la peton. Ĝisdatigu Jiyu Pulse kaj provu denove
+1394	La servilo ne rekonas ĉi tiun telefonon. Se tio daŭras, eniru denove per via ŝlosilo
+1395	La servilo nun ne respondas. Provu denove post iom da tempo
+1396	Ĝi estas tro granda por sendi
+1397	Ĝi estas la ŝlosilo de via konto. Se vi perdos ĉi tiun telefonon, per ĝi vi eniros de alia. Notu ĝin sur papero kaj gardu ĝin: oni ne povas vidi ĝin denove nek ŝanĝi ĝin per alia.
+1398	Tiu peto jam estis sendita. Provu denove
+1399	Tio jam ekzistas. Provu denove
+1400	Atendu iomete antaŭ ol reprovi
+1401	Ĉi tiu telefono jam estas en konto
+1402	Grupo {0}: {1}
+1403	La konto estas en prizorgado. Revenu post iom da tempo; la muziko daŭras same
+1404	La konto atingis sian hodiaŭan limon. Morgaŭ ĝi denove funkcios; la muziko daŭras same
+1405	La horo de la telefono ne ĝustas. Agordu ĝin aŭtomata kaj provu denove
+1406	Ne sukcesis ({0}). Provu denove post iom da tempo
+1407	Ne estis atendanta forigo
+1408	Ne estas konto en ĉi tiu telefono
+1409	Ni ne povis kontroli, ke vi estas homo. Provu denove
+1410	Ne trovita. Eble ĝi ne plu ekzistas
+1411	Alia telefono ŝanĝis la samon samtempe. Provu denove
+1412	Sen konekto. Kiam ĝi revenos, provu denove
+1413	Ĝi estas 26 signoj en 7 grupoj: ses po 4 kaj unu po 2. Ĉio ronda ĉiam estas nulo: en via ŝlosilo neniam estas la litero O (nek I, L aŭ U).
+1414	Via nuba biblioteko ne malfermiĝas
+1415	Via konto jam okupas la maksimumon (20 MB)
+1416	Via seanco eksvalidiĝis. Provu denove
+1417	Grupo estas la 4 signoj kiuj iras kune, kun sia numero supre. Kalkulu de maldekstre: la grupo {0} estas la markita supre.
+1418	Ankoraŭ ne sinkronigita
+1419	Elŝutante vian bibliotekon…
+1420	Biblioteko ĝisdata
+1421	Kunigante tion de viaj telefonoj…
+1422	Atendas alŝuton
+1423	Sen konekto: ĝi alŝutiĝos poste
+1424	Sinkronigita {0}
+1425	Alŝutante vian bibliotekon…
+1426	Tuŝu por sinkronigi nun.
+1427	je {0}
+1428	Nun ĝi estas nur en ĉi tiu telefono. Se vi denove sinkronigos ĝin, ĝi iros al viaj aliaj telefonoj.
+1429	Artistoj, kiujn vi sekvas
+1430	Dosierujoj
+1431	Ĝi ne plu estas ŝatata ĉi tie kaj en viaj aliaj telefonoj.
+1432	Vi ne plu sekvas ĝin ĉi tie kaj en viaj aliaj telefonoj.
+1433	Ĉi tio vojaĝas ĉifrita inter viaj telefonoj. Tuŝu ion por lasi ĝin nur en ĉi tiu telefono aŭ por forigi ĝin el ĉiuj.
+1434	Kio sinkroniĝas
+1435	Vi sekvas neniun artiston.
+1436	Ne sinkronigi ĉi tion
+1437	Vi ne havas dosierujojn.
+1438	Vi ne havas ŝatatajn.
+1439	Vi ne havas ludlistojn.
+1440	Vi ne havas konservitajn albumojn.
+1441	Forigi el ĉiuj miaj telefonoj
+1442	La dosierujo foriĝas ĉi tie kaj en viaj aliaj telefonoj; ĝia enhavo supreniras unu nivelon. Ne malfareblas.
+1443	La ludlisto foriĝas ĉi tie kaj en viaj aliaj telefonoj. Ne malfareblas.
+1444	La albumo foriĝas el via biblioteko ĉi tie kaj en viaj aliaj telefonoj.
+1445	Nur en ĉi tiu telefono
+1446	Nur en ĉi tiu telefono: ĝi iras kun sia dosierujo
+1447	Ĝi iras kun sia dosierujo, kiu ne sinkroniĝas. Por denove sinkronigi ĝin, denove sinkronigu la dosierujon.
+1448	Vidi ĉiujn {0}
+1449	Denove sinkronigi
+1450	«Ne sinkronigi ĉi tion» lasas ĝin nur en ĉi tiu telefono (en la aliaj ĝi restas same). «Forigi el ĉiuj miaj telefonoj» forigas ĝin ĉi tie kaj en la aliaj.
+1451	Ĉu forigi «{0}» el ĉiuj viaj telefonoj?
+1452	Nomo de la konto
+1453	Por ke vi rekonu vian konton en viaj telefonoj. Ĝis 40 signoj; malplena, sen nomo.
+1454	Ekzemple, Mia muziko
+1455	Nur por vi: ĝi estas ĉifrita kaj nur viaj telefonoj vidas ĝin. Ĝi ne estas uzantnomo: neniu povas serĉi vin per ĝi.

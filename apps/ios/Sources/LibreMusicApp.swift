@@ -180,7 +180,7 @@ struct RootView: View {
                 .transition(.opacity)
             }
         }
-        .sheet(isPresented: $showAccount) { NavigationStack { AccountView() }.environmentObject(library) }
+        .sheet(isPresented: $showAccount) { NavigationStack { CuentaView() }.environmentObject(library) }
         // library.json no se pudo leer (revisión del bloque 1, T3): hay una copia guardada y no se escribe encima
         // hasta que el usuario elija. «Ahora no» deja la app en memoria; el aviso vuelve al abrirla otra vez.
         .alert(L("No hemos podido leer tu biblioteca"),
@@ -245,6 +245,7 @@ struct RootView: View {
         }
         .modifier(UpdateAlert())
         .overlay { IncidentOverlay() }
+        .overlay { AvisoSync() }
         .overlay { SimulatedVersionRibbon() }
         .modifier(NowPlayingAccessory())
         // Jam «cada uno en su móvil» (2.6 de x.1.1): sigue al anfitrión con el reproductor de aquí.

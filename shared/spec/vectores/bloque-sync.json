@@ -1,0 +1,50 @@
+{
+  "aviso": "Aceptada por Toxbox el 17-11-2026 (ADR 0003 y 0004 ACEPTADOS, DECISIONS 56). Falta la revisión independiente (sesión nueva). Generado por tools/spec/generar.mjs.",
+  "descripcion": "Bloque cifrado de sync.md §2: 0x01 ‖ nonce(12) ‖ AES-256-GCM(K_music, datos, aad) ‖ etiqueta(16).",
+  "entrada": {
+    "k_music_hex": "d3c6eb74112ec41d3bd48b0e90d353a353961829501256e459304fe787d73540",
+    "account_id": "1X99P4D412HRCSNX9XJZYP85GR",
+    "clave": "biblioteca",
+    "nonce_hex": "fc93143a8f5237e30899eac0",
+    "datos_hex": "7b226661766f7269746573223a5b7b226964223a226451773477395767586351222c227469746c65223a2243616e6369c3b36e222c22617274697374223a2241727469737461227d5d2c22706c61796c69737473223a5b5d7d"
+  },
+  "aad": "pear-sync/v1|1X99P4D412HRCSNX9XJZYP85GR|music|biblioteca",
+  "bloque_hex": "01fc93143a8f5237e30899eac0b28dc7a361c32b09607b8dccf45f5e766a40c3a91f00752e3f1a743b527931b6a566c1b0eacd255ffe9963a97751ab53eea940654ea31c35b8ba170dbef169da6b1755b5f821a65ca885ffda5386202c48a95d68bed0a665f9cb0216d1d1d7e6d7aa67dd67806eed9c",
+  "deflate": {
+    "descripcion": "Los datos van comprimidos con deflate sin cabecera (RFC 1951). Los bytes comprimidos pueden variar entre plataformas: sólo se exige que esto se descomprima en el JSON.",
+    "comprimido_hex": "ab564a4b2ccb2fca2c492d56b28aae56ca4c51b2524a092c3729b70c4f8f480e54d2512ac92cc94955b252724ecc4bce3cbc394f494729b1a824b3b844c94ac911cc4854aa8dd5512ac849acccc92c2e0119145b0b00",
+    "json": "{\"favorites\":[{\"id\":\"dQw4w9WgXcQ\",\"title\":\"Canción\",\"artist\":\"Artista\"}],\"playlists\":[]}"
+  },
+  "debe_fallar": [
+    {
+      "nombre": "abierto como «estadisticas» (aad de otra clave)",
+      "account_id": "1X99P4D412HRCSNX9XJZYP85GR",
+      "clave": "estadisticas",
+      "bloque_hex": "01fc93143a8f5237e30899eac0b28dc7a361c32b09607b8dccf45f5e766a40c3a91f00752e3f1a743b527931b6a566c1b0eacd255ffe9963a97751ab53eea940654ea31c35b8ba170dbef169da6b1755b5f821a65ca885ffda5386202c48a95d68bed0a665f9cb0216d1d1d7e6d7aa67dd67806eed9c"
+    },
+    {
+      "nombre": "abierto con el id de otra cuenta",
+      "account_id": "AR1QTSZAX67A3F3488ET6RWGWM",
+      "clave": "biblioteca",
+      "bloque_hex": "01fc93143a8f5237e30899eac0b28dc7a361c32b09607b8dccf45f5e766a40c3a91f00752e3f1a743b527931b6a566c1b0eacd255ffe9963a97751ab53eea940654ea31c35b8ba170dbef169da6b1755b5f821a65ca885ffda5386202c48a95d68bed0a665f9cb0216d1d1d7e6d7aa67dd67806eed9c"
+    },
+    {
+      "nombre": "un bit cambiado",
+      "account_id": "1X99P4D412HRCSNX9XJZYP85GR",
+      "clave": "biblioteca",
+      "bloque_hex": "01fc93143a8f5237e30899eac0b28dc7a361c32b08607b8dccf45f5e766a40c3a91f00752e3f1a743b527931b6a566c1b0eacd255ffe9963a97751ab53eea940654ea31c35b8ba170dbef169da6b1755b5f821a65ca885ffda5386202c48a95d68bed0a665f9cb0216d1d1d7e6d7aa67dd67806eed9c"
+    },
+    {
+      "nombre": "versión 2",
+      "account_id": "1X99P4D412HRCSNX9XJZYP85GR",
+      "clave": "biblioteca",
+      "bloque_hex": "02fc93143a8f5237e30899eac0b28dc7a361c32b09607b8dccf45f5e766a40c3a91f00752e3f1a743b527931b6a566c1b0eacd255ffe9963a97751ab53eea940654ea31c35b8ba170dbef169da6b1755b5f821a65ca885ffda5386202c48a95d68bed0a665f9cb0216d1d1d7e6d7aa67dd67806eed9c"
+    },
+    {
+      "nombre": "cortado (sin etiqueta)",
+      "account_id": "1X99P4D412HRCSNX9XJZYP85GR",
+      "clave": "biblioteca",
+      "bloque_hex": "01fc93143a8f5237e30899eac0b28dc7a361c32b"
+    }
+  ]
+}

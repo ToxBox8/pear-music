@@ -1282,3 +1282,174 @@
 1282	La teua biblioteca és massa gran per al núvol
 1283	Ara no es poden crear comptes; prova-ho demà
 1284	Canviar el nom d'este mòbil
+1285	Afig un mòbil
+1286	Afegir un mòbil al teu compte
+1287	Caduca d'ací a {0}
+1288	Comprova els emojis
+1289	Comprova que l'altre mòbil mostra el mateix.
+1290	Amb l'altre mòbil a mà, entra amb un codi QR. Si l'has perdut, amb la clau que vas apuntar.
+1291	Càmera per a escanejar el codi
+1292	Codi QR per a afegir este mòbil
+1293	El codi ha caducat. Torna-ho a provar
+1294	Emojis: {0}
+1295	Torna a començar
+1296	En el mòbil nou, obri Ajustos › Compte › Entra des d'un altre mòbil i apunta la càmera al seu codi.
+1297	En l'altre mòbil, obri Ajustos › Compte › Dispositius › Afig un mòbil i escaneja este codi.
+1298	Entra des d'un altre mòbil
+1299	Escaneja el codi que mostra el mòbil nou.
+1300	Torna a escanejar
+1301	Este codi no és vàlid
+1302	Este codi ja s'ha usat. Torna-ho a provar
+1303	Jiyu Pulse no pot usar la càmera. Activa-la en els ajustos de l'iPhone.
+1304	Els dos mòbils han de mostrar els mateixos emojis, en el mateix orde.
+1305	No coincidixen
+1306	No mostres este codi a ningú: servix per a entrar en el teu compte.
+1307	No ha eixit bé. Pots tornar-ho a provar.
+1308	No s'ha afegit res al teu compte.
+1309	No s'ha pogut afegir este mòbil
+1310	No uses este codi i lleva el mòbil del teu compte des de l'altre.
+1311	Un altre mòbil ha usat este codi abans que tu. En el mòbil nou, toca «No coincidixen» i torna a començar
+1312	Podrà usar el teu compte i vore la teua biblioteca. Et demanarem Face ID, l'empremta o el codi del mòbil.
+1313	Preparant el codi…
+1314	Si no coincidixen, lleva "{0}" del teu compte en Dispositius.
+1315	Sí, coincidixen
+1316	abella
+1317	àncora
+1318	arc de Sant Martí
+1319	balena
+1320	pilota
+1321	bicicleta
+1322	bombeta
+1323	mussol
+1324	cactus
+1325	café
+1326	carabassa
+1327	calcetins
+1328	campana
+1329	cranc
+1330	caragol
+1331	casa
+1332	cireres
+1333	cotxe
+1334	coet
+1335	corona
+1336	càmera
+1337	dau
+1338	despertador
+1339	diamant
+1340	diana
+1341	dònut
+1342	elefant
+1343	estrella
+1344	foc
+1345	ulleres
+1346	gira-sol
+1347	globus
+1348	guitarra
+1349	gelat
+1350	girafa
+1351	llibres
+1352	clau
+1353	lluna
+1354	poma
+1355	papallona
+1356	martell
+1357	dacsa
+1358	ninot de neu
+1359	paraigua
+1360	pingüí
+1361	pizza
+1362	pinya
+1363	plàtan
+1364	polp
+1365	formatge
+1366	llamp
+1367	regal
+1368	meló d'aigua
+1369	serp
+1370	bolet
+1371	barret de copa
+1372	tambor
+1373	tortuga
+1374	trompeta
+1375	trèvol
+1376	unicorn
+1377	raïm
+1378	veler
+1379	safanòria
+1380	Vols afegir "{0}" al teu compte?
+1381	Veus el mateix en l'altre mòbil?
+1382	Ja tens compte?
+1383	Apunta la càmera al codi del mòbil nou
+1384	Escaneja el codi
+1385	Podrà usar el teu compte i vore la teua biblioteca. Et demanarem l'empremta o el codi del mòbil.
+1386	llanterna
+1387	món
+1388	En l'altre mòbil, obri Ajustos › Compte › Afig un mòbil i escaneja este codi.
+1389	Per a entrar en el teu compte des d'un altre mòbil sense escriure la clau: en el mòbil nou, «Entra des d'un altre mòbil».
+1390	Actualitza l'app per a vore la teua biblioteca
+1391	Copiada: s'esborrarà d'ací a 1 minut
+1392	El servidor ha tingut un problema. Torna-ho a provar d'ací a una estona
+1393	El servidor no ha entés la petició. Actualitza Jiyu Pulse i torna-ho a provar
+1394	El servidor no reconeix este mòbil. Si continua passant, torna a entrar amb la teua clau
+1395	El servidor no respon ara. Torna-ho a provar d'ací a una estona
+1396	És massa gran per a enviar-ho
+1397	És la clau del teu compte. Si perds este mòbil, hi entres des d'un altre amb ella. Apunta-la en paper i guarda-la: no es pot tornar a vore ni canviar per una altra.
+1398	Esta petició ja s'havia enviat. Torna-ho a provar
+1399	Açò ja existix. Torna-ho a provar
+1400	Espera un poc abans de tornar-ho a provar
+1401	Este mòbil ja està en un compte
+1402	Grup {0}: {1}
+1403	El compte està en manteniment. Torna d'ací a una estona; la música continua igual
+1404	El compte ha arribat al límit de hui. Demà tornarà a funcionar; la música continua igual
+1405	L'hora del mòbil no és correcta. Posa-la en automàtic i torna-ho a provar
+1406	No ha eixit bé ({0}). Torna-ho a provar d'ací a una estona
+1407	No hi havia cap esborrat pendent
+1408	No hi ha cap compte en este mòbil
+1409	No hem pogut comprovar que eres una persona. Torna-ho a provar
+1410	No s'ha trobat. Potser ja no existix
+1411	Un altre mòbil ha canviat el mateix alhora. Torna-ho a provar
+1412	Sense connexió. Quan torne, torna-ho a provar
+1413	Són 26 caràcters en 7 grups: sis de 4 i un de 2. El que és redó sempre és un zero: en la teua clau mai no hi ha la lletra O (ni I, L o U).
+1414	La teua biblioteca del núvol no es pot obrir
+1415	El teu compte ja ocupa el màxim (20 MB)
+1416	La sessió ha caducat. Torna-ho a provar
+1417	Un grup són els 4 caràcters que van junts, amb el seu número damunt. Compta des de l'esquerra: el {0} és el que està marcat dalt.
+1418	Encara no s'ha sincronitzat
+1419	Baixant la teua biblioteca…
+1420	Biblioteca al dia
+1421	Ajuntant el que hi ha als teus mòbils…
+1422	Pendent de pujar
+1423	Sense connexió: es pujarà després
+1424	Sincronitzat {0}
+1425	Pujant la teua biblioteca…
+1426	Toca per a sincronitzar ara.
+1427	el {0}
+1428	Ara només està en este mòbil. Si el tornes a sincronitzar, passarà als teus altres mòbils.
+1429	Artistes que seguixes
+1430	Carpetes
+1431	Deixa de ser preferida ací i en els teus altres mòbils.
+1432	Deixes de seguir-lo ací i en els teus altres mòbils.
+1433	Açò viatja xifrat entre els teus mòbils. Toca alguna cosa per a deixar-la només en este mòbil o per a llevar-la de tots.
+1434	El que se sincronitza
+1435	No seguixes cap artista.
+1436	No sincronitzes açò
+1437	No tens carpetes.
+1438	No tens preferides.
+1439	No tens llistes.
+1440	No tens àlbums guardats.
+1441	Lleva-ho de tots els meus mòbils
+1442	S'esborra la carpeta ací i en els teus altres mòbils; el que té dins puja un nivell. No es pot desfer.
+1443	S'esborra la llista ací i en els teus altres mòbils. No es pot desfer.
+1444	Es lleva l'àlbum de la teua biblioteca ací i en els teus altres mòbils.
+1445	Només en este mòbil
+1446	Només en este mòbil: va amb la seua carpeta
+1447	Va amb la seua carpeta, que no se sincronitza. Per a tornar-lo a sincronitzar, torna a sincronitzar la carpeta.
+1448	Vore-les totes ({0})
+1449	Torna a sincronitzar
+1450	«No sincronitzes açò» ho deixa només en este mòbil (en els altres es queda com està). «Lleva-ho de tots els meus mòbils» ho esborra ací i en els altres.
+1451	Vols llevar «{0}» de tots els teus mòbils?
+1452	Nom del compte
+1453	Perquè reconegues el teu compte en els teus mòbils. Fins a 40 caràcters; buit, sense nom.
+1454	Per exemple, La meua música
+1455	Només per a tu: va xifrat i només el veuen els teus mòbils. No és un nom d'usuari: ningú no et pot buscar per ell.

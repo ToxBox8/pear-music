@@ -9,7 +9,7 @@ enum Demo {
     enum Tab: String { case home, reels, library, settings }
     enum Route { case favorites, themePicker, artist, downloads, playlists, folder, artists, manage, badges,
                  cuenta, cuentaCrear, cuentaClave, cuentaEntrar, cuentaDispositivos, cuentaComprobar, cuentaBorrar,
-                 cuentaQr, cuentaQrEmojis, cuentaAnadir, cuentaAnadirEmojis }
+                 cuentaQr, cuentaQrEmojis, cuentaAnadir, cuentaAnadirEmojis, cuentaConectada, cuentaSincronizado }
 
     struct Scenario {
         var theme: AppTheme = .glass
@@ -102,6 +102,10 @@ enum Demo {
         "64_cuenta_qr_emojis": Scenario(tab: .settings, route: .cuentaQrEmojis),
         "65_cuenta_anadir": Scenario(tab: .settings, route: .cuentaAnadir),
         "66_cuenta_anadir_emojis": Scenario(tab: .settings, route: .cuentaAnadirEmojis),
+        // Pulir el bloque 2: Ajustes › Cuenta con la cuenta puesta («Añadir un móvil», el estado de la sincronización).
+        "67_cuenta_conectada": Scenario(tab: .settings, route: .cuentaConectada),
+        // PULIR #5: «Lo que se sincroniza» con la biblioteca de ejemplo.
+        "68_cuenta_sincronizado": Scenario(tab: .settings, route: .cuentaSincronizado),
         // Sólo tests de interfaz (BibliotecaUITests): Playlists con 24 playlists más, para el desplazamiento al borde.
         "ui_muchas_playlists": Scenario(playing: false, tab: .library, route: .playlists, manyPlaylists: true),
         // Sólo tests de interfaz: la Biblioteca con «Reducir movimiento», para ver que en «Ordenar» nada tiembla.

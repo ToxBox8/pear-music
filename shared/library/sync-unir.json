@@ -1947,6 +1947,55 @@
           "r1"
         ]
       }
+    },
+    {
+      "nombre": "nombre de la cuenta (PULIR #6): gana el último cambio, como los órdenes; el que no lo tiene lo recibe",
+      "regla": "§5.2 vOrden (accountName)",
+      "conmutativo": true,
+      "local": {
+        "accountName": "Mis móviles",
+        "vOrden": {
+          "accountName": [
+            1763391000000,
+            1,
+            "TJJTHK2B"
+          ]
+        },
+        "playlistSort": "name"
+      },
+      "nube": {
+        "accountName": "Casa",
+        "vOrden": {
+          "accountName": [
+            1763399000000,
+            4,
+            "WR85D13C"
+          ]
+        }
+      },
+      "esperado": {
+        "playlistSort": "name",
+        "vOrden": {
+          "playlistSort": [
+            0,
+            0,
+            ""
+          ],
+          "accountName": [
+            1763399000000,
+            4,
+            "WR85D13C"
+          ]
+        },
+        "accountName": "Casa"
+      },
+      "aviso": null,
+      "comprobar": {
+        "ordenes": {
+          "accountName": "Casa",
+          "playlistSort": "name"
+        }
+      }
     }
   ]
 }

@@ -1282,3 +1282,174 @@
 1282	A túa biblioteca é demasiado grande para a nube
 1283	Agora non se poden crear contas; proba mañá
 1284	Cambiar o nome deste móbil
+1285	Engadir un móbil
+1286	Engadir un móbil á túa conta
+1287	Caduca en {0}
+1288	Comproba os emojis
+1289	Comproba que o outro móbil amosa o mesmo.
+1290	Co teu outro móbil a man, entra cun código QR. Se o perdiches, coa clave que apuntaches.
+1291	Cámara para escanear o código
+1292	Código QR para engadir este móbil
+1293	O código caducou. Proba outra vez
+1294	Emojis: {0}
+1295	Comezar outra vez
+1296	No móbil novo, abre Axustes › Conta › Entrar desde outro móbil e apunta a cámara ao seu código.
+1297	No teu outro móbil, abre Axustes › Conta › Dispositivos › Engadir un móbil e escanea este código.
+1298	Entrar desde outro móbil
+1299	Escanea o código que amosa o móbil novo.
+1300	Escanear outra vez
+1301	Este código non é válido
+1302	Este código xa se usou. Proba outra vez
+1303	Jiyu Pulse non pode usar a cámara. Actívaa nos axustes do iPhone.
+1304	Os dous móbiles teñen que amosar os mesmos emojis, na mesma orde.
+1305	Non coinciden
+1306	Non amoses este código a ninguén: serve para entrar na túa conta.
+1307	Non saíu ben. Podes probar outra vez.
+1308	Non se engadiu nada á túa conta.
+1309	Non se puido engadir este móbil
+1310	Non uses este código e quita o móbil da túa conta desde o outro.
+1311	Outro móbil usou este código antes ca ti. No móbil novo, toca «Non coinciden» e comeza outra vez
+1312	Poderá usar a túa conta e ver a túa biblioteca. Pedirémosche Face ID, a pegada ou o código do móbil.
+1313	Preparando o código…
+1314	Se non coinciden, quita "{0}" da túa conta en Dispositivos.
+1315	Si, coinciden
+1316	abella
+1317	áncora
+1318	arco da vella
+1319	balea
+1320	balón
+1321	bicicleta
+1322	lámpada
+1323	moucho
+1324	cacto
+1325	café
+1326	cabaza
+1327	calcetíns
+1328	campá
+1329	cangrexo
+1330	caracol
+1331	casa
+1332	cereixas
+1333	coche
+1334	foguete
+1335	coroa
+1336	cámara
+1337	dado
+1338	espertador
+1339	diamante
+1340	diana
+1341	rosquilla
+1342	elefante
+1343	estrela
+1344	lume
+1345	lentes
+1346	xirasol
+1347	globo
+1348	guitarra
+1349	xeado
+1350	xirafa
+1351	libros
+1352	chave
+1353	lúa
+1354	mazá
+1355	bolboreta
+1356	martelo
+1357	millo
+1358	boneco de neve
+1359	paraugas
+1360	pingüín
+1361	pizza
+1362	ananás
+1363	plátano
+1364	polbo
+1365	queixo
+1366	raio
+1367	agasallo
+1368	sandía
+1369	serpe
+1370	cogomelo
+1371	chisteira
+1372	tambor
+1373	tartaruga
+1374	trompeta
+1375	trevo
+1376	unicornio
+1377	uvas
+1378	veleiro
+1379	cenoria
+1380	Engadir "{0}" á túa conta?
+1381	Ves o mesmo no teu outro móbil?
+1382	Xa tes conta?
+1383	Apunta a cámara ao código do móbil novo
+1384	Escanear o código
+1385	Poderá usar a túa conta e ver a túa biblioteca. Pedirémosche a pegada ou o código do móbil.
+1386	lanterna
+1387	mundo
+1388	No teu outro móbil, abre Axustes › Conta › Engadir un móbil e escanea este código.
+1389	Para entrar na túa conta desde outro móbil sen escribir a clave: no móbil novo, «Entrar desde outro móbil».
+1390	Actualiza a app para ver a túa biblioteca
+1391	Copiada: borrarase nun minuto
+1392	O servidor tivo un problema. Proba outra vez dentro dun anaco
+1393	O servidor non entendeu a petición. Actualiza Jiyu Pulse e proba outra vez
+1394	O servidor non recoñece este móbil. Se segue pasando, entra outra vez coa túa clave
+1395	O servidor non responde agora. Proba outra vez dentro dun anaco
+1396	É demasiado grande para envialo
+1397	É a chave da túa conta. Se perdes este móbil, con ela entras desde outro. Apúntaa en papel e gárdaa: non se pode ver outra vez nin cambiar por outra.
+1398	Esa petición xa se enviara. Proba outra vez
+1399	Iso xa existe. Proba outra vez
+1400	Agarda un pouco antes de volver intentalo
+1401	Este móbil xa está nunha conta
+1402	Grupo {0}: {1}
+1403	A conta está en mantemento. Volve dentro dun anaco; a música segue igual
+1404	A conta chegou ao seu límite de hoxe. Mañá volve funcionar; a música segue igual
+1405	A hora do móbil non está ben. Ponla en automática e proba outra vez
+1406	Non saíu ben ({0}). Proba outra vez dentro dun anaco
+1407	Non había ningún borrado pendente
+1408	Non hai ningunha conta neste móbil
+1409	Non puidemos comprobar que es unha persoa. Proba outra vez
+1410	Non se atopou. Pode que xa non exista
+1411	Outro móbil cambiou o mesmo á vez. Proba outra vez
+1412	Sen conexión. Cando volva, proba outra vez
+1413	Son 26 caracteres en 7 grupos: seis de 4 e un de 2. O redondo é sempre un cero: na túa clave nunca hai letra O (nin I, L ou U).
+1414	A túa biblioteca da nube non se pode abrir
+1415	A túa conta xa ocupa o máximo (20 MB)
+1416	A sesión caducou. Proba outra vez
+1417	Un grupo son os 4 caracteres que van xuntos, co seu número enriba. Conta desde a esquerda: o {0} é o que está marcado arriba.
+1418	Aínda non se sincronizou
+1419	Baixando a túa biblioteca…
+1420	Biblioteca ao día
+1421	Xuntando o dos teus móbiles…
+1422	Pendente de subir
+1423	Sen conexión: subirase despois
+1424	Sincronizado {0}
+1425	Subindo a túa biblioteca…
+1426	Toca para sincronizar agora.
+1427	o {0}
+1428	Agora só está neste móbil. Se o volves sincronizar, pasará aos teus outros móbiles.
+1429	Artistas que segues
+1430	Cartafoles
+1431	Deixa de ser favorita aquí e nos teus outros móbiles.
+1432	Deixas de seguilo aquí e nos teus outros móbiles.
+1433	Isto viaxa cifrado entre os teus móbiles. Toca algo para deixalo só neste móbil ou para quitalo de todos.
+1434	O que se sincroniza
+1435	Non segues ningún artista.
+1436	Non sincronizar isto
+1437	Non tes cartafoles.
+1438	Non tes favoritas.
+1439	Non tes listas.
+1440	Non tes álbums gardados.
+1441	Quitar de todos os meus móbiles
+1442	Bórrase o cartafol aquí e nos teus outros móbiles; o que ten dentro sobe un nivel. Non se pode desfacer.
+1443	Bórrase a lista aquí e nos teus outros móbiles. Non se pode desfacer.
+1444	Quítase o álbum da túa biblioteca aquí e nos teus outros móbiles.
+1445	Só neste móbil
+1446	Só neste móbil: vai co seu cartafol
+1447	Vai co seu cartafol, que non se sincroniza. Para volvelo sincronizar, volve sincronizar o cartafol.
+1448	Ver as {0}
+1449	Volver sincronizar
+1450	«Non sincronizar isto» déixao só neste móbil (nos outros queda como está). «Quitar de todos os meus móbiles» bórrao aquí e nos outros.
+1451	Queres quitar «{0}» de todos os teus móbiles?
+1452	Nome da conta
+1453	Para que recoñezas a túa conta nos teus móbiles. Ata 40 caracteres; baleiro, sen nome.
+1454	Por exemplo, A miña música
+1455	Só para ti: vai cifrado e só o ven os teus móbiles. Non é un nome de usuario: ninguén te pode buscar por el.

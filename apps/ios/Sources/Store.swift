@@ -171,20 +171,7 @@ final class Library: ObservableObject {
             }
             if !map.isEmpty { dict["covers"] = map }
         }
-        let d = UserDefaults.standard
-        let order = LibraryOrder.decode(d.string(forKey: "playlistOrder") ?? "")
-        if !order.isEmpty { dict["playlistOrder"] = order }
-        dict["playlistSort"] = d.string(forKey: "playlistSort") ?? "recent"
-        // Orden de «Tus álbumes» (2.9 de x.1.1), como el de las playlists.
-        let albumOrder = LibraryOrder.decode(d.string(forKey: "albumOrder") ?? "")
-        if !albumOrder.isEmpty { dict["albumOrder"] = albumOrder }
-        dict["albumSort"] = d.string(forKey: "albumSort") ?? "recent"
-        // Orden de «Fijados» (x.1.1).
-        let pinnedOrder = LibraryOrder.decode(d.string(forKey: "pinnedOrder") ?? "")
-        if !pinnedOrder.isEmpty { dict["pinnedOrder"] = pinnedOrder }
-        // Orden de las carpetas de «Tu música» (Cierre 1.0), sólo si no es el de fábrica.
-        let music = MusicOrder.decode(d.string(forKey: "musicOrder"))
-        if music != MusicOrder.defaults { dict["musicOrder"] = music }
+        LibraryFile.ponerOrdenes(en: &dict, de: .standard)
         return (try? JSONSerialization.data(withJSONObject: dict, options: [.prettyPrinted, .sortedKeys])) ?? base
     }
 
@@ -211,10 +198,8 @@ final class Library: ObservableObject {
             }
             objectWillChange.send()
         }
-        let d = UserDefaults.standard
-        for k in ["playlistOrder", "albumOrder"] { if let o = extra[k] as? [String] { d.set(o.joined(separator: "\n"), forKey: k) } }
-        for k in ["playlistSort", "albumSort"] { if let v = extra[k] as? String { d.set(v, forKey: k) } }
-        if let music = extra["musicOrder"] as? [String] { d.set(MusicOrder.decode(music.joined(separator: ",")).joined(separator: ","), forKey: "musicOrder") }
+        // Los órdenes también se vigilan (`SyncBiblioteca.ordenCambiado`): ponerlos aquí no pide otra sincronización.
+        SyncBiblioteca.shared.callado { LibraryFile.adoptarOrdenes(extra, en: .standard) }
     }
 
     /// Une una copia sin borrar nada: favoritas y recientes por id de canción, playlists por id.

@@ -11,7 +11,7 @@ import UIKit
 @MainActor
 final class CuentaPear: ObservableObject {
     static let shared = CuentaPear()
-    /// pear-api (sin desplegar todavía). Jiyu Dev / pruebas: `-pearApiBase http://…` para hablar con `wrangler dev`.
+    /// pear-api (desplegado el 19-11-2026). Jiyu Dev / pruebas: `-pearApiBase http://…` para hablar con `wrangler dev`.
     static var base: URL {
         if let s = UserDefaults.standard.string(forKey: "pearApiBase"), let u = URL(string: s) { return u }
         return URL(string: "https://pear-api.8toxbox8-69a.workers.dev")!
@@ -63,41 +63,15 @@ final class CuentaPear: ObservableObject {
         cuentaId = meta.cuenta
         // Capturas: la cuenta de mentira sólo en los escenarios que la necesitan. (No en el cierre de `.demoRoute`:
         // SwiftUI construye el destino aunque no sea la ruta del escenario, y la ponía en todos.)
-        if let r = Demo.current?.route, [.cuentaDispositivos, .cuentaComprobar, .cuentaBorrar, .cuentaAnadir, .cuentaAnadirEmojis].contains(r) { estadoDePrueba() }
+        if let r = Demo.current?.route, [.cuentaDispositivos, .cuentaComprobar, .cuentaBorrar, .cuentaAnadir, .cuentaAnadirEmojis, .cuentaConectada, .cuentaSincronizado].contains(r) { estadoDePrueba() }
     }
 
     // MARK: Errores (cuenta.md §7.1 y ADR 0004 §9)
 
     struct ErrorCuenta: Error, Equatable {
         let codigo: String
-        /// Lo que se enseña (L()); discreto, nunca corta la música.
-        var mensaje: String {
-            switch codigo {
-            case "sin_conexion": return L("Sin conexión")
-            case "bloqueado": return L("Conexión bloqueada temporalmente. La música sigue funcionando")
-            case "mantenimiento": return L("En mantenimiento")
-            case "servicio_no_disponible", "limite_diario", "incidente":
-                return L("La cuenta no está disponible ahora; puedes seguir escuchando")
-            case "reloj_desfasado": return L("Revisa la hora del móvil")
-            case "demasiadas_peticiones": return L("Demasiados intentos. Prueba dentro de un rato")
-            case "dispositivo_revocado": return L("Este móvil ya no está en tu cuenta")
-            case "no_encontrado": return L("No hay ninguna cuenta con esa clave")
-            case "clave_invalida": return L("Esa clave no es válida")
-            case "terminos_pendientes", "terminos_nuevos": return L("Hay términos nuevos que aceptar")
-            case "ya_existe": return L("Ya hay 10 móviles en tu cuenta. Quita uno antes")
-            case "no_es_la_cuenta": return L("No se ha podido abrir tu cuenta con esa clave")
-            case "presencia": return L("Hace falta Face ID, huella o el código del móvil")
-            case "nombre_invalido": return L("Pon un nombre de 1 a 40 caracteres")
-            case "tope_altas": return L("Ahora no se pueden crear cuentas; prueba mañana")
-            case "movil_no_encontrado": return L("Ese móvil ya no está en tu cuenta")
-            case "qr_invalido": return L("Este código no es válido")
-            case "emparejamiento_caducado": return L("El código ha caducado. Prueba otra vez")
-            case "emparejamiento_usado": return L("Este código ya se ha usado. Prueba otra vez")
-            case "qr_adelantado": return L("Otro móvil ha usado este código antes que tú. En el móvil nuevo, pulsa «No coinciden» y empieza otra vez")
-            case "no_anadido": return L("No se ha podido añadir este móvil")
-            default: return L("Algo ha fallado. Prueba otra vez")
-            }
-        }
+        /// Lo que se enseña (`CuentaErrores.mensaje`, sólo Foundation: se prueba en Linux).
+        var mensaje: String { CuentaErrores.mensaje(codigo) }
     }
 
     // MARK: Crear la cuenta (§3, §7, §7.2)
@@ -133,6 +107,7 @@ final class CuentaPear: ObservableObject {
         meta.siguienteSugerencia = ahora() + 7 * 86400
         guardarMeta()
         recibirToken(r)
+        SyncBiblioteca.shared.alEntrar()
     }
 
     // MARK: Entrar con la clave de recuperación (§7, §7.3 punto 1)
@@ -141,7 +116,9 @@ final class CuentaPear: ObservableObject {
         try abierta()
         guard let c = CuentaCripto.leerClave(texto) else { throw ErrorCuenta(codigo: "clave_invalida") }
         let deC = try CuentaCripto.derivarDeC(c)
-        let enc = try await json(try await pedir("POST", "/v1/id/recuperacion/buscar", cuerpo: try datos(["l": CuentaCripto.b64u(deC.l)])))
+        let enc: [String: Any]
+        do { enc = try await json(try await pedir("POST", "/v1/id/recuperacion/buscar", cuerpo: try datos(["l": CuentaCripto.b64u(deC.l)]))) }
+        catch let e as ErrorCuenta where e.codigo == "no_encontrado" { throw ErrorCuenta(codigo: "clave_sin_cuenta") }
         guard let cuenta = enc["account_id"] as? String, let env = enc["envoltura_rec"] as? String,
               let pc = enc["pub_cuenta"] as? String else { throw ErrorCuenta(codigo: "error_interno") }
         let r = try CuentaCripto.desenvolver(deC.kekRec, env, cuenta: cuenta)
@@ -150,13 +127,16 @@ final class CuentaPear: ObservableObject {
         let d = try ClaveDispositivo.nueva()
         let deviceId = CuentaCripto.idDispositivo(d.publica)
         let cuerpo: [String: Any] = ["account_id": cuenta, "pub_disp": CuentaCripto.b64u(d.publica), "nombre": nombreMovil, "plataforma": "ios"]
-        let res = try await firmada("POST", "/v1/id/dispositivos", cuerpo, cuenta: cuenta, disp: d, dispId: deviceId, rec: deC.semillaRec, conToken: false)
+        let res: (Data, HTTPURLResponse)
+        do { res = try await firmada("POST", "/v1/id/dispositivos", cuerpo, cuenta: cuenta, disp: d, dispId: deviceId, rec: deC.semillaRec, conToken: false) }
+        catch let e as ErrorCuenta where e.codigo == "ya_existe" { throw ErrorCuenta(codigo: "cuenta_llena") } // la D es nueva: son los 10
         try guardar(r: r, d: d, cuenta: cuenta, dispositivo: deviceId, pubRec: deC.pubRec)
         recibirToken(res)
         try await cargar()
         meta.vistos = Array(Set(meta.vistos + dispositivos.map(\.id) + altasVistas))
         avisos = []
         guardarMeta()
+        SyncBiblioteca.shared.alEntrar()
     }
 
     // MARK: Al abrir y en Ajustes › Cuenta
@@ -240,7 +220,8 @@ final class CuentaPear: ObservableObject {
     }
 
     func cancelarBorrado() async throws {
-        _ = try await firmada("DELETE", "/v1/id/cuenta/borrado", nil, cuentaFirma: true)
+        do { _ = try await firmada("DELETE", "/v1/id/cuenta/borrado", nil, cuentaFirma: true) }
+        catch let e as ErrorCuenta where e.codigo == "no_encontrado" { throw ErrorCuenta(codigo: "sin_borrado") }
         borrarEn = nil
     }
 
@@ -289,9 +270,12 @@ final class CuentaPear: ObservableObject {
         try abierta()
         let d = try ClaveDispositivo.nueva()
         let e = CuentaCripto.x25519Nueva(), s = CuentaCripto.aleatorio(16)
-        let o = try await json(try await pedir("POST", "/v1/id/emparejamientos", cuerpo: try datos([
-            "pub_disp_nuevo": CuentaCripto.b64u(d.publica), "e_n": CuentaCripto.b64u(e.pub), "nombre": nombreMovil, "plataforma": "ios",
-        ])))
+        let o: [String: Any]
+        do {
+            o = try await json(try await pedir("POST", "/v1/id/emparejamientos", cuerpo: try datos([
+                "pub_disp_nuevo": CuentaCripto.b64u(d.publica), "e_n": CuentaCripto.b64u(e.pub), "nombre": nombreMovil, "plataforma": "ios",
+            ])))
+        } catch let err as ErrorCuenta where err.codigo == "ya_existe" { throw ErrorCuenta(codigo: "movil_ya_en_cuenta") }
         guard let id = o["id_emp"] as? String, CuentaCripto.esId(id) else { throw ErrorCuenta(codigo: "error_interno") }
         let q = CuentaCripto.Qr(id: id, eN: e.pub, huella: CuentaCripto.sha256(d.publica), s: s, nombre: nombreMovil)
         return QrNuevo(texto: CuentaCripto.qr(q), idEmp: id, d: d, ePriv: e.priv, eN: e.pub, s: s, inicio: ProcessInfo.processInfo.systemUptime)
@@ -333,6 +317,7 @@ final class CuentaPear: ObservableObject {
         meta.vistos = Array(Set(meta.vistos + dispositivos.map(\.id) + altasVistas))
         avisos = []
         guardarMeta()
+        SyncBiblioteca.shared.alEntrar()
     }
 
     // MARK: Añadir un móvil desde el viejo (§4.2 pasos 3–7 y 11)
@@ -368,6 +353,8 @@ final class CuentaPear: ObservableObject {
             _ = try await firmada("POST", "/v1/id/emparejamientos/completar", cuerpo, cuentaFirma: true)
         } catch let err as ErrorCuenta where err.codigo == "emparejamiento_usado" {
             throw ErrorCuenta(codigo: "qr_adelantado")
+        } catch let err as ErrorCuenta where err.codigo == "ya_existe" {
+            throw ErrorCuenta(codigo: "cuenta_llena")
         }
         meta.vistos.append(CuentaCripto.idDispositivo(l.pubDispNuevo)) // el aviso de alta no salta para el que acabas de añadir
         guardarMeta()
@@ -532,7 +519,9 @@ final class CuentaPear: ObservableObject {
         if http.statusCode >= 400 {
             let codigo = ((try? JSONSerialization.jsonObject(with: data) as? [String: Any])?["error"] as? [String: Any])?["codigo"] as? String
             Logs.w("Cuenta", "\(metodo) \(http.statusCode) \(codigo ?? "?")") // sin ruta ni ids (§9)
-            throw ErrorCuenta(codigo: codigo ?? "error_interno")
+            // Sin el JSON de error (lo de delante de Cloudflare, un Worker caído): por el código HTTP.
+            throw ErrorCuenta(codigo: codigo ?? (http.statusCode == 429 ? "demasiadas_peticiones"
+                                                 : (500...599).contains(http.statusCode) ? "servidor_caido" : "http_\(http.statusCode)"))
         }
         return (data, http)
     }

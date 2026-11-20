@@ -1282,3 +1282,174 @@
 1282	A tua biblioteca é demasiado grande para a nuvem
 1283	Agora não se podem criar contas; tenta amanhã
 1284	Mudar o nome deste telemóvel
+1285	Adicionar um telemóvel
+1286	Adicionar um telemóvel à tua conta
+1287	Expira em {0}
+1288	Confirma os emojis
+1289	Confirma que o outro telemóvel mostra o mesmo.
+1290	Com o outro telemóvel à mão, entra com um código QR. Se o perdeste, com a chave que apontaste.
+1291	Câmara para ler o código
+1292	Código QR para adicionar este telemóvel
+1293	O código expirou. Tenta outra vez
+1294	Emojis: {0}
+1295	Começar outra vez
+1296	No telemóvel novo, abre Definições › Conta › Entrar a partir de outro telemóvel e aponta a câmara ao código.
+1297	No outro telemóvel, abre Definições › Conta › Dispositivos › Adicionar um telemóvel e lê este código.
+1298	Entrar a partir de outro telemóvel
+1299	Lê o código que o telemóvel novo mostra.
+1300	Ler outra vez
+1301	Este código não é válido
+1302	Este código já foi usado. Tenta outra vez
+1303	O Jiyu Pulse não pode usar a câmara. Ativa-a nas definições do iPhone.
+1304	Os dois telemóveis têm de mostrar os mesmos emojis, pela mesma ordem.
+1305	Não coincidem
+1306	Não mostres este código a ninguém: serve para entrar na tua conta.
+1307	Não correu bem. Podes tentar outra vez.
+1308	Não foi adicionado nada à tua conta.
+1309	Não foi possível adicionar este telemóvel
+1310	Não uses este código e remove o telemóvel da tua conta a partir do outro.
+1311	Outro telemóvel usou este código antes de ti. No telemóvel novo, toca «Não coincidem» e começa outra vez
+1312	Vai poder usar a tua conta e ver a tua biblioteca. Vamos pedir o Face ID, a impressão digital ou o código do telemóvel.
+1313	A preparar o código…
+1314	Se não coincidirem, remove "{0}" da tua conta em Dispositivos.
+1315	Sim, coincidem
+1316	abelha
+1317	âncora
+1318	arco-íris
+1319	baleia
+1320	bola
+1321	bicicleta
+1322	lâmpada
+1323	coruja
+1324	cacto
+1325	café
+1326	abóbora
+1327	meias
+1328	sino
+1329	caranguejo
+1330	caracol
+1331	casa
+1332	cerejas
+1333	carro
+1334	foguetão
+1335	coroa
+1336	câmara
+1337	dado
+1338	despertador
+1339	diamante
+1340	alvo
+1341	donut
+1342	elefante
+1343	estrela
+1344	fogo
+1345	óculos
+1346	girassol
+1347	balão
+1348	guitarra
+1349	sorvete
+1350	girafa
+1351	livros
+1352	chave
+1353	lua
+1354	maçã
+1355	borboleta
+1356	martelo
+1357	milho
+1358	boneco de neve
+1359	guarda-chuva
+1360	pinguim
+1361	pizza
+1362	abacaxi
+1363	banana
+1364	polvo
+1365	queijo
+1366	raio
+1367	presente
+1368	melancia
+1369	cobra
+1370	cogumelo
+1371	cartola
+1372	tambor
+1373	tartaruga
+1374	trompete
+1375	trevo
+1376	unicórnio
+1377	uvas
+1378	veleiro
+1379	cenoura
+1380	Adicionar "{0}" à tua conta?
+1381	Vês o mesmo no outro telemóvel?
+1382	Já tens conta?
+1383	Aponta a câmara ao código do telemóvel novo
+1384	Ler o código
+1385	Vai poder usar a tua conta e ver a tua biblioteca. Vamos pedir a impressão digital ou o código do telemóvel.
+1386	lanterna
+1387	mundo
+1388	No outro telemóvel, abre Definições › Conta › Adicionar um telemóvel e lê este código.
+1389	Para entrares na tua conta noutro telemóvel sem escrever a chave: no telemóvel novo, «Entrar a partir de outro telemóvel».
+1390	Atualiza a app para veres a tua biblioteca
+1391	Copiada: será apagada daqui a 1 minuto
+1392	O servidor teve um problema. Tenta outra vez daqui a pouco
+1393	O servidor não percebeu o pedido. Atualiza o Jiyu Pulse e tenta outra vez
+1394	O servidor não reconhece este telemóvel. Se continuar, entra outra vez com a tua chave
+1395	O servidor não responde agora. Tenta outra vez daqui a pouco
+1396	É demasiado grande para enviar
+1397	É a chave da tua conta. Se perderes este telemóvel, é com ela que entras noutro. Escreve-a em papel e guarda-a bem: não se pode voltar a ver nem trocar por outra.
+1398	Esse pedido já tinha sido enviado. Tenta outra vez
+1399	Isso já existe. Tenta outra vez
+1400	Espera um pouco antes de tentares outra vez
+1401	Este telemóvel já está numa conta
+1402	Grupo {0}: {1}
+1403	A conta está em manutenção. Volta daqui a pouco; a música continua igual
+1404	A conta chegou ao limite de hoje. Amanhã volta a funcionar; a música continua igual
+1405	A hora do telemóvel não está certa. Põe-na em automático e tenta outra vez
+1406	Não correu bem ({0}). Tenta outra vez daqui a pouco
+1407	Não havia nenhuma eliminação pendente
+1408	Não há nenhuma conta neste telemóvel
+1409	Não conseguimos confirmar que és uma pessoa. Tenta outra vez
+1410	Não encontrado. Pode já não existir
+1411	Outro telemóvel mudou o mesmo ao mesmo tempo. Tenta outra vez
+1412	Sem ligação. Quando voltar, tenta outra vez
+1413	São 26 caracteres em 7 grupos: seis de 4 e um de 2. O que é redondo é sempre um zero: na tua chave nunca há a letra O (nem I, L ou U).
+1414	Não é possível abrir a tua biblioteca na nuvem
+1415	A tua conta já ocupa o máximo (20 MB)
+1416	A sessão expirou. Tenta outra vez
+1417	Um grupo são os 4 caracteres que vão juntos, com o número por cima. Conta a partir da esquerda: o {0} é o que está marcado em cima.
+1418	Ainda não foi sincronizada
+1419	A descarregar a tua biblioteca…
+1420	Biblioteca em dia
+1421	A juntar o que tens nos teus telemóveis…
+1422	À espera de envio
+1423	Sem ligação: será enviada depois
+1424	Sincronizada {0}
+1425	A enviar a tua biblioteca…
+1426	Toca para sincronizar agora.
+1427	a {0}
+1428	Agora só está neste telemóvel. Se o voltares a sincronizar, passa para os teus outros telemóveis.
+1429	Artistas que segues
+1430	Pastas
+1431	Deixa de ser favorita aqui e nos teus outros telemóveis.
+1432	Deixas de o seguir aqui e nos teus outros telemóveis.
+1433	Isto viaja cifrado entre os teus telemóveis. Toca em algo para o deixares só neste telemóvel ou para o tirares de todos.
+1434	O que se sincroniza
+1435	Não segues nenhum artista.
+1436	Não sincronizar isto
+1437	Não tens pastas.
+1438	Não tens favoritas.
+1439	Não tens playlists.
+1440	Não tens álbuns guardados.
+1441	Tirar de todos os meus telemóveis
+1442	A pasta é apagada aqui e nos teus outros telemóveis; o que tem dentro sobe um nível. Não se pode desfazer.
+1443	A playlist é apagada aqui e nos teus outros telemóveis. Não se pode desfazer.
+1444	O álbum sai da tua biblioteca aqui e nos teus outros telemóveis.
+1445	Só neste telemóvel
+1446	Só neste telemóvel: vai com a sua pasta
+1447	Vai com a sua pasta, que não se sincroniza. Para o voltares a sincronizar, volta a sincronizar a pasta.
+1448	Ver as {0}
+1449	Voltar a sincronizar
+1450	«Não sincronizar isto» deixa-o só neste telemóvel (nos outros fica como está). «Tirar de todos os meus telemóveis» apaga-o aqui e nos outros.
+1451	Tirar «{0}» de todos os teus telemóveis?
+1452	Nome da conta
+1453	Para reconheceres a tua conta nos teus telemóveis. Até 40 caracteres; vazio, sem nome.
+1454	Por exemplo, A minha música
+1455	Só para ti: vai cifrado e só os teus telemóveis o veem. Não é um nome de utilizador: ninguém te pode procurar por ele.

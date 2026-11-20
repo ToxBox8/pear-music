@@ -39,7 +39,30 @@ final class SyncBiblioteca: ObservableObject {
         var previoEst: JV?
         var pendienteEst = false
         var ultimaSubidaEst: Double = 0
+        /// ms de la última vez que la nube y el móvil quedaron iguales (PULIR #4). Opcional: los archivos de antes no
+        /// lo tienen y Codable no usa el valor por defecto al leer.
+        var ultimaOk: Double?
+        /// «No sincronizar esto» (PULIR #5, sync.md §5.6): las claves «k:id» marcadas en este móvil.
+        var soloAqui: [String]?
     }
+
+    /// Lo marcado «sólo en este móvil»: ni sube ni lo toca lo que llega; en los demás móviles, como estaba. Igual que
+    /// `SyncBiblioteca.soloAqui` en Android.
+    @Published private(set) var soloAqui: Set<String> = []
+    /// `marcar` = true: «No sincronizar esto»; false: «Volver a sincronizar».
+    func soloEnEsteMovil(_ clave: String, _ marcar: Bool) {
+        if marcar { soloAqui.insert(clave) } else { soloAqui.remove(clave) }
+        estado.soloAqui = soloAqui.sorted()
+        guardar()
+        alCambiar()
+    }
+
+    /// Lo que se ve (PULIR #3 y #4): la cápsula de arriba (`AvisoSync`) y la fila de Ajustes › Cuenta.
+    @Published private(set) var vista = VistaSync()
+    private func fase(_ f: FaseSync) { vista.fase = f }
+    private func alAcabar() { vista.fase = .quieta; vista.pendiente = estado.pendiente; vista.ultimaOk = estado.ultimaOk ?? 0 }
+    /// Sólo capturas (`-screenshotScenario`): un estado fijo, como `vistaDePrueba` en Android.
+    func vistaDePrueba(_ v: VistaSync) { vista = v }
 
     /// Lo que se enseña una vez (§5.4, §4): la pantalla de la cuenta lo lee.
     @Published private(set) var aviso: String?
@@ -52,6 +75,36 @@ final class SyncBiblioteca: ObservableObject {
 
     private init() {
         if let d = try? Data(contentsOf: Self.archivo), let e = try? JSONDecoder().decode(Estado.self, from: d) { estado = e }
+        alAcabar()
+        soloAqui = Set(estado.soloAqui ?? [])
+        ordenVisto = Self.ordenes()
+        // Los órdenes (con las claves `folder:` de las carpetas) viven en UserDefaults, no en library.json: cambiar sólo
+        // el orden (arrastrar en «Ordenar», «Ordenar por») no pasaba por `Library.save` y no se subía (PULIR #1).
+        NotificationCenter.default.addObserver(forName: UserDefaults.didChangeNotification, object: nil, queue: .main) { _ in
+            Task { @MainActor in SyncBiblioteca.shared.ordenCambiado() } // `callado` ya habrá puesto `ordenVisto`
+        }
+    }
+
+    // MARK: Órdenes (playlistOrder, albumOrder, musicOrder y los «Ordenar por»)
+
+    static let clavesOrden = ["playlistOrder", "albumOrder", "musicOrder", "playlistSort", "albumSort", "accountName"]
+    private static func ordenes() -> String {
+        clavesOrden.map { UserDefaults.standard.string(forKey: $0) ?? "\u{1}" }.joined(separator: "\u{0}")
+    }
+    private var ordenVisto = ""
+    private var silencio = false
+    private func ordenCambiado() {
+        let o = Self.ordenes()
+        guard o != ordenVisto else { return }
+        ordenVisto = o
+        if !silencio { alCambiar() }
+    }
+    /// Lo que se hace dentro no cuenta como un cambio de este móvil (poner lo que llega de la nube).
+    func callado(_ f: () -> Void) {
+        silencio = true
+        f()
+        ordenVisto = Self.ordenes()
+        silencio = false
     }
     private func guardar() {
         guard let d = try? JSONEncoder().encode(estado) else { return }
@@ -66,6 +119,10 @@ final class SyncBiblioteca: ObservableObject {
         esperaEst?.cancel(); esperaEst = nil
         estado = Estado()
         try? FileManager.default.removeItem(at: Self.archivo)
+        vista = VistaSync()
+        soloAqui = []
+        // El nombre es de esa cuenta (PULIR #6): si se quedara, al entrar en otra se subiría encima del suyo.
+        callado { UserDefaults.standard.removeObject(forKey: "accountName") }
     }
 
     // MARK: Cuándo (§4)
@@ -74,12 +131,20 @@ final class SyncBiblioteca: ObservableObject {
     func alCambiar() {
         guard CuentaPear.shared.tieneCuenta else { return }
         estado.pendiente = true
+        vista.pendiente = true
         espera?.cancel()
         espera = Task { [weak self] in
             try? await Task.sleep(nanoseconds: 30_000_000_000)
             guard !Task.isCancelled else { return }
             await self?.sincronizar()
         }
+    }
+
+    /// Recién creada la cuenta o recién entrado en ella (con la clave o el QR): se sincroniza ya, sin esperar a la
+    /// siguiente apertura (PULIR #1: el móvil nuevo no traía nada hasta volver a abrir la app).
+    func alEntrar() {
+        guard CuentaPear.shared.tieneCuenta else { return }
+        Task { await sincronizar(); await sincronizarEstadisticas() }
     }
 
     /// Al abrir y al volver a primer plano: bajar si hace más de 5 min (o si quedó algo pendiente).
@@ -126,17 +191,23 @@ final class SyncBiblioteca: ObservableObject {
         let cuenta = CuentaPear.shared
         guard cuenta.tieneCuenta, let k = cuenta.kMusic, let d = cuenta.dispositivoCorto, let id = cuenta.cuentaId else { return }
         enCurso = true
-        defer { enCurso = false; guardar() }
+        defer { enCurso = false; guardar(); alAcabar() }
         do {
             // 1. Marcar lo que ha cambiado desde la última vez (§5.2), con el reloj híbrido (§5.1).
-            guard let actual = try? JV.leer(library.exportData(covers: true)) else { return }
+            // Lo marcado «sólo en este móvil» (§5.6) no entra: ni en lo que se marca ni en lo último marcado (así no deja
+            // bajas); al final se vuelve a poner como está aquí.
+            guard let entera = try? JV.leer(library.exportData(covers: true)) else { return }
+            let claves = SyncModel.soloAquiEntero(entera, Array(soloAqui))
+            let actual = SyncModel.quitarSoloAqui(entera, claves) ?? entera
+            let previo = SyncModel.quitarSoloAqui(estado.previo, claves)
             let ahora = cuenta.ahoraMs()
-            let t = Swift.max(ahora.rounded(.down), SyncModel.marcaMayor(estado.previo).t + 1)
-            let m = SyncModel.marcar(estado.previo, actual, t: t, c: estado.contador, d: d)
+            let t = Swift.max(ahora.rounded(.down), SyncModel.marcaMayor(previo).t + 1)
+            let m = SyncModel.marcar(previo, actual, t: t, c: estado.contador, d: d)
             estado.contador = m.c
             let ultima = estado.ultimaSync.map { Marca(t: $0[0], c: $0[1], d: estado.ultimaSyncD ?? "") }
             for _ in 0..<3 {
                 // 2. Bajar (con If-None-Match si ya hay una versión) y unir.
+                fase(.bajando)
                 let nube: JV?
                 var etag = estado.etag
                 switch try await cuenta.bajarBloque(Self.clave, etag: estado.previo == nil ? nil : estado.etag) {
@@ -145,13 +216,15 @@ final class SyncBiblioteca: ObservableObject {
                 case .noHay: nube = nil; etag = nil
                 }
                 estado.ultimaBajada = Date().timeIntervalSince1970
+                fase(.uniendo)
                 let u = SyncModel.unir(m.lib, nube, ahora: ahora, ultimaSync: ultima)
-                if u.aviso == .puestaAlDia { guardarCopia(actual) }
+                if u.aviso == .puestaAlDia { guardarCopia(entera) }
                 if let a = u.aviso { avisar(a) }
                 // 3. Subir si la nube no tiene ya todo (sólo cuenta lo que se sincroniza: no los recientes).
                 var resultado = u.lib
                 if nube == nil || !SyncModel.mismoContenido(resultado, nube!) {
                     guard let bloque = sellar(&resultado, clave: k, cuenta: id) else { estado.pendiente = false; return }
+                    fase(.subiendo)
                     do {
                         etag = try await cuenta.subirBloque(Self.clave, bloque, etag: etag)
                     } catch let e as CuentaPear.ErrorCuenta where e.codigo == "version_cambiada" {
@@ -165,14 +238,21 @@ final class SyncBiblioteca: ObservableObject {
                 estado.etag = etag
                 estado.previo = resultado
                 estado.pendiente = false
-                if !SyncModel.mismoContenido(resultado, m.lib) { try? library.adoptarSync(resultado.datos()) }
+                estado.ultimaOk = Date().timeIntervalSince1970 * 1000
+                vista.sinRed = false
+                if !SyncModel.mismoContenido(SyncModel.quitarSoloAqui(resultado, claves) ?? resultado, m.lib) {
+                    try? library.adoptarSync(SyncModel.ponerSoloAqui(resultado, entera, claves).datos())
+                    vista.traido = Date().timeIntervalSince1970 * 1000
+                }
                 return
             }
             // Tres choques seguidos: se queda pendiente para la siguiente apertura (§4).
             estado.pendiente = true
         } catch {
             estado.pendiente = true // sin red, 5xx, términos…: se reintenta al volver o al abrir
-            Logs.w("Sync", "biblioteca pendiente: \((error as? CuentaPear.ErrorCuenta)?.codigo ?? "error")") // sin datos
+            let codigo = (error as? CuentaPear.ErrorCuenta)?.codigo
+            vista.sinRed = codigo == "sin_conexion" || codigo == "bloqueado"
+            Logs.w("Sync", "biblioteca pendiente: \(codigo ?? "error")") // sin datos
         }
     }
 

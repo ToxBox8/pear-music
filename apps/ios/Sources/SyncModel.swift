@@ -113,7 +113,7 @@ enum SyncModel {
         Tipo(campo: "playlists", k: "playlist", idKey: "id"),
     ]
     static let conV: Set<String> = ["folders", "albumFolders", "playlists"]
-    static let ordenes = ["playlistOrder", "albumOrder", "musicOrder", "playlistSort", "albumSort"]
+    static let ordenes = ["playlistOrder", "albumOrder", "musicOrder", "playlistSort", "albumSort", "accountName"]
     static let marcas = ["a", "v", "vCanciones"]
     static let propios: Set<String> = Set(tipos.map(\.campo) + ordenes + ["vOrden", "deleted", "deletedHorizon", "covers"])
 
@@ -446,6 +446,56 @@ enum SyncModel {
         if !bajas.isEmpty { l["deleted"] = .arr(bajas.values.sorted { menor(claveBaja($0), claveBaja($1)) }) }
         if tiene(p, "deletedHorizon") { l["deletedHorizon"] = p["deletedHorizon"] }
         return (l, c)
+    }
+
+    // MARK: «No sincronizar esto» (PULIR #5; sync.md §5.6): una marca de ESTE móvil, fuera de library.json y del bloque
+
+    /// Las claves «k:id» marcadas más lo que hay dentro de las carpetas marcadas (subcarpetas y sus playlists o álbumes).
+    static func soloAquiEntero(_ lib: JV?, _ marcadas: [String]) -> [String] {
+        var fuera = Set(marcadas)
+        for (campo, k, esAlbum) in [("folders", "folder", false), ("albumFolders", "albumFolder", true)] {
+            let carpetas = lib?[campo]?.lista ?? []
+            var dentro = Set(carpetas.compactMap { $0["id"]?.texto }.filter { fuera.contains("\(k):\($0)") })
+            var cambio = true
+            while cambio {
+                cambio = false
+                for f in carpetas {
+                    guard let id = f["id"]?.texto, let padre = f["parent"]?.texto else { continue }
+                    if dentro.contains(padre) && !dentro.contains(id) { dentro.insert(id); cambio = true }
+                }
+            }
+            for id in dentro { fuera.insert("\(k):\(id)") }
+            for p in lib?["playlists"]?.lista ?? [] {
+                let album = p["album"].map { $0 != .null && $0 != .bool(false) } ?? false
+                if album == esAlbum, let c = p["folder"]?.texto, dentro.contains(c) { fuera.insert("playlist:\(p["id"]?.texto ?? "")") }
+            }
+        }
+        return fuera.sorted(by: JV.menorUtf16)
+    }
+
+    /// La biblioteca sin lo de `claves` (y sin sus portadas): lo que se marca y se sube.
+    static func quitarSoloAqui(_ lib: JV?, _ claves: [String]) -> JV? {
+        guard var l = lib, let o = l.objeto else { return lib }
+        let fuera = Set(claves)
+        for t in tipos { if let xs = o[t.campo]?.lista { l[t.campo] = .arr(xs.filter { !fuera.contains("\(t.k):\(idDe(t, $0))") }) } }
+        if let c = o["covers"]?.objeto { l["covers"] = .obj(c.filter { !fuera.contains("playlist:\($0.key)") }) }
+        return l
+    }
+
+    /// Lo que se pone en la app: lo unido, pero lo de `claves` como está en este móvil (o nada, si aquí no está).
+    static func ponerSoloAqui(_ unida: JV, _ local: JV?, _ claves: [String]) -> JV {
+        guard unida.objeto != nil else { return unida }
+        let fuera = Set(claves)
+        var out = unida
+        for t in tipos {
+            let nube = (unida[t.campo]?.lista ?? []).filter { !fuera.contains("\(t.k):\(idDe(t, $0))") }
+            let mio = (local?[t.campo]?.lista ?? []).filter { fuera.contains("\(t.k):\(idDe(t, $0))") }
+            if !nube.isEmpty || !mio.isEmpty || unida[t.campo] != nil { out[t.campo] = .arr(nube + mio) }
+        }
+        var covers = (unida["covers"]?.objeto ?? [:]).filter { !fuera.contains("playlist:\($0.key)") }
+        for (id, c) in local?["covers"]?.objeto ?? [:] where fuera.contains("playlist:\(id)") { covers[id] = c }
+        if unida["covers"] != nil || !covers.isEmpty { out["covers"] = .obj(covers) }
+        return out
     }
 
     // MARK: Estadísticas (sync.md §6)

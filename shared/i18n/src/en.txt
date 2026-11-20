@@ -1282,3 +1282,174 @@
 1282	Your library is too big for the cloud
 1283	Accounts can't be created right now; try tomorrow
 1284	Rename this phone
+1285	Add a phone
+1286	Add a phone to your account
+1287	Expires in {0}
+1288	Check the emojis
+1289	Check that the other phone shows the same.
+1290	With your other phone at hand, sign in with a QR code. If you've lost it, with the key you wrote down.
+1291	Camera to scan the code
+1292	QR code to add this phone
+1293	The code has expired. Try again
+1294	Emojis: {0}
+1295	Start again
+1296	On the new phone, open Settings › Account › Sign in from another phone and point the camera at its code.
+1297	On your other phone, open Settings › Account › Devices › Add a phone and scan this code.
+1298	Sign in from another phone
+1299	Scan the code shown on the new phone.
+1300	Scan again
+1301	This code isn't valid
+1302	This code has already been used. Try again
+1303	Jiyu Pulse can't use the camera. Turn it on in the iPhone settings.
+1304	Both phones must show the same emojis, in the same order.
+1305	They don't match
+1306	Don't show this code to anyone: it lets you into your account.
+1307	That didn't work. You can try again.
+1308	Nothing has been added to your account.
+1309	This phone couldn't be added
+1310	Don't use this code, and remove the phone from your account on the other one.
+1311	Another phone used this code before you. On the new phone, tap “They don't match” and start again
+1312	It will be able to use your account and see your library. We'll ask for Face ID, your fingerprint or your phone's code.
+1313	Preparing the code…
+1314	If they don't match, remove "{0}" from your account in Devices.
+1315	Yes, they match
+1316	bee
+1317	anchor
+1318	rainbow
+1319	whale
+1320	ball
+1321	bicycle
+1322	light bulb
+1323	owl
+1324	cactus
+1325	coffee
+1326	pumpkin
+1327	socks
+1328	bell
+1329	crab
+1330	snail
+1331	house
+1332	cherries
+1333	car
+1334	rocket
+1335	crown
+1336	camera
+1337	die
+1338	alarm clock
+1339	diamond
+1340	target
+1341	doughnut
+1342	elephant
+1343	star
+1344	fire
+1345	glasses
+1346	sunflower
+1347	balloon
+1348	guitar
+1349	ice cream
+1350	giraffe
+1351	books
+1352	key
+1353	moon
+1354	apple
+1355	butterfly
+1356	hammer
+1357	corn
+1358	snowman
+1359	umbrella
+1360	penguin
+1361	pizza
+1362	pineapple
+1363	banana
+1364	octopus
+1365	cheese
+1366	lightning
+1367	gift
+1368	watermelon
+1369	snake
+1370	mushroom
+1371	top hat
+1372	drum
+1373	turtle
+1374	trumpet
+1375	clover
+1376	unicorn
+1377	grapes
+1378	sailboat
+1379	carrot
+1380	Add "{0}" to your account?
+1381	Do you see the same on your other phone?
+1382	Already have an account?
+1383	Point the camera at the new phone's code
+1384	Scan the code
+1385	It will be able to use your account and see your library. We'll ask for your fingerprint or your phone's code.
+1386	flashlight
+1387	world
+1388	On your other phone, open Settings › Account › Add a phone and scan this code.
+1389	To sign in to your account on another phone without typing your key: on the new phone, tap «Sign in from another phone».
+1390	Update the app to see your library
+1391	Copied: it will be cleared in 1 minute
+1392	The server had a problem. Try again in a while
+1393	The server didn't understand the request. Update Jiyu Pulse and try again
+1394	The server doesn't recognise this phone. If it keeps happening, sign in again with your key
+1395	The server isn't responding right now. Try again in a while
+1396	It's too big to send
+1397	It's the key to your account. If you lose this phone, you use it to sign in from another one. Write it down on paper and keep it safe: you can't see it again or swap it for another.
+1398	That request had already been sent. Try again
+1399	That already exists. Try again
+1400	Wait a little before trying again
+1401	This phone is already in an account
+1402	Group {0}: {1}
+1403	Your account is under maintenance. Come back in a while; the music keeps playing
+1404	Your account has reached today's limit. It works again tomorrow; the music keeps playing
+1405	Your phone's time is wrong. Set it to automatic and try again
+1406	That didn't work ({0}). Try again in a while
+1407	There was no pending deletion
+1408	There's no account on this phone
+1409	We couldn't check that you're a person. Try again
+1410	Not found. It may no longer exist
+1411	Another phone changed the same thing at the same time. Try again
+1412	No connection. When it's back, try again
+1413	It's 26 characters in 7 groups: six of 4 and one of 2. Anything round is always a zero: your key never has the letter O (nor I, L or U).
+1414	Your cloud library can't be opened
+1415	Your account is already at the maximum (20 MB)
+1416	Your session has expired. Try again
+1417	A group is the 4 characters that go together, with their number on top. Count from the left: group {0} is the one marked above.
+1418	Not synced yet
+1419	Downloading your library…
+1420	Library up to date
+1421	Bringing your phones together…
+1422	Waiting to upload
+1423	No connection: it will upload later
+1424	Synced {0}
+1425	Uploading your library…
+1426	Tap to sync now.
+1427	on {0}
+1428	It's now only on this phone. If you sync it again, it will go to your other phones.
+1429	Artists you follow
+1430	Folders
+1431	It stops being a favourite here and on your other phones.
+1432	You stop following them here and on your other phones.
+1433	This travels encrypted between your phones. Tap something to keep it only on this phone or to remove it from all of them.
+1434	What syncs
+1435	You don't follow any artist.
+1436	Don't sync this
+1437	You have no folders.
+1438	You have no favourites.
+1439	You have no playlists.
+1440	You have no saved albums.
+1441	Remove from all my phones
+1442	The folder is deleted here and on your other phones; what's inside moves up a level. This can't be undone.
+1443	The playlist is deleted here and on your other phones. This can't be undone.
+1444	The album is removed from your library here and on your other phones.
+1445	Only on this phone
+1446	Only on this phone: it goes with its folder
+1447	It goes with its folder, which isn't synced. To sync it again, sync the folder again.
+1448	See all {0}
+1449	Sync again
+1450	«Don't sync this» keeps it only on this phone (it stays as it is on the others). «Remove from all my phones» deletes it here and on the others.
+1451	Remove "{0}" from all your phones?
+1452	Account name
+1453	So you recognise your account on your phones. Up to 40 characters; empty, no name.
+1454	For example, My music
+1455	Just for you: it's encrypted and only your phones see it. It isn't a username: nobody can search for you by it.

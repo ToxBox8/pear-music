@@ -95,4 +95,52 @@ final class CuentaUITests: XCTestCase {
         XCTAssertTrue(app.buttons["anadirMovil"].exists)
         shot("anadir")
     }
+
+    /// PULIR #2: en el móvil nuevo, «Entrar desde otro móvil» es lo primero, antes de «Crear cuenta» (como Android).
+    func testSinCuentaEntrarDesdeOtroVaPrimero() {
+        launch("56_cuenta_sin_crear", ready: "¿Ya tienes cuenta?")
+        let entrar = id("entrarDesdeOtro"), crear = id("crearCuenta")
+        XCTAssertTrue(entrar.waitForExistence(timeout: 5))
+        if !crear.exists { app.swipeUp() }
+        XCTAssertTrue(crear.waitForExistence(timeout: 5))
+        shot("sin-cuenta")
+        XCTAssertLessThan(entrar.frame.minY, crear.frame.minY, "«Entrar desde otro móvil» tiene que ir antes que «Crear cuenta»")
+    }
+
+    /// PULIR #2: con la cuenta puesta, «Añadir un móvil» está en Ajustes › Cuenta (no sólo en Dispositivos).
+    func testConCuentaAnadirUnMovilEnLaCuenta() {
+        launch("67_cuenta_conectada", ready: "Añadir un móvil")
+        let fila = id("anadirUnMovilCuenta")
+        XCTAssertTrue(fila.waitForExistence(timeout: 5))
+        XCTAssertTrue(any("Sincronizado hace 2 min").exists, "PULIR #4: la fila del estado de la sincronización")
+        XCTAssertTrue(id("nombreCuenta").exists, "PULIR #6: la fila del nombre de la cuenta")
+        shot("con-cuenta")
+        fila.tap()
+        XCTAssertTrue(app.navigationBars["Añadir un móvil"].waitForExistence(timeout: 5), "Tiene que abrir «Añadir un móvil»")
+    }
+
+    /// Orden 11: la clave en 7 grupos numerados; al confirmar se dice qué es un grupo y cuál se pide (como Android).
+    func testLaClaveExplicaQueEsUnGrupo() {
+        launch("58_cuenta_tu_clave", ready: "Tu clave de recuperación")
+        XCTAssertTrue(any("Lo redondo es siempre un cero").waitForExistence(timeout: 5))
+        XCTAssertTrue(any("Grupo 1:").exists, "Cada grupo con su número para VoiceOver")
+        app.buttons["botonClave"].tap()
+        XCTAssertTrue(any("Un grupo son los 4 caracteres").waitForExistence(timeout: 5))
+        shot("grupo-marcado")
+    }
+
+    /// PULIR #5: «No sincronizar esto» la deja sólo aquí y «Quitar de todos mis móviles» pide confirmación (como Android).
+    func testLoQueSeSincronizaDosOpciones() {
+        launch("68_cuenta_sincronizado", ready: "Lo que se sincroniza")
+        let fila = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'sinc-playlist:'")).firstMatch
+        XCTAssertTrue(fila.waitForExistence(timeout: 5), "Tiene que haber alguna playlist")
+        fila.tap()
+        app.buttons["No sincronizar esto"].tap()
+        XCTAssertTrue(any("Sólo en este móvil").waitForExistence(timeout: 5), "Tiene que decir «Sólo en este móvil»")
+        shot("solo-aqui")
+        fila.tap()
+        app.buttons["Quitar de todos mis móviles"].tap()
+        XCTAssertTrue(any("de todos tus móviles?").waitForExistence(timeout: 5), "Tiene que pedir confirmación")
+        shot("confirmar")
+    }
 }

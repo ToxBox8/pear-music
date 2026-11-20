@@ -1282,3 +1282,174 @@ Tu biblioteca de la nube estaba incompleta: la hemos completado con la de este m
 Tu biblioteca es demasiado grande para la nube
 Ahora no se pueden crear cuentas; prueba mañana
 Cambiar el nombre de este móvil
+Añadir un móvil
+Añadir un móvil a tu cuenta
+Caduca en {0}
+Comprueba los emojis
+Comprueba que el otro móvil enseña lo mismo.
+Con tu otro móvil a mano, entra con un código QR. Si lo has perdido, con la clave que apuntaste.
+Cámara para escanear el código
+Código QR para añadir este móvil
+El código ha caducado. Prueba otra vez
+Emojis: {0}
+Empezar otra vez
+En el móvil nuevo, abre Ajustes › Cuenta › Entrar desde otro móvil y apunta la cámara a su código.
+En tu otro móvil, abre Ajustes › Cuenta › Dispositivos › Añadir un móvil y escanea este código.
+Entrar desde otro móvil
+Escanea el código que enseña el móvil nuevo.
+Escanear otra vez
+Este código no es válido
+Este código ya se ha usado. Prueba otra vez
+Jiyu Pulse no puede usar la cámara. Actívala en los ajustes del iPhone.
+Los dos móviles tienen que enseñar los mismos emojis, en el mismo orden.
+No coinciden
+No enseñes este código a nadie: sirve para entrar en tu cuenta.
+No ha salido bien. Puedes probar otra vez.
+No se ha añadido nada a tu cuenta.
+No se ha podido añadir este móvil
+No uses este código y quita el móvil de tu cuenta desde el otro.
+Otro móvil ha usado este código antes que tú. En el móvil nuevo, pulsa «No coinciden» y empieza otra vez
+Podrá usar tu cuenta y ver tu biblioteca. Te pediremos Face ID, huella o el código del móvil.
+Preparando el código…
+Si no coinciden, quita "{0}" de tu cuenta en Dispositivos.
+Sí, coinciden
+abeja
+ancla
+arcoíris
+ballena
+balón
+bicicleta
+bombilla
+búho
+cactus
+café
+calabaza
+calcetines
+campana
+cangrejo
+caracol
+casa
+cerezas
+coche
+cohete
+corona
+cámara
+dado
+despertador
+diamante
+diana
+dónut
+elefante
+estrella
+fuego
+gafas
+girasol
+globo
+guitarra
+helado
+jirafa
+libros
+llave
+luna
+manzana
+mariposa
+martillo
+maíz
+muñeco de nieve
+paraguas
+pingüino
+pizza
+piña
+plátano
+pulpo
+queso
+rayo
+regalo
+sandía
+serpiente
+seta
+sombrero de copa
+tambor
+tortuga
+trompeta
+trébol
+unicornio
+uvas
+velero
+zanahoria
+¿Añadir "{0}" a tu cuenta?
+¿Ves lo mismo en tu otro móvil?
+¿Ya tienes cuenta?
+Apunta la cámara al código del móvil nuevo
+Escanear el código
+Podrá usar tu cuenta y ver tu biblioteca. Te pediremos la huella o el código del móvil.
+linterna
+mundo
+En tu otro móvil, abre Ajustes › Cuenta › Añadir un móvil y escanea este código.
+Para entrar en tu cuenta desde otro móvil sin escribir la clave: en el móvil nuevo, «Entrar desde otro móvil».
+Actualiza la app para ver tu biblioteca
+Copiada: se borra en 1 minuto
+El servidor ha tenido un problema. Prueba otra vez dentro de un rato
+El servidor no ha entendido la petición. Actualiza Jiyu Pulse y prueba otra vez
+El servidor no reconoce este móvil. Si sigue pasando, entra otra vez con tu clave
+El servidor no responde ahora. Prueba otra vez dentro de un rato
+Es demasiado grande para enviarlo
+Es la llave de tu cuenta. Si pierdes este móvil, con ella entras desde otro. Apúntala en papel y guárdala: no se puede ver otra vez ni cambiar por otra.
+Esa petición ya se había enviado. Prueba otra vez
+Eso ya existe. Prueba otra vez
+Espera un poco antes de volver a intentarlo
+Este móvil ya está en una cuenta
+Grupo {0}: {1}
+La cuenta está en mantenimiento. Vuelve en un rato; la música sigue igual
+La cuenta ha llegado a su límite de hoy. Mañana vuelve a funcionar; la música sigue igual
+La hora del móvil no está bien. Ponla en automática y prueba otra vez
+No ha salido bien ({0}). Prueba otra vez dentro de un rato
+No había ningún borrado pendiente
+No hay ninguna cuenta en este móvil
+No hemos podido comprobar que eres una persona. Prueba otra vez
+No se ha encontrado. Puede que ya no exista
+Otro móvil ha cambiado lo mismo a la vez. Prueba otra vez
+Sin conexión. Cuando vuelva, prueba otra vez
+Son 26 caracteres en 7 grupos: seis de 4 y uno de 2. Lo redondo es siempre un cero: en tu clave nunca hay letra O (ni I, L o U).
+Tu biblioteca de la nube no se puede abrir
+Tu cuenta ya ocupa el máximo (20 MB)
+Tu sesión ha caducado. Prueba otra vez
+Un grupo son los 4 caracteres que van juntos, con su número encima. Cuenta desde la izquierda: el {0} es el que está marcado arriba.
+Aún no se ha sincronizado
+Bajando tu biblioteca…
+Biblioteca al día
+Juntando lo de tus móviles…
+Pendiente de subir
+Sin conexión: se subirá luego
+Sincronizado {0}
+Subiendo tu biblioteca…
+Toca para sincronizar ahora.
+el {0}
+Ahora sólo está en este móvil. Si lo vuelves a sincronizar, pasará a tus otros móviles.
+Artistas que sigues
+Carpetas
+Deja de ser favorita aquí y en tus otros móviles.
+Dejas de seguirlo aquí y en tus otros móviles.
+Esto viaja cifrado entre tus móviles. Toca algo para dejarlo sólo en este móvil o para quitarlo de todos.
+Lo que se sincroniza
+No sigues a ningún artista.
+No sincronizar esto
+No tienes carpetas.
+No tienes favoritas.
+No tienes playlists.
+No tienes álbumes guardados.
+Quitar de todos mis móviles
+Se borra la carpeta aquí y en tus otros móviles; lo que tiene dentro sube un nivel. No se puede deshacer.
+Se borra la playlist aquí y en tus otros móviles. No se puede deshacer.
+Se quita el álbum de tu biblioteca aquí y en tus otros móviles.
+Sólo en este móvil
+Sólo en este móvil: va con su carpeta
+Va con su carpeta, que no se sincroniza. Para volver a sincronizarlo, vuelve a sincronizar la carpeta.
+Ver las {0}
+Volver a sincronizar
+«No sincronizar esto» lo deja sólo en este móvil (en los demás se queda como está). «Quitar de todos mis móviles» lo borra aquí y en los demás.
+¿Quitar "{0}" de todos tus móviles?
+Nombre de la cuenta
+Para que reconozcas tu cuenta en tus móviles. Hasta 40 caracteres; vacío, sin nombre.
+Por ejemplo, Mi música
+Sólo para ti: va cifrado y sólo lo ven tus móviles. No es un nombre de usuario: nadie te puede buscar por él.
