@@ -445,7 +445,7 @@ struct ClaveNuevaView: View {
             defer { creando = false }
             do { try await CuentaPear.shared.crear(borrador); hecho = true }
             catch let e as CuentaPear.ErrorCuenta { error = e.mensaje }
-            catch { self.error = CuentaPear.ErrorCuenta(codigo: "error_interno").mensaje }
+            catch is CancellationError {} catch { self.error = CuentaPear.mensajeDe(error) }
         }
     }
 }
@@ -484,7 +484,7 @@ struct EntrarConClaveView: View {
             defer { entrando = false }
             do { try await CuentaPear.shared.entrarConClave(clave); dismiss() }
             catch let e as CuentaPear.ErrorCuenta { error = e.mensaje }
-            catch { self.error = CuentaPear.ErrorCuenta(codigo: "error_interno").mensaje }
+            catch is CancellationError {} catch { self.error = CuentaPear.mensajeDe(error) }
         }
     }
 }
@@ -604,7 +604,7 @@ private struct CuentaConectada: View {
         Task {
             do { try await trabajo(); error = nil }
             catch let e as CuentaPear.ErrorCuenta { error = e.mensaje }
-            catch { self.error = CuentaPear.ErrorCuenta(codigo: "error_interno").mensaje }
+            catch is CancellationError {} catch { self.error = CuentaPear.mensajeDe(error) }
         }
     }
 }
@@ -629,6 +629,7 @@ private struct TerminosNuevosView: View {
                         Task {
                             do { try await CuentaPear.shared.aceptarTerminos(); dismiss() }
                             catch let e as CuentaPear.ErrorCuenta { error = e.mensaje }
+                            catch is CancellationError {} catch { self.error = CuentaPear.mensajeDe(error) }
                         }
                     }
                     .buttonStyle(PillButtonStyle(prominent: true)).listRowBackground(Color.clear).listRowInsets(EdgeInsets())
@@ -732,7 +733,7 @@ struct DispositivosView: View {
         Task {
             do { try await trabajo(); error = nil }
             catch let e as CuentaPear.ErrorCuenta { error = e.mensaje }
-            catch { self.error = CuentaPear.ErrorCuenta(codigo: "error_interno").mensaje }
+            catch is CancellationError {} catch { self.error = CuentaPear.mensajeDe(error) }
         }
     }
 }
@@ -797,6 +798,7 @@ struct BorrarCuentaView: View {
                 Task {
                     do { try await cuenta.borrar(clave: c.isEmpty ? nil : c); dismiss() }
                     catch let e as CuentaPear.ErrorCuenta { error = e.mensaje }
+                    catch is CancellationError {} catch { self.error = CuentaPear.mensajeDe(error) }
                 }
             }
             Button(L("Cancelar"), role: .cancel) {}

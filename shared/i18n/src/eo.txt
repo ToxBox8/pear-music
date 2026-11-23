@@ -1453,3 +1453,4 @@
 1453	Por ke vi rekonu vian konton en viaj telefonoj. Ĝis 40 signoj; malplena, sen nomo.
 1454	Ekzemple, Mia muziko
 1455	Nur por vi: ĝi estas ĉifrita kaj nur viaj telefonoj vidas ĝin. Ĝi ne estas uzantnomo: neniu povas serĉi vin per ĝi.
+1456	Io fiaskis en ĉi tiu telefono. Provu denove; se tio daŭras, raportu la eraron

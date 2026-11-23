@@ -59,6 +59,10 @@ jobs:
             exit 1
           }
 
+      - name: Permisos en el Info.plist
+        # DECISIONS 94: sin NSFaceIDUsageDescription, Face ID cerraba la app al pedir presencia.
+        run: scripts/comprobar-plist.sh build/Build/Products/Release-iphoneos/LibreMusic.app
+
       - name: Crear .ipa
         run: |
           VERSION="${{ inputs.version }}"

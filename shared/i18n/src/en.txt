@@ -1453,3 +1453,4 @@
 1453	So you recognise your account on your phones. Up to 40 characters; empty, no name.
 1454	For example, My music
 1455	Just for you: it's encrypted and only your phones see it. It isn't a username: nobody can search for you by it.
+1456	Something went wrong on this phone. Try again; if it keeps happening, report the problem

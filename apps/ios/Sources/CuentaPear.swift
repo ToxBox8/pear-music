@@ -74,6 +74,13 @@ final class CuentaPear: ObservableObject {
         var mensaje: String { CuentaErrores.mensaje(codigo) }
     }
 
+    /// El texto de cualquier fallo de la cuenta: un ErrorCuenta da el suyo; lo demás es del propio móvil (`error_local`,
+    /// DECISIONS 94), con su tipo en el registro y, en Jiyu Dev, debajo del aviso. Igual que `CuentaPear.mensajeDe` en Android.
+    nonisolated static func mensajeDe(_ e: Error) -> String {
+        if let c = e as? ErrorCuenta { return c.mensaje }
+        return CuentaErrores.local(e, dev: Channel.current == "dev") { Logs.w("Cuenta", $0) }
+    }
+
     // MARK: Crear la cuenta (§3, §7, §7.2)
 
     /// Lo que nace en el móvil ANTES de hablar con el servidor: R, C y el id de la cuenta. C se enseña una vez.

@@ -21,9 +21,19 @@ for c in codigos {
 }
 for c in ["sin_conexion", "bloqueado", "servidor_caido", "incidente", "version_bloque", "bloque_roto", "sin_cuenta",
           "clave_sin_cuenta", "cuenta_llena", "movil_ya_en_cuenta", "sin_borrado", "movil_no_encontrado", "clave_invalida",
-          "no_es_la_cuenta", "presencia", "nombre_invalido", "tope_altas", "qr_invalido", "qr_adelantado", "no_anadido"] {
+          "no_es_la_cuenta", "presencia", "nombre_invalido", "tope_altas", "qr_invalido", "qr_adelantado", "no_anadido", "error_local"] {
     comprobar(!CuentaErrores.mensaje(c).hasPrefix(desconocido), "«\(c)» no tiene texto propio")
 }
 comprobar(CuentaErrores.mensaje("http_418").contains("http_418"), "el que no se conoce dice cuál")
+// Lo del propio móvil (DECISIONS 94): un error que no es ErrorCuenta no puede decir «el servidor»; sólo el tipo al registro.
+struct FalloDePrueba: Error { let secreto = "no-debe-salir" }
+var registro: [String] = []
+let local = CuentaErrores.local(FalloDePrueba(), dev: false) { registro.append($0) }
+comprobar(local == CuentaErrores.mensaje("error_local"), "un fallo del móvil da error_local")
+comprobar(!local.contains("servidor"), "error_local no culpa al servidor: \(local)")
+comprobar(registro == ["error_local FalloDePrueba"], "se registra sólo el tipo: \(registro)")
+comprobar(CuentaErrores.local(FalloDePrueba(), dev: true) { _ in } == local + "\nFalloDePrueba", "en Jiyu Dev, el tipo debajo")
+let ns = CuentaErrores.tipo(NSError(domain: "LAErrorDomain", code: -6, userInfo: [NSLocalizedDescriptionKey: "dato"]))
+comprobar(ns == "LAErrorDomain -6", "un NSError da dominio y código, sin su texto: \(ns)")
 print("Errores de la cuenta: \(total - fallos)/\(total) bien")
 exit(fallos == 0 ? 0 : 1)

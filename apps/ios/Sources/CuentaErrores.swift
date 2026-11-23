@@ -52,9 +52,28 @@ enum CuentaErrores {
         case "emparejamiento_usado": return L("Este código ya se ha usado. Prueba otra vez")
         case "qr_adelantado": return L("Otro móvil ha usado este código antes que tú. En el móvil nuevo, pulsa «No coinciden» y empieza otra vez")
         case "no_anadido": return L("No se ha podido añadir este móvil")
+        // Del propio móvil (no es el servidor): cualquier error que no sea ErrorCuenta (ver `local`).
+        case "error_local": return L("Algo ha fallado en este móvil. Prueba otra vez; si sigue, informa del error")
         // Uno que esta versión no conoce: se dice cuál (sirve para un reporte), nunca «Algo ha fallado».
         // Uno que esta versión no conoce: se dice cuál (sirve para un reporte), nunca «Algo ha fallado».
         default: return L("No ha salido bien ({0}). Prueba otra vez dentro de un rato", codigo)
         }
+    }
+
+    /// El tipo del error, sin su mensaje (el mensaje puede llevar datos). Un NSError, con su dominio y su código.
+    static func tipo(_ e: Error) -> String {
+        let t = String(describing: type(of: e))
+        if t == "NSError" || t.hasPrefix("__") { let n = e as NSError; return "\(n.domain) \(n.code)" } // i18n: no
+        return t
+    }
+
+    /// Un error que no es ErrorCuenta es del propio móvil (DECISIONS 94): `error_local`, nunca «el servidor». Se
+    /// registra sólo el tipo y, en Jiyu Dev, se enseña debajo del aviso. Lo llama `CuentaPear.mensajeDe`; igual que
+    /// `CuentaPear.mensajeDe` en Android.
+    static func local(_ e: Error, dev: Bool, registrar: (String) -> Void) -> String {
+        let t = tipo(e)
+        registrar("error_local \(t)") // i18n: no
+        let m = mensaje("error_local")
+        return dev ? m + "\n" + t : m
     }
 }

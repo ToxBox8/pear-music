@@ -1453,3 +1453,4 @@ Nombre de la cuenta
 Para que reconozcas tu cuenta en tus móviles. Hasta 40 caracteres; vacío, sin nombre.
 Por ejemplo, Mi música
 Sólo para ti: va cifrado y sólo lo ven tus móviles. No es un nombre de usuario: nadie te puede buscar por él.
+Algo ha fallado en este móvil. Prueba otra vez; si sigue, informa del error

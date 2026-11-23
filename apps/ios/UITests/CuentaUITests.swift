@@ -21,6 +21,10 @@ final class CuentaUITests: XCTestCase {
         app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", text)).firstMatch
     }
     private func id(_ identifier: String) -> XCUIElement { app.descendants(matching: .any)[identifier].firstMatch }
+    /// Baja hasta que salga (el `Form` no crea las filas que no se ven: «Tu clave» es más alta desde la orden 11).
+    private func bajarHasta(_ e: XCUIElement) {
+        for _ in 0..<6 where !e.exists || !e.isHittable { app.swipeUp() }
+    }
     private func shot(_ name: String) {
         try? XCUIScreen.main.screenshot().pngRepresentation
             .write(to: Self.out.appendingPathComponent("\(self.name.filter { $0.isLetter || $0.isNumber })-\(name).png"))
@@ -60,11 +64,13 @@ final class CuentaUITests: XCTestCase {
     /// §3: se confirma un grupo de 4; si se equivoca, otro grupo al azar (sin llamar al servidor).
     func testConfirmarUnGrupoEquivocado() {
         launch("58_cuenta_tu_clave", ready: "Tu clave de recuperación")
+        bajarHasta(app.buttons["botonClave"])
         app.buttons["botonClave"].tap()
         let grupo = id("campoGrupo")
         XCTAssertTrue(grupo.waitForExistence(timeout: 5))
         grupo.tap()
         grupo.typeText("UUUU") // la U no está en el alfabeto: nunca es un grupo
+        bajarHasta(app.buttons["botonClave"])
         app.buttons["botonClave"].tap()
         XCTAssertTrue(any("No es ese grupo").waitForExistence(timeout: 5))
         shot("grupo-equivocado")
@@ -124,6 +130,7 @@ final class CuentaUITests: XCTestCase {
         launch("58_cuenta_tu_clave", ready: "Tu clave de recuperación")
         XCTAssertTrue(any("Lo redondo es siempre un cero").waitForExistence(timeout: 5))
         XCTAssertTrue(any("Grupo 1:").exists, "Cada grupo con su número para VoiceOver")
+        bajarHasta(app.buttons["botonClave"])
         app.buttons["botonClave"].tap()
         XCTAssertTrue(any("Un grupo son los 4 caracteres").waitForExistence(timeout: 5))
         shot("grupo-marcado")

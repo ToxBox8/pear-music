@@ -1453,3 +1453,4 @@
 1453	Zure kontua zure mugikorretan ezagutzeko. 40 karaktere gehienez; hutsik, izenik gabe.
 1454	Adibidez, Nire musika
 1455	Zuretzat bakarrik: zifratuta doa eta zure mugikorrek bakarrik ikusten dute. Ez da erabiltzaile-izena: inork ezin zaitu horrekin bilatu.
+1456	Zerbaitek huts egin du mugikor honetan. Saiatu berriro; jarraitzen badu, jakinarazi errorea

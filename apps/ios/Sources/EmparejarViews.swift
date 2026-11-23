@@ -86,7 +86,7 @@ private struct AvisoQr: View {
 }
 
 private func mensaje(_ e: Error) -> String {
-    (e as? CuentaPear.ErrorCuenta)?.mensaje ?? CuentaPear.ErrorCuenta(codigo: "error_interno").mensaje
+    CuentaPear.mensajeDe(e)
 }
 
 // MARK: Móvil nuevo: «Entrar desde otro móvil»
@@ -187,7 +187,7 @@ struct QrNuevoView: View {
         aceptando = true
         Task {
             defer { aceptando = false }
-            do { try await CuentaPear.shared.aceptarQr(q, r); dismiss() } catch { paso = .error(mensaje(error)) }
+            do { try await CuentaPear.shared.aceptarQr(q, r); dismiss() } catch is CancellationError {} catch { paso = .error(mensaje(error)) }
         }
     }
 }
@@ -275,6 +275,7 @@ struct AnadirMovilView: View {
             do {
                 let l = try await CuentaPear.shared.leerQrDeOtro(texto)
                 leido = l; nombre = l.qr.nombre; paso = .confirmar
+            } catch is CancellationError {
             } catch { paso = .error(mensaje(error)) }
         }
         return true
@@ -287,6 +288,7 @@ struct AnadirMovilView: View {
             defer { completando = false }
             do { emojis = try await CuentaPear.shared.completarQr(l); paso = .emojis }
             catch let e as CuentaPear.ErrorCuenta where e.codigo == "presencia" { aviso = e.mensaje }
+            catch is CancellationError {}
             catch { paso = .error(mensaje(error)) }
         }
     }

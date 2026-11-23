@@ -41,6 +41,8 @@ targets:
         # Para que el aviso de versión nueva pueda abrir AltStore o SideStore (Updates.swift).
         LSApplicationQueriesSchemes: [altstore, sidestore]
         NSCameraUsageDescription: Jiyu Pulse usa la cámara para escanear el código QR de un Jam o de un móvil nuevo de tu cuenta.
+        # Presencia de la cuenta (CuentaPear.presencia, evaluatePolicy): sin ella, Face ID cierra la app (DECISIONS 94).
+        NSFaceIDUsageDescription: Jiyu Pulse usa Face ID para confirmar que eres tú antes de cambiar tu cuenta.
         CFBundleURLTypes:
           - CFBundleURLName: com.example.libremusic
             CFBundleURLSchemes: [libremusic]

@@ -3,7 +3,8 @@
 # comparación de versiones del aviso de versión nueva) y library.json con carpetas (LibraryModel.swift, con los casos
 # comunes de shared/library/) y artistas seguidos con la mezcla de Novedades (LibraryModel.swift y ReleasesModel.swift).
 # Y las carpetas y sus órdenes entre dos móviles con la sync (SyncCarpetasTests: LibraryFile + SyncModel), y un texto
-# por cada código de error de la cuenta (ErroresCuentaTests: CuentaErrores con docs/spec/cuenta.md §7.1).
+# por cada código de error de la cuenta (ErroresCuentaTests: CuentaErrores con docs/spec/cuenta.md §7.1; también
+# error_local). Y que el Info.plist de project.yml lleva el texto de cada permiso que usa el código (comprobar-plist.sh).
 # Mismo requisito que check-linux.sh.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -54,3 +55,9 @@ mkdir "$OUT/estado-sync"
 cp scripts/tests/EstadoSyncTests.swift "$OUT/estado-sync/main.swift"
 "$SWIFT" -o "$OUT/estado-sync/tests" Sources/SyncVista.swift Sources/I18n.swift "$OUT/estado-sync/main.swift"
 "$OUT/estado-sync/tests"
+
+# Los permisos del Info.plist (DECISIONS 94), con el de project.yml (en la CI, el del .app compilado, ios.yml).
+if python3 -c 'import yaml' 2>/dev/null; then
+  python3 -c 'import yaml,plistlib,sys; plistlib.dump(yaml.safe_load(open("project.yml"))["targets"]["LibreMusic"]["info"]["properties"], open(sys.argv[1],"wb"))' "$OUT/Info.plist"
+  scripts/comprobar-plist.sh "$OUT/Info.plist"
+else echo "Sin PyYAML: los permisos del Info.plist se comprueban sólo en la CI"; fi
