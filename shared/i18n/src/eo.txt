@@ -1454,3 +1454,6 @@
 1454	Ekzemple, Mia muziko
 1455	Nur por vi: ĝi estas ĉifrita kaj nur viaj telefonoj vidas ĝin. Ĝi ne estas uzantnomo: neniu povas serĉi vin per ĝi.
 1456	Io fiaskis en ĉi tiu telefono. Provu denove; se tio daŭras, raportu la eraron
+1457	En Hispanio tio foje okazas dum futbalaj matĉoj. Ĝi reprovos per si mem.
+1458	Provi poste
+1459	Ne eblas atingi la servilon

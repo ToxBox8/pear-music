@@ -219,6 +219,15 @@ struct SettingsView: View {
                 // La fila de la sincronización siempre igual en la captura 67: «Sincronizado hace 2 min» (como Android).
                 CuentaView().onAppear { SyncBiblioteca.shared.vistaDePrueba(VistaSync(ultimaOk: Date().timeIntervalSince1970 * 1000 - 120_000)) }
             }
+            .demoRoute(.cuentaBloqueado) {
+                // Modo fútbol (Pulir 2 #2), como la captura 69 de Android.
+                CuentaView().onAppear {
+                    let ahora = Date().timeIntervalSince1970 * 1000
+                    var v = VistaSync(ultimaOk: ahora - 40 * 60_000, pendiente: true, sinRed: true)
+                    v.bloqueado = true; v.reintentoEn = ahora + 4 * 60_000
+                    SyncBiblioteca.shared.vistaDePrueba(v)
+                }
+            }
             .demoRoute(.cuentaComprobar) { ComprobarClaveView() }
             .demoRoute(.cuentaBorrar) { BorrarCuentaView() }
             .demoRoute(.cuentaQr) { QrNuevoView(prueba: .qr) }

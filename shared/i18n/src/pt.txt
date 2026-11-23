@@ -1454,3 +1454,6 @@
 1454	Por exemplo, A minha música
 1455	Só para ti: vai cifrado e só os teus telemóveis o veem. Não é um nome de utilizador: ninguém te pode procurar por ele.
 1456	Algo correu mal neste telemóvel. Tenta outra vez; se continuar, comunica o erro
+1457	Em Espanha acontece às vezes durante os jogos de futebol. Vai tentar de novo sozinha.
+1458	Tentar mais tarde
+1459	Não é possível chegar ao servidor

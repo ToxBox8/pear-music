@@ -120,6 +120,8 @@ final class CuentaUITests: XCTestCase {
         XCTAssertTrue(fila.waitForExistence(timeout: 5))
         XCTAssertTrue(any("Sincronizado hace 2 min").exists, "PULIR #4: la fila del estado de la sincronización")
         XCTAssertTrue(id("nombreCuenta").exists, "PULIR #6: la fila del nombre de la cuenta")
+        XCTAssertTrue(id("comprobarAhora").exists, "Pulir 2 #3: «Comprobar ahora» en la fila de la sincronización")
+        XCTAssertTrue(any("Comprobar ahora").isHittable, "Pulir 2 #3: se ve y se puede tocar")
         shot("con-cuenta")
         fila.tap()
         XCTAssertTrue(app.navigationBars["Añadir un móvil"].waitForExistence(timeout: 5), "Tiene que abrir «Añadir un móvil»")

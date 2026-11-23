@@ -9,7 +9,7 @@ enum Demo {
     enum Tab: String { case home, reels, library, settings }
     enum Route { case favorites, themePicker, artist, downloads, playlists, folder, artists, manage, badges,
                  cuenta, cuentaCrear, cuentaClave, cuentaEntrar, cuentaDispositivos, cuentaComprobar, cuentaBorrar,
-                 cuentaQr, cuentaQrEmojis, cuentaAnadir, cuentaAnadirEmojis, cuentaConectada, cuentaSincronizado }
+                 cuentaQr, cuentaQrEmojis, cuentaAnadir, cuentaAnadirEmojis, cuentaConectada, cuentaSincronizado, cuentaBloqueado }
 
     struct Scenario {
         var theme: AppTheme = .glass
@@ -105,7 +105,11 @@ enum Demo {
         // Pulir el bloque 2: Ajustes › Cuenta con la cuenta puesta («Añadir un móvil», el estado de la sincronización).
         "67_cuenta_conectada": Scenario(tab: .settings, route: .cuentaConectada),
         // PULIR #5: «Lo que se sincroniza» con la biblioteca de ejemplo.
-        "68_cuenta_sincronizado": Scenario(tab: .settings, route: .cuentaSincronizado),
+        // Pulir 2 #1: con carpetas y seguidos, cada fila con su imagen, en claro y en oscuro.
+        "68_cuenta_sincronizado": Scenario(tab: .settings, route: .cuentaSincronizado, folders: true, followed: true),
+        "68_cuenta_sincronizado_oscuro": Scenario(appearance: "dark", tab: .settings, route: .cuentaSincronizado, folders: true, followed: true),
+        // Pulir 2 #2, modo fútbol: la cápsula y la fila dicen por qué no se llega al servidor.
+        "69_cuenta_bloqueado": Scenario(tab: .settings, route: .cuentaBloqueado),
         // Sólo tests de interfaz (BibliotecaUITests): Playlists con 24 playlists más, para el desplazamiento al borde.
         "ui_muchas_playlists": Scenario(playing: false, tab: .library, route: .playlists, manyPlaylists: true),
         // Sólo tests de interfaz: la Biblioteca con «Reducir movimiento», para ver que en «Ordenar» nada tiembla.

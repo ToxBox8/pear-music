@@ -61,6 +61,31 @@ final class SyncBiblioteca: ObservableObject {
     @Published private(set) var vista = VistaSync()
     private func fase(_ f: FaseSync) { vista.fase = f }
     private func alAcabar() { vista.fase = .quieta; vista.pendiente = estado.pendiente; vista.ultimaOk = estado.ultimaOk ?? 0 }
+    // MARK: Modo fútbol (Pulir 2 #2)
+    private var reintento: Task<Void, Never>?
+    private var intentosBloqueado = 0
+    /// Tras un intento fallido con `codigo`: con `bloqueado`, la vista lo explica y se programa el siguiente intento.
+    func alFallar(_ codigo: String?, ahora: Double = Date().timeIntervalSince1970 * 1000) {
+        guard codigo == "bloqueado" else {
+            reintento?.cancel(); intentosBloqueado = 0
+            vista.sinRed = codigo == "sin_conexion"; vista.bloqueado = false; vista.reintentoEn = 0
+            return
+        }
+        let espera = VistaSync.esperaBloqueado(intentosBloqueado)
+        intentosBloqueado += 1
+        vista.sinRed = true; vista.bloqueado = true; vista.reintentoEn = ahora + espera
+        reintento?.cancel()
+        reintento = Task { [weak self] in
+            try? await Task.sleep(nanoseconds: UInt64(espera * 1_000_000))
+            guard !Task.isCancelled else { return }
+            await self?.sincronizar(); await self?.sincronizarEstadisticas()
+        }
+    }
+    private func alSalirBien() {
+        reintento?.cancel(); reintento = nil; intentosBloqueado = 0
+        vista.sinRed = false; vista.bloqueado = false; vista.reintentoEn = 0
+    }
+
     /// Sólo capturas (`-screenshotScenario`): un estado fijo, como `vistaDePrueba` en Android.
     func vistaDePrueba(_ v: VistaSync) { vista = v }
 
@@ -117,6 +142,7 @@ final class SyncBiblioteca: ObservableObject {
     func olvidar() {
         espera?.cancel()
         esperaEst?.cancel(); esperaEst = nil
+        reintento?.cancel(); reintento = nil; intentosBloqueado = 0
         estado = Estado()
         try? FileManager.default.removeItem(at: Self.archivo)
         vista = VistaSync()
@@ -133,8 +159,10 @@ final class SyncBiblioteca: ObservableObject {
         estado.pendiente = true
         vista.pendiente = true
         espera?.cancel()
+        // Con el servidor bloqueado no se adelanta al reintento: el cambio espera, pendiente, a que toque (Pulir 2 #2).
+        let tras = Swift.max(30_000, vista.reintentoEn - Date().timeIntervalSince1970 * 1000)
         espera = Task { [weak self] in
-            try? await Task.sleep(nanoseconds: 30_000_000_000)
+            try? await Task.sleep(nanoseconds: UInt64(tras * 1_000_000))
             guard !Task.isCancelled else { return }
             await self?.sincronizar()
         }
@@ -149,7 +177,7 @@ final class SyncBiblioteca: ObservableObject {
 
     /// Al abrir y al volver a primer plano: bajar si hace más de 5 min (o si quedó algo pendiente).
     func alAbrir() {
-        guard CuentaPear.shared.tieneCuenta else { return }
+        guard CuentaPear.shared.tieneCuenta, vista.puedeIntentar() else { return }
         if estado.pendiente || estado.pendienteEst || Date().timeIntervalSince1970 - estado.ultimaBajada > 300 {
             Task { await sincronizar(); await sincronizarEstadisticas() }
         }
@@ -172,7 +200,7 @@ final class SyncBiblioteca: ObservableObject {
 
     /// Al ir a segundo plano con algo pendiente: se sube ya (con el tiempo que da el sistema; nunca programado).
     func alSegundoPlano() {
-        guard CuentaPear.shared.tieneCuenta, estado.pendiente || estado.pendienteEst else { return }
+        guard CuentaPear.shared.tieneCuenta, vista.puedeIntentar(), estado.pendiente || estado.pendienteEst else { return }
         espera?.cancel()
         esperaEst?.cancel(); esperaEst = nil
         var tarea = UIBackgroundTaskIdentifier.invalid
@@ -239,7 +267,7 @@ final class SyncBiblioteca: ObservableObject {
                 estado.previo = resultado
                 estado.pendiente = false
                 estado.ultimaOk = Date().timeIntervalSince1970 * 1000
-                vista.sinRed = false
+                alSalirBien()
                 if !SyncModel.mismoContenido(SyncModel.quitarSoloAqui(resultado, claves) ?? resultado, m.lib) {
                     try? library.adoptarSync(SyncModel.ponerSoloAqui(resultado, entera, claves).datos())
                     vista.traido = Date().timeIntervalSince1970 * 1000
@@ -251,7 +279,7 @@ final class SyncBiblioteca: ObservableObject {
         } catch {
             estado.pendiente = true // sin red, 5xx, términos…: se reintenta al volver o al abrir
             let codigo = (error as? CuentaPear.ErrorCuenta)?.codigo
-            vista.sinRed = codigo == "sin_conexion" || codigo == "bloqueado"
+            alFallar(codigo)
             Logs.w("Sync", "biblioteca pendiente: \(codigo ?? "error")") // sin datos
         }
     }

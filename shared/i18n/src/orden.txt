@@ -1454,3 +1454,6 @@ Para que reconozcas tu cuenta en tus móviles. Hasta 40 caracteres; vacío, sin 
 Por ejemplo, Mi música
 Sólo para ti: va cifrado y sólo lo ven tus móviles. No es un nombre de usuario: nadie te puede buscar por él.
 Algo ha fallado en este móvil. Prueba otra vez; si sigue, informa del error
+En España pasa a veces durante los partidos de fútbol. Se volverá a intentar sola.
+Intentar más tarde
+No se puede llegar al servidor

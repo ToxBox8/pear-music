@@ -23,10 +23,31 @@ struct VistaSync: Equatable {
     var sinRed = false
     /// Al acabar, se han puesto cambios de otro móvil: la cápsula dice «Biblioteca al día» un momento (ms).
     var traido: Double = 0
+    /// Modo fútbol (Pulir 2 #2): hay Internet pero no se llega al servidor (`bloqueado`, ADR 0004 §9; en España, a
+    /// veces, durante los partidos). No es un error: se explica y se vuelve a intentar solo en `reintentoEn` (ms).
+    var bloqueado = false
+    var reintentoEn: Double = 0
+
+    static var textoBloqueado: String { L("No se puede llegar al servidor") }
+    static var detalleBloqueado: String { L("En España pasa a veces durante los partidos de fútbol. Se volverá a intentar sola.") }
+
+    /// Cuánto esperar (ms) tras el intento `intento` (0, 1…) que ha dado `bloqueado`: 1, 2, 4, 8, 16 y luego 30 min
+    /// como mucho, ±10 % al azar (que no vuelvan todos los móviles a la vez al acabar el partido). Igual en Android.
+    static func esperaBloqueado(_ intento: Int, azar: Double = Double.random(in: 0...1)) -> Double {
+        let base = Swift.min(30.0 * 60_000, 60_000 * pow(2, Double(Swift.min(intento, 5))))
+        return (base * (0.9 + 0.2 * azar)).rounded(.down)
+    }
+
+    /// Si se puede intentar ya sin martillear: al abrir o tras un cambio no se intenta antes de `reintentoEn`.
+    func puedeIntentar(ahora: Double = Date().timeIntervalSince1970 * 1000) -> Bool { !bloqueado || ahora >= reintentoEn }
+
+    /// La segunda línea de la fila (sólo en el modo fútbol).
+    var detalle: String? { bloqueado ? VistaSync.detalleBloqueado : nil }
 
     /// El icono (SF Symbol) y el texto de la fila de Ajustes › Cuenta.
     func estado(ahora: Double = Date().timeIntervalSince1970 * 1000) -> (icono: String, texto: String) {
         if fase != .quieta { return ("arrow.triangle.2.circlepath", fase.texto) }
+        if bloqueado { return ("icloud.slash", VistaSync.textoBloqueado) }
         if sinRed { return ("icloud.slash", L("Sin conexión: se subirá luego")) }
         if pendiente { return ("icloud.and.arrow.up", L("Pendiente de subir")) }
         if ultimaOk > 0 { return ("checkmark.icloud", L("Sincronizado {0}", VistaSync.haceCuanto(ultimaOk, ahora))) }

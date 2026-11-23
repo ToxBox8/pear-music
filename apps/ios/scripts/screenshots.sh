@@ -17,7 +17,7 @@ SCENARIOS=(
   53_tu_musica_ordenar 54_playlists_ordenar 55_playlists_ordenar_oscuro
   56_cuenta_sin_crear 57_cuenta_crear 58_cuenta_tu_clave 58_cuenta_tu_clave_oscuro 59_cuenta_entrar
   60_cuenta_dispositivos 61_cuenta_comprobar 62_cuenta_borrar
-  63_cuenta_qr 64_cuenta_qr_emojis 65_cuenta_anadir 66_cuenta_anadir_emojis 67_cuenta_conectada 68_cuenta_sincronizado
+  63_cuenta_qr 64_cuenta_qr_emojis 65_cuenta_anadir 66_cuenta_anadir_emojis 67_cuenta_conectada 68_cuenta_sincronizado 68_cuenta_sincronizado_oscuro 69_cuenta_bloqueado
 )
 # DEMO=1: las del tráiler v2 con el catálogo del patrocinador (Sources/DemoCatalog.swift; sólo en Debug y Jiyu Dev).
 # En castellano, como ScreenshotTest de Android: la app usa `language` (UserDefaults) o el idioma del sistema, y el

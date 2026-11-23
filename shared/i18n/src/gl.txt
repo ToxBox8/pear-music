@@ -1454,3 +1454,6 @@
 1454	Por exemplo, A miña música
 1455	Só para ti: vai cifrado e só o ven os teus móbiles. Non é un nome de usuario: ninguén te pode buscar por el.
 1456	Algo fallou neste móbil. Proba outra vez; se segue, informa do erro
+1457	En España pasa ás veces durante os partidos de fútbol. Volverase intentar soa.
+1458	Tentalo máis tarde
+1459	Non se pode chegar ao servidor

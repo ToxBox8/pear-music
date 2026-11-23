@@ -129,8 +129,32 @@ struct AvisoSync: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var texto: String?
     @State private var girando = false
+    /// Modo fútbol (Pulir 2 #2): «Intentar más tarde» la cierra hasta que se llegue al servidor y se vuelva a perder.
+    @State private var cerrado = false
     var body: some View {
         VStack {
+            if sync.vista.bloqueado && !cerrado && texto == nil {
+                VStack(alignment: .trailing, spacing: 0) {
+                    HStack(alignment: .firstTextBaseline, spacing: 10) {
+                        Image(systemName: "icloud.slash").foregroundStyle(.secondary)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(VistaSync.textoBloqueado).font(.subheadline.weight(.semibold))
+                            Text(VistaSync.detalleBloqueado).font(.subheadline).foregroundStyle(.secondary)
+                        }
+                        Spacer(minLength: 0)
+                    }
+                    .accessibilityElement(children: .combine)
+                    Button(L("Intentar más tarde")) { cerrado = true }
+                        .font(.subheadline.weight(.semibold)).foregroundStyle(.tint)
+                        .frame(minHeight: 44).padding(.horizontal, 8)
+                        .accessibilityIdentifier("intentarMasTarde")
+                }
+                .padding(.leading, 16).padding(.trailing, 8).padding(.top, 12)
+                .background(.thickMaterial, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+                .padding(.horizontal, 16)
+                .transition(.opacity)
+                .accessibilityIdentifier("avisoSyncBloqueado")
+            }
             if let texto {
                 HStack(spacing: 10) {
                     if girando && !reduceMotion { ProgressView().controlSize(.small) }
@@ -143,12 +167,14 @@ struct AvisoSync: View {
                 .accessibilityElement(children: .combine)
                 .accessibilityAddTraits(.updatesFrequently)
                 .accessibilityIdentifier("avisoSync")
+                .allowsHitTesting(false)
             }
             Spacer()
         }
         .padding(.top, 8)
-        .allowsHitTesting(false)
         .animation(.timingCurve(0.23, 1, 0.32, 1, duration: 0.25), value: texto)
+        .animation(.timingCurve(0.23, 1, 0.32, 1, duration: 0.25), value: sync.vista.bloqueado && !cerrado)
+        .onChange(of: sync.vista.bloqueado) { b in if !b { cerrado = false } }
         .task(id: sync.vista.fase) {
             let f = sync.vista.fase
             if f == .quieta { if girando { texto = nil; girando = false }; return }
@@ -164,6 +190,30 @@ struct AvisoSync: View {
             try? await Task.sleep(nanoseconds: 2_000_000_000)
             if !girando { texto = nil }
         }
+    }
+}
+
+/// Pulir 2 #3: «Comprobar ahora» de la fila de la sincronización, cápsula `systemFill` con el texto en `.tint` (no
+/// cuenta como shu). Mientras comprueba, «Comprobando…» con la rueda (sin ella con «Reducir movimiento») y no se toca.
+/// Igual que `BotonComprobar` en Android.
+struct BotonComprobar: View {
+    let comprobando: Bool
+    let alTocar: () -> Void
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    var body: some View {
+        Button(action: alTocar) {
+            HStack(spacing: 6) {
+                if comprobando && !reduceMotion { ProgressView().controlSize(.mini) }
+                Text(comprobando ? L("Comprobando…") : L("Comprobar ahora"))
+                    .font(.subheadline.weight(.semibold)).lineLimit(1)
+                    .foregroundStyle(comprobando ? AnyShapeStyle(Color(uiColor: .secondaryLabel)) : AnyShapeStyle(.tint))
+            }
+            .padding(.horizontal, 14).frame(minHeight: 44)
+            .background(Color(uiColor: .systemFill), in: Capsule())
+        }
+        .buttonStyle(.plain)
+        .disabled(comprobando)
+        .accessibilityIdentifier("comprobarAhora")
     }
 }
 
@@ -199,7 +249,14 @@ struct SincronizadoView: View {
             }
         }
     }
-    struct Elemento: Identifiable, Equatable { let clave: String, nombre: String, tipo: Tipo, detalle: String?; var id: String { clave } }
+    /// La carpeta, playlist, canción o artista de la biblioteca, para dibujar su imagen (Pulir 2 #1).
+    enum Cosa { case carpeta(PlaylistFolder), playlist(Playlist), cancion(Song), artista(FollowedArtist) }
+    struct Elemento: Identifiable, Equatable {
+        let clave: String, nombre: String, tipo: Tipo, detalle: String?
+        var cosa: Cosa? = nil
+        var id: String { clave }
+        static func == (a: Elemento, b: Elemento) -> Bool { a.clave == b.clave && a.nombre == b.nombre && a.detalle == b.detalle }
+    }
 
     private var enteras: Set<String> {
         let lib = try? JV.leer(library.exportData(covers: false))
@@ -213,19 +270,19 @@ struct SincronizadoView: View {
                      texto: L("Esto viaja cifrado entre tus móviles. Toca algo para dejarlo sólo en este móvil o para quitarlo de todos."))
             seccion(L("Carpetas"), library.folders.map { f in
                 Elemento(clave: "folder:\(f.id)", nombre: f.name, tipo: .carpeta,
-                         detalle: PlaylistFolders.path(f.id, in: library.folders).dropLast().map(\.name).joined(separator: " › ").nilSiVacio)
+                         detalle: PlaylistFolders.path(f.id, in: library.folders).dropLast().map(\.name).joined(separator: " › ").nilSiVacio, cosa: .carpeta(f))
             }, vacio: L("No tienes carpetas."), enteras: enteras)
             seccion(L("Playlists"), library.userPlaylists.map {
-                Elemento(clave: "playlist:\($0.id.uuidString)", nombre: $0.name, tipo: .playlist, detalle: L("{0} canciones", String($0.songs.count)))
+                Elemento(clave: "playlist:\($0.id.uuidString)", nombre: $0.name, tipo: .playlist, detalle: L("{0} canciones", String($0.songs.count)), cosa: .playlist($0))
             }, vacio: L("No tienes playlists."), enteras: enteras)
             seccion(L("Álbumes"), library.albums.map {
-                Elemento(clave: "playlist:\($0.id.uuidString)", nombre: $0.name, tipo: .album, detalle: $0.album?.artist)
+                Elemento(clave: "playlist:\($0.id.uuidString)", nombre: $0.name, tipo: .album, detalle: $0.album?.artist, cosa: .playlist($0))
             }, vacio: L("No tienes álbumes guardados."), enteras: enteras)
             seccion(L("Favoritas"), library.favorites.map {
-                Elemento(clave: "favorite:\($0.id)", nombre: $0.title, tipo: .favorita, detalle: $0.artist.nilSiVacio)
+                Elemento(clave: "favorite:\($0.id)", nombre: $0.title, tipo: .favorita, detalle: $0.artist.nilSiVacio, cosa: .cancion($0))
             }, vacio: L("No tienes favoritas."), enteras: enteras, tope: verTodas ? .max : 30)
             seccion(L("Artistas que sigues"), library.followedArtists.map {
-                Elemento(clave: "artist:\($0.browseId)", nombre: $0.name, tipo: .artista, detalle: nil)
+                Elemento(clave: "artist:\($0.browseId)", nombre: $0.name, tipo: .artista, detalle: nil, cosa: .artista($0))
             }, vacio: L("No sigues a ningún artista."), enteras: enteras)
         }
         .navigationTitle(L("Lo que se sincroniza")).navigationBarTitleDisplayMode(.inline)
@@ -259,7 +316,7 @@ struct SincronizadoView: View {
             ForEach(elementos.prefix(tope)) { e in
                 Button { elegido = e } label: {
                     HStack(spacing: 12) {
-                        Image(systemName: e.tipo.icono).foregroundStyle(Color(uiColor: .secondaryLabel)).frame(width: 28)
+                        portada(e)
                         VStack(alignment: .leading, spacing: 2) {
                             Text(e.nombre).foregroundStyle(Color(uiColor: .label))
                             let sub = sync.soloAqui.contains(e.clave) ? L("Sólo en este móvil")
@@ -275,6 +332,28 @@ struct SincronizadoView: View {
             }
             if elementos.count > tope { Button(L("Ver las {0}", String(elementos.count))) { verTodas = true } }
         } header: { Text(titulo) } footer: { if elementos.isEmpty { Text(vacio) } }
+    }
+
+    /// Pulir 2 #1: la imagen de cada fila, con los mismos componentes que la Biblioteca: la carpeta con su mosaico o su
+    /// icono (`FolderCover`), la playlist y el álbum con su portada, su icono y color o su carátula (`PlaylistCover`), la
+    /// favorita con su carátula y el artista con su foto, redonda como en Artistas › Siguiendo (sin foto, su silueta).
+    /// Igual que `Portada` en Android.
+    @ViewBuilder
+    private func portada(_ e: Elemento) -> some View {
+        let lado: CGFloat = 44
+        let forma = RoundedRectangle(cornerRadius: Tokens.Radius.artworkSmall, style: .continuous)
+        switch e.cosa {
+        case .carpeta(let f): FolderCover(folder: f).frame(width: lado, height: lado)
+        case .playlist(let p): PlaylistCover(playlist: p, size: lado, radius: Tokens.Radius.artworkSmall)
+        case .cancion(let c): CoverImage(url: c.thumb(132)).frame(width: lado, height: lado).clipShape(forma)
+        case .artista(let a):
+            if let t = a.thumbnail { CoverImage(url: t).frame(width: lado, height: lado).clipShape(Circle()) }
+            else {
+                Circle().fill(Color(uiColor: .systemFill)).frame(width: lado, height: lado)
+                    .overlay(Image(systemName: "person.fill").foregroundStyle(Color(uiColor: .secondaryLabel)))
+            }
+        case nil: Image(systemName: e.tipo.icono).foregroundStyle(Color(uiColor: .secondaryLabel)).frame(width: lado)
+        }
     }
 
     private func quitar(_ e: Elemento) {
@@ -558,18 +637,26 @@ private struct CuentaConectada: View {
                 }
                 .accessibilityIdentifier("nombreCuenta")
             } footer: { Text(L("Sólo para ti: va cifrado y sólo lo ven tus móviles. No es un nombre de usuario: nadie te puede buscar por él.")) }
-            // PULIR #4: cómo va la sincronización; tocar la fila sincroniza ya. Igual en Android.
+            // PULIR #4: cómo va la sincronización. Pulir 2 #3: con «Comprobar ahora» a la derecha, para que se vea que se
+            // toca (toda la fila hace lo mismo). Cápsula neutra, no shu. Igual en Android.
             Section {
                 let e = sync.vista.estado()
-                Button { sync.alEntrar() } label: {
-                    HStack {
-                        Label(e.texto, systemImage: e.icono).foregroundStyle(Color(uiColor: .label))
+                let comprobando = sync.vista.fase != .quieta
+                // Sin envolver en otro Button: en un Form, un botón dentro de otro se lleva el toque de la fila entera.
+                HStack(spacing: 8) {
+                        Label {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(e.texto).foregroundStyle(Color(uiColor: .label))
+                                if let d = sync.vista.detalle { Text(d).font(.footnote).foregroundStyle(Color(uiColor: .secondaryLabel)) }
+                            }
+                        } icon: { Image(systemName: e.icono).foregroundStyle(Color(uiColor: .label)) }
                         Spacer(minLength: 0)
-                        if sync.vista.fase != .quieta && !reduceMotion { ProgressView() }
-                    }
+                        BotonComprobar(comprobando: comprobando) { sync.alEntrar() }
                 }
+                .contentShape(Rectangle())
+                .onTapGesture { if !comprobando { sync.alEntrar() } }
                 .accessibilityIdentifier("estadoSync")
-            } footer: { Text(L("Toca para sincronizar ahora.")) }
+            }
             // PULIR #2: «Añadir un móvil» también aquí, no sólo dentro de Dispositivos (no se encontraba).
             Section {
                 NavigationLink(destination: AnadirMovilView()) { Label(L("Añadir un móvil"), systemImage: "qrcode.viewfinder") }

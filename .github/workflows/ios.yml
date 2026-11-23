@@ -84,7 +84,7 @@ jobs:
   uitests:
     if: inputs.version == ''
     runs-on: macos-latest
-    timeout-minutes: 40
+    timeout-minutes: 60 # 40 se quedaba corto: Biblioteca sola tarda ~27 min (Pulir 2 #5)
     defaults:
       run:
         working-directory: apps/ios

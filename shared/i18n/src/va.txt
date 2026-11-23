@@ -1454,3 +1454,6 @@
 1454	Per exemple, La meua música
 1455	Només per a tu: va xifrat i només el veuen els teus mòbils. No és un nom d'usuari: ningú no et pot buscar per ell.
 1456	Alguna cosa ha fallat en este mòbil. Torna-ho a provar; si continua, informa de l'error
+1457	A Espanya passa de vegades durant els partits de futbol. Es tornarà a provar tota sola.
+1458	Provar-ho més tard
+1459	No es pot arribar al servidor

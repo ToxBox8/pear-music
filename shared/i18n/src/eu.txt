@@ -1454,3 +1454,6 @@
 1454	Adibidez, Nire musika
 1455	Zuretzat bakarrik: zifratuta doa eta zure mugikorrek bakarrik ikusten dute. Ez da erabiltzaile-izena: inork ezin zaitu horrekin bilatu.
 1456	Zerbaitek huts egin du mugikor honetan. Saiatu berriro; jarraitzen badu, jakinarazi errorea
+1457	Espainian batzuetan gertatzen da futbol partidetan. Berriro saiatuko da bere kabuz.
+1458	Saiatu geroago
+1459	Ezin da zerbitzarira iritsi
