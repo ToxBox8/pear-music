@@ -62,27 +62,23 @@ final class SyncBiblioteca: ObservableObject {
     private func fase(_ f: FaseSync) { vista.fase = f }
     private func alAcabar() { vista.fase = .quieta; vista.pendiente = estado.pendiente; vista.ultimaOk = estado.ultimaOk ?? 0 }
     // MARK: Modo fútbol (Pulir 2 #2)
-    private var reintento: Task<Void, Never>?
+    private let reintento = ReintentoBloqueado()
     private var intentosBloqueado = 0
     /// Tras un intento fallido con `codigo`: con `bloqueado`, la vista lo explica y se programa el siguiente intento.
     func alFallar(_ codigo: String?, ahora: Double = Date().timeIntervalSince1970 * 1000) {
         guard codigo == "bloqueado" else {
-            reintento?.cancel(); intentosBloqueado = 0
+            reintento.cancelar(); intentosBloqueado = 0
             vista.sinRed = codigo == "sin_conexion"; vista.bloqueado = false; vista.reintentoEn = 0
             return
         }
         let espera = VistaSync.esperaBloqueado(intentosBloqueado)
         intentosBloqueado += 1
         vista.sinRed = true; vista.bloqueado = true; vista.reintentoEn = ahora + espera
-        reintento?.cancel()
-        reintento = Task { [weak self] in
-            try? await Task.sleep(nanoseconds: UInt64(espera * 1_000_000))
-            guard !Task.isCancelled else { return }
-            await self?.sincronizar(); await self?.sincronizarEstadisticas()
-        }
+        // Sin cancelarse a sí mismo si es el propio reintento el que vuelve a fallar (ReintentoBloqueado).
+        reintento.programar(espera: espera) { [weak self] in await self?.sincronizar(); await self?.sincronizarEstadisticas() }
     }
     private func alSalirBien() {
-        reintento?.cancel(); reintento = nil; intentosBloqueado = 0
+        reintento.cancelar(); intentosBloqueado = 0
         vista.sinRed = false; vista.bloqueado = false; vista.reintentoEn = 0
     }
 
@@ -142,7 +138,7 @@ final class SyncBiblioteca: ObservableObject {
     func olvidar() {
         espera?.cancel()
         esperaEst?.cancel(); esperaEst = nil
-        reintento?.cancel(); reintento = nil; intentosBloqueado = 0
+        reintento.cancelar(); intentosBloqueado = 0
         estado = Estado()
         try? FileManager.default.removeItem(at: Self.archivo)
         vista = VistaSync()
@@ -391,8 +387,8 @@ final class SyncBiblioteca: ObservableObject {
 
     private func avisar(_ a: SyncModel.Aviso) {
         switch a {
-        case .puestaAlDia: aviso = L("Hacía mucho que este móvil no se sincronizaba: se ha puesto al día con tu cuenta")
-        case .nubeAntigua, .nubeVacia: aviso = L("Tu biblioteca de la nube estaba incompleta: la hemos completado con la de este móvil")
+        case .puestaAlDia: aviso = L("Hacía mucho que este dispositivo no se sincronizaba: se ha puesto al día con tu cuenta")
+        case .nubeAntigua, .nubeVacia: aviso = L("Tu biblioteca de la nube estaba incompleta: la hemos completado con la de este dispositivo")
         }
     }
     func avisoVisto() { aviso = nil }

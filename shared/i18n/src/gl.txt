@@ -1457,3 +1457,93 @@
 1457	En España pasa ás veces durante os partidos de fútbol. Volverase intentar soa.
 1458	Tentalo máis tarde
 1459	Non se pode chegar ao servidor
+1460	Agora só está neste dispositivo. Se o volves sincronizar, pasará aos teus outros dispositivos.
+1461	Algo fallou neste dispositivo. Proba outra vez; se segue, informa do erro
+1462	Apunta a cámara ao código do dispositivo novo
+1463	Así o verás nos teus dispositivos. De 1 a 40 caracteres.
+1464	Engadir un dispositivo
+1465	Engadir un dispositivo á túa conta
+1466	Cambiar o nome deste dispositivo
+1467	Clave de recuperación, nome, termos e borrar a conta
+1468	Comproba que o outro dispositivo amosa o mesmo.
+1469	Coa túa clave bórrase ao momento. Sen ela, bórrase dentro de 14 días e verás o aviso en todos os teus dispositivos, por se non fuches ti.
+1470	Copia cifrada, cambiar de dispositivo e vantaxes que veñen
+1471	Código QR para engadir este dispositivo
+1472	Deixa de ser favorita aquí e nos teus outros dispositivos.
+1473	Deixas de seguilo aquí e nos teus outros dispositivos.
+1474	O nome da conta é só para ti: vai cifrado e só o ven os teus dispositivos. Non é un nome de usuario: ninguén te pode buscar por el.
+1475	O servidor non recoñece este dispositivo. Se segue pasando, entra outra vez coa túa clave
+1476	No dispositivo novo, abre Axustes › Conta › Entrar desde outro dispositivo e apunta a cámara ao seu código.
+1477	No novo, abre Jiyu Pulse, escolle «Entrar desde outro dispositivo» e escanea o código que che amosa.
+1478	No teu outro dispositivo, abre Axustes › Conta › Engadir un dispositivo e escanea este código.
+1479	Entrar desde outro dispositivo
+1480	É a chave da túa conta. Se perdes este dispositivo, con ela entras desde outro. Apúntaa en papel e gárdaa: non se pode ver outra vez nin cambiar por outra.
+1481	Escanea o código que amosa o dispositivo novo.
+1482	Escanea un código co que xa ten a túa conta.
+1483	Escríbea enteira. Compróbase neste dispositivo: non se envía a ningures.
+1484	Ese dispositivo xa non está na túa conta
+1485	Ese dispositivo xa non poderá entrar na túa conta.
+1486	Este dispositivo
+1487	Este dispositivo sairá da túa conta.
+1488	Este dispositivo xa está nunha conta
+1489	Este dispositivo xa non está na túa conta
+1490	Isto viaxa cifrado entre os teus dispositivos. Toca algo para deixalo só neste dispositivo ou para quitalo de todos.
+1491	Hai moito que este dispositivo non se sincronizaba: púxose ao día coa túa conta
+1492	Xuntando o dos teus dispositivos…
+1493	A hora do dispositivo non está ben. Ponla en automática e proba outra vez
+1494	A que apuntaches ao crear a conta.
+1495	Os dispositivos que poden entrar na túa conta. Se non recoñeces algún, quítao.
+1496	Os dous dispositivos teñen que amosar os mesmos emojis, na mesma orde.
+1497	Nada que lembrar nin que che poidan roubar. A túa biblioteca viaxa cifrada: só os teus dispositivos poden lela.
+1498	Non hai ningunha conta neste dispositivo
+1499	Non se puido engadir este dispositivo
+1500	Non uses este código e quita o dispositivo da túa conta desde o outro.
+1501	Nome do dispositivo
+1502	Opcional e de balde. Vai cifrada: nin nós podemos lela.
+1503	Outro dispositivo cambiou o mesmo á vez. Proba outra vez
+1504	Outro dispositivo usou este código antes ca ti. No dispositivo novo, toca «Non coinciden» e comeza outra vez
+1505	Para que recoñezas a túa conta nos teus dispositivos. Ata 40 caracteres; baleiro, sen nome.
+1506	Pásaa a outro dispositivo
+1507	Quitar de todos os meus dispositivos
+1508	Quitar todos os demais dispositivos
+1509	Quitar un dispositivo da túa conta
+1510	Que gañas coa conta
+1511	Engadiuse «{0}» á túa conta e xa se quitou. Non fuches ti? Revisa os teus dispositivos
+1512	Bórrase o cartafol aquí e nos teus outros dispositivos; o que ten dentro sobe un nivel. Non se pode desfacer.
+1513	Bórrase a lista aquí e nos teus outros dispositivos. Non se pode desfacer.
+1514	Bórranse a túa conta e todo o que hai na nube. O que tes nos teus dispositivos queda.
+1515	Quítase o álbum da túa biblioteca aquí e nos teus outros dispositivos.
+1516	Seguridade e conta
+1517	Se che roubaron un dispositivo: sae todo de golpe menos este. Fai falla a túa clave de recuperación.
+1518	Só neste dispositivo
+1519	Só neste dispositivo: vai co seu cartafol
+1520	Só tes este dispositivo na túa conta. Se o perdes, só poderás entrar coa túa clave de recuperación.
+1521	A túa biblioteca da nube estaba incompleta: completámola coa deste dispositivo
+1522	A túa música en todos os teus dispositivos
+1523	A túa música está igual nos teus {0} dispositivos
+1524	Os teus dispositivos
+1525	Termos e privacidade
+1526	Usar a miña clave de recuperación
+1527	Xa hai 10 dispositivos na túa conta. Quita un antes
+1528	«Non sincronizar isto» déixao só neste dispositivo (nos outros queda como está). «Quitar de todos os meus dispositivos» bórrao aquí e nos outros.
+1529	Queres quitar «{0}» de todos os teus dispositivos?
+1530	Ves o mesmo no teu outro dispositivo?
+1531	Xa tes conta noutro dispositivo?
+1532	Aberto
+1533	Pechado
+1534	Pechar a sesión neste dispositivo
+1535	Clave de recuperación, nome, termos, pechar a sesión e borrar a conta
+1536	É o teu único dispositivo
+1537	É o teu único dispositivo: só poderás volver entrar coa túa clave de recuperación.
+1538	Este dispositivo sae da túa conta. A biblioteca queda aquí, pero xa non se sincroniza. Non se borra nada.
+1539	Pechaches a sesión. A túa biblioteca segue aquí.
+1540	Para volver entrar na túa conta farache falta a clave de recuperación. Sen ela, a conta e o que hai na nube pérdense.
+1541	Podes comprobala antes en Seguridade e conta › Comprobar a miña clave.
+1542	Quitar da conta
+1543	Sairá da túa conta. A biblioteca queda aquí, sen sincronizar.
+1544	Queda só neste dispositivo; nos demais non se toca.
+1545	Se che roubaron un. Fai falta a clave de recuperación.
+1546	Os teus outros dispositivos seguen na conta e verán que este xa non está.
+1547	Pechar a sesión neste dispositivo?
+1548	Quitar «{0}» de todos os teus dispositivos?
+1549	Quitar «{0}»?

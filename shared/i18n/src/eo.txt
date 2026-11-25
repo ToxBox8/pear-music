@@ -1457,3 +1457,93 @@
 1457	En Hispanio tio foje okazas dum futbalaj matĉoj. Ĝi reprovos per si mem.
 1458	Provi poste
 1459	Ne eblas atingi la servilon
+1460	Nun ĝi estas nur en ĉi tiu aparato. Se vi denove sinkronigos ĝin, ĝi iros al viaj aliaj aparatoj.
+1461	Io fiaskis en ĉi tiu aparato. Provu denove; se tio daŭras, raportu la eraron
+1462	Celu la fotilon al la kodo de la nova aparato
+1463	Tiel vi vidos ĝin en viaj aparatoj. De 1 ĝis 40 signoj.
+1464	Aldoni aparaton
+1465	Aldoni aparaton al via konto
+1466	Ŝanĝi la nomon de ĉi tiu aparato
+1467	Restariga ŝlosilo, nomo, kondiĉoj kaj forigi la konton
+1468	Kontrolu, ke la alia aparato montras la samon.
+1469	Kun via ŝlosilo ĝi foriĝas tuj. Sen ĝi, ĝi foriĝas post 14 tagoj kaj vi vidos tion en ĉiuj viaj aparatoj, se ne estis vi.
+1470	Ĉifrita kopio, ŝanĝi aparaton kaj venontaj avantaĝoj
+1471	QR-kodo por aldoni ĉi tiun aparaton
+1472	Ĝi ne plu estas ŝatata ĉi tie kaj en viaj aliaj aparatoj.
+1473	Vi ne plu sekvas ĝin ĉi tie kaj en viaj aliaj aparatoj.
+1474	La nomo de la konto estas nur por vi: ĝi estas ĉifrita kaj nur viaj aparatoj vidas ĝin. Ĝi ne estas uzantnomo: neniu povas serĉi vin per ĝi.
+1475	La servilo ne rekonas ĉi tiun aparaton. Se tio daŭras, eniru denove per via ŝlosilo
+1476	En la nova aparato, malfermu Agordoj › Konto › Eniri de alia aparato kaj celu la fotilon al ĝia kodo.
+1477	En la nova, malfermu Jiyu Pulse, elektu «Eniri de alia aparato» kaj skanu la kodon, kiun ĝi montras al vi.
+1478	En via alia aparato, malfermu Agordoj › Konto › Aldoni aparaton kaj skanu ĉi tiun kodon.
+1479	Eniri de alia aparato
+1480	Ĝi estas la ŝlosilo de via konto. Se vi perdos ĉi tiun aparaton, per ĝi vi eniros de alia. Notu ĝin sur papero kaj gardu ĝin: oni ne povas vidi ĝin denove nek ŝanĝi ĝin per alia.
+1481	Skanu la kodon, kiun montras la nova aparato.
+1482	Skanu kodon per tiu, kiu jam havas vian konton.
+1483	Tajpu ĝin tuta. Ĝi kontroliĝas en ĉi tiu aparato: ĝi estas sendata nenien.
+1484	Tiu aparato ne plu estas en via konto
+1485	Tiu aparato ne plu povos eniri vian konton.
+1486	Ĉi tiu aparato
+1487	Ĉi tiu aparato eliros el via konto.
+1488	Ĉi tiu aparato jam estas en konto
+1489	Ĉi tiu aparato ne plu estas en via konto
+1490	Ĉi tio vojaĝas ĉifrita inter viaj aparatoj. Tuŝu ion por lasi ĝin nur en ĉi tiu aparato aŭ por forigi ĝin el ĉiuj.
+1491	Ĉi tiu aparato delonge ne sinkroniĝis: ĝi nun estas ĝisdata kun via konto
+1492	Kunigante tion de viaj aparatoj…
+1493	La horo de la aparato ne ĝustas. Agordu ĝin aŭtomata kaj provu denove
+1494	Tiu, kiun vi notis kiam vi kreis la konton.
+1495	La aparatoj, kiuj povas eniri vian konton. Se vi ne rekonas iun, forigu ĝin.
+1496	Ambaŭ aparatoj devas montri la samajn emoĝiojn, en la sama ordo.
+1497	Nenio por memori nek por ŝteli. Via biblioteko vojaĝas ĉifrita: nur viaj aparatoj povas legi ĝin.
+1498	Ne estas konto en ĉi tiu aparato
+1499	Ne eblis aldoni ĉi tiun aparaton
+1500	Ne uzu ĉi tiun kodon kaj forigu la aparaton el via konto per la alia.
+1501	Nomo de la aparato
+1502	Nedeviga kaj senpaga. Ĝi estas ĉifrita: eĉ ni ne povas legi ĝin.
+1503	Alia aparato ŝanĝis la samon samtempe. Provu denove
+1504	Alia aparato uzis ĉi tiun kodon antaŭ vi. En la nova aparato, tuŝetu «Ili ne kongruas» kaj rekomencu
+1505	Por ke vi rekonu vian konton en viaj aparatoj. Ĝis 40 signoj; malplena, sen nomo.
+1506	Transportu ĝin al alia aparato
+1507	Forigi el ĉiuj miaj aparatoj
+1508	Forigi ĉiujn aliajn aparatojn
+1509	Forigi aparaton el via konto
+1510	Kion vi gajnas per la konto
+1511	«{0}» aldoniĝis al via konto kaj jam estas forigita. Ĉu ne estis vi? Kontrolu viajn aparatojn
+1512	La dosierujo foriĝas ĉi tie kaj en viaj aliaj aparatoj; ĝia enhavo supreniras unu nivelon. Ne malfareblas.
+1513	La ludlisto foriĝas ĉi tie kaj en viaj aliaj aparatoj. Ne malfareblas.
+1514	Via konto kaj ĉio en la nubo foriĝas. Kio estas en viaj aparatoj restas.
+1515	La albumo foriĝas el via biblioteko ĉi tie kaj en viaj aliaj aparatoj.
+1516	Sekureco kaj konto
+1517	Se oni ŝtelis aparaton: ĉio krom ĉi tiu eliras samtempe. Necesas via restaŭra ŝlosilo.
+1518	Nur en ĉi tiu aparato
+1519	Nur en ĉi tiu aparato: ĝi iras kun sia dosierujo
+1520	Vi havas nur ĉi tiun aparaton en via konto. Se vi perdas ĝin, vi povos eniri nur per via restaŭra ŝlosilo.
+1521	Via biblioteko en la nubo estis nekompleta: ni kompletigis ĝin per tiu de ĉi tiu aparato
+1522	Via muziko en ĉiuj viaj aparatoj
+1523	Via muziko estas sama en viaj {0} aparatoj
+1524	Viaj aparatoj
+1525	Kondiĉoj kaj privateco
+1526	Uzi mian restarigan ŝlosilon
+1527	Jam estas 10 aparatoj en via konto. Unue forigu unu
+1528	«Ne sinkronigi ĉi tion» lasas ĝin nur en ĉi tiu aparato (en la aliaj ĝi restas same). «Forigi el ĉiuj miaj aparatoj» forigas ĝin ĉi tie kaj en la aliaj.
+1529	Ĉu forigi «{0}» el ĉiuj viaj aparatoj?
+1530	Ĉu vi vidas la samon en via alia aparato?
+1531	Ĉu vi jam havas konton en alia aparato?
+1532	Malfermita
+1533	Fermita
+1534	Elsaluti en ĉi tiu aparato
+1535	Restaŭra ŝlosilo, nomo, kondiĉoj, elsaluti kaj forigi la konton
+1536	Ĝi estas via sola aparato
+1537	Ĝi estas via sola aparato: vi povos reeniri nur per via restaŭra ŝlosilo.
+1538	Ĉi tiu aparato eliras el via konto. Via biblioteko restas ĉi tie, sed ĝi ne plu sinkroniĝas. Nenio estas forigita.
+1539	Vi elsalutis. Via biblioteko ankoraŭ estas ĉi tie.
+1540	Por reeniri vian konton vi bezonos vian restaŭran ŝlosilon. Sen ĝi, la konto kaj tio, kio estas en la nubo, perdiĝas.
+1541	Vi povas kontroli ĝin antaŭe en Sekureco kaj konto › Kontroli mian ŝlosilon.
+1542	Forigi el la konto
+1543	Ĝi eliros el via konto. Via biblioteko restas ĉi tie, sen sinkronigo.
+1544	Ĝi restas nur en ĉi tiu aparato; en la aliaj nenio ŝanĝiĝas.
+1545	Se oni ŝtelis unu. Necesas via restaŭra ŝlosilo.
+1546	Viaj aliaj aparatoj restas en la konto kaj vidos, ke ĉi tiu ne plu estas.
+1547	Ĉu elsaluti en ĉi tiu aparato?
+1548	Ĉu forigi «{0}» el ĉiuj viaj aparatoj?
+1549	Ĉu forigi «{0}»?

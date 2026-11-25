@@ -1457,3 +1457,93 @@
 1457	In Spain this sometimes happens during football matches. It'll try again on its own.
 1458	Try later
 1459	Can't reach the server
+1460	It's now only on this device. If you sync it again, it will go to your other devices.
+1461	Something went wrong on this device. Try again; if it keeps happening, report the problem
+1462	Point the camera at the new device's code
+1463	That's how you'll see it on your devices. 1 to 40 characters.
+1464	Add a device
+1465	Add a device to your account
+1466	Rename this device
+1467	Recovery key, name, terms and deleting the account
+1468	Check that the other device shows the same.
+1469	With your key it's deleted right away. Without it, it's deleted in 14 days and you'll see it on all your devices, in case it wasn't you.
+1470	Encrypted copy, switching devices and perks on the way
+1471	QR code to add this device
+1472	It stops being a favourite here and on your other devices.
+1473	You stop following them here and on your other devices.
+1474	The account name is just for you: it's encrypted and only your devices see it. It isn't a username: nobody can search for you by it.
+1475	The server doesn't recognise this device. If it keeps happening, sign in again with your key
+1476	On the new device, open Settings › Account › Sign in from another device and point the camera at its code.
+1477	On the new one, open Jiyu Pulse, choose «Sign in from another device» and scan the code it shows you.
+1478	On your other device, open Settings › Account › Add a device and scan this code.
+1479	Sign in from another device
+1480	It's the key to your account. If you lose this device, you use it to sign in from another one. Write it down on paper and keep it safe: you can't see it again or swap it for another.
+1481	Scan the code shown on the new device.
+1482	Scan a code with the one that already has your account.
+1483	Type it in full. It's checked on this device: it isn't sent anywhere.
+1484	That device is no longer in your account
+1485	That device won't be able to get into your account anymore.
+1486	This device
+1487	This device will leave your account.
+1488	This device is already in an account
+1489	This device is no longer in your account
+1490	This travels encrypted between your devices. Tap something to keep it only on this device or to remove it from all of them.
+1491	This device hadn't synced for a long time: it's now up to date with your account
+1492	Bringing your devices together…
+1493	Your device's time is wrong. Set it to automatic and try again
+1494	The one you wrote down when you created the account.
+1495	The devices that can get into your account. If you don't recognise one, remove it.
+1496	Both devices must show the same emojis, in the same order.
+1497	Nothing to remember and nothing to steal. Your library travels encrypted: only your devices can read it.
+1498	There's no account on this device
+1499	This device couldn't be added
+1500	Don't use this code, and remove the device from your account on the other one.
+1501	Device name
+1502	Optional and free. It's encrypted: not even we can read it.
+1503	Another device changed the same thing at the same time. Try again
+1504	Another device used this code before you. On the new device, tap “They don't match” and start again
+1505	So you recognise your account on your devices. Up to 40 characters; empty, no name.
+1506	Move it to another device
+1507	Remove from all my devices
+1508	Remove all other devices
+1509	Remove a device from your account
+1510	What you get with an account
+1511	"{0}" was added to your account and has already been removed. Wasn't it you? Check your devices
+1512	The folder is deleted here and on your other devices; what's inside moves up a level. This can't be undone.
+1513	The playlist is deleted here and on your other devices. This can't be undone.
+1514	Your account and everything in the cloud will be deleted. What's on your devices stays.
+1515	The album is removed from your library here and on your other devices.
+1516	Security and account
+1517	If a device was stolen: everything except this one is signed out at once. You need your recovery key.
+1518	Only on this device
+1519	Only on this device: it goes with its folder
+1520	This is the only device in your account. If you lose it, you can only get in with your recovery key.
+1521	Your library in the cloud was incomplete: we've completed it with this device's
+1522	Your music on all your devices
+1523	Your music is the same on your {0} devices
+1524	Your devices
+1525	Terms and privacy
+1526	Use my recovery key
+1527	Your account already has 10 devices. Remove one first
+1528	«Don't sync this» keeps it only on this device (it stays as it is on the others). «Remove from all my devices» deletes it here and on the others.
+1529	Remove "{0}" from all your devices?
+1530	Do you see the same on your other device?
+1531	Already have an account on another device?
+1532	Open
+1533	Closed
+1534	Sign out on this device
+1535	Recovery key, name, terms, sign out and delete the account
+1536	It's your only device
+1537	It's your only device: you'll only be able to get back in with your recovery key.
+1538	This device leaves your account. Your library stays here, but it no longer syncs. Nothing is deleted.
+1539	You've signed out. Your library is still here.
+1540	To get back into your account you'll need your recovery key. Without it, the account and what's in the cloud are lost.
+1541	You can check it first in Security and account › Check my key.
+1542	Remove from the account
+1543	It will leave your account. Your library stays here, without syncing.
+1544	It stays only on this device; nothing changes on the others.
+1545	If one was stolen. You'll need your recovery key.
+1546	Your other devices stay in the account and will see that this one is gone.
+1547	Sign out on this device?
+1548	Remove «{0}» from all your devices?
+1549	Remove «{0}»?

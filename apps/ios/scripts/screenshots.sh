@@ -15,9 +15,14 @@ SCENARIOS=(
   43_carpetas 44_carpetas_oscuro 45_carpeta 46_mover_a 47_artistas_siguiendo 48_inicio_novedades
   49_artista_seguir 50_artista_siguiendo 51_eliminar_biblioteca 52_insignia_nuevo_claro 52_insignia_nuevo_oscuro
   53_tu_musica_ordenar 54_playlists_ordenar 55_playlists_ordenar_oscuro
-  56_cuenta_sin_crear 57_cuenta_crear 58_cuenta_tu_clave 58_cuenta_tu_clave_oscuro 59_cuenta_entrar
-  60_cuenta_dispositivos 61_cuenta_comprobar 62_cuenta_borrar
-  63_cuenta_qr 64_cuenta_qr_emojis 65_cuenta_anadir 66_cuenta_anadir_emojis 67_cuenta_conectada 68_cuenta_sincronizado 68_cuenta_sincronizado_oscuro 69_cuenta_bloqueado
+  56_cuenta_sin_crear 56_cuenta_sin_crear_oscuro 56b_cuenta_sin_crear_abierto 57_cuenta_crear 57_cuenta_crear_oscuro
+  58_cuenta_tu_clave 58_cuenta_tu_clave_oscuro 59_cuenta_entrar 59_cuenta_entrar_oscuro
+  61_cuenta_comprobar 61_cuenta_comprobar_oscuro 62_cuenta_borrar 62_cuenta_borrar_oscuro
+  63_cuenta_qr 64_cuenta_qr_emojis 65_cuenta_anadir 66_cuenta_anadir_emojis
+  67_cuenta_conectada 67_cuenta_conectada_oscuro 67b_cuenta_seguridad 67b_cuenta_seguridad_oscuro
+  68_cuenta_sincronizado 68_cuenta_sincronizado_oscuro 69_cuenta_bloqueado
+  70_cuenta_cerrar_sesion 70_cuenta_cerrar_sesion_oscuro 70b_cuenta_cerrar_sesion_unico 70b_cuenta_cerrar_sesion_unico_oscuro
+  71_cuenta_terminos_nuevos 71_cuenta_terminos_nuevos_oscuro
 )
 # DEMO=1: las del tráiler v2 con el catálogo del patrocinador (Sources/DemoCatalog.swift; sólo en Debug y Jiyu Dev).
 # En castellano, como ScreenshotTest de Android: la app usa `language` (UserDefaults) o el idioma del sistema, y el

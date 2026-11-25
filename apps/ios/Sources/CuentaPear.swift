@@ -36,13 +36,16 @@ final class CuentaPear: ObservableObject {
     private var deMentira = false
 
     /// Sólo capturas (`-screenshotScenario`): una cuenta de mentira, sin red ni claves (como `estadoDePrueba` de Android).
-    func estadoDePrueba() {
+    /// `unico`: sólo este dispositivo (captura 70b, «Cerrar sesión» siendo el único).
+    func estadoDePrueba(unico: Bool = false) {
         deMentira = true
         cuentaId = "1X99P4D412HRCSNX9XJZYP85GR"
         dispositivos = [
             Dispositivo(id: "WR85D13CWP6P3DAEZ6QB9H13HR", nombre: L("iPhone 16"), plataforma: "ios", visto: 1763400000, este: true),
             Dispositivo(id: "1X99P4D412HRCSNX9XJZYP85GR", nombre: L("Pixel de Ana"), plataforma: "android", visto: 1763390000, este: false),
         ]
+        if unico { dispositivos.removeLast() }
+        meta.dispositivo = "WR85D13CWP6P3DAEZ6QB9H13HR"
         // La pub_rec de shared/spec/vectores/hkdf.json: su clave es TN2T-D4WT-QT75-ZFCX-H5W9-QQTJ-2W (CuentaUITests).
         meta.pubRec = "dIKLJHcIXwRQ7QUYY9Ec7so6OaW2UtKdC3gPfYwcW7o"
     }
@@ -63,7 +66,11 @@ final class CuentaPear: ObservableObject {
         cuentaId = meta.cuenta
         // Capturas: la cuenta de mentira sólo en los escenarios que la necesitan. (No en el cierre de `.demoRoute`:
         // SwiftUI construye el destino aunque no sea la ruta del escenario, y la ponía en todos.)
-        if let r = Demo.current?.route, [.cuentaDispositivos, .cuentaComprobar, .cuentaBorrar, .cuentaAnadir, .cuentaAnadirEmojis, .cuentaConectada, .cuentaSincronizado, .cuentaBloqueado].contains(r) { estadoDePrueba() }
+        if let r = Demo.current?.route, [.cuentaComprobar, .cuentaBorrar, .cuentaAnadir, .cuentaAnadirEmojis, .cuentaConectada,
+                                          .cuentaSincronizado, .cuentaBloqueado, .cuentaSeguridad, .cuentaCerrarSesion,
+                                          .cuentaCerrarSesionUnico, .cuentaTerminos].contains(r) {
+            estadoDePrueba(unico: r == .cuentaCerrarSesionUnico)
+        }
     }
 
     // MARK: Errores (cuenta.md §7.1 y ADR 0004 §9)
@@ -85,6 +92,10 @@ final class CuentaPear: ObservableObject {
 
     /// Lo que nace en el móvil ANTES de hablar con el servidor: R, C y el id de la cuenta. C se enseña una vez.
     struct Borrador { let r: Data; let c: Data; let cuentaId: String; var clave: String { CuentaCripto.base32(c) } }
+
+    /// El borrador de «Crear cuenta», para «Tu clave de recuperación», que la sustituye en la pila (como
+    /// `CuentaPear.pendiente` en Android). Sólo en memoria: C no se guarda nunca.
+    var pendiente: Borrador?
 
     func borrador() -> Borrador {
         Borrador(r: CuentaCripto.aleatorio(32), c: CuentaCripto.aleatorio(16), cuentaId: CuentaCripto.base32(CuentaCripto.aleatorio(16)))
@@ -183,7 +194,7 @@ final class CuentaPear: ObservableObject {
     // MARK: Dispositivos (§7.3 puntos 3 y 9)
 
     func quitar(_ id: String) async throws {
-        if id != meta.dispositivo { try await presencia(L("Quitar un móvil de tu cuenta")) }
+        if id != meta.dispositivo { try await presencia(L("Quitar un dispositivo de tu cuenta")) }
         _ = try await firmada("DELETE", "/v1/id/dispositivos/\(id)", nil, cuentaFirma: true)
         if id == meta.dispositivo { olvidar() } else { try await cargar() }
     }
@@ -192,7 +203,7 @@ final class CuentaPear: ObservableObject {
     func renombrar(_ id: String, a nombre: String) async throws {
         guard let n = CuentaCripto.nombreValido(nombre) else { throw ErrorCuenta(codigo: "nombre_invalido") }
         let propio = id == meta.dispositivo
-        if propio { try await presencia(L("Cambiar el nombre de este móvil")) }
+        if propio { try await presencia(L("Cambiar el nombre de este dispositivo")) }
         do {
             _ = try await firmada("PUT", "/v1/id/dispositivos/\(id)/nombre", ["nombre": n], cuentaFirma: !propio)
         } catch let e as ErrorCuenta where e.codigo == "no_encontrado" {
@@ -201,11 +212,25 @@ final class CuentaPear: ObservableObject {
         try await cargar()
     }
 
+    /// Cerrar sesión (Pulir 2 · notas de la opción A #4): este dispositivo sale de la cuenta con la misma ruta que quitar
+    /// uno (`DELETE …/dispositivos/{este}`, sin nada nuevo en el servidor) y se olvidan R, D y la sesión (`olvidar`). La
+    /// biblioteca se queda en el dispositivo, sin sincronizar: no se borra nada. Pide presencia (quitar el propio no la
+    /// exige el servidor; la pide la app). Si el servidor no contesta, no se olvida nada: seguirías en la lista de los
+    /// demás sin poder salir de ella. Igual que `CuentaPear.cerrarSesion` en Android.
+    func cerrarSesion() async throws {
+        try await presencia(L("Cerrar sesión en este dispositivo"))
+        if !deMentira {
+            guard let id = meta.dispositivo else { throw ErrorCuenta(codigo: "sin_cuenta") }
+            _ = try await firmada("DELETE", "/v1/id/dispositivos/\(id)", nil, cuentaFirma: true)
+        }
+        olvidar()
+    }
+
     /// «Quitar todos los demás móviles»: con C y presencia.
     func quitarLosDemas(clave: String) async throws {
         guard let c = CuentaCripto.leerClave(clave) else { throw ErrorCuenta(codigo: "clave_invalida") }
         let deC = try CuentaCripto.derivarDeC(c)
-        try await presencia(L("Quitar todos los demás móviles"))
+        try await presencia(L("Quitar todos los demás dispositivos"))
         _ = try await firmada("DELETE", "/v1/id/dispositivos", nil, cuentaFirma: true, rec: deC.semillaRec)
         meta.pubRec = CuentaCripto.b64u(deC.pubRec)
         try await cargar()
@@ -345,7 +370,7 @@ final class CuentaPear: ObservableObject {
     /// 410 emparejamiento_usado: otro se adelantó con el mismo QR (paso 11), sin emojis.
     func completarQr(_ l: QrLeido) async throws -> [Int] {
         try abierta()
-        try await presencia(L("Añadir un móvil a tu cuenta"))
+        try await presencia(L("Añadir un dispositivo a tu cuenta"))
         guard let cuenta = meta.cuenta, let r = Llavero.leer("R") else { throw ErrorCuenta(codigo: "sin_cuenta") }
         let deR = try CuentaCripto.derivarDeR(r)
         let e = CuentaCripto.x25519Nueva()
@@ -391,6 +416,7 @@ final class CuentaPear: ObservableObject {
         meta = Meta()
         meta.desfase = desfase
         cuentaId = nil; token = nil; tokenExp = 0; dispositivos = []; avisos = []; borrarEn = nil
+        deMentira = false
     }
 
     private var nombreMovil: String { CuentaCripto.nombreValido(UIDevice.current.name) ?? "iPhone" }
@@ -559,6 +585,7 @@ final class CuentaPear: ObservableObject {
 
     private func presencia(_ motivo: String) async throws {
         if UserDefaults.standard.bool(forKey: "pearSinPresencia") && Channel.adminTools { return } // tests de interfaz (Jiyu Dev)
+        if deMentira { return } // la cuenta de mentira de las capturas y los CuentaUITests: sin claves ni servidor
         let ctx = LAContext()
         do {
             guard try await ctx.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: motivo) else { throw ErrorCuenta(codigo: "presencia") }

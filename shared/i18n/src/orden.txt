@@ -1457,3 +1457,93 @@ Algo ha fallado en este móvil. Prueba otra vez; si sigue, informa del error
 En España pasa a veces durante los partidos de fútbol. Se volverá a intentar sola.
 Intentar más tarde
 No se puede llegar al servidor
+Ahora sólo está en este dispositivo. Si lo vuelves a sincronizar, pasará a tus otros dispositivos.
+Algo ha fallado en este dispositivo. Prueba otra vez; si sigue, informa del error
+Apunta la cámara al código del dispositivo nuevo
+Así lo verás en tus dispositivos. De 1 a 40 caracteres.
+Añadir un dispositivo
+Añadir un dispositivo a tu cuenta
+Cambiar el nombre de este dispositivo
+Clave de recuperación, nombre, términos y borrar la cuenta
+Comprueba que el otro dispositivo enseña lo mismo.
+Con tu clave se borra al momento. Sin ella, se borra dentro de 14 días y lo verás en todos tus dispositivos, por si no has sido tú.
+Copia cifrada, cambiar de dispositivo y ventajas que vienen
+Código QR para añadir este dispositivo
+Deja de ser favorita aquí y en tus otros dispositivos.
+Dejas de seguirlo aquí y en tus otros dispositivos.
+El nombre de la cuenta es sólo para ti: va cifrado y sólo lo ven tus dispositivos. No es un nombre de usuario: nadie te puede buscar por él.
+El servidor no reconoce este dispositivo. Si sigue pasando, entra otra vez con tu clave
+En el dispositivo nuevo, abre Ajustes › Cuenta › Entrar con otro dispositivo y apunta la cámara a su código.
+En el nuevo, abre Jiyu Pulse, elige «Entrar con otro dispositivo» y escanea el código que te enseña.
+En tu otro dispositivo, abre Ajustes › Cuenta › Añadir un dispositivo y escanea este código.
+Entrar con otro dispositivo
+Es la llave de tu cuenta. Si pierdes este dispositivo, con ella entras desde otro. Apúntala en papel y guárdala: no se puede ver otra vez ni cambiar por otra.
+Escanea el código que enseña el dispositivo nuevo.
+Escanea un código con el que ya tiene tu cuenta.
+Escríbela entera. Se comprueba en este dispositivo: no se envía a ningún sitio.
+Ese dispositivo ya no está en tu cuenta
+Ese dispositivo ya no podrá entrar en tu cuenta.
+Este dispositivo
+Este dispositivo saldrá de tu cuenta.
+Este dispositivo ya está en una cuenta
+Este dispositivo ya no está en tu cuenta
+Esto viaja cifrado entre tus dispositivos. Toca algo para dejarlo sólo en este dispositivo o para quitarlo de todos.
+Hacía mucho que este dispositivo no se sincronizaba: se ha puesto al día con tu cuenta
+Juntando lo de tus dispositivos…
+La hora del dispositivo no está bien. Ponla en automática y prueba otra vez
+La que apuntaste al crear la cuenta.
+Los dispositivos que pueden entrar en tu cuenta. Si no reconoces alguno, quítalo.
+Los dos dispositivos tienen que enseñar los mismos emojis, en el mismo orden.
+Nada que recordar ni que te puedan robar. Tu biblioteca viaja cifrada: sólo tus dispositivos pueden leerla.
+No hay ninguna cuenta en este dispositivo
+No se ha podido añadir este dispositivo
+No uses este código y quita el dispositivo de tu cuenta desde el otro.
+Nombre del dispositivo
+Opcional y gratis. Va cifrada: ni nosotros podemos leerla.
+Otro dispositivo ha cambiado lo mismo a la vez. Prueba otra vez
+Otro dispositivo ha usado este código antes que tú. En el dispositivo nuevo, pulsa «No coinciden» y empieza otra vez
+Para que reconozcas tu cuenta en tus dispositivos. Hasta 40 caracteres; vacío, sin nombre.
+Pásala a otro dispositivo
+Quitar de todos mis dispositivos
+Quitar todos los demás dispositivos
+Quitar un dispositivo de tu cuenta
+Qué ganas con la cuenta
+Se añadió "{0}" a tu cuenta y ya se ha quitado. ¿No has sido tú? Revisa tus dispositivos
+Se borra la carpeta aquí y en tus otros dispositivos; lo que tiene dentro sube un nivel. No se puede deshacer.
+Se borra la playlist aquí y en tus otros dispositivos. No se puede deshacer.
+Se borran tu cuenta y todo lo que hay en la nube. Lo que tienes en tus dispositivos se queda.
+Se quita el álbum de tu biblioteca aquí y en tus otros dispositivos.
+Seguridad y cuenta
+Si te han robado un dispositivo: sale todo de golpe menos este. Hace falta tu clave de recuperación.
+Sólo en este dispositivo
+Sólo en este dispositivo: va con su carpeta
+Sólo tienes este dispositivo en tu cuenta. Si lo pierdes, sólo podrás entrar con tu clave de recuperación.
+Tu biblioteca de la nube estaba incompleta: la hemos completado con la de este dispositivo
+Tu música en todos tus dispositivos
+Tu música está igual en tus {0} dispositivos
+Tus dispositivos
+Términos y privacidad
+Usar mi clave de recuperación
+Ya hay 10 dispositivos en tu cuenta. Quita uno antes
+«No sincronizar esto» lo deja sólo en este dispositivo (en los demás se queda como está). «Quitar de todos mis dispositivos» lo borra aquí y en los demás.
+¿Quitar "{0}" de todos tus dispositivos?
+¿Ves lo mismo en tu otro dispositivo?
+¿Ya tienes cuenta en otro dispositivo?
+Abierto
+Cerrado
+Cerrar sesión en este dispositivo
+Clave de recuperación, nombre, términos, cerrar sesión y borrar la cuenta
+Es tu único dispositivo
+Es tu único dispositivo: sólo podrás volver a entrar con tu clave de recuperación.
+Este dispositivo sale de tu cuenta. Tu biblioteca se queda aquí, pero ya no se sincroniza. No se borra nada.
+Has cerrado sesión. Tu biblioteca sigue aquí.
+Para volver a entrar en tu cuenta hará falta tu clave de recuperación. Sin ella, la cuenta y lo que hay en la nube se pierden.
+Puedes comprobarla antes en Seguridad y cuenta › Comprobar mi clave.
+Quitar de la cuenta
+Saldrá de tu cuenta. Tu biblioteca se queda aquí, sin sincronizar.
+Se queda sólo en este dispositivo; en los demás no se toca.
+Si te han robado uno. Hace falta tu clave de recuperación.
+Tus otros dispositivos siguen en la cuenta y verán que este ya no está.
+¿Cerrar sesión en este dispositivo?
+¿Quitar «{0}» de todos tus dispositivos?
+¿Quitar «{0}»?

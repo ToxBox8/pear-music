@@ -122,10 +122,13 @@ struct ClaveEnGrupos: View {
 }
 
 /// PULIR #3: mientras se baja, se une o se sube la biblioteca (si tarda más de 0,8 s, para no parpadear en cada 304) y
-/// «Biblioteca al día» 2 s cuando han llegado cambios de otro móvil. Arriba, sin tapar nada que se toque. Con «Reducir
+/// «Biblioteca al día» 2 s cuando han llegado cambios de otro dispositivo. Arriba, sin tapar nada que se toque. Con «Reducir
 /// movimiento», icono quieto en vez de la rueda. Igual que `AvisoSync` en Android.
 struct AvisoSync: View {
     @ObservedObject private var sync = SyncBiblioteca.shared
+    /// En las pantallas de la cuenta no sale: la fila de la sincronización ya lo dice, y la cápsula tapaba el título y
+    /// esa fila (captura 69; Pulir 2 · notas de la opción A). Igual que `AvisoSync` en Android.
+    @ObservedObject private var enCuenta = CuentaEnPantalla.shared
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var texto: String?
     @State private var girando = false
@@ -133,7 +136,8 @@ struct AvisoSync: View {
     @State private var cerrado = false
     var body: some View {
         VStack {
-            if sync.vista.bloqueado && !cerrado && texto == nil {
+            if enCuenta.visible { EmptyView() }
+            else if sync.vista.bloqueado && !cerrado && texto == nil {
                 VStack(alignment: .trailing, spacing: 0) {
                     HStack(alignment: .firstTextBaseline, spacing: 10) {
                         Image(systemName: "icloud.slash").foregroundStyle(.secondary)
@@ -155,7 +159,7 @@ struct AvisoSync: View {
                 .transition(.opacity)
                 .accessibilityIdentifier("avisoSyncBloqueado")
             }
-            if let texto {
+            if let texto, !enCuenta.visible {
                 HStack(spacing: 10) {
                     if girando && !reduceMotion { ProgressView().controlSize(.small) }
                     else { Image(systemName: girando ? "arrow.triangle.2.circlepath" : "checkmark.icloud").foregroundStyle(.secondary) }
@@ -181,7 +185,7 @@ struct AvisoSync: View {
             if texto == nil { try? await Task.sleep(nanoseconds: 800_000_000) }
             guard !Task.isCancelled, sync.vista.fase == f else { return }
             texto = f.texto; girando = true
-            UIAccessibility.post(notification: .announcement, argument: f.texto)
+            if !enCuenta.visible { UIAccessibility.post(notification: .announcement, argument: f.texto) }
         }
         .task(id: sync.vista.traido) {
             let t = sync.vista.traido
@@ -218,14 +222,13 @@ struct BotonComprobar: View {
 }
 
 /// PULIR #5: Ajustes › Cuenta › «Lo que se sincroniza». Las carpetas, playlists, álbumes, favoritas y artistas que
-/// viajan entre tus móviles; al tocar uno, dos cosas distintas (lo decidió Toxbox el 19-11): «No sincronizar esto» (sólo
-/// en este móvil; en los demás no se toca; sync.md §5.6) y «Quitar de todos mis móviles» (se borra, con confirmación).
-/// Una carpeta marcada arrastra lo de dentro. Sin shu. Igual que `Sincronizado` en Android.
+/// viajan entre tus dispositivos; al tocar uno, su menú (`Menu`, anclado a la fila; Pulir 2 · notas de la opción A #3)
+/// con dos cosas distintas (lo decidió Toxbox el 19-11): «No sincronizar esto» (sólo en este dispositivo; en los demás
+/// no se toca; sync.md §5.6) y «Quitar de todos mis dispositivos» (se borra, con la confirmación de eliminar). Una
+/// carpeta marcada arrastra lo de dentro. Sin shu. Igual que `Sincronizado` en Android.
 struct SincronizadoView: View {
     @EnvironmentObject private var library: Library
     @ObservedObject private var sync = SyncBiblioteca.shared
-    @State private var elegido: Elemento?
-    @State private var confirmar: Elemento?
     @State private var verTodas = false
 
     enum Tipo {
@@ -241,11 +244,11 @@ struct SincronizadoView: View {
         }
         var aviso: String {
             switch self {
-            case .carpeta: return L("Se borra la carpeta aquí y en tus otros móviles; lo que tiene dentro sube un nivel. No se puede deshacer.")
-            case .playlist: return L("Se borra la playlist aquí y en tus otros móviles. No se puede deshacer.")
-            case .album: return L("Se quita el álbum de tu biblioteca aquí y en tus otros móviles.")
-            case .favorita: return L("Deja de ser favorita aquí y en tus otros móviles.")
-            case .artista: return L("Dejas de seguirlo aquí y en tus otros móviles.")
+            case .carpeta: return L("Se borra la carpeta aquí y en tus otros dispositivos; lo que tiene dentro sube un nivel. No se puede deshacer.")
+            case .playlist: return L("Se borra la playlist aquí y en tus otros dispositivos. No se puede deshacer.")
+            case .album: return L("Se quita el álbum de tu biblioteca aquí y en tus otros dispositivos.")
+            case .favorita: return L("Deja de ser favorita aquí y en tus otros dispositivos.")
+            case .artista: return L("Dejas de seguirlo aquí y en tus otros dispositivos.")
             }
         }
     }
@@ -267,7 +270,7 @@ struct SincronizadoView: View {
         let enteras = self.enteras
         Form {
             Cabecera(pose: "con-cascos", titulo: L("Lo que se sincroniza"),
-                     texto: L("Esto viaja cifrado entre tus móviles. Toca algo para dejarlo sólo en este móvil o para quitarlo de todos."))
+                     texto: L("Esto viaja cifrado entre tus dispositivos. Toca algo para dejarlo sólo en este dispositivo o para quitarlo de todos."))
             seccion(L("Carpetas"), library.folders.map { f in
                 Elemento(clave: "folder:\(f.id)", nombre: f.name, tipo: .carpeta,
                          detalle: PlaylistFolders.path(f.id, in: library.folders).dropLast().map(\.name).joined(separator: " › ").nilSiVacio, cosa: .carpeta(f))
@@ -286,45 +289,23 @@ struct SincronizadoView: View {
             }, vacio: L("No sigues a ningún artista."), enteras: enteras)
         }
         .navigationTitle(L("Lo que se sincroniza")).navigationBarTitleDisplayMode(.inline)
-        .confirmationDialog(elegido?.nombre ?? "", isPresented: Binding(get: { elegido != nil }, set: { if !$0 { elegido = nil } }),
-                            titleVisibility: .visible, presenting: elegido) { e in
-            let heredada = enteras.contains(e.clave) && !sync.soloAqui.contains(e.clave)
-            if !heredada {
-                Button(sync.soloAqui.contains(e.clave) ? L("Volver a sincronizar") : L("No sincronizar esto")) {
-                    sync.soloEnEsteMovil(e.clave, !sync.soloAqui.contains(e.clave))
-                }
-            }
-            Button(L("Quitar de todos mis móviles"), role: .destructive) { confirmar = e }
-            Button(L("Cancelar"), role: .cancel) {}
-        } message: { e in
-            Text(enteras.contains(e.clave) && !sync.soloAqui.contains(e.clave)
-                 ? L("Va con su carpeta, que no se sincroniza. Para volver a sincronizarlo, vuelve a sincronizar la carpeta.")
-                 : sync.soloAqui.contains(e.clave)
-                 ? L("Ahora sólo está en este móvil. Si lo vuelves a sincronizar, pasará a tus otros móviles.")
-                 : L("«No sincronizar esto» lo deja sólo en este móvil (en los demás se queda como está). «Quitar de todos mis móviles» lo borra aquí y en los demás."))
-        }
-        .alert(L("¿Quitar \"{0}\" de todos tus móviles?", confirmar?.nombre ?? ""),
-               isPresented: Binding(get: { confirmar != nil }, set: { if !$0 { confirmar = nil } }), presenting: confirmar) { e in
-            Button(L("Quitar"), role: .destructive) { quitar(e) }
-            Button(L("Cancelar"), role: .cancel) {}
-        } message: { e in Text(e.tipo.aviso) }
     }
 
     @ViewBuilder
     private func seccion(_ titulo: String, _ elementos: [Elemento], vacio: String, enteras: Set<String>, tope: Int = .max) -> some View {
         Section {
             ForEach(elementos.prefix(tope)) { e in
-                Button { elegido = e } label: {
+                let sub = sync.soloAqui.contains(e.clave) ? L("Sólo en este dispositivo")
+                    : enteras.contains(e.clave) ? L("Sólo en este dispositivo: va con su carpeta") : e.detalle
+                Menu { menu(e, enteras: enteras) } label: {
                     HStack(spacing: 12) {
                         portada(e)
                         VStack(alignment: .leading, spacing: 2) {
                             Text(e.nombre).foregroundStyle(Color(uiColor: .label))
-                            let sub = sync.soloAqui.contains(e.clave) ? L("Sólo en este móvil")
-                                : enteras.contains(e.clave) ? L("Sólo en este móvil: va con su carpeta") : e.detalle
                             if let sub { Text(sub).font(.footnote).foregroundStyle(Color(uiColor: .secondaryLabel)) }
                         }
                         Spacer(minLength: 0)
-                        Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(Color(uiColor: .tertiaryLabel))
+                        Image(systemName: "ellipsis").foregroundStyle(Color(uiColor: .tertiaryLabel)).accessibilityHidden(true)
                     }
                     .frame(minHeight: 44).contentShape(Rectangle())
                 }
@@ -356,6 +337,26 @@ struct SincronizadoView: View {
         }
     }
 
+    /// El menú de una fila: «No sincronizar esto» (o «Volver a sincronizar») y «Quitar de todos mis dispositivos», que
+    /// pide la confirmación de eliminar. Lo que va con su carpeta sólo explica por qué. Igual que `menuDe` en Android.
+    @ViewBuilder
+    private func menu(_ e: Elemento, enteras: Set<String>) -> some View {
+        let marcada = sync.soloAqui.contains(e.clave)
+        if enteras.contains(e.clave) && !marcada {
+            Text(L("Va con su carpeta, que no se sincroniza. Para volver a sincronizarlo, vuelve a sincronizar la carpeta."))
+        } else if marcada {
+            Button { sync.soloEnEsteMovil(e.clave, false) } label: { Label(L("Volver a sincronizar"), systemImage: "arrow.triangle.2.circlepath") }
+            Text(L("Ahora sólo está en este dispositivo. Si lo vuelves a sincronizar, pasará a tus otros dispositivos."))
+        } else {
+            Button { sync.soloEnEsteMovil(e.clave, true) } label: { Label(L("No sincronizar esto"), systemImage: "icloud.slash") }
+            Text(L("Se queda sólo en este dispositivo; en los demás no se toca."))
+        }
+        Divider()
+        Button(role: .destructive) {
+            AppAlert.confirm(L("¿Quitar «{0}» de todos tus dispositivos?", e.nombre), message: e.tipo.aviso, confirm: L("Quitar")) { quitar(e) }
+        } label: { Label(L("Quitar de todos mis dispositivos"), systemImage: "trash") }
+    }
+
     private func quitar(_ e: Elemento) {
         let id = String(e.clave.split(separator: ":", maxSplits: 1).last ?? "")
         switch e.tipo {
@@ -370,10 +371,73 @@ struct SincronizadoView: View {
 
 private extension String { var nilSiVacio: String? { isEmpty ? nil : self } }
 
-// MARK: Raíz
+// MARK: Raíz y navegación (Pulir 2 · notas de la opción A #1 y #2)
+
+/// Las pantallas de Ajustes › Cuenta: como mucho dos niveles (Cuenta › una de estas). El mapa, en
+/// `version 3/ESTADO.md` y DECISIONS 101. El título de cada una es la fila que la abre. Igual que `PantallaCuenta` en
+/// Android.
+enum PantallaCuenta: Hashable {
+    case crear, clave, entrar, qrNuevo, anadirMovil, sincronizado, comprobar, cerrarSesion, borrar, terminos
+}
+
+/// Cómo se va de Cuenta a una de sus pantallas. `ir` la abre encima de Cuenta (la flecha y el gesto atrás vuelven a
+/// Cuenta); `cambiar` sustituye la que está abierta por otra, como «Crear cuenta» › «Tu clave de recuperación» (atrás
+/// vuelve a Cuenta, no a «Crear cuenta»). Para volver a Cuenta al acabar, cada pantalla usa `dismiss`. Igual que
+/// `NavCuenta` en Android.
+struct NavCuenta {
+    var ir: (PantallaCuenta) -> Void = { _ in }
+    var cambiar: (PantallaCuenta) -> Void = { _ in }
+}
+private struct NavCuentaClave: EnvironmentKey { static let defaultValue = NavCuenta() }
+extension EnvironmentValues {
+    var navCuenta: NavCuenta {
+        get { self[NavCuentaClave.self] }
+        set { self[NavCuentaClave.self] = newValue }
+    }
+}
+
+/// Si se está viendo alguna pantalla de la cuenta (la cápsula de la sync no sale ahí: la fila de la sync ya lo dice y
+/// la cápsula tapaba el título; captura 69) y el aviso corto de abajo («Has cerrado sesión…»).
+@MainActor
+final class CuentaEnPantalla: ObservableObject {
+    static let shared = CuentaEnPantalla()
+    @Published fileprivate(set) var abiertas = 0
+    @Published var aviso: String?
+    var visible: Bool { abiertas > 0 }
+}
+private struct EnLaCuenta: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .onAppear { CuentaEnPantalla.shared.abiertas += 1 }
+            .onDisappear { CuentaEnPantalla.shared.abiertas = Swift.max(0, CuentaEnPantalla.shared.abiertas - 1) }
+    }
+}
+extension View { fileprivate func enLaCuenta() -> some View { modifier(EnLaCuenta()) } }
+
+/// Sólo capturas (56b y 67b): «Seguridad y cuenta» o «Qué ganas con la cuenta» ya abiertos y la página abajo del
+/// todo, como `seguridadAbiertaCapturas` de Android.
+enum CuentaCapturas {
+    /// 56b: «Qué ganas con la cuenta» abierto.
+    static var queGanas: Bool { Demo.current?.route == .cuentaSinCrearAbierto }
+    /// 67b: «Seguridad y cuenta» abierto.
+    static var seguridad: Bool { Demo.current?.route == .cuentaSeguridad }
+}
+private extension View {
+    @ViewBuilder func alFinalEnCapturas(_ si: Bool) -> some View {
+        if si {
+            if #available(iOS 17.0, *) { defaultScrollAnchor(.bottom) } else { self }
+        } else { self }
+    }
+}
 
 struct CuentaView: View {
     @ObservedObject private var cuenta = CuentaPear.shared
+    @ObservedObject private var enCuenta = CuentaEnPantalla.shared
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var abierta: PantallaCuenta?
+
+    private var nav: NavCuenta { NavCuenta(ir: { abierta = $0 }, cambiar: { abierta = $0 }) }
+
     var body: some View {
         Group {
             if cuenta.tieneCuenta { CuentaConectada() } else { CuentaSinCrear() }
@@ -381,49 +445,166 @@ struct CuentaView: View {
         .navigationTitle(L("Cuenta"))
         .navigationBarTitleDisplayMode(.inline)
         .themed()
+        .environment(\.navCuenta, nav)
+        // Una sola pantalla encima de Cuenta (dos niveles como mucho): la flecha y el gesto atrás vuelven aquí.
+        // `cambiar` cambia la de encima sin apilar otra (`.id`: empieza de cero).
+        .navigationDestination(isPresented: Binding(get: { abierta != nil }, set: { if !$0 { abierta = nil } })) {
+            if let p = abierta { CuentaPantalla(p).id(p).environment(\.navCuenta, nav) }
+        }
+        .enLaCuenta()
+        .overlay(alignment: .bottom) {
+            if let texto = enCuenta.aviso {
+                Text(texto).font(.subheadline.weight(.semibold))
+                    .padding(.horizontal, 16).padding(.vertical, 10)
+                    .background(.thickMaterial, in: Capsule())
+                    .padding(.bottom, 96).padding(.horizontal, 16)
+                    .transition(.opacity)
+                    .accessibilityIdentifier("avisoCuenta")
+                    .task {
+                        UIAccessibility.post(notification: .announcement, argument: texto)
+                        try? await Task.sleep(nanoseconds: 3_000_000_000)
+                        enCuenta.aviso = nil
+                    }
+            }
+        }
+        .animation(reduceMotion ? nil : Animation.uiEaseOut(0.25), value: enCuenta.aviso)
     }
 }
 
-private struct CuentaSinCrear: View {
-    @State private var crear = false
+/// Una pantalla de la cuenta por su nombre (también la usan las capturas, `Screenshots.swift`).
+struct CuentaPantalla: View {
+    let pantalla: PantallaCuenta
+    init(_ pantalla: PantallaCuenta) { self.pantalla = pantalla }
     var body: some View {
-        Form {
-            Section { AccountPitch().listRowInsets(EdgeInsets()).listRowBackground(Color.clear) }
-            // PULIR #2: quien ya tiene la cuenta en otro móvil lo ve lo primero (antes estaba debajo de «Crear cuenta» y
-            // no se encontraba). Filas con icono; el shu sigue siendo «Crear cuenta», el único de la pantalla.
-            Section {
-                NavigationLink(destination: QrNuevoView()) { Label(L("Entrar desde otro móvil"), systemImage: "qrcode") }
-                    .accessibilityIdentifier("entrarDesdeOtro")
-                NavigationLink(destination: EntrarConClaveView()) { Label(L("Entrar con tu clave de recuperación"), systemImage: "key") }
-                    .accessibilityIdentifier("entrarConClave")
-            } header: { Text(L("¿Ya tienes cuenta?")) } footer: {
-                Text(L("Con tu otro móvil a mano, entra con un código QR. Si lo has perdido, con la clave que apuntaste."))
-            }
-            Section {
-                // Un NavigationLink dentro de un Form se pinta como fila y pierde el botón shu: botón + destino.
-                Button(L("Crear cuenta")) { crear = true }
-                    .buttonStyle(PillButtonStyle(prominent: true)).listRowBackground(Color.clear).listRowInsets(EdgeInsets())
-                    .accessibilityIdentifier("crearCuenta")
+        Group {
+            switch pantalla {
+            case .crear: CrearCuentaView()
+            case .clave: ClaveNuevaView()
+            case .entrar: EntrarConClaveView()
+            case .qrNuevo: QrNuevoView()
+            case .anadirMovil: AnadirMovilView()
+            case .sincronizado: SincronizadoView()
+            case .comprobar: ComprobarClaveView()
+            case .cerrarSesion: CerrarSesionView()
+            case .borrar: BorrarCuentaView()
+            case .terminos: TerminosNuevosView()
             }
         }
-        .navigationDestination(isPresented: $crear) { CrearCuentaView() }
+        .enLaCuenta()
+    }
+}
+
+/// Una fila de la cuenta: icono, título, la frase de debajo y, a la derecha, el valor, «⋯» (abre un menú) o la flecha
+/// (abre una pantalla). Colores del sistema explícitos: dentro de un botón, `.primary` saldría con el tinte (shu) y la
+/// pantalla tendría varios (COLOR.md). Igual que `FormRow` en Android.
+private struct Fila: View {
+    let titulo: String
+    var subtitulo: String? = nil
+    var icono: String? = nil
+    var valor: String? = nil
+    var rojo = false
+    var flecha = false
+    var mas = false
+    var body: some View {
+        HStack(spacing: 12) {
+            if let icono {
+                Image(systemName: icono).font(.body).frame(width: 28)
+                    .foregroundStyle(rojo ? Color.red : Color(uiColor: .label)).accessibilityHidden(true)
+            }
+            VStack(alignment: .leading, spacing: 2) {
+                Text(titulo).foregroundStyle(rojo ? Color.red : Color(uiColor: .label))
+                if let subtitulo { Text(subtitulo).font(.footnote).foregroundStyle(Color(uiColor: .secondaryLabel)) }
+            }
+            Spacer(minLength: 0)
+            if let valor { Text(valor).foregroundStyle(Color(uiColor: .secondaryLabel)).lineLimit(1) }
+            if mas { Image(systemName: "ellipsis").foregroundStyle(Color(uiColor: .tertiaryLabel)).accessibilityHidden(true) }
+            if flecha {
+                Image(systemName: "chevron.right").font(.footnote.weight(.semibold))
+                    .foregroundStyle(Color(uiColor: .tertiaryLabel)).accessibilityHidden(true)
+            }
+        }
+        .frame(minHeight: 44)
+        .contentShape(Rectangle())
+    }
+}
+
+/// «Hace algo y deja el error» de cada pantalla, con el texto de `CuentaPear.mensajeDe`.
+@MainActor private func intentar(_ fallo: Binding<String?>, _ trabajo: @escaping () async throws -> Void) {
+    Task {
+        do { try await trabajo(); fallo.wrappedValue = nil }
+        catch is CancellationError {} catch { fallo.wrappedValue = CuentaPear.mensajeDe(error) }
+    }
+}
+
+// MARK: Sin cuenta (opción A «Ordenar», lo decidió Toxbox el 25-11)
+
+private struct CuentaSinCrear: View {
+    @Environment(\.navCuenta) private var nav
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var abierto = CuentaCapturas.queGanas
+    var body: some View {
+        Form {
+            // «Crear cuenta» se ve sin bajar, en una tarjeta corta con la mascota: el único shu de la pantalla.
+            Section {
+                HStack(spacing: 14) {
+                    Image("mascota-con-cascos").resizable().scaledToFit().frame(width: 72, height: 72).accessibilityHidden(true)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(L("Tu música en todos tus dispositivos")).font(.title3.bold())
+                        Text(L("Opcional y gratis. Va cifrada: ni nosotros podemos leerla."))
+                            .font(.subheadline).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .padding(.top, 6)
+                .listRowSeparator(.hidden)
+                .accessibilityElement(children: .combine)
+                Button(L("Crear cuenta")) { nav.ir(.crear) }
+                    .buttonStyle(PillButtonStyle(prominent: true))
+                    .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 14, trailing: 16))
+                    .accessibilityIdentifier("crearCuenta")
+            }
+            // PULIR #2: quien ya tiene la cuenta en otro dispositivo encuentra aquí cómo entrar, sin palabras técnicas.
+            Section {
+                Button { nav.ir(.qrNuevo) } label: {
+                    Fila(titulo: L("Entrar con otro dispositivo"), subtitulo: L("Escanea un código con el que ya tiene tu cuenta."),
+                         icono: "qrcode", flecha: true)
+                }
+                .accessibilityIdentifier("entrarDesdeOtro")
+                Button { nav.ir(.entrar) } label: {
+                    Fila(titulo: L("Usar mi clave de recuperación"), subtitulo: L("La que apuntaste al crear la cuenta."),
+                         icono: "key", flecha: true)
+                }
+                .accessibilityIdentifier("entrarConClave")
+            } header: { Text(L("¿Ya tienes cuenta en otro dispositivo?")) }
+            // Plegado: por qué crearla (los mismos puntos que AccountPitch de la guía inicial). El `DisclosureGroup` dice
+            // a VoiceOver si está abierto, como `FoldRow` en Android.
+            Section {
+                DisclosureGroup(isExpanded: $abierto.animation(reduceMotion ? nil : Animation.uiEaseOut(0.25))) {
+                    PuntosCuenta().padding(.bottom, 8)
+                } label: {
+                    Fila(titulo: L("Qué ganas con la cuenta"),
+                         subtitulo: abierto ? nil : L("Copia cifrada, cambiar de dispositivo y ventajas que vienen"), icono: "info.circle")
+                }
+                .accessibilityIdentifier("queGanas")
+            }
+        }
+        .alFinalEnCapturas(CuentaCapturas.queGanas)
     }
 }
 
 // MARK: Crear cuenta (§7.2: dos casillas obligatorias y la telemetría aparte)
 
 struct CrearCuentaView: View {
+    @Environment(\.navCuenta) private var nav
     @State private var terminos = false
     @State private var edad = false
     @State private var telemetria = false
-    @State private var borrador: CuentaPear.Borrador?
     /// Términos y privacidad en el idioma de la app (lo decidió Toxbox, orden 9 del 18-11).
     private var legal: URL { CuentaViewsLegal.url }
 
     var body: some View {
         Form {
             Cabecera(pose: "saltando", titulo: L("Tu cuenta, sin contraseña"),
-                     texto: L("Nada que recordar ni que te puedan robar. Tu biblioteca viaja cifrada: sólo tus móviles pueden leerla."))
+                     texto: L("Nada que recordar ni que te puedan robar. Tu biblioteca viaja cifrada: sólo tus dispositivos pueden leerla."))
             Section {
                 Casilla(marcada: $terminos, titulo: L("Acepto los Términos de uso y la Política de privacidad"), enlace: (L("Leer los textos"), legal))
                     .accessibilityIdentifier("casillaTerminos")
@@ -435,7 +616,9 @@ struct CrearCuentaView: View {
             Section {
                 Button(L("Crear cuenta")) {
                     if telemetria { Telemetry.shared.setConsent(true) }
-                    borrador = CuentaPear.shared.borrador()
+                    CuentaPear.shared.pendiente = CuentaPear.shared.borrador()
+                    // «Tu clave de recuperación» sustituye a esta pantalla: atrás vuelve a Cuenta.
+                    nav.cambiar(.clave)
                 }
                 .buttonStyle(PillButtonStyle(prominent: true)).listRowBackground(Color.clear).listRowInsets(EdgeInsets())
                 .disabled(!(terminos && edad))
@@ -443,16 +626,13 @@ struct CrearCuentaView: View {
             }
         }
         .navigationTitle(L("Crear cuenta")).navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(isPresented: Binding(get: { borrador != nil }, set: { if !$0 { borrador = nil } })) {
-            if let b = borrador { ClaveNuevaView(borrador: b) }
-        }
     }
 }
 
 // MARK: Tu clave de recuperación: se enseña UNA vez y se confirma un grupo (§3)
 
 struct ClaveNuevaView: View {
-    let borrador: CuentaPear.Borrador
+    private let borrador: CuentaPear.Borrador
     @Environment(\.dismiss) private var dismiss
     @State private var confirmando = false
     @State private var grupo = Int.random(in: 1...6)
@@ -460,14 +640,19 @@ struct ClaveNuevaView: View {
     @State private var fallo = false
     @State private var creando = false
     @State private var error: String?
-    @State private var hecho = false
     @State private var copiada = false
+
+    /// El borrador de «Crear cuenta» (`CuentaPear.pendiente`); sin él (capturas), uno nuevo.
+    init(borrador: CuentaPear.Borrador? = nil) {
+        if let b = borrador ?? CuentaPear.shared.pendiente { self.borrador = b }
+        else { let b = CuentaPear.shared.borrador(); CuentaPear.shared.pendiente = b; self.borrador = b }
+    }
 
     var body: some View {
         Form {
             // Orden 11: qué es, para qué sirve y qué hay que hacer, sin pensar.
             Cabecera(pose: "brazos-cruzados", titulo: L("Tu clave de recuperación"),
-                     texto: L("Es la llave de tu cuenta. Si pierdes este móvil, con ella entras desde otro. Apúntala en papel y guárdala: no se puede ver otra vez ni cambiar por otra."))
+                     texto: L("Es la llave de tu cuenta. Si pierdes este dispositivo, con ella entras desde otro. Apúntala en papel y guárdala: no se puede ver otra vez ni cambiar por otra."))
             Section {
                 ClaveEnGrupos(clave: borrador.clave, resaltar: confirmando ? grupo : nil)
                 Button { copiarClave(CuentaCripto.mostrarClave(borrador.clave)); copiada = true } label: {
@@ -502,11 +687,8 @@ struct ClaveNuevaView: View {
                     .accessibilityIdentifier("botonClave")
             }
         }
-        .navigationTitle(L("Tu clave")).navigationBarTitleDisplayMode(.inline)
+        .navigationTitle(L("Tu clave de recuperación")).navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(creando)
-        .alert(L("Cuenta creada"), isPresented: $hecho) {
-            Button(L("Vale"), role: .cancel) { dismiss() }
-        } message: { Text(L("Sólo tienes este móvil en tu cuenta. Si lo pierdes, sólo podrás entrar con tu clave de recuperación.")) }
     }
 
     private func siguiente() {
@@ -522,14 +704,19 @@ struct ClaveNuevaView: View {
         creando = true
         Task {
             defer { creando = false }
-            do { try await CuentaPear.shared.crear(borrador); hecho = true }
-            catch let e as CuentaPear.ErrorCuenta { error = e.mensaje }
+            do {
+                try await CuentaPear.shared.crear(borrador)
+                CuentaPear.shared.pendiente = nil
+                // El aviso de la app (el mismo que los de la Biblioteca) y de vuelta a Cuenta, como Android.
+                AppAlert.show(L("Cuenta creada"), message: L("Sólo tienes este dispositivo en tu cuenta. Si lo pierdes, sólo podrás entrar con tu clave de recuperación."))
+                dismiss()
+            }
             catch is CancellationError {} catch { self.error = CuentaPear.mensajeDe(error) }
         }
     }
 }
 
-// MARK: Entrar con tu clave de recuperación (§7.3 punto 1)
+// MARK: Usar mi clave de recuperación (§7.3 punto 1)
 
 struct EntrarConClaveView: View {
     @State private var clave = ""
@@ -552,7 +739,8 @@ struct EntrarConClaveView: View {
                     .accessibilityIdentifier("botonEntrar")
             }
         }
-        .navigationTitle(L("Entrar")).navigationBarTitleDisplayMode(.inline)
+        .navigationTitle(L("Usar mi clave de recuperación")).navigationBarTitleDisplayMode(.inline)
+        .onChange(of: clave) { _ in error = nil }
     }
 
     private func entrar() {
@@ -562,44 +750,44 @@ struct EntrarConClaveView: View {
         Task {
             defer { entrando = false }
             do { try await CuentaPear.shared.entrarConClave(clave); dismiss() }
-            catch let e as CuentaPear.ErrorCuenta { error = e.mensaje }
             catch is CancellationError {} catch { self.error = CuentaPear.mensajeDe(error) }
         }
     }
 }
 
-// MARK: Con cuenta: avisos y secciones
+// MARK: Con cuenta (opción A «Ordenar»): avisos, la sync, tus dispositivos, lo que viaja y, plegado, lo demás
 
 private struct CuentaConectada: View {
+    @Environment(\.navCuenta) private var nav
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @ObservedObject private var cuenta = CuentaPear.shared
     @ObservedObject private var sync = SyncBiblioteca.shared
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @AppStorage("accountName") private var nombreCuenta = ""
-    @State private var cambiarNombre = false
-    @State private var nombreNuevo = ""
     @State private var error: String?
-    @State private var terminos = false
+    @State private var abierto = CuentaCapturas.seguridad
 
     var body: some View {
+        let n = cuenta.dispositivos.count
+        let lleno = n >= 10
         Form {
             if let fecha = cuenta.borrarEn {
                 Section {
                     Estado(ok: false, texto: L("Se va a borrar tu cuenta el {0}", Date(timeIntervalSince1970: TimeInterval(fecha))
                         .formatted(.dateTime.day().month(.wide).year().locale(Locale(identifier: I18n.current == "va" ? "ca" : I18n.current)))))
-                    Button(L("Cancelar el borrado")) { hacer { try await cuenta.cancelarBorrado() } }
+                    Button { intentar($error) { try await cuenta.cancelarBorrado() } } label: { Label(L("Cancelar el borrado"), systemImage: "arrow.uturn.backward") }
                 }
             }
             if cuenta.terminosPendientes {
                 Section {
                     Text(L("Hay términos nuevos. Para seguir usando la cuenta, léelos y acéptalos."))
-                    Button(L("Ver los términos nuevos")) { terminos = true }
+                    Button { nav.ir(.terminos) } label: { Label(L("Ver los términos nuevos"), systemImage: "doc.text") }
                 }
             }
             // La biblioteca de la cuenta (2-D, sync.md §4 y §5.4): lo que hay que contar una vez.
             if let aviso = sync.aviso {
                 Section {
                     Text(aviso)
-                    Button(L("Entendido")) { sync.avisoVisto() }
+                    Button { sync.avisoVisto() } label: { Label(L("Entendido"), systemImage: "checkmark") }
                 }
             }
             ForEach(cuenta.avisos) { a in
@@ -607,221 +795,201 @@ private struct CuentaConectada: View {
                     switch a.aviso {
                     case .nuevo(let id):
                         Text(L("Se ha añadido \"{0}\" a tu cuenta. ¿No has sido tú? Quítalo", a.nombre))
-                        Button(L("Quitar"), role: .destructive) { hacer { try await cuenta.quitar(id); cuenta.avisoVisto(id) } }
-                        Button(L("He sido yo")) { cuenta.avisoVisto(id) }
+                        Button(role: .destructive) { intentar($error) { try await cuenta.quitar(id); cuenta.avisoVisto(id) } } label: {
+                            Label(L("Quitar"), systemImage: "minus.circle")
+                        }
+                        Button { cuenta.avisoVisto(id) } label: { Label(L("He sido yo"), systemImage: "checkmark") }
                     case .quitado(let id):
-                        Text(L("Se añadió \"{0}\" a tu cuenta y ya se ha quitado. ¿No has sido tú? Revisa tus móviles", a.nombre))
-                        Button(L("Entendido")) { cuenta.avisoVisto(id) }
+                        Text(L("Se añadió \"{0}\" a tu cuenta y ya se ha quitado. ¿No has sido tú? Revisa tus dispositivos", a.nombre))
+                        Button { cuenta.avisoVisto(id) } label: { Label(L("Entendido"), systemImage: "checkmark") }
                     }
                 }
             }
-            if cuenta.soloEsteMovil {
-                Section { Text(L("Sólo tienes este móvil en tu cuenta. Si lo pierdes, sólo podrás entrar con tu clave de recuperación.")).font(.footnote) }
-            }
+            // Un recordatorio cada tantos meses, no un segundo menú: lleva a «Comprobar mi clave» (DECISIONS 101).
             if cuenta.tocaSugerirClave {
                 Section {
                     Text(L("¿Sigues teniendo tu clave de recuperación? Compruébala un momento."))
-                    NavigationLink(L("Comprobar ahora"), destination: ComprobarClaveView())
-                    Button(L("Ahora no")) { cuenta.posponerSugerencia() }
+                    Button { nav.ir(.comprobar) } label: { Label(L("Comprobar ahora"), systemImage: "key") }
+                    Button { cuenta.posponerSugerencia() } label: { Label(L("Ahora no"), systemImage: "clock") }
                 }
             }
             if let error { Section { Estado(ok: false, texto: error) } }
-            // PULIR #6: el nombre de la cuenta, sólo para ti (cifrado; sólo lo ven tus móviles). Sin @usuario ni buscador.
-            Section {
-                Button { nombreNuevo = nombreCuenta; cambiarNombre = true } label: {
-                    HStack {
-                        Label(L("Nombre de la cuenta"), systemImage: "person.text.rectangle").foregroundStyle(Color(uiColor: .label))
-                        Spacer()
-                        Text(nombreCuenta.isEmpty ? L("Sin nombre") : nombreCuenta).foregroundStyle(Color(uiColor: .secondaryLabel)).lineLimit(1)
-                    }
-                }
-                .accessibilityIdentifier("nombreCuenta")
-            } footer: { Text(L("Sólo para ti: va cifrado y sólo lo ven tus móviles. No es un nombre de usuario: nadie te puede buscar por él.")) }
-            // PULIR #4: cómo va la sincronización. Pulir 2 #3: con «Comprobar ahora» a la derecha, para que se vea que se
-            // toca (toda la fila hace lo mismo). Cápsula neutra, no shu. Igual en Android.
+
+            // 1. Cómo va la sincronización, con «Comprobar ahora» (Pulir 2 #3). Cápsula neutra: no es el shu de la pantalla.
             Section {
                 let e = sync.vista.estado()
-                let comprobando = sync.vista.fase != .quieta
+                let v = sync.vista
+                let comprobando = v.fase != .quieta
+                let alDia = !comprobando && !v.bloqueado && !v.sinRed && !v.pendiente && v.ultimaOk > 0 && n > 1
                 // Sin envolver en otro Button: en un Form, un botón dentro de otro se lleva el toque de la fila entera.
                 HStack(spacing: 8) {
-                        Label {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(e.texto).foregroundStyle(Color(uiColor: .label))
-                                if let d = sync.vista.detalle { Text(d).font(.footnote).foregroundStyle(Color(uiColor: .secondaryLabel)) }
-                            }
-                        } icon: { Image(systemName: e.icono).foregroundStyle(Color(uiColor: .label)) }
-                        Spacer(minLength: 0)
-                        BotonComprobar(comprobando: comprobando) { sync.alEntrar() }
+                    Image(systemName: e.icono).foregroundStyle(Color(uiColor: .label)).frame(width: 28).accessibilityHidden(true)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(e.texto).foregroundStyle(Color(uiColor: .label))
+                        if alDia {
+                            Text(L("Tu música está igual en tus {0} dispositivos", String(n)))
+                                .font(.footnote).foregroundStyle(Color(uiColor: .secondaryLabel))
+                        }
+                    }
+                    Spacer(minLength: 0)
+                    BotonComprobar(comprobando: comprobando) { sync.alEntrar() }
                 }
                 .contentShape(Rectangle())
                 .onTapGesture { if !comprobando { sync.alEntrar() } }
                 .accessibilityIdentifier("estadoSync")
-            }
-            // PULIR #2: «Añadir un móvil» también aquí, no sólo dentro de Dispositivos (no se encontraba).
-            Section {
-                NavigationLink(destination: AnadirMovilView()) { Label(L("Añadir un móvil"), systemImage: "qrcode.viewfinder") }
-                    .disabled(cuenta.dispositivos.count >= 10)
-                    .accessibilityIdentifier("anadirUnMovilCuenta")
             } footer: {
-                Text(cuenta.dispositivos.count >= 10 ? L("Ya hay 10 móviles en tu cuenta. Quita uno antes")
-                                                     : L("Para entrar en tu cuenta desde otro móvil sin escribir la clave: en el móvil nuevo, «Entrar desde otro móvil»."))
+                // Modo fútbol: la explicación en el pie (junto al botón quedaba en una columna estrecha). Igual en Android.
+                if let d = sync.vista.detalle { Text(d) }
             }
+
+            // 2. Tus dispositivos: tocar uno abre su menú (cambiar el nombre; quitar, si no es este), y «Añadir un
+            // dispositivo», el único shu de la pantalla.
             Section {
-                NavigationLink(destination: SincronizadoView()) { Label(L("Lo que se sincroniza"), systemImage: "checklist") } // PULIR #5
+                ForEach(cuenta.dispositivos) { d in FilaDispositivo(d: d, error: $error) }
+                Button { nav.ir(.anadirMovil) } label: { Label(L("Añadir un dispositivo"), systemImage: "plus") }
+                    .buttonStyle(PillButtonStyle(prominent: true))
+                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                    .disabled(lleno)
+                    .accessibilityIdentifier("anadirDispositivo")
+            } header: { Text(L("Tus dispositivos")) } footer: {
+                Text(lleno ? L("Ya hay 10 dispositivos en tu cuenta. Quita uno antes")
+                     : cuenta.soloEsteMovil ? L("Sólo tienes este dispositivo en tu cuenta. Si lo pierdes, sólo podrás entrar con tu clave de recuperación.")
+                     : L("En el nuevo, abre Jiyu Pulse, elige «Entrar con otro dispositivo» y escanea el código que te enseña."))
+            }
+
+            // 3. Lo que viaja (PULIR #5).
+            Section {
+                Button { nav.ir(.sincronizado) } label: { Fila(titulo: L("Lo que se sincroniza"), icono: "checklist", flecha: true) }
                     .accessibilityIdentifier("loQueSeSincroniza")
-                NavigationLink(destination: DispositivosView()) { Label(L("Dispositivos"), systemImage: "iphone.gen3") }
-                NavigationLink(destination: ComprobarClaveView()) { Label(L("Comprobar mi clave"), systemImage: "key") }
             } footer: { Text(L("Tu biblioteca viaja cifrada: el servidor no puede leerla.")) }
+
+            // 4. Plegado: la clave, el nombre, los términos, quitar los demás, cerrar sesión y borrar. Como «Avanzado».
             Section {
-                NavigationLink(destination: BorrarCuentaView()) { Label(L("Borrar cuenta"), systemImage: "person.crop.circle.badge.minus").foregroundStyle(.red) }
-            }
-        }
-        .task { hacer { try await cuenta.cargar() } }
-        .refreshable { hacer { try await cuenta.cargar() } }
-        .sheet(isPresented: $terminos) { TerminosNuevosView() }
-        .alert(L("Nombre de la cuenta"), isPresented: $cambiarNombre) {
-            TextField(L("Por ejemplo, Mi música"), text: $nombreNuevo)
-            Button(L("Guardar")) { if let n = LibraryFile.nombreCuentaValido(nombreNuevo) { nombreCuenta = n } }
-                .disabled(LibraryFile.nombreCuentaValido(nombreNuevo) == nil)
-            Button(L("Cancelar"), role: .cancel) {}
-        } message: { Text(L("Para que reconozcas tu cuenta en tus móviles. Hasta 40 caracteres; vacío, sin nombre.")) }
-    }
-
-    private func hacer(_ trabajo: @escaping () async throws -> Void) {
-        Task {
-            do { try await trabajo(); error = nil }
-            catch let e as CuentaPear.ErrorCuenta { error = e.mensaje }
-            catch is CancellationError {} catch { self.error = CuentaPear.mensajeDe(error) }
-        }
-    }
-}
-
-/// Términos nuevos: las mismas dos casillas que al crear la cuenta (§7.2).
-private struct TerminosNuevosView: View {
-    @Environment(\.dismiss) private var dismiss
-    @State private var terminos = false
-    @State private var edad = false
-    @State private var error: String?
-    var body: some View {
-        NavigationStack {
-            Form {
-                Section {
-                    Casilla(marcada: $terminos, titulo: L("Acepto los Términos de uso y la Política de privacidad"),
-                            enlace: (L("Leer los textos"), CuentaViewsLegal.url))
-                    Casilla(marcada: $edad, titulo: L("Tengo 14 años o más"))
-                    if let error { Estado(ok: false, texto: error) }
-                }
-                Section {
-                    Button(L("Aceptar")) {
-                        Task {
-                            do { try await CuentaPear.shared.aceptarTerminos(); dismiss() }
-                            catch let e as CuentaPear.ErrorCuenta { error = e.mensaje }
-                            catch is CancellationError {} catch { self.error = CuentaPear.mensajeDe(error) }
+                DisclosureGroup(isExpanded: $abierto.animation(reduceMotion ? nil : Animation.uiEaseOut(0.25))) {
+                    Button { nav.ir(.comprobar) } label: { Fila(titulo: L("Comprobar mi clave"), icono: "key", flecha: true) }
+                        .accessibilityIdentifier("comprobarMiClave")
+                    // PULIR #6: el nombre de la cuenta, sólo para ti (cifrado). El aviso con campo, como «Renombrar».
+                    Button {
+                        NamePrompt.ask(L("Nombre de la cuenta"), initial: nombreCuenta, confirm: L("Guardar"),
+                                       message: L("Para que reconozcas tu cuenta en tus dispositivos. Hasta 40 caracteres; vacío, sin nombre."),
+                                       placeholder: L("Por ejemplo, Mi música"), valid: { LibraryFile.nombreCuentaValido($0) != nil }) { t in
+                            if let v = LibraryFile.nombreCuentaValido(t) { nombreCuenta = v }
                         }
+                    } label: {
+                        Fila(titulo: L("Nombre de la cuenta"), icono: "person.text.rectangle", valor: nombreCuenta.isEmpty ? L("Sin nombre") : nombreCuenta, flecha: true)
                     }
-                    .buttonStyle(PillButtonStyle(prominent: true)).listRowBackground(Color.clear).listRowInsets(EdgeInsets())
-                    .disabled(!(terminos && edad))
-                }
-            }
-            .navigationTitle(L("Términos nuevos")).navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .cancellationAction) { Button(L("Ahora no")) { dismiss() } } }
-        }
-    }
-}
-
-// MARK: Dispositivos (§7.3 puntos 3, 7 y 9)
-
-struct DispositivosView: View {
-    @ObservedObject private var cuenta = CuentaPear.shared
-    @State private var quitar: CuentaPear.Dispositivo?
-    @State private var renombrar: CuentaPear.Dispositivo?
-    @State private var nombreNuevo = ""
-    @State private var losDemas = false
-    @State private var clave = ""
-    @State private var error: String?
-
-    var body: some View {
-        Form {
-            Cabecera(pose: "con-cascos", titulo: L("Tus móviles"), texto: L("Los móviles que pueden entrar en tu cuenta. Si no reconoces alguno, quítalo."))
-            Section {
-                ForEach(cuenta.dispositivos) { d in
-                    HStack(spacing: 12) {
-                        Image(systemName: d.plataforma == "ios" ? "iphone" : "smartphone").foregroundStyle(.secondary).frame(width: 28)
-                        // Tocar el nombre lo cambia (orden 6 del 18-11): sirve para este móvil y para los demás.
-                        Button { nombreNuevo = d.nombre; renombrar = d } label: {
-                            HStack(spacing: 6) {
-                                VStack(alignment: .leading, spacing: 2) {
-                                    // Colores del sistema explícitos: dentro de un botón, .primary/.secondary salen con el
-                                    // tinte (shu) y la pantalla tendría varios (COLOR.md, un solo shu; captura 60 del 18-11).
-                                    Text(d.nombre).foregroundStyle(Color(uiColor: .label))
-                                    Text(d.este ? L("Este móvil") : visto(d)).font(.footnote).foregroundStyle(Color(uiColor: .secondaryLabel))
-                                }
-                                Spacer(minLength: 0)
-                                Image(systemName: "pencil").font(.footnote).foregroundStyle(Color(uiColor: .secondaryLabel)).accessibilityHidden(true)
+                    .accessibilityIdentifier("nombreCuenta")
+                    Link(destination: CuentaViewsLegal.url) { Fila(titulo: L("Términos y privacidad"), icono: "doc.text", flecha: true) }
+                    // Si te han robado uno: sale todo de golpe menos este (antes, en la pantalla Dispositivos, que ya no hay).
+                    if n > 1 {
+                        Button {
+                            NamePrompt.ask(L("Quitar todos los demás dispositivos"), confirm: L("Quitar todos"),
+                                           message: L("Escribe tu clave de recuperación para confirmarlo."),
+                                           placeholder: L("Tu clave de recuperación"), secret: true, destructive: true) { k in
+                                intentar($error) { try await cuenta.quitarLosDemas(clave: k) }
                             }
-                            .contentShape(Rectangle())
+                        } label: {
+                            Fila(titulo: L("Quitar todos los demás dispositivos"), subtitulo: L("Si te han robado uno. Hace falta tu clave de recuperación."),
+                                 icono: "minus.circle", rojo: true)
                         }
-                        .buttonStyle(.borderless)
-                        .accessibilityHint(L("Cambiar nombre"))
-                        .accessibilityIdentifier("renombrar-\(d.id)")
-                        Button(L("Quitar"), role: .destructive) { quitar = d }.buttonStyle(.borderless)
+                        .accessibilityIdentifier("quitarLosDemas")
                     }
-                    .frame(minHeight: 44)
+                    Button { nav.ir(.cerrarSesion) } label: {
+                        Fila(titulo: L("Cerrar sesión"), icono: "rectangle.portrait.and.arrow.right", flecha: true)
+                    }
+                    .accessibilityIdentifier("cerrarSesion")
+                    Button { nav.ir(.borrar) } label: {
+                        Fila(titulo: L("Borrar cuenta"), icono: "person.crop.circle.badge.minus", rojo: true, flecha: true)
+                    }
+                    .accessibilityIdentifier("borrarCuenta")
+                } label: {
+                    Fila(titulo: L("Seguridad y cuenta"),
+                         subtitulo: abierto ? nil : L("Clave de recuperación, nombre, términos, cerrar sesión y borrar la cuenta"), icono: "shield")
                 }
+                .accessibilityIdentifier("seguridadYCuenta")
             } footer: {
-                if cuenta.soloEsteMovil { Text(L("Sólo tienes este móvil en tu cuenta. Si lo pierdes, sólo podrás entrar con tu clave de recuperación.")) }
-            }
-            Section {
-                NavigationLink(destination: AnadirMovilView()) { Label(L("Añadir un móvil"), systemImage: "qrcode.viewfinder") }
-                    .disabled(cuenta.dispositivos.count >= 10)
-                    .accessibilityIdentifier("anadirUnMovil")
-            } footer: {
-                Text(cuenta.dispositivos.count >= 10 ? L("Ya hay 10 móviles en tu cuenta. Quita uno antes")
-                                                     : L("Escanea el código que enseña el móvil nuevo."))
-            }
-            if let error { Section { Estado(ok: false, texto: error) } }
-            if cuenta.dispositivos.count > 1 {
-                Section {
-                    Button(L("Quitar todos los demás móviles"), role: .destructive) { losDemas = true }
-                } footer: { Text(L("Si te han robado un móvil: sale todo de golpe menos este. Hace falta tu clave de recuperación.")) }
+                if abierto {
+                    Text(L("El nombre de la cuenta es sólo para ti: va cifrado y sólo lo ven tus dispositivos. No es un nombre de usuario: nadie te puede buscar por él."))
+                }
             }
         }
-        .navigationTitle(L("Dispositivos")).navigationBarTitleDisplayMode(.inline)
-        .task { try? await cuenta.cargar() }
-        .confirmationDialog(L("¿Quitar \"{0}\"?", quitar?.nombre ?? ""), isPresented: Binding(get: { quitar != nil }, set: { if !$0 { quitar = nil } }), titleVisibility: .visible) {
-            Button(L("Quitar"), role: .destructive) {
-                if let d = quitar { hacer { try await cuenta.quitar(d.id) } }
+        .alFinalEnCapturas(CuentaCapturas.seguridad && cuenta.tieneCuenta)
+        .task { intentar($error) { try await cuenta.cargar() } }
+        .refreshable { intentar($error) { try await cuenta.cargar() } }
+    }
+}
+
+/// Un dispositivo de «Tus dispositivos». Tocarlo abre su menú (`Menu`, anclado a la fila como el de una playlist):
+/// «Cambiar nombre» (el aviso con campo, como «Renombrar») y, si no es este, «Quitar de la cuenta» (con la confirmación
+/// de eliminar). Este dispositivo sale con «Cerrar sesión», en «Seguridad y cuenta». Igual que `FilaDispositivo` en Android.
+private struct FilaDispositivo: View {
+    let d: CuentaPear.Dispositivo
+    @Binding var error: String?
+    @ObservedObject private var cuenta = CuentaPear.shared
+
+    var body: some View {
+        Menu {
+            Button {
+                NamePrompt.ask(L("Cambiar nombre"), initial: d.nombre, confirm: L("Guardar"),
+                               message: L("Así lo verás en tus dispositivos. De 1 a 40 caracteres."),
+                               placeholder: L("Nombre del dispositivo"), valid: { CuentaCripto.nombreValido($0) != nil }) { n in
+                    intentar($error) { try await cuenta.renombrar(d.id, a: n) }
+                }
+            } label: { Label(L("Cambiar nombre"), systemImage: "pencil") }
+            if !d.este {
+                Button(role: .destructive) {
+                    AppAlert.confirm(L("¿Quitar «{0}»?", d.nombre), message: L("Ese dispositivo ya no podrá entrar en tu cuenta."), confirm: L("Quitar")) {
+                        intentar($error) { try await cuenta.quitar(d.id) }
+                    }
+                } label: { Label(L("Quitar de la cuenta"), systemImage: "minus.circle") }
             }
-            Button(L("Cancelar"), role: .cancel) {}
-        } message: { Text(quitar?.este == true ? L("Este móvil saldrá de tu cuenta.") : L("Ese móvil ya no podrá entrar en tu cuenta.")) }
-        .alert(L("Cambiar nombre"), isPresented: Binding(get: { renombrar != nil }, set: { if !$0 { renombrar = nil } })) {
-            TextField(L("Nombre del móvil"), text: $nombreNuevo).accessibilityIdentifier("nombre-movil")
-            Button(L("Guardar")) {
-                if let d = renombrar { let n = nombreNuevo; hacer { try await cuenta.renombrar(d.id, a: n) } }
-            }
-            .disabled(CuentaCripto.nombreValido(nombreNuevo) == nil)
-            Button(L("Cancelar"), role: .cancel) {}
-        } message: { Text(L("Así lo verás en tus móviles. De 1 a 40 caracteres.")) }
-        .alert(L("Quitar todos los demás móviles"), isPresented: $losDemas) {
-            TextField(L("Tu clave de recuperación"), text: $clave).textInputAutocapitalization(.characters).autocorrectionDisabled()
-            Button(L("Quitar todos"), role: .destructive) { let c = clave; clave = ""; hacer { try await cuenta.quitarLosDemas(clave: c) } }
-            Button(L("Cancelar"), role: .cancel) { clave = "" }
-        } message: { Text(L("Escribe tu clave de recuperación para confirmarlo.")) }
+        } label: {
+            Fila(titulo: d.nombre, subtitulo: d.este ? L("Este dispositivo") : visto, icono: d.plataforma == "ios" ? "iphone" : "smartphone", mas: true)
+        }
+        .accessibilityIdentifier("disp-\(d.id)")
     }
 
-    private func visto(_ d: CuentaPear.Dispositivo) -> String {
+    private var visto: String {
         guard let v = d.visto else { return L("Nunca") }
         // Fecha en el idioma de la app (no en el del sistema), igual que Android: «Visto 17 nov 2025».
         let idioma = I18n.current == "va" ? "ca" : I18n.current
         return L("Visto {0}", Date(timeIntervalSince1970: TimeInterval(v))
             .formatted(.dateTime.day().month(.abbreviated).year().locale(Locale(identifier: idioma))))
     }
-    private func hacer(_ trabajo: @escaping () async throws -> Void) {
-        Task {
-            do { try await trabajo(); error = nil }
-            catch let e as CuentaPear.ErrorCuenta { error = e.mensaje }
-            catch is CancellationError {} catch { self.error = CuentaPear.mensajeDe(error) }
+}
+
+/// Términos nuevos (antes una hoja): las dos casillas y «Aceptar», el shu de la pantalla. Vuelve a Cuenta.
+struct TerminosNuevosView: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var terminos = false
+    @State private var edad = false
+    @State private var enviando = false
+    @State private var error: String?
+    var body: some View {
+        Form {
+            Cabecera(pose: "pensando", titulo: L("Términos nuevos"), texto: L("Hay términos nuevos. Para seguir usando la cuenta, léelos y acéptalos."))
+            Section {
+                Casilla(marcada: $terminos, titulo: L("Acepto los Términos de uso y la Política de privacidad"),
+                        enlace: (L("Leer los textos"), CuentaViewsLegal.url))
+                    .accessibilityIdentifier("casillaTerminosNuevos")
+                Casilla(marcada: $edad, titulo: L("Tengo 14 años o más")).accessibilityIdentifier("casillaEdadNuevos")
+                if let error { Estado(ok: false, texto: error) }
+            }
+            Section {
+                Button(L("Aceptar")) {
+                    enviando = true
+                    Task {
+                        defer { enviando = false }
+                        do { try await CuentaPear.shared.aceptarTerminos(); dismiss() }
+                        catch is CancellationError {} catch { self.error = CuentaPear.mensajeDe(error) }
+                    }
+                }
+                .buttonStyle(PillButtonStyle(prominent: true)).listRowBackground(Color.clear).listRowInsets(EdgeInsets())
+                .disabled(!(terminos && edad) || enviando)
+                .accessibilityIdentifier("botonTerminos")
+            }
         }
+        .navigationTitle(L("Términos nuevos")).navigationBarTitleDisplayMode(.inline)
     }
 }
 
@@ -833,7 +1001,7 @@ struct ComprobarClaveView: View {
 
     var body: some View {
         Form {
-            Cabecera(pose: "pensando", titulo: L("Comprobar mi clave"), texto: L("Escríbela entera. Se comprueba en este móvil: no se envía a ningún sitio."))
+            Cabecera(pose: "pensando", titulo: L("Comprobar mi clave"), texto: L("Escríbela entera. Se comprueba en este dispositivo: no se envía a ningún sitio."))
             Section {
                 CampoClave(texto: $clave)
                 if let resultado { Estado(ok: resultado, texto: resultado ? L("Está bien") : L("Esa no es tu clave")).accessibilityIdentifier("resultadoClave") }
@@ -853,43 +1021,101 @@ struct ComprobarClaveView: View {
     }
 }
 
+// MARK: Cerrar sesión (Pulir 2 · notas de la opción A #4)
+
+/// Este dispositivo sale de la cuenta y la biblioteca se queda aquí, sin sincronizar. Si es el único de la cuenta, un
+/// aviso grande: para volver a entrar hará falta la clave. Pide presencia (`CuentaPear.cerrarSesion`). Sin shu: no es la
+/// acción que se quiere empujar. Igual que `CerrarSesion` en Android.
+struct CerrarSesionView: View {
+    @ObservedObject private var cuenta = CuentaPear.shared
+    @Environment(\.dismiss) private var dismiss
+    @State private var error: String?
+
+    var body: some View {
+        let solo = cuenta.soloEsteMovil
+        Form {
+            Cabecera(pose: "corriendo", titulo: L("Cerrar sesión en este dispositivo"),
+                     texto: L("Este dispositivo sale de tu cuenta. Tu biblioteca se queda aquí, pero ya no se sincroniza. No se borra nada."))
+            if solo {
+                // Aviso grande: icono naranja (aviso, no error) + texto en `label`; el color nunca es la única pista.
+                Section {
+                    HStack(alignment: .top, spacing: 14) {
+                        Image(systemName: "exclamationmark.triangle.fill").font(.system(size: 28)).foregroundStyle(.orange).accessibilityHidden(true)
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(L("Es tu único dispositivo")).font(.title3.bold())
+                            Text(L("Para volver a entrar en tu cuenta hará falta tu clave de recuperación. Sin ella, la cuenta y lo que hay en la nube se pierden."))
+                                .fixedSize(horizontal: false, vertical: true)
+                            Text(L("Puedes comprobarla antes en Seguridad y cuenta › Comprobar mi clave."))
+                                .font(.subheadline).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                    .padding(.vertical, 8)
+                    .accessibilityElement(children: .combine)
+                    .accessibilityIdentifier("avisoUnico")
+                }
+            }
+            if let error { Section { Estado(ok: false, texto: error) } }
+            Section {
+                Button {
+                    AppAlert.confirm(L("¿Cerrar sesión en este dispositivo?"),
+                                     message: solo ? L("Es tu único dispositivo: sólo podrás volver a entrar con tu clave de recuperación.")
+                                                   : L("Saldrá de tu cuenta. Tu biblioteca se queda aquí, sin sincronizar."),
+                                     confirm: L("Cerrar sesión")) { cerrar() }
+                } label: { Fila(titulo: L("Cerrar sesión"), icono: "rectangle.portrait.and.arrow.right", rojo: true) }
+                .accessibilityIdentifier("botonCerrarSesion")
+            } footer: {
+                if !solo { Text(L("Tus otros dispositivos siguen en la cuenta y verán que este ya no está.")) }
+            }
+        }
+        .navigationTitle(L("Cerrar sesión")).navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func cerrar() {
+        Task {
+            do {
+                try await cuenta.cerrarSesion()
+                CuentaEnPantalla.shared.aviso = L("Has cerrado sesión. Tu biblioteca sigue aquí.")
+                dismiss()
+            }
+            catch is CancellationError {} catch { self.error = CuentaPear.mensajeDe(error) }
+        }
+    }
+}
+
 // MARK: Borrar cuenta (§7.3 punto 6)
 
 struct BorrarCuentaView: View {
     @ObservedObject private var cuenta = CuentaPear.shared
     @Environment(\.dismiss) private var dismiss
     @State private var clave = ""
-    @State private var confirmar = false
     @State private var error: String?
 
     var body: some View {
         Form {
             Cabecera(pose: "de-espaldas", titulo: L("Borrar tu cuenta"),
-                     texto: L("Se borran tu cuenta y todo lo que hay en la nube. Lo que tienes en tus móviles se queda."))
+                     texto: L("Se borran tu cuenta y todo lo que hay en la nube. Lo que tienes en tus dispositivos se queda."))
             Section {
                 CampoClave(texto: $clave, titulo: L("Tu clave de recuperación (opcional)"))
-                if let error { Estado(ok: false, texto: error) }
             } footer: {
-                Text(L("Con tu clave se borra al momento. Sin ella, se borra dentro de 14 días y lo verás en todos tus móviles, por si no has sido tú."))
+                Text(L("Con tu clave se borra al momento. Sin ella, se borra dentro de 14 días y lo verás en todos tus dispositivos, por si no has sido tú."))
             }
+            if let error { Section { Estado(ok: false, texto: error) } }
             Section {
-                Button(clave.isEmpty ? L("Borrar dentro de 14 días") : L("Borrar ahora"), role: .destructive) { confirmar = true }
-                    .frame(maxWidth: .infinity, minHeight: 44)
-                    .accessibilityIdentifier("botonBorrar")
+                Button {
+                    AppAlert.confirm(L("¿Borrar tu cuenta?"), message: L("No se puede deshacer."), confirm: L("Borrar la cuenta")) { borrar() }
+                } label: { Fila(titulo: clave.isEmpty ? L("Borrar dentro de 14 días") : L("Borrar ahora"), icono: "trash", rojo: true) }
+                .accessibilityIdentifier("botonBorrar")
             }
         }
         .navigationTitle(L("Borrar cuenta")).navigationBarTitleDisplayMode(.inline)
-        .confirmationDialog(L("¿Borrar tu cuenta?"), isPresented: $confirmar, titleVisibility: .visible) {
-            Button(L("Borrar la cuenta"), role: .destructive) {
-                let c = clave
-                Task {
-                    do { try await cuenta.borrar(clave: c.isEmpty ? nil : c); dismiss() }
-                    catch let e as CuentaPear.ErrorCuenta { error = e.mensaje }
-                    catch is CancellationError {} catch { self.error = CuentaPear.mensajeDe(error) }
-                }
-            }
-            Button(L("Cancelar"), role: .cancel) {}
-        } message: { Text(L("No se puede deshacer.")) }
+    }
+
+    private func borrar() {
+        let c = clave
+        Task {
+            do { try await cuenta.borrar(clave: c.isEmpty ? nil : c); dismiss() }
+            catch is CancellationError {} catch { self.error = CuentaPear.mensajeDe(error) }
+        }
     }
 }
 
@@ -918,15 +1144,25 @@ struct AccountPitch: View {
             Text(L("No la necesitas para nada: Jiyu Pulse funciona igual sin ella. Pero si te la creas nos ayudas muchísimo a mejorar la app, y tú te llevas tu música allá donde vayas."))
                 .font(.callout).foregroundStyle(.secondary).padding(.top, 14).padding(.bottom, 6)
                 .fixedSize(horizontal: false, vertical: true)
-            point("lock.fill", 5, L("Tu biblioteca, cifrada en la nube"), L("Sólo tú tienes la clave. Ni siquiera nosotros podemos leerla."))
-            point("iphone.gen3", 2, L("Pásala a otro móvil"), L("Playlists y favoritos en un minuto, también entre iPhone y Android."))
-            point("heart.fill", 0, L("Ayudas a mejorar Jiyu Pulse"), L("Saber cuántos sois nos dice dónde poner el esfuerzo."))
-            point("sparkles", 4, L("Muy pronto, ventajas"), L("Estamos preparando cosas solo para quien tenga cuenta. Te avisaremos en Avisos."))
+            PuntosCuenta()
         }
         .padding(.horizontal, 20).padding(.vertical, 22)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(RoundedRectangle(cornerRadius: 24, style: .continuous).fill(.regularMaterial))
         .accessibilityElement(children: .combine)
+    }
+}
+
+/// Lo que ganas con la cuenta: en la guía inicial (`AccountPitch`) y plegado en Ajustes › Cuenta sin cuenta. Igual que
+/// `PuntosCuenta` en Android.
+struct PuntosCuenta: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            point("lock.fill", 5, L("Tu biblioteca, cifrada en la nube"), L("Sólo tú tienes la clave. Ni siquiera nosotros podemos leerla."))
+            point("iphone.gen3", 2, L("Pásala a otro dispositivo"), L("Playlists y favoritos en un minuto, también entre iPhone y Android."))
+            point("heart.fill", 0, L("Ayudas a mejorar Jiyu Pulse"), L("Saber cuántos sois nos dice dónde poner el esfuerzo."))
+            point("sparkles", 4, L("Muy pronto, ventajas"), L("Estamos preparando cosas solo para quien tenga cuenta. Te avisaremos en Avisos."))
+        }
     }
 
     private func point(_ icon: String, _ palette: Int, _ title: String, _ text: String) -> some View {

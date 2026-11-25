@@ -1457,3 +1457,93 @@
 1457	A Espanya passa de vegades durant els partits de futbol. Es tornarà a provar tota sola.
 1458	Provar-ho més tard
 1459	No es pot arribar al servidor
+1460	Ara només és en aquest dispositiu. Si el tornes a sincronitzar, passarà als teus altres dispositius.
+1461	Alguna cosa ha fallat en aquest dispositiu. Torna-ho a provar; si continua, informa de l'error
+1462	Apunta la càmera al codi del dispositiu nou
+1463	Així el veuràs als teus dispositius. D'1 a 40 caràcters.
+1464	Afegeix un dispositiu
+1465	Afegir un dispositiu al teu compte
+1466	Canviar el nom d'aquest dispositiu
+1467	Clau de recuperació, nom, condicions i esborrar el compte
+1468	Comprova que l'altre dispositiu mostra el mateix.
+1469	Amb la teva clau s'esborra al moment. Sense ella, s'esborra d'aquí a 14 dies i ho veuràs a tots els teus dispositius, per si no has estat tu.
+1470	Còpia xifrada, canviar de dispositiu i avantatges que vindran
+1471	Codi QR per afegir aquest dispositiu
+1472	Deixa de ser preferida aquí i als teus altres dispositius.
+1473	Deixes de seguir-lo aquí i als teus altres dispositius.
+1474	El nom del compte és només per a tu: va xifrat i només el veuen els teus dispositius. No és un nom d'usuari: ningú no et pot buscar per ell.
+1475	El servidor no reconeix aquest dispositiu. Si continua passant, torna a entrar amb la teva clau
+1476	Al dispositiu nou, obre Configuració › Compte › Entra des d'un altre dispositiu i apunta la càmera al seu codi.
+1477	Al nou, obre Jiyu Pulse, tria «Entra des d'un altre dispositiu» i escaneja el codi que et mostra.
+1478	A l'altre dispositiu, obre Configuració › Compte › Afegeix un dispositiu i escaneja aquest codi.
+1479	Entra des d'un altre dispositiu
+1480	És la clau del teu compte. Si perds aquest dispositiu, hi entres des d'un altre amb ella. Apunta-la en paper i guarda-la: no es pot tornar a veure ni canviar per una altra.
+1481	Escaneja el codi que mostra el dispositiu nou.
+1482	Escaneja un codi amb el que ja té el teu compte.
+1483	Escriu-la sencera. Es comprova en aquest dispositiu: no s'envia enlloc.
+1484	Aquell dispositiu ja no és al teu compte
+1485	Aquest dispositiu ja no podrà entrar al teu compte.
+1486	Aquest dispositiu
+1487	Aquest dispositiu sortirà del teu compte.
+1488	Aquest dispositiu ja és en un compte
+1489	Aquest dispositiu ja no és al teu compte
+1490	Això viatja xifrat entre els teus dispositius. Toca alguna cosa per deixar-la només en aquest dispositiu o per treure-la de tots.
+1491	Feia molt que aquest dispositiu no se sincronitzava: s'ha posat al dia amb el teu compte
+1492	Ajuntant el que hi ha als teus dispositius…
+1493	L'hora del dispositiu no és correcta. Posa-la en automàtic i torna-ho a provar
+1494	La que vas apuntar en crear el compte.
+1495	Els dispositius que poden entrar al teu compte. Si no en reconeixes algun, treu-lo.
+1496	Els dos dispositius han de mostrar els mateixos emojis, en el mateix ordre.
+1497	Res per recordar ni que et puguin robar. La teva biblioteca viatja xifrada: només els teus dispositius la poden llegir.
+1498	No hi ha cap compte en aquest dispositiu
+1499	No s'ha pogut afegir aquest dispositiu
+1500	No facis servir aquest codi i treu el dispositiu del teu compte des de l'altre.
+1501	Nom del dispositiu
+1502	Opcional i gratuït. Va xifrada: ni nosaltres la podem llegir.
+1503	Un altre dispositiu ha canviat el mateix alhora. Torna-ho a provar
+1504	Un altre dispositiu ha fet servir aquest codi abans que tu. Al dispositiu nou, toca «No coincideixen» i torna a començar
+1505	Perquè reconeguis el teu compte als teus dispositius. Fins a 40 caràcters; buit, sense nom.
+1506	Passa-la a un altre dispositiu
+1507	Treu-ho de tots els meus dispositius
+1508	Treu tots els altres dispositius
+1509	Treure un dispositiu del teu compte
+1510	Què hi guanyes amb el compte
+1511	S'ha afegit «{0}» al teu compte i ja s'ha tret. No has estat tu? Revisa els teus dispositius
+1512	S'esborra la carpeta aquí i als teus altres dispositius; el que té a dins puja un nivell. No es pot desfer.
+1513	S'esborra la llista aquí i als teus altres dispositius. No es pot desfer.
+1514	S'esborren el teu compte i tot el que hi ha al núvol. El que tens als teus dispositius es queda.
+1515	Es treu l'àlbum de la teva biblioteca aquí i als teus altres dispositius.
+1516	Seguretat i compte
+1517	Si t'han robat un dispositiu: surt tot de cop menys aquest. Cal la teva clau de recuperació.
+1518	Només en aquest dispositiu
+1519	Només en aquest dispositiu: va amb la seva carpeta
+1520	Només tens aquest dispositiu al teu compte. Si el perds, només podràs entrar amb la teva clau de recuperació.
+1521	La teva biblioteca del núvol estava incompleta: l'hem completada amb la d'aquest dispositiu
+1522	La teva música a tots els teus dispositius
+1523	La teva música és igual als teus {0} dispositius
+1524	Els teus dispositius
+1525	Condicions i privadesa
+1526	Fes servir la meva clau de recuperació
+1527	Ja hi ha 10 dispositius al teu compte. Treu-ne un abans
+1528	«No sincronitzis això» ho deixa només en aquest dispositiu (als altres es queda com està). «Treu-ho de tots els meus dispositius» ho esborra aquí i als altres.
+1529	Vols treure «{0}» de tots els teus dispositius?
+1530	Veus el mateix a l'altre dispositiu?
+1531	Ja tens compte en un altre dispositiu?
+1532	Obert
+1533	Tancat
+1534	Tanca la sessió en aquest dispositiu
+1535	Clau de recuperació, nom, termes, tancar la sessió i esborrar el compte
+1536	És el teu únic dispositiu
+1537	És el teu únic dispositiu: només podràs tornar a entrar amb la clau de recuperació.
+1538	Aquest dispositiu surt del teu compte. La biblioteca es queda aquí, però ja no se sincronitza. No s'esborra res.
+1539	Has tancat la sessió. La biblioteca continua aquí.
+1540	Per tornar a entrar al compte caldrà la clau de recuperació. Sense ella, el compte i el que hi ha al núvol es perden.
+1541	Abans la pots comprovar a Seguretat i compte › Comprova la meva clau.
+1542	Treu del compte
+1543	Sortirà del teu compte. La biblioteca es queda aquí, sense sincronitzar.
+1544	Es queda només en aquest dispositiu; als altres no es toca.
+1545	Si te n'han robat un. Cal la clau de recuperació.
+1546	Els altres dispositius continuen al compte i veuran que aquest ja no hi és.
+1547	Vols tancar la sessió en aquest dispositiu?
+1548	Vols treure «{0}» de tots els teus dispositius?
+1549	Vols treure «{0}»?

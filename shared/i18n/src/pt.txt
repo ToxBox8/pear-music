@@ -1457,3 +1457,93 @@
 1457	Em Espanha acontece às vezes durante os jogos de futebol. Vai tentar de novo sozinha.
 1458	Tentar mais tarde
 1459	Não é possível chegar ao servidor
+1460	Agora só está neste dispositivo. Se o voltares a sincronizar, passa para os teus outros dispositivos.
+1461	Algo correu mal neste dispositivo. Tenta outra vez; se continuar, comunica o erro
+1462	Aponta a câmara ao código do dispositivo novo
+1463	É assim que o vais ver nos teus dispositivos. De 1 a 40 caracteres.
+1464	Adicionar um dispositivo
+1465	Adicionar um dispositivo à tua conta
+1466	Mudar o nome deste dispositivo
+1467	Chave de recuperação, nome, termos e apagar a conta
+1468	Confirma que o outro dispositivo mostra o mesmo.
+1469	Com a tua chave é apagada de imediato. Sem ela, é apagada dentro de 14 dias e vais vê-lo em todos os teus dispositivos, caso não tenhas sido tu.
+1470	Cópia cifrada, mudar de dispositivo e vantagens que vêm aí
+1471	Código QR para adicionar este dispositivo
+1472	Deixa de ser favorita aqui e nos teus outros dispositivos.
+1473	Deixas de o seguir aqui e nos teus outros dispositivos.
+1474	O nome da conta é só para ti: vai cifrado e só os teus dispositivos o veem. Não é um nome de utilizador: ninguém te pode procurar por ele.
+1475	O servidor não reconhece este dispositivo. Se continuar, entra outra vez com a tua chave
+1476	No dispositivo novo, abre Definições › Conta › Entrar a partir de outro dispositivo e aponta a câmara ao código.
+1477	No novo, abre o Jiyu Pulse, escolhe «Entrar a partir de outro dispositivo» e lê o código que te mostra.
+1478	No outro dispositivo, abre Definições › Conta › Adicionar um dispositivo e lê este código.
+1479	Entrar a partir de outro dispositivo
+1480	É a chave da tua conta. Se perderes este dispositivo, é com ela que entras noutro. Escreve-a em papel e guarda-a bem: não se pode voltar a ver nem trocar por outra.
+1481	Lê o código que o dispositivo novo mostra.
+1482	Lê um código com o que já tem a tua conta.
+1483	Escreve-a inteira. É verificada neste dispositivo: não é enviada para lado nenhum.
+1484	Esse dispositivo já não está na tua conta
+1485	Esse dispositivo já não vai poder entrar na tua conta.
+1486	Este dispositivo
+1487	Este dispositivo vai sair da tua conta.
+1488	Este dispositivo já está numa conta
+1489	Este dispositivo já não está na tua conta
+1490	Isto viaja cifrado entre os teus dispositivos. Toca em algo para o deixares só neste dispositivo ou para o tirares de todos.
+1491	Há muito que este dispositivo não sincronizava: foi posto em dia com a tua conta
+1492	A juntar o que tens nos teus dispositivos…
+1493	A hora do dispositivo não está certa. Põe-na em automático e tenta outra vez
+1494	A que apontaste ao criar a conta.
+1495	Os dispositivos que podem entrar na tua conta. Se não reconheceres algum, retira-o.
+1496	Os dois dispositivos têm de mostrar os mesmos emojis, pela mesma ordem.
+1497	Nada para lembrar nem para te roubarem. A tua biblioteca viaja cifrada: só os teus dispositivos a podem ler.
+1498	Não há nenhuma conta neste dispositivo
+1499	Não foi possível adicionar este dispositivo
+1500	Não uses este código e remove o dispositivo da tua conta a partir do outro.
+1501	Nome do dispositivo
+1502	Opcional e grátis. Vai cifrada: nem nós a conseguimos ler.
+1503	Outro dispositivo mudou o mesmo ao mesmo tempo. Tenta outra vez
+1504	Outro dispositivo usou este código antes de ti. No dispositivo novo, toca «Não coincidem» e começa outra vez
+1505	Para reconheceres a tua conta nos teus dispositivos. Até 40 caracteres; vazio, sem nome.
+1506	Passa-a para outro dispositivo
+1507	Tirar de todos os meus dispositivos
+1508	Retirar todos os outros dispositivos
+1509	Retirar um dispositivo da tua conta
+1510	O que ganhas com a conta
+1511	«{0}» foi adicionado à tua conta e já foi retirado. Não foste tu? Verifica os teus dispositivos
+1512	A pasta é apagada aqui e nos teus outros dispositivos; o que tem dentro sobe um nível. Não se pode desfazer.
+1513	A playlist é apagada aqui e nos teus outros dispositivos. Não se pode desfazer.
+1514	São apagados a tua conta e tudo o que está na nuvem. O que tens nos teus dispositivos fica.
+1515	O álbum sai da tua biblioteca aqui e nos teus outros dispositivos.
+1516	Segurança e conta
+1517	Se te roubaram um dispositivo: sai tudo de uma vez menos este. É preciso a tua chave de recuperação.
+1518	Só neste dispositivo
+1519	Só neste dispositivo: vai com a sua pasta
+1520	Só tens este dispositivo na tua conta. Se o perderes, só vais poder entrar com a tua chave de recuperação.
+1521	A tua biblioteca na nuvem estava incompleta: completámo-la com a deste dispositivo
+1522	A tua música em todos os teus dispositivos
+1523	A tua música está igual nos teus {0} dispositivos
+1524	Os teus dispositivos
+1525	Termos e privacidade
+1526	Usar a minha chave de recuperação
+1527	Já há 10 dispositivos na tua conta. Retira um primeiro
+1528	«Não sincronizar isto» deixa-o só neste dispositivo (nos outros fica como está). «Tirar de todos os meus dispositivos» apaga-o aqui e nos outros.
+1529	Tirar «{0}» de todos os teus dispositivos?
+1530	Vês o mesmo no outro dispositivo?
+1531	Já tens conta noutro dispositivo?
+1532	Aberto
+1533	Fechado
+1534	Terminar sessão neste dispositivo
+1535	Chave de recuperação, nome, termos, terminar sessão e apagar a conta
+1536	É o teu único dispositivo
+1537	É o teu único dispositivo: só poderás voltar a entrar com a tua chave de recuperação.
+1538	Este dispositivo sai da tua conta. A biblioteca fica aqui, mas deixa de sincronizar. Não se apaga nada.
+1539	Terminaste a sessão. A tua biblioteca continua aqui.
+1540	Para voltares a entrar na tua conta vais precisar da chave de recuperação. Sem ela, a conta e o que está na nuvem perdem-se.
+1541	Podes confirmá-la antes em Segurança e conta › Verificar a minha chave.
+1542	Remover da conta
+1543	Vai sair da tua conta. A biblioteca fica aqui, sem sincronizar.
+1544	Fica só neste dispositivo; nos outros não muda nada.
+1545	Se te roubaram um. É precisa a tua chave de recuperação.
+1546	Os teus outros dispositivos continuam na conta e vão ver que este já não está.
+1547	Terminar sessão neste dispositivo?
+1548	Remover «{0}» de todos os teus dispositivos?
+1549	Remover «{0}»?

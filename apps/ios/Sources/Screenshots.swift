@@ -8,7 +8,8 @@ import SwiftUI
 enum Demo {
     enum Tab: String { case home, reels, library, settings }
     enum Route { case favorites, themePicker, artist, downloads, playlists, folder, artists, manage, badges,
-                 cuenta, cuentaCrear, cuentaClave, cuentaEntrar, cuentaDispositivos, cuentaComprobar, cuentaBorrar,
+                 cuenta, cuentaCrear, cuentaClave, cuentaEntrar, cuentaComprobar, cuentaBorrar,
+                 cuentaSinCrearAbierto, cuentaSeguridad, cuentaCerrarSesion, cuentaCerrarSesionUnico, cuentaTerminos,
                  cuentaQr, cuentaQrEmojis, cuentaAnadir, cuentaAnadirEmojis, cuentaConectada, cuentaSincronizado, cuentaBloqueado }
 
     struct Scenario {
@@ -90,13 +91,21 @@ enum Demo {
         "55_playlists_ordenar_oscuro": Scenario(appearance: "dark", playing: false, tab: .library, route: .playlists, folders: true, playlistsOrdering: true, reduceMotion: true),
         // Cuenta 3.0 (bloque 2, 2-C paso 3): Ajustes › Cuenta, como ScreenshotTest.cuenta_* de Android.
         "56_cuenta_sin_crear": Scenario(tab: .settings, route: .cuenta),
+        "56_cuenta_sin_crear_oscuro": Scenario(appearance: "dark", tab: .settings, route: .cuenta),
+        // Pulir 2 · opción A: sin cuenta, con «Qué ganas con la cuenta» abierto.
+        "56b_cuenta_sin_crear_abierto": Scenario(tab: .settings, route: .cuentaSinCrearAbierto),
         "57_cuenta_crear": Scenario(tab: .settings, route: .cuentaCrear),
+        "57_cuenta_crear_oscuro": Scenario(appearance: "dark", tab: .settings, route: .cuentaCrear),
         "58_cuenta_tu_clave": Scenario(tab: .settings, route: .cuentaClave),
         "58_cuenta_tu_clave_oscuro": Scenario(appearance: "dark", tab: .settings, route: .cuentaClave),
         "59_cuenta_entrar": Scenario(tab: .settings, route: .cuentaEntrar),
-        "60_cuenta_dispositivos": Scenario(tab: .settings, route: .cuentaDispositivos),
+        "59_cuenta_entrar_oscuro": Scenario(appearance: "dark", tab: .settings, route: .cuentaEntrar),
+        // La 60 («Dispositivos») ya no existe (DECISIONS 101): el menú de un dispositivo (60, 60b, 60c) lo capturan
+        // los CuentaUITests, porque hay que tocarlo.
         "61_cuenta_comprobar": Scenario(tab: .settings, route: .cuentaComprobar),
+        "61_cuenta_comprobar_oscuro": Scenario(appearance: "dark", tab: .settings, route: .cuentaComprobar),
         "62_cuenta_borrar": Scenario(tab: .settings, route: .cuentaBorrar),
+        "62_cuenta_borrar_oscuro": Scenario(appearance: "dark", tab: .settings, route: .cuentaBorrar),
         // Móvil nuevo por QR (2-E): el QR del nuevo, sus emojis, «¿Añadir…?» del viejo y sus emojis.
         "63_cuenta_qr": Scenario(tab: .settings, route: .cuentaQr),
         "64_cuenta_qr_emojis": Scenario(tab: .settings, route: .cuentaQrEmojis),
@@ -104,12 +113,23 @@ enum Demo {
         "66_cuenta_anadir_emojis": Scenario(tab: .settings, route: .cuentaAnadirEmojis),
         // Pulir el bloque 2: Ajustes › Cuenta con la cuenta puesta («Añadir un móvil», el estado de la sincronización).
         "67_cuenta_conectada": Scenario(tab: .settings, route: .cuentaConectada),
+        "67_cuenta_conectada_oscuro": Scenario(appearance: "dark", tab: .settings, route: .cuentaConectada),
+        // Pulir 2 · opción A: con «Seguridad y cuenta» abierto.
+        "67b_cuenta_seguridad": Scenario(tab: .settings, route: .cuentaSeguridad),
+        "67b_cuenta_seguridad_oscuro": Scenario(appearance: "dark", tab: .settings, route: .cuentaSeguridad),
         // PULIR #5: «Lo que se sincroniza» con la biblioteca de ejemplo.
         // Pulir 2 #1: con carpetas y seguidos, cada fila con su imagen, en claro y en oscuro.
         "68_cuenta_sincronizado": Scenario(tab: .settings, route: .cuentaSincronizado, folders: true, followed: true),
         "68_cuenta_sincronizado_oscuro": Scenario(appearance: "dark", tab: .settings, route: .cuentaSincronizado, folders: true, followed: true),
         // Pulir 2 #2, modo fútbol: la cápsula y la fila dicen por qué no se llega al servidor.
         "69_cuenta_bloqueado": Scenario(tab: .settings, route: .cuentaBloqueado),
+        // Pulir 2 · notas de la opción A #4: cerrar sesión (70b, siendo el único dispositivo) y los términos nuevos (71).
+        "70_cuenta_cerrar_sesion": Scenario(tab: .settings, route: .cuentaCerrarSesion),
+        "70_cuenta_cerrar_sesion_oscuro": Scenario(appearance: "dark", tab: .settings, route: .cuentaCerrarSesion),
+        "70b_cuenta_cerrar_sesion_unico": Scenario(tab: .settings, route: .cuentaCerrarSesionUnico),
+        "70b_cuenta_cerrar_sesion_unico_oscuro": Scenario(appearance: "dark", tab: .settings, route: .cuentaCerrarSesionUnico),
+        "71_cuenta_terminos_nuevos": Scenario(tab: .settings, route: .cuentaTerminos),
+        "71_cuenta_terminos_nuevos_oscuro": Scenario(appearance: "dark", tab: .settings, route: .cuentaTerminos),
         // Sólo tests de interfaz (BibliotecaUITests): Playlists con 24 playlists más, para el desplazamiento al borde.
         "ui_muchas_playlists": Scenario(playing: false, tab: .library, route: .playlists, manyPlaylists: true),
         // Sólo tests de interfaz: la Biblioteca con «Reducir movimiento», para ver que en «Ordenar» nada tiembla.

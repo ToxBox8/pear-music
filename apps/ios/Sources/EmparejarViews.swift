@@ -57,7 +57,7 @@ private struct ImagenQr: View {
         .background(RoundedRectangle(cornerRadius: 16, style: .continuous).fill(Color.white))
         .frame(maxWidth: 260)
         .frame(maxWidth: .infinity)
-        .accessibilityLabel(L("Código QR para añadir este móvil"))
+        .accessibilityLabel(L("Código QR para añadir este dispositivo"))
         .accessibilityIdentifier("imagenQr")
     }
 }
@@ -111,11 +111,11 @@ struct QrNuevoView: View {
         Form {
             switch paso {
             case .cargando:
-                CabeceraQr(pose: "corriendo", titulo: L("Entrar desde otro móvil"), texto: L("Preparando el código…"))
+                CabeceraQr(pose: "corriendo", titulo: L("Entrar con otro dispositivo"), texto: L("Preparando el código…"))
                 Section { ProgressView().frame(maxWidth: .infinity) }
             case .qr:
-                CabeceraQr(pose: "corriendo", titulo: L("Entrar desde otro móvil"),
-                           texto: L("En tu otro móvil, abre Ajustes › Cuenta › Añadir un móvil y escanea este código."))
+                CabeceraQr(pose: "corriendo", titulo: L("Entrar con otro dispositivo"),
+                           texto: L("En tu otro dispositivo, abre Ajustes › Cuenta › Añadir un dispositivo y escanea este código."))
                 Section {
                     ImagenQr(texto: texto).listRowBackground(Color.clear)
                 } footer: {
@@ -124,8 +124,8 @@ struct QrNuevoView: View {
                 }
                 Section { Text(L("No enseñes este código a nadie: sirve para entrar en tu cuenta.")).font(.footnote).foregroundStyle(.secondary) }
             case .comparar:
-                CabeceraQr(pose: "pensando", titulo: L("¿Ves lo mismo en tu otro móvil?"),
-                           texto: L("Los dos móviles tienen que enseñar los mismos emojis, en el mismo orden."))
+                CabeceraQr(pose: "pensando", titulo: L("¿Ves lo mismo en tu otro dispositivo?"),
+                           texto: L("Los dos dispositivos tienen que enseñar los mismos emojis, en el mismo orden."))
                 Section { EmojisComprobacion(indices: emojis) }
                 Section {
                     Button(L("Sí, coinciden")) { aceptar() }
@@ -141,10 +141,10 @@ struct QrNuevoView: View {
                 }
             case .noCoinciden:
                 CabeceraQr(pose: "brazos-cruzados", titulo: L("No coinciden"),
-                           texto: L("No uses este código y quita el móvil de tu cuenta desde el otro."))
+                           texto: L("No uses este código y quita el dispositivo de tu cuenta desde el otro."))
                 Section { Button(L("Empezar otra vez")) { intento += 1 }.frame(maxWidth: .infinity, minHeight: 44) }
             case .error(let m):
-                CabeceraQr(pose: "brazos-cruzados", titulo: L("Entrar desde otro móvil"), texto: L("No ha salido bien. Puedes probar otra vez."))
+                CabeceraQr(pose: "brazos-cruzados", titulo: L("Entrar con otro dispositivo"), texto: L("No ha salido bien. Puedes probar otra vez."))
                 Section { AvisoQr(texto: m) }
                 Section {
                     Button(L("Empezar otra vez")) { intento += 1 }
@@ -152,7 +152,7 @@ struct QrNuevoView: View {
                 }
             }
         }
-        .navigationTitle(L("Entrar desde otro móvil")).navigationBarTitleDisplayMode(.inline)
+        .navigationTitle(L("Entrar con otro dispositivo")).navigationBarTitleDisplayMode(.inline)
         .task(id: intento) { await empezar() }
     }
 
@@ -212,8 +212,8 @@ struct AnadirMovilView: View {
         Form {
             switch paso {
             case .escaner, .leyendo:
-                CabeceraQr(pose: "con-movil", titulo: L("Añadir un móvil"),
-                           texto: L("En el móvil nuevo, abre Ajustes › Cuenta › Entrar desde otro móvil y apunta la cámara a su código."))
+                CabeceraQr(pose: "con-movil", titulo: L("Añadir un dispositivo"),
+                           texto: L("En el dispositivo nuevo, abre Ajustes › Cuenta › Entrar con otro dispositivo y apunta la cámara a su código."))
                 Section {
                     if AVCaptureDevice.authorizationStatus(for: .video) == .denied {
                         Text(L("Jiyu Pulse no puede usar la cámara. Actívala en los ajustes del iPhone."))
@@ -241,7 +241,7 @@ struct AnadirMovilView: View {
                     Button(L("Cancelar")) { dismiss() }.frame(maxWidth: .infinity, minHeight: 44).listRowBackground(Color.clear)
                 }
             case .emojis:
-                CabeceraQr(pose: "victoria", titulo: L("Comprueba los emojis"), texto: L("Comprueba que el otro móvil enseña lo mismo."))
+                CabeceraQr(pose: "victoria", titulo: L("Comprueba los emojis"), texto: L("Comprueba que el otro dispositivo enseña lo mismo."))
                 Section { EmojisComprobacion(indices: emojis) } footer: {
                     Text(L("Si no coinciden, quita \"{0}\" de tu cuenta en Dispositivos.", nombre))
                 }
@@ -250,7 +250,7 @@ struct AnadirMovilView: View {
                         .buttonStyle(PillButtonStyle(prominent: true)).listRowBackground(Color.clear).listRowInsets(EdgeInsets())
                 }
             case .error(let m):
-                CabeceraQr(pose: "brazos-cruzados", titulo: L("Añadir un móvil"), texto: L("No se ha añadido nada a tu cuenta."))
+                CabeceraQr(pose: "brazos-cruzados", titulo: L("Añadir un dispositivo"), texto: L("No se ha añadido nada a tu cuenta."))
                 Section { AvisoQr(texto: m) }
                 Section {
                     Button(L("Escanear otra vez")) { aviso = nil; paso = .escaner }
@@ -258,7 +258,7 @@ struct AnadirMovilView: View {
                 }
             }
         }
-        .navigationTitle(L("Añadir un móvil")).navigationBarTitleDisplayMode(.inline)
+        .navigationTitle(L("Añadir un dispositivo")).navigationBarTitleDisplayMode(.inline)
         .onAppear {
             guard let prueba else { return }
             nombre = L("Pixel de Ana"); emojis = [59, 29, 27, 61, 23, 38]

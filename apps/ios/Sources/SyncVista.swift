@@ -7,7 +7,7 @@ enum FaseSync { case quieta, bajando, uniendo, subiendo
     var texto: String {
         switch self {
         case .bajando: return L("Bajando tu biblioteca…")
-        case .uniendo: return L("Juntando lo de tus móviles…")
+        case .uniendo: return L("Juntando lo de tus dispositivos…")
         case .subiendo: return L("Subiendo tu biblioteca…")
         case .quieta: return L("Biblioteca al día")
         }
@@ -65,4 +65,32 @@ struct VistaSync: Equatable {
         f.dateStyle = .medium; f.timeStyle = .none
         return L("el {0}", f.string(from: Date(timeIntervalSince1970: ms / 1000)))
     }
+}
+
+/// El reintento del modo fútbol (Pulir 2 #2): espera y vuelve a intentar. Al empezar, deja de ser «el que espera»; así,
+/// si ese intento vuelve a dar `bloqueado` y se programa el siguiente, no se cancela a sí mismo (antes `alFallar` hacía
+/// `reintento?.cancel()` sobre su propia `Task` y las estadísticas no se subían nunca al reintentar; DECISIONS 100).
+/// Sólo Foundation: se prueba en Linux (`scripts/tests/ReintentoTests.swift`). Igual que `ModoFutbolTest` en Android.
+@MainActor
+final class ReintentoBloqueado {
+    private var tarea: Task<Void, Never>?
+    private var turno = 0
+    /// Hay un reintento esperando (no uno que ya ha empezado).
+    var esperando: Bool { tarea != nil }
+
+    /// Cancela el que espera (si lo hay) y programa [accion] dentro de [espera] ms.
+    func programar(espera: Double, _ accion: @escaping @MainActor () async -> Void) {
+        tarea?.cancel()
+        turno += 1
+        let mio = turno
+        tarea = Task { @MainActor [weak self] in
+            try? await Task.sleep(nanoseconds: UInt64(Swift.max(0, espera) * 1_000_000))
+            guard !Task.isCancelled else { return }
+            if self?.turno == mio { self?.tarea = nil } // ya ha empezado: no es «el que espera»
+            await accion()
+        }
+    }
+
+    /// Cancela el que espera; uno que ya ha empezado sigue hasta el final.
+    func cancelar() { tarea?.cancel(); tarea = nil }
 }

@@ -56,6 +56,11 @@ cp scripts/tests/EstadoSyncTests.swift "$OUT/estado-sync/main.swift"
 "$SWIFT" -o "$OUT/estado-sync/tests" Sources/SyncVista.swift Sources/I18n.swift "$OUT/estado-sync/main.swift"
 "$OUT/estado-sync/tests"
 
+mkdir "$OUT/reintento"
+cp scripts/tests/ReintentoTests.swift "$OUT/reintento/main.swift"
+"$SWIFT" -o "$OUT/reintento/tests" Sources/SyncVista.swift Sources/I18n.swift "$OUT/reintento/main.swift"
+"$OUT/reintento/tests"
+
 # Los permisos del Info.plist (DECISIONS 94), con el de project.yml (en la CI, el del .app compilado, ios.yml).
 if python3 -c 'import yaml' 2>/dev/null; then
   python3 -c 'import yaml,plistlib,sys; plistlib.dump(yaml.safe_load(open("project.yml"))["targets"]["LibreMusic"]["info"]["properties"], open(sys.argv[1],"wb"))' "$OUT/Info.plist"

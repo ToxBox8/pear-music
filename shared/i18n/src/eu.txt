@@ -1457,3 +1457,93 @@
 1457	Espainian batzuetan gertatzen da futbol partidetan. Berriro saiatuko da bere kabuz.
 1458	Saiatu geroago
 1459	Ezin da zerbitzarira iritsi
+1460	Orain gailu honetan bakarrik dago. Berriro sinkronizatzen baduzu, zure beste gailuetara pasatuko da.
+1461	Zerbaitek huts egin du gailu honetan. Saiatu berriro; jarraitzen badu, jakinarazi errorea
+1462	Jarri kamera gailu berriaren kodearen aurrean
+1463	Horrela ikusiko duzu zure gailuetan. 1etik 40ra karaktere.
+1464	Gehitu gailu bat
+1465	Gehitu gailu bat zure kontura
+1466	Mugikor honen izena aldatu
+1467	Berreskuratze-gakoa, izena, baldintzak eta kontua ezabatzea
+1468	Egiaztatu beste gailuak gauza bera erakusten duela.
+1469	Zure gakoarekin berehala ezabatzen da. Hura gabe, 14 egun barru ezabatzen da eta zure gailu guztietan ikusiko duzu, zu izan ez bazara ere.
+1470	Kopia zifratua, gailuz aldatzea eta datozen abantailak
+1471	Mugikor hau gehitzeko QR kodea
+1472	Gogokoa izateari uzten dio hemen eta zure beste gailuetan.
+1473	Jarraitzeari uzten diozu hemen eta zure beste gailuetan.
+1474	Kontuaren izena zuretzat bakarrik da: zifratuta doa eta zure gailuek bakarrik ikusten dute. Ez da erabiltzaile-izena: inork ezin zaitu horrekin bilatu.
+1475	Zerbitzariak ez du gailu hau ezagutzen. Berriro gertatzen bada, sartu berriro zure gakoarekin
+1476	Mugikor berrian, ireki Ezarpenak › Kontua › Sartu beste gailu batetik, eta jarri kamera haren kodearen aurrean.
+1477	Berrian, ireki Jiyu Pulse, aukeratu «Sartu beste gailu batetik» eta eskaneatu erakusten dizun kodea.
+1478	Zure beste gailuan, ireki Ezarpenak › Kontua › Gehitu gailu bat, eta eskaneatu kode hau.
+1479	Sartu beste gailu batetik
+1480	Zure kontuaren giltza da. Mugikor hau galtzen baduzu, beste batetik sartzeko balio du. Idatzi paperean eta gorde ondo: ezin da berriro ikusi ezta beste batengatik aldatu ere.
+1481	Eskaneatu gailu berriak erakusten duen kodea.
+1482	Eskaneatu kode bat zure kontua duen gailuarekin.
+1483	Idatzi osorik. Mugikor honetan egiaztatzen da: ez da inora bidaltzen.
+1484	Mugikor hori ez dago jada zure kontuan
+1485	Mugikor hori ezingo da zure kontuan sartu.
+1486	Mugikor hau
+1487	Mugikor hau zure kontutik aterako da.
+1488	Mugikor hau kontu batean dago jada
+1489	Mugikor hau jada ez dago zure kontuan
+1490	Hau zifratuta doa zure gailuen artean. Ukitu zerbait gailu honetan bakarrik uzteko edo guztietatik kentzeko.
+1491	Aspaldi ez zen gailu hau sinkronizatzen: zure kontuarekin eguneratu da
+1492	Zure gailuetakoa batzen…
+1493	Mugikorraren ordua ez dago ondo. Jarri automatikoan eta saiatu berriro
+1494	Kontua sortzean idatzi zenuena.
+1495	Zure kontuan sar daitezkeen gailuak. Bat ezagutzen ez baduzu, kendu.
+1496	Bi gailuek emoji berak erakutsi behar dituzte, ordena berean.
+1497	Ez dago ezer gogoratu edo lapurtzeko. Zure liburutegia zifratuta doa: zure gailuek bakarrik irakur dezakete.
+1498	Ez dago konturik gailu honetan
+1499	Ezin izan da gailu hau gehitu
+1500	Ez erabili kode hau, eta kendu gailua zure kontutik bestetik.
+1501	Mugikorraren izena
+1502	Aukerakoa eta doakoa. Zifratuta doa: guk ere ezin dugu irakurri.
+1503	Beste gailu batek gauza bera aldatu du aldi berean. Saiatu berriro
+1504	Beste gailu batek kode hau erabili du zu baino lehen. Mugikor berrian, sakatu «Ez datoz bat» eta hasi berriro
+1505	Zure kontua zure gailuetan ezagutzeko. 40 karaktere gehienez; hutsik, izenik gabe.
+1506	Eraman beste gailu batera
+1507	Kendu nire gailu guztietatik
+1508	Kendu beste gailu guztiak
+1509	Kendu gailu bat zure kontutik
+1510	Zer irabazten duzu kontuarekin
+1511	«{0}» zure kontuan gehitu zen eta dagoeneko kendu da. Ez zara zu izan? Begiratu zure gailuak
+1512	Karpeta ezabatzen da hemen eta zure beste gailuetan; barruan duena maila bat igotzen da. Ezin da desegin.
+1513	Zerrenda ezabatzen da hemen eta zure beste gailuetan. Ezin da desegin.
+1514	Zure kontua eta hodeian dagoen guztia ezabatzen dira. Zure gailuetan duzuna geratu egiten da.
+1515	Albuma zure liburutegitik kentzen da hemen eta zure beste gailuetan.
+1516	Segurtasuna eta kontua
+1517	Mugikor bat lapurtu badizute: hau izan ezik dena ateratzen da batera. Zure berreskuratze-gakoa behar da.
+1518	Mugikor honetan bakarrik
+1519	Mugikor honetan bakarrik: bere karpetarekin doa
+1520	Mugikor hau bakarrik duzu zure kontuan. Galtzen baduzu, zure berreskuratze-gakoarekin bakarrik sartu ahal izango zara.
+1521	Hodeiko zure liburutegia osatu gabe zegoen: gailu honetakoarekin osatu dugu
+1522	Zure musika zure gailu guztietan
+1523	Zure musika berdina da zure {0} gailuetan
+1524	Zure gailuak
+1525	Baldintzak eta pribatutasuna
+1526	Erabili nire berreskuratze-gakoa
+1527	Dagoeneko 10 gailu daude zure kontuan. Kendu bat lehenago
+1528	«Ez sinkronizatu hau»: gailu honetan bakarrik uzten du (besteetan dagoen bezala geratzen da). «Kendu nire gailu guztietatik»: hemen eta besteetan ezabatzen du.
+1529	«{0}» zure gailu guztietatik kendu?
+1530	Gauza bera ikusten duzu zure beste gailuan?
+1531	Baduzu konturik beste gailu batean?
+1532	Irekita
+1533	Itxita
+1534	Itxi saioa gailu honetan
+1535	Berreskuratze-gakoa, izena, baldintzak, saioa itxi eta kontua ezabatu
+1536	Zure gailu bakarra da
+1537	Zure gailu bakarra da: berreskuratze-gakoarekin bakarrik sartu ahal izango zara berriro.
+1538	Gailu hau zure kontutik aterako da. Liburutegia hemen geratzen da, baina ez da gehiago sinkronizatzen. Ez da ezer ezabatzen.
+1539	Saioa itxi duzu. Zure liburutegia hemen dago oraindik.
+1540	Zure kontuan berriro sartzeko berreskuratze-gakoa beharko duzu. Hura gabe, kontua eta hodeian dagoena galtzen dira.
+1541	Lehenago egiaztatu dezakezu Segurtasuna eta kontua › Egiaztatu nire gakoa atalean.
+1542	Kendu kontutik
+1543	Zure kontutik aterako da. Liburutegia hemen geratzen da, sinkronizatu gabe.
+1544	Gailu honetan bakarrik geratzen da; besteetan ez da ukitzen.
+1545	Bat lapurtu badizute. Berreskuratze-gakoa behar da.
+1546	Zure beste gailuak kontuan jarraitzen dute eta hau jada ez dagoela ikusiko dute.
+1547	Saioa itxi gailu honetan?
+1548	«{0}» kendu zure gailu guztietatik?
+1549	«{0}» kendu?

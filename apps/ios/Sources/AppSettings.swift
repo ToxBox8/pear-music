@@ -210,11 +210,10 @@ struct SettingsView: View {
             .demoRoute(.themePicker) { AppearanceSettings() }
             .demoRoute(.manage) { ManagePlaylistsView() }
             .demoRoute(.cuenta) { CuentaView() }
-            .demoRoute(.cuentaCrear) { CrearCuentaView() }
-            .demoRoute(.cuentaClave) { ClaveNuevaView(borrador: CuentaPear.shared.borrador()) }
-            .demoRoute(.cuentaEntrar) { EntrarConClaveView() }
-            .demoRoute(.cuentaDispositivos) { DispositivosView() }
-            .demoRoute(.cuentaSincronizado) { SincronizadoView() }
+            .demoRoute(.cuentaCrear) { CuentaPantalla(.crear) }
+            .demoRoute(.cuentaClave) { CuentaPantalla(.clave) }
+            .demoRoute(.cuentaEntrar) { CuentaPantalla(.entrar) }
+            .demoRoute(.cuentaSincronizado) { CuentaPantalla(.sincronizado) }
             .demoRoute(.cuentaConectada) {
                 // La fila de la sincronización siempre igual en la captura 67: «Sincronizado hace 2 min» (como Android).
                 CuentaView().onAppear { SyncBiblioteca.shared.vistaDePrueba(VistaSync(ultimaOk: Date().timeIntervalSince1970 * 1000 - 120_000)) }
@@ -228,8 +227,15 @@ struct SettingsView: View {
                     SyncBiblioteca.shared.vistaDePrueba(v)
                 }
             }
-            .demoRoute(.cuentaComprobar) { ComprobarClaveView() }
-            .demoRoute(.cuentaBorrar) { BorrarCuentaView() }
+            .demoRoute(.cuentaComprobar) { CuentaPantalla(.comprobar) }
+            .demoRoute(.cuentaBorrar) { CuentaPantalla(.borrar) }
+            .demoRoute(.cuentaSinCrearAbierto) { CuentaView() }
+            .demoRoute(.cuentaSeguridad) {
+                CuentaView().onAppear { SyncBiblioteca.shared.vistaDePrueba(VistaSync(ultimaOk: Date().timeIntervalSince1970 * 1000 - 120_000)) }
+            }
+            .demoRoute(.cuentaCerrarSesion) { CuentaPantalla(.cerrarSesion) }
+            .demoRoute(.cuentaCerrarSesionUnico) { CuentaPantalla(.cerrarSesion) }
+            .demoRoute(.cuentaTerminos) { CuentaPantalla(.terminos) }
             .demoRoute(.cuentaQr) { QrNuevoView(prueba: .qr) }
             .demoRoute(.cuentaQrEmojis) { QrNuevoView(prueba: .emojis) }
             .demoRoute(.cuentaAnadir) { AnadirMovilView(prueba: .confirmar) }

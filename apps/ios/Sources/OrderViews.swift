@@ -689,39 +689,90 @@ struct OrderHint: View {
 /// que no tiene dónde colgar un aviso), el botón se apaga con el nombre vacío en cualquier versión de iOS, e Intro
 /// en el teclado hace lo mismo que el botón. Los botones van del color del texto, no en shu (DECISIONS 40).
 enum NamePrompt {
-    static func ask(_ title: String, initial: String = "", confirm: String = L("Crear"), onDone: @escaping (String) -> Void) {
-        Task { @MainActor in present(title, initial: initial, confirm: confirm, onDone: onDone) }
+    /// - message: la frase de debajo del título (la cuenta: «Así lo verás en tus dispositivos…»).
+    /// - valid: qué se puede confirmar (el nombre de un dispositivo, de 1 a 40 caracteres); sin ella, cualquier texto no
+    ///   vacío. Con ella también vale el vacío si lo acepta (el nombre de la cuenta: vacío, sin nombre).
+    /// - secret: el campo es la clave de recuperación: letra fija, mayúsculas, sin autocorrector ni sugerencias (el
+    ///   teclado no la aprende). Como `AlertSpec.fieldSecret` en Android.
+    /// - destructive: el botón de confirmar borra («Quitar todos»): rojo.
+    static func ask(_ title: String, initial: String = "", confirm: String = L("Crear"), message: String? = nil,
+                    placeholder: String = L("Nombre"), valid: ((String) -> Bool)? = nil, secret: Bool = false,
+                    destructive: Bool = false, onDone: @escaping (String) -> Void) {
+        Task { @MainActor in
+            present(title, initial: initial, confirm: confirm, message: message, placeholder: placeholder, valid: valid,
+                    secret: secret, destructive: destructive, onDone: onDone)
+        }
     }
 
     @MainActor
-    private static func present(_ title: String, initial: String, confirm: String, onDone: @escaping (String) -> Void) {
-        guard let top = topController() else { return }
-        let alert = UIAlertController(title: title, message: nil, preferredStyle: .alert)
-        let action = UIAlertAction(title: confirm, style: .default) { [weak alert] _ in
-            let name = (alert?.textFields?.first?.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-            if !name.isEmpty { onDone(name) }
+    private static func present(_ title: String, initial: String, confirm: String, message: String?, placeholder: String,
+                                valid: ((String) -> Bool)?, secret: Bool, destructive: Bool, onDone: @escaping (String) -> Void) {
+        guard let top = AppAlert.topController() else { return }
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let limpio: (String?) -> String = { ($0 ?? "").trimmingCharacters(in: .whitespacesAndNewlines) }
+        let ok: (String?) -> Bool = { t in valid.map { $0(limpio(t)) } ?? !limpio(t).isEmpty }
+        let action = UIAlertAction(title: confirm, style: destructive ? .destructive : .default) { [weak alert] _ in
+            let name = limpio(alert?.textFields?.first?.text)
+            if ok(name) { onDone(name) }
         }
-        let filled: (String?) -> Bool = { !($0 ?? "").trimmingCharacters(in: .whitespacesAndNewlines).isEmpty }
-        action.isEnabled = filled(initial)
+        action.isEnabled = ok(initial)
         alert.addTextField { field in
-            field.placeholder = L("Nombre")
+            field.placeholder = placeholder
             field.text = initial
-            field.autocapitalizationType = .sentences
             field.returnKeyType = .done
             field.clearButtonMode = .whileEditing
-            field.addAction(UIAction { [weak action, weak field] _ in action?.isEnabled = filled(field?.text) }, for: .editingChanged)
+            if secret {
+                field.font = .monospacedSystemFont(ofSize: UIFont.preferredFont(forTextStyle: .body).pointSize, weight: .regular)
+                field.autocapitalizationType = .allCharacters
+                field.autocorrectionType = .no
+                field.spellCheckingType = .no
+                field.smartDashesType = .no; field.smartQuotesType = .no; field.smartInsertDeleteType = .no
+                if #available(iOS 17.0, *) { field.inlinePredictionType = .no }
+            } else {
+                field.autocapitalizationType = .sentences
+            }
+            field.accessibilityIdentifier = "campoAviso"
+            field.addAction(UIAction { [weak action, weak field] _ in action?.isEnabled = ok(field?.text) }, for: .editingChanged)
         }
         alert.addAction(UIAlertAction(title: L("Cancelar"), style: .cancel))
         alert.addAction(action)
-        alert.preferredAction = action
+        if !destructive { alert.preferredAction = action }
         // Sin texto shu (lo decidió Toxbox): los botones del color del texto, que se lee igual en claro y en oscuro.
         alert.view.tintColor = .label
         top.present(alert, animated: true)
     }
+}
+
+/// Los avisos de la app sin campo (confirmar algo que borra, «Cuenta creada»): el mismo aviso de UIKit que `NamePrompt`,
+/// que se abre desde cualquier sitio (también desde un `Menu` o una pantalla que se está cerrando) y con los botones
+/// del color del texto. Como `AppState.alert` con `AlertSpec` en Android (Pulir 2 · notas de la opción A #3).
+enum AppAlert {
+    /// «¿Quitar…?»: el botón que borra en rojo y «Cancelar».
+    static func confirm(_ title: String, message: String?, confirm: String, destructive: Bool = true, onConfirm: @escaping () -> Void) {
+        Task { @MainActor in
+            guard let top = topController() else { return }
+            let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: confirm, style: destructive ? .destructive : .default) { _ in onConfirm() })
+            alert.addAction(UIAlertAction(title: L("Cancelar"), style: .cancel))
+            alert.view.tintColor = .label
+            top.present(alert, animated: true)
+        }
+    }
+
+    /// Un aviso que sólo se lee («Cuenta creada»), con un botón.
+    static func show(_ title: String, message: String?, ok: String = L("Vale")) {
+        Task { @MainActor in
+            guard let top = topController() else { return }
+            let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: ok, style: .cancel))
+            alert.view.tintColor = .label
+            top.present(alert, animated: true)
+        }
+    }
 
     /// La pantalla que está encima de todo (también de una hoja abierta).
     @MainActor
-    private static func topController() -> UIViewController? {
+    static func topController() -> UIViewController? {
         let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
         let window = scenes.filter { $0.activationState == .foregroundActive }.flatMap(\.windows).first(where: \.isKeyWindow)
             ?? scenes.flatMap(\.windows).first(where: \.isKeyWindow) ?? scenes.flatMap(\.windows).first

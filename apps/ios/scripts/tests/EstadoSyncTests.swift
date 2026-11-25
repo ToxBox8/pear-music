@@ -6,7 +6,7 @@ func comprobar(_ a: String, _ b: String) { total += 1; if a != b { fallos += 1; 
 let ahora: Double = 1_763_400_000_000
 func t(_ v: VistaSync) -> String { v.estado(ahora: ahora).texto }
 comprobar(t(VistaSync(fase: .bajando)), "Bajando tu biblioteca…")
-comprobar(t(VistaSync(fase: .uniendo, sinRed: true)), "Juntando lo de tus móviles…")
+comprobar(t(VistaSync(fase: .uniendo, sinRed: true)), "Juntando lo de tus dispositivos…")
 comprobar(t(VistaSync(fase: .subiendo)), "Subiendo tu biblioteca…")
 comprobar(t(VistaSync(pendiente: true, sinRed: true)), "Sin conexión: se subirá luego")
 comprobar(t(VistaSync(ultimaOk: ahora, pendiente: true)), "Pendiente de subir")
