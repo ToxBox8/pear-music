@@ -1547,3 +1547,4 @@
 1547	Ĉu elsaluti en ĉi tiu aparato?
 1548	Ĉu forigi «{0}» el ĉiuj viaj aparatoj?
 1549	Ĉu forigi «{0}»?
+1550	Se ili ne kongruas, forigu "{0}" el via konto en Viaj aparatoj.

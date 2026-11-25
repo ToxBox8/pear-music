@@ -209,7 +209,7 @@ struct BotonComprobar: View {
             HStack(spacing: 6) {
                 if comprobando && !reduceMotion { ProgressView().controlSize(.mini) }
                 Text(comprobando ? L("Comprobando…") : L("Comprobar ahora"))
-                    .font(.subheadline.weight(.semibold)).lineLimit(1)
+                    .font(.subheadline.weight(.semibold)).lineLimit(1).fixedSize()
                     .foregroundStyle(comprobando ? AnyShapeStyle(Color(uiColor: .secondaryLabel)) : AnyShapeStyle(.tint))
             }
             .padding(.horizontal, 14).frame(minHeight: 44)
@@ -345,11 +345,18 @@ struct SincronizadoView: View {
         if enteras.contains(e.clave) && !marcada {
             Text(L("Va con su carpeta, que no se sincroniza. Para volver a sincronizarlo, vuelve a sincronizar la carpeta."))
         } else if marcada {
-            Button { sync.soloEnEsteMovil(e.clave, false) } label: { Label(L("Volver a sincronizar"), systemImage: "arrow.triangle.2.circlepath") }
-            Text(L("Ahora sólo está en este dispositivo. Si lo vuelves a sincronizar, pasará a tus otros dispositivos."))
+            // La explicación, de subtítulo del botón (suelta, el menú la cortaba a tres líneas).
+            Button { sync.soloEnEsteMovil(e.clave, false) } label: {
+                Text(L("Volver a sincronizar"))
+                Text(L("Ahora sólo está en este dispositivo. Si lo vuelves a sincronizar, pasará a tus otros dispositivos."))
+                Image(systemName: "arrow.triangle.2.circlepath")
+            }
         } else {
-            Button { sync.soloEnEsteMovil(e.clave, true) } label: { Label(L("No sincronizar esto"), systemImage: "icloud.slash") }
-            Text(L("Se queda sólo en este dispositivo; en los demás no se toca."))
+            Button { sync.soloEnEsteMovil(e.clave, true) } label: {
+                Text(L("No sincronizar esto"))
+                Text(L("Se queda sólo en este dispositivo; en los demás no se toca."))
+                Image(systemName: "icloud.slash")
+            }
         }
         Divider()
         Button(role: .destructive) {
@@ -414,19 +421,25 @@ private struct EnLaCuenta: ViewModifier {
 }
 extension View { fileprivate func enLaCuenta() -> some View { modifier(EnLaCuenta()) } }
 
-/// Sólo capturas (56b y 67b): «Seguridad y cuenta» o «Qué ganas con la cuenta» ya abiertos y la página abajo del
-/// todo, como `seguridadAbiertaCapturas` de Android.
+/// Sólo capturas (56b y 67b): «Qué ganas con la cuenta» o «Seguridad y cuenta» ya abiertos y la página bajada hasta lo
+/// último (`id("fin")`), como `seguridadAbiertaCapturas` de Android.
 enum CuentaCapturas {
     /// 56b: «Qué ganas con la cuenta» abierto.
     static var queGanas: Bool { Demo.current?.route == .cuentaSinCrearAbierto }
     /// 67b: «Seguridad y cuenta» abierto.
     static var seguridad: Bool { Demo.current?.route == .cuentaSeguridad }
 }
-private extension View {
-    @ViewBuilder func alFinalEnCapturas(_ si: Bool) -> some View {
-        if si {
-            if #available(iOS 17.0, *) { defaultScrollAnchor(.bottom) } else { self }
-        } else { self }
+private struct AlFinalEnCapturas<Contenido: View>: View {
+    let si: Bool
+    @ViewBuilder let contenido: () -> Contenido
+    var body: some View {
+        ScrollViewReader { proxy in
+            contenido().task {
+                guard si else { return }
+                try? await Task.sleep(nanoseconds: 600_000_000)
+                proxy.scrollTo("fin", anchor: .bottom)
+            }
+        }
     }
 }
 
@@ -543,6 +556,10 @@ private struct CuentaSinCrear: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var abierto = CuentaCapturas.queGanas
     var body: some View {
+        AlFinalEnCapturas(si: CuentaCapturas.queGanas) { formulario }
+    }
+
+    private var formulario: some View {
         Form {
             // «Crear cuenta» se ve sin bajar, en una tarjeta corta con la mascota: el único shu de la pantalla.
             Section {
@@ -579,15 +596,15 @@ private struct CuentaSinCrear: View {
             // a VoiceOver si está abierto, como `FoldRow` en Android.
             Section {
                 DisclosureGroup(isExpanded: $abierto.animation(reduceMotion ? nil : Animation.uiEaseOut(0.25))) {
-                    PuntosCuenta().padding(.bottom, 8)
+                    PuntosCuenta().padding(.bottom, 8).id("fin")
                 } label: {
+                    // El identificador en la fila: en el `DisclosureGroup` pisaría los de lo de dentro.
                     Fila(titulo: L("Qué ganas con la cuenta"),
                          subtitulo: abierto ? nil : L("Copia cifrada, cambiar de dispositivo y ventajas que vienen"), icono: "info.circle")
+                        .accessibilityIdentifier("queGanas")
                 }
-                .accessibilityIdentifier("queGanas")
             }
         }
-        .alFinalEnCapturas(CuentaCapturas.queGanas)
     }
 }
 
@@ -767,9 +784,14 @@ private struct CuentaConectada: View {
     @State private var abierto = CuentaCapturas.seguridad
 
     var body: some View {
+        AlFinalEnCapturas(si: CuentaCapturas.seguridad && cuenta.tieneCuenta) { formulario }
+            .task { intentar($error) { try await cuenta.cargar() } }
+    }
+
+    private var formulario: some View {
         let n = cuenta.dispositivos.count
         let lleno = n >= 10
-        Form {
+        return Form {
             if let fecha = cuenta.borrarEn {
                 Section {
                     Estado(ok: false, texto: L("Se va a borrar tu cuenta el {0}", Date(timeIntervalSince1970: TimeInterval(fecha))
@@ -824,19 +846,21 @@ private struct CuentaConectada: View {
                 // Sin envolver en otro Button: en un Form, un botón dentro de otro se lleva el toque de la fila entera.
                 HStack(spacing: 8) {
                     Image(systemName: e.icono).foregroundStyle(Color(uiColor: .label)).frame(width: 28).accessibilityHidden(true)
+                    // El identificador en los textos, no en la fila: en la fila tapaba el de «Comprobar ahora».
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(e.texto).foregroundStyle(Color(uiColor: .label))
+                        Text(e.texto).foregroundStyle(Color(uiColor: .label)).fixedSize(horizontal: false, vertical: true)
                         if alDia {
                             Text(L("Tu música está igual en tus {0} dispositivos", String(n)))
                                 .font(.footnote).foregroundStyle(Color(uiColor: .secondaryLabel))
                         }
                     }
+                    .accessibilityElement(children: .combine)
+                    .accessibilityIdentifier("estadoSync")
                     Spacer(minLength: 0)
                     BotonComprobar(comprobando: comprobando) { sync.alEntrar() }
                 }
                 .contentShape(Rectangle())
                 .onTapGesture { if !comprobando { sync.alEntrar() } }
-                .accessibilityIdentifier("estadoSync")
             } footer: {
                 // Modo fútbol: la explicación en el pie (junto al botón quedaba en una columna estrecha). Igual en Android.
                 if let d = sync.vista.detalle { Text(d) }
@@ -902,19 +926,18 @@ private struct CuentaConectada: View {
                         Fila(titulo: L("Borrar cuenta"), icono: "person.crop.circle.badge.minus", rojo: true, flecha: true)
                     }
                     .accessibilityIdentifier("borrarCuenta")
+                    .id("fin")
                 } label: {
                     Fila(titulo: L("Seguridad y cuenta"),
                          subtitulo: abierto ? nil : L("Clave de recuperación, nombre, términos, cerrar sesión y borrar la cuenta"), icono: "shield")
+                        .accessibilityIdentifier("seguridadYCuenta")
                 }
-                .accessibilityIdentifier("seguridadYCuenta")
             } footer: {
                 if abierto {
                     Text(L("El nombre de la cuenta es sólo para ti: va cifrado y sólo lo ven tus dispositivos. No es un nombre de usuario: nadie te puede buscar por él."))
                 }
             }
         }
-        .alFinalEnCapturas(CuentaCapturas.seguridad && cuenta.tieneCuenta)
-        .task { intentar($error) { try await cuenta.cargar() } }
         .refreshable { intentar($error) { try await cuenta.cargar() } }
     }
 }
@@ -1063,8 +1086,12 @@ struct CerrarSesionView: View {
                                      confirm: L("Cerrar sesión")) { cerrar() }
                 } label: { Fila(titulo: L("Cerrar sesión"), icono: "rectangle.portrait.and.arrow.right", rojo: true) }
                 .accessibilityIdentifier("botonCerrarSesion")
-            } footer: {
-                if !solo { Text(L("Tus otros dispositivos siguen en la cuenta y verán que este ya no está.")) }
+            } header: {
+                // Antes del botón, como en Android: primero lo que pasa, después la acción.
+                if !solo {
+                    Text(L("Tus otros dispositivos siguen en la cuenta y verán que este ya no está."))
+                        .font(.footnote).textCase(nil).foregroundStyle(.secondary)
+                }
             }
         }
         .navigationTitle(L("Cerrar sesión")).navigationBarTitleDisplayMode(.inline)

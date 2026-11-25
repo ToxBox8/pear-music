@@ -1547,3 +1547,4 @@ Tus otros dispositivos siguen en la cuenta y verán que este ya no está.
 ¿Cerrar sesión en este dispositivo?
 ¿Quitar «{0}» de todos tus dispositivos?
 ¿Quitar «{0}»?
+Si no coinciden, quita "{0}" de tu cuenta en Tus dispositivos.

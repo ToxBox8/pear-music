@@ -1547,3 +1547,4 @@
 1547	Sign out on this device?
 1548	Remove «{0}» from all your devices?
 1549	Remove «{0}»?
+1550	If they don't match, remove "{0}" from your account in Your devices.

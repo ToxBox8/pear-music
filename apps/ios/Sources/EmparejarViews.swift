@@ -243,7 +243,7 @@ struct AnadirMovilView: View {
             case .emojis:
                 CabeceraQr(pose: "victoria", titulo: L("Comprueba los emojis"), texto: L("Comprueba que el otro dispositivo enseña lo mismo."))
                 Section { EmojisComprobacion(indices: emojis) } footer: {
-                    Text(L("Si no coinciden, quita \"{0}\" de tu cuenta en Dispositivos.", nombre))
+                    Text(L("Si no coinciden, quita \"{0}\" de tu cuenta en Tus dispositivos.", nombre))
                 }
                 Section {
                     Button(L("Hecho")) { dismiss() }

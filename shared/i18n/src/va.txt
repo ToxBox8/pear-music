@@ -1547,3 +1547,4 @@
 1547	Vols tancar la sessió en este dispositiu?
 1548	Vols llevar «{0}» de tots els teus dispositius?
 1549	Vols llevar «{0}»?
+1550	Si no coincidixen, lleva "{0}" del teu compte en Els teus dispositius.

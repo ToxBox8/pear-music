@@ -1547,3 +1547,4 @@
 1547	Pechar a sesión neste dispositivo?
 1548	Quitar «{0}» de todos os teus dispositivos?
 1549	Quitar «{0}»?
+1550	Se non coinciden, quita "{0}" da túa conta en Os teus dispositivos.

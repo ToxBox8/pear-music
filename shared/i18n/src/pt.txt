@@ -1547,3 +1547,4 @@
 1547	Terminar sessão neste dispositivo?
 1548	Remover «{0}» de todos os teus dispositivos?
 1549	Remover «{0}»?
+1550	Se não coincidirem, remove "{0}" da tua conta em Os teus dispositivos.

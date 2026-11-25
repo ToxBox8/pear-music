@@ -265,7 +265,8 @@ final class CuentaUITests: XCTestCase {
         let fila = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'sinc-playlist:'")).firstMatch
         XCTAssertTrue(fila.waitForExistence(timeout: 5), "Tiene que haber alguna playlist")
         fila.tap()
-        let no = app.buttons["No sincronizar esto"]
+        // Con su explicación de subtítulo, la etiqueta del botón empieza por el título.
+        let no = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "No sincronizar esto")).firstMatch
         XCTAssertTrue(no.waitForExistence(timeout: 5))
         anclado(no, a: fila)
         captura("68b_cuenta_sincronizado_menu\(sufijo)")
