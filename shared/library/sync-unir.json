@@ -1996,6 +1996,276 @@
           "playlistSort": "name"
         }
       }
+    },
+    {
+      "nombre": "B2: carpeta borrada en un móvil y, sin red en el otro, una playlist metida en ella: la playlist se queda",
+      "regla": "§5.3 y §5.5",
+      "conmutativo": true,
+      "local": {
+        "folders": [
+          {
+            "id": "F",
+            "name": "Verano",
+            "v": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "a": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ]
+          }
+        ],
+        "playlists": [
+          {
+            "id": "P",
+            "name": "Playa",
+            "folder": "F",
+            "v": [
+              1763399000000,
+              9,
+              "TJJTHK2B"
+            ],
+            "a": [
+              1763392000000,
+              2,
+              "TJJTHK2B"
+            ],
+            "vCanciones": [
+              1763392000000,
+              2,
+              "TJJTHK2B"
+            ],
+            "songs": []
+          }
+        ]
+      },
+      "nube": {
+        "folders": [],
+        "playlists": [
+          {
+            "id": "P",
+            "name": "Playa",
+            "v": [
+              1763392000000,
+              2,
+              "TJJTHK2B"
+            ],
+            "a": [
+              1763392000000,
+              2,
+              "TJJTHK2B"
+            ],
+            "vCanciones": [
+              1763392000000,
+              2,
+              "TJJTHK2B"
+            ],
+            "songs": []
+          }
+        ],
+        "deleted": [
+          {
+            "k": "folder",
+            "id": "F",
+            "m": [
+              1763398000000,
+              7,
+              "WR85D13C"
+            ]
+          }
+        ]
+      },
+      "esperado": {
+        "folders": [],
+        "playlists": [
+          {
+            "id": "P",
+            "name": "Playa",
+            "folder": "F",
+            "a": [
+              1763392000000,
+              2,
+              "TJJTHK2B"
+            ],
+            "v": [
+              1763399000000,
+              9,
+              "TJJTHK2B"
+            ],
+            "songs": [],
+            "vCanciones": [
+              1763392000000,
+              2,
+              "TJJTHK2B"
+            ]
+          }
+        ],
+        "deleted": [
+          {
+            "k": "folder",
+            "id": "F",
+            "m": [
+              1763398000000,
+              7,
+              "WR85D13C"
+            ]
+          }
+        ]
+      },
+      "aviso": null,
+      "comprobar": {
+        "queda": [
+          "playlists:P"
+        ],
+        "no_queda": [
+          "folders:F"
+        ]
+      }
+    },
+    {
+      "nombre": "B2: la misma favorita añadida en los dos móviles sin red: sale una vez",
+      "regla": "§5.5 paso 1",
+      "conmutativo": true,
+      "local": {
+        "favorites": [
+          {
+            "id": "X",
+            "title": "Canción X",
+            "artist": "Artista",
+            "a": [
+              1763397000000,
+              4,
+              "TJJTHK2B"
+            ]
+          }
+        ]
+      },
+      "nube": {
+        "favorites": [
+          {
+            "id": "X",
+            "title": "Canción X",
+            "artist": "Artista",
+            "a": [
+              1763398000000,
+              5,
+              "WR85D13C"
+            ]
+          }
+        ]
+      },
+      "esperado": {
+        "favorites": [
+          {
+            "id": "X",
+            "title": "Canción X",
+            "artist": "Artista",
+            "a": [
+              1763398000000,
+              5,
+              "WR85D13C"
+            ]
+          }
+        ]
+      },
+      "aviso": null,
+      "comprobar": {
+        "queda": [
+          "favorites:X"
+        ],
+        "orden_lista": {
+          "favorites": [
+            "X"
+          ]
+        }
+      }
+    },
+    {
+      "nombre": "B2 (H11, aceptado): borrar una playlist en un móvil le gana a añadirle canciones a la vez en el otro",
+      "regla": "§5.3",
+      "conmutativo": true,
+      "local": {
+        "playlists": [
+          {
+            "id": "P",
+            "name": "Viaje",
+            "v": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "a": [
+              1763391000000,
+              1,
+              "TJJTHK2B"
+            ],
+            "vCanciones": [
+              1763399000000,
+              9,
+              "TJJTHK2B"
+            ],
+            "songs": [
+              {
+                "id": "s1",
+                "title": "Canción s1",
+                "artist": "Artista",
+                "a": [
+                  1763391000000,
+                  2,
+                  "TJJTHK2B"
+                ]
+              },
+              {
+                "id": "s9",
+                "title": "Canción s9",
+                "artist": "Artista",
+                "a": [
+                  1763399000000,
+                  9,
+                  "TJJTHK2B"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "nube": {
+        "playlists": [],
+        "deleted": [
+          {
+            "k": "playlist",
+            "id": "P",
+            "m": [
+              1763398000000,
+              8,
+              "WR85D13C"
+            ]
+          }
+        ]
+      },
+      "esperado": {
+        "playlists": [],
+        "deleted": [
+          {
+            "k": "playlist",
+            "id": "P",
+            "m": [
+              1763398000000,
+              8,
+              "WR85D13C"
+            ]
+          }
+        ]
+      },
+      "aviso": null,
+      "comprobar": {
+        "no_queda": [
+          "playlists:P"
+        ]
+      }
     }
   ]
 }

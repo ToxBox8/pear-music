@@ -1515,6 +1515,393 @@
           "P2"
         ]
       }
+    },
+    {
+      "nombre": "B2: «Quitar de todos» en otro móvil de algo que aquí es «No sincronizar esto»: aquí se queda",
+      "lib": {
+        "favorites": [
+          {
+            "id": "f1",
+            "title": "Canción f1",
+            "artist": "Artista"
+          },
+          {
+            "id": "f2",
+            "title": "Canción f2",
+            "artist": "Artista"
+          }
+        ],
+        "followedArtists": [
+          {
+            "browseId": "UC1",
+            "name": "Uno"
+          },
+          {
+            "browseId": "UC2",
+            "name": "Dos"
+          }
+        ],
+        "folders": [
+          {
+            "id": "GYM",
+            "name": "Gimnasio"
+          },
+          {
+            "id": "PIERNA",
+            "name": "Pierna",
+            "parent": "GYM"
+          },
+          {
+            "id": "LUNES",
+            "name": "Lunes",
+            "parent": "PIERNA"
+          },
+          {
+            "id": "OTRA",
+            "name": "Otra"
+          }
+        ],
+        "albumFolders": [
+          {
+            "id": "SETENTA",
+            "name": "Años 70"
+          }
+        ],
+        "playlists": [
+          {
+            "id": "P1",
+            "name": "Cardio",
+            "folder": "LUNES",
+            "songs": [
+              {
+                "id": "s1",
+                "title": "Canción s1",
+                "artist": "Artista"
+              }
+            ]
+          },
+          {
+            "id": "P2",
+            "name": "Suelta",
+            "songs": []
+          },
+          {
+            "id": "P3",
+            "name": "En otra",
+            "folder": "OTRA",
+            "songs": []
+          },
+          {
+            "id": "AL",
+            "name": "Disco",
+            "album": {
+              "browseId": "MPREb_x"
+            },
+            "folder": "SETENTA",
+            "songs": []
+          }
+        ],
+        "covers": {
+          "P1": "AAAA",
+          "P2": "BBBB"
+        },
+        "playlistOrder": [
+          "folder:GYM",
+          "P2"
+        ]
+      },
+      "marcadas": [
+        "playlist:P2"
+      ],
+      "claves": [
+        "playlist:P2"
+      ],
+      "sinSoloAqui": {
+        "favorites": [
+          {
+            "id": "f1",
+            "title": "Canción f1",
+            "artist": "Artista"
+          },
+          {
+            "id": "f2",
+            "title": "Canción f2",
+            "artist": "Artista"
+          }
+        ],
+        "followedArtists": [
+          {
+            "browseId": "UC1",
+            "name": "Uno"
+          },
+          {
+            "browseId": "UC2",
+            "name": "Dos"
+          }
+        ],
+        "folders": [
+          {
+            "id": "GYM",
+            "name": "Gimnasio"
+          },
+          {
+            "id": "PIERNA",
+            "name": "Pierna",
+            "parent": "GYM"
+          },
+          {
+            "id": "LUNES",
+            "name": "Lunes",
+            "parent": "PIERNA"
+          },
+          {
+            "id": "OTRA",
+            "name": "Otra"
+          }
+        ],
+        "albumFolders": [
+          {
+            "id": "SETENTA",
+            "name": "Años 70"
+          }
+        ],
+        "playlists": [
+          {
+            "id": "P1",
+            "name": "Cardio",
+            "folder": "LUNES",
+            "songs": [
+              {
+                "id": "s1",
+                "title": "Canción s1",
+                "artist": "Artista"
+              }
+            ]
+          },
+          {
+            "id": "P3",
+            "name": "En otra",
+            "folder": "OTRA",
+            "songs": []
+          },
+          {
+            "id": "AL",
+            "name": "Disco",
+            "album": {
+              "browseId": "MPREb_x"
+            },
+            "folder": "SETENTA",
+            "songs": []
+          }
+        ],
+        "covers": {
+          "P1": "AAAA"
+        },
+        "playlistOrder": [
+          "folder:GYM",
+          "P2"
+        ]
+      },
+      "unida": {
+        "favorites": [
+          {
+            "id": "f1",
+            "title": "Canción f1",
+            "artist": "Artista"
+          },
+          {
+            "id": "f2",
+            "title": "Canción f2",
+            "artist": "Artista"
+          }
+        ],
+        "followedArtists": [
+          {
+            "browseId": "UC1",
+            "name": "Uno"
+          },
+          {
+            "browseId": "UC2",
+            "name": "Dos"
+          }
+        ],
+        "folders": [
+          {
+            "id": "GYM",
+            "name": "Gimnasio"
+          },
+          {
+            "id": "PIERNA",
+            "name": "Pierna",
+            "parent": "GYM"
+          },
+          {
+            "id": "LUNES",
+            "name": "Lunes",
+            "parent": "PIERNA"
+          },
+          {
+            "id": "OTRA",
+            "name": "Otra"
+          }
+        ],
+        "albumFolders": [
+          {
+            "id": "SETENTA",
+            "name": "Años 70"
+          }
+        ],
+        "playlists": [
+          {
+            "id": "P1",
+            "name": "Cardio",
+            "folder": "LUNES",
+            "songs": [
+              {
+                "id": "s1",
+                "title": "Canción s1",
+                "artist": "Artista"
+              }
+            ]
+          },
+          {
+            "id": "P3",
+            "name": "En otra",
+            "folder": "OTRA",
+            "songs": []
+          },
+          {
+            "id": "AL",
+            "name": "Disco",
+            "album": {
+              "browseId": "MPREb_x"
+            },
+            "folder": "SETENTA",
+            "songs": []
+          }
+        ],
+        "covers": {
+          "P1": "AAAA"
+        },
+        "playlistOrder": [
+          "folder:GYM",
+          "P2"
+        ],
+        "deleted": [
+          {
+            "k": "playlist",
+            "id": "P2",
+            "m": [
+              1763400000000,
+              9,
+              "WR85D13C"
+            ]
+          }
+        ]
+      },
+      "enLaApp": {
+        "favorites": [
+          {
+            "id": "f1",
+            "title": "Canción f1",
+            "artist": "Artista"
+          },
+          {
+            "id": "f2",
+            "title": "Canción f2",
+            "artist": "Artista"
+          }
+        ],
+        "followedArtists": [
+          {
+            "browseId": "UC1",
+            "name": "Uno"
+          },
+          {
+            "browseId": "UC2",
+            "name": "Dos"
+          }
+        ],
+        "folders": [
+          {
+            "id": "GYM",
+            "name": "Gimnasio"
+          },
+          {
+            "id": "PIERNA",
+            "name": "Pierna",
+            "parent": "GYM"
+          },
+          {
+            "id": "LUNES",
+            "name": "Lunes",
+            "parent": "PIERNA"
+          },
+          {
+            "id": "OTRA",
+            "name": "Otra"
+          }
+        ],
+        "albumFolders": [
+          {
+            "id": "SETENTA",
+            "name": "Años 70"
+          }
+        ],
+        "playlists": [
+          {
+            "id": "P1",
+            "name": "Cardio",
+            "folder": "LUNES",
+            "songs": [
+              {
+                "id": "s1",
+                "title": "Canción s1",
+                "artist": "Artista"
+              }
+            ]
+          },
+          {
+            "id": "P3",
+            "name": "En otra",
+            "folder": "OTRA",
+            "songs": []
+          },
+          {
+            "id": "AL",
+            "name": "Disco",
+            "album": {
+              "browseId": "MPREb_x"
+            },
+            "folder": "SETENTA",
+            "songs": []
+          },
+          {
+            "id": "P2",
+            "name": "Suelta",
+            "songs": []
+          }
+        ],
+        "covers": {
+          "P1": "AAAA",
+          "P2": "BBBB"
+        },
+        "playlistOrder": [
+          "folder:GYM",
+          "P2"
+        ],
+        "deleted": [
+          {
+            "k": "playlist",
+            "id": "P2",
+            "m": [
+              1763400000000,
+              9,
+              "WR85D13C"
+            ]
+          }
+        ]
+      }
     }
   ]
 }

@@ -552,12 +552,18 @@ final class CuentaPear: ObservableObject {
         if http.statusCode >= 400 {
             let codigo = ((try? JSONSerialization.jsonObject(with: data) as? [String: Any])?["error"] as? [String: Any])?["codigo"] as? String
             Logs.w("Cuenta", "\(metodo) \(http.statusCode) \(codigo ?? "?")") // sin ruta ni ids (§9)
+            if let codigo { trasError(codigo) }
             // Sin el JSON de error (lo de delante de Cloudflare, un Worker caído): por el código HTTP.
             throw ErrorCuenta(codigo: codigo ?? (http.statusCode == 429 ? "demasiadas_peticiones"
                                                  : (500...599).contains(http.statusCode) ? "servidor_caido" : "http_\(http.statusCode)"))
         }
         return (data, http)
     }
+
+    /// Lo que pasa con un error del servidor, en cualquier petición (revisión del bloque 2, B2-2): «dispositivo_revocado»
+    /// (el Worker sólo lo dice con la firma o el token buenos) saca a este dispositivo de la cuenta al momento, no sólo al
+    /// renovar la sesión. Igual que `trasError` en Android.
+    func trasError(_ codigo: String) { if codigo == "dispositivo_revocado" && tieneCuenta { olvidar() } }
 
     /// Sin Internet o Cloudflare bloqueado (ADR 0004 §9): se prueba un dominio que no es de Cloudflare.
     private func errorDeRed() async -> ErrorCuenta {
@@ -584,8 +590,12 @@ final class CuentaPear: ObservableObject {
     // MARK: Presencia (§7.3 punto 3): Face ID / huella o el código del sistema
 
     private func presencia(_ motivo: String) async throws {
+        // Los dos atajos, sólo en el simulador (B2-1): nunca en un iPhone, ni en Jiyu Dev. `deMentira` sólo lo pone
+        // `Demo.current`, que fuera del simulador es nil; el `#if` es la segunda llave.
+        #if targetEnvironment(simulator)
         if UserDefaults.standard.bool(forKey: "pearSinPresencia") && Channel.adminTools { return } // tests de interfaz (Jiyu Dev)
         if deMentira { return } // la cuenta de mentira de las capturas y los CuentaUITests: sin claves ni servidor
+        #endif
         let ctx = LAContext()
         do {
             guard try await ctx.evaluatePolicy(.deviceOwnerAuthentication, localizedReason: motivo) else { throw ErrorCuenta(codigo: "presencia") }

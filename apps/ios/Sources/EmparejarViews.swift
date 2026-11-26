@@ -229,7 +229,7 @@ struct AnadirMovilView: View {
                 }
             case .confirmar:
                 CabeceraQr(pose: "saltando", titulo: L("¿Añadir \"{0}\" a tu cuenta?", nombre),
-                           texto: L("Podrá usar tu cuenta y ver tu biblioteca. Te pediremos Face ID, huella o el código del móvil."))
+                           texto: L("Podrá usar tu cuenta y ver tu biblioteca. Te pediremos Face ID, huella o el código del dispositivo."))
                 if let aviso { Section { AvisoQr(texto: aviso) } }
                 Section {
                     Button(L("Añadir")) { completar() }

@@ -847,17 +847,28 @@ private struct CuentaConectada: View {
                 HStack(spacing: 8) {
                     Image(systemName: e.icono).foregroundStyle(Color(uiColor: .label)).frame(width: 28).accessibilityHidden(true)
                     // El identificador en los textos, no en la fila: en la fila tapaba el de «Comprobar ahora».
+                    // «Comprobar ahora» al lado si el texto cabe entero en una línea; si no (letra grande, idiomas
+                    // largos), debajo: nunca parte «Pendiente de subir» (revisión del bloque 2). Igual que
+                    // `TextOrTrailingBelow` en Android.
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(e.texto).foregroundStyle(Color(uiColor: .label)).fixedSize(horizontal: false, vertical: true)
+                        ViewThatFits(in: .horizontal) {
+                            HStack(spacing: 8) {
+                                Text(e.texto).foregroundStyle(Color(uiColor: .label)).fixedSize()
+                                    .accessibilityIdentifier("estadoSync")
+                                Spacer(minLength: 0)
+                                BotonComprobar(comprobando: comprobando) { sync.alEntrar() }
+                            }
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(e.texto).foregroundStyle(Color(uiColor: .label)).fixedSize(horizontal: false, vertical: true)
+                                    .accessibilityIdentifier("estadoSync")
+                                BotonComprobar(comprobando: comprobando) { sync.alEntrar() }
+                            }
+                        }
                         if alDia {
                             Text(L("Tu música está igual en tus {0} dispositivos", String(n)))
                                 .font(.footnote).foregroundStyle(Color(uiColor: .secondaryLabel))
                         }
                     }
-                    .accessibilityElement(children: .combine)
-                    .accessibilityIdentifier("estadoSync")
-                    Spacer(minLength: 0)
-                    BotonComprobar(comprobando: comprobando) { sync.alEntrar() }
                 }
                 .contentShape(Rectangle())
                 .onTapGesture { if !comprobando { sync.alEntrar() } }

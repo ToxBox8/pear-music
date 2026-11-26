@@ -1548,3 +1548,5 @@
 1548	Remove «{0}» from all your devices?
 1549	Remove «{0}»?
 1550	If they don't match, remove "{0}" from your account in Your devices.
+1551	It will be able to use your account and see your library. We'll ask for Face ID, your fingerprint or your device's code.
+1552	It will be able to use your account and see your library. We'll ask for your fingerprint or your device's code.

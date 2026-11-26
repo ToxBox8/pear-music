@@ -1548,3 +1548,5 @@
 1548	Quitar «{0}» de todos os teus dispositivos?
 1549	Quitar «{0}»?
 1550	Se non coinciden, quita "{0}" da túa conta en Os teus dispositivos.
+1551	Poderá usar a túa conta e ver a túa biblioteca. Pedirémosche Face ID, a pegada ou o código do dispositivo.
+1552	Poderá usar a túa conta e ver a túa biblioteca. Pedirémosche a pegada ou o código do dispositivo.

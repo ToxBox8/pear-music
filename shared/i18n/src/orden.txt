@@ -1548,3 +1548,5 @@ Tus otros dispositivos siguen en la cuenta y verán que este ya no está.
 ¿Quitar «{0}» de todos tus dispositivos?
 ¿Quitar «{0}»?
 Si no coinciden, quita "{0}" de tu cuenta en Tus dispositivos.
+Podrá usar tu cuenta y ver tu biblioteca. Te pediremos Face ID, huella o el código del dispositivo.
+Podrá usar tu cuenta y ver tu biblioteca. Te pediremos la huella o el código del dispositivo.

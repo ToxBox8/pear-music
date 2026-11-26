@@ -10,6 +10,8 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 SWIFT="${SWIFT:-$HOME/tools/swift/usr/bin/swiftc}"
 export LD_LIBRARY_PATH="$HOME/tools/swift/compat${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+# Los atajos de prueba que se saltan la presencia, sólo en el simulador y en Jiyu Dev debug (revisión del bloque 2, B2-1).
+python3 ../../tools/revision/atajos.py
 OUT="$(mktemp -d)"
 trap 'rm -rf "$OUT"' EXIT
 cp scripts/tests/AppVersionTests.swift "$OUT/main.swift"

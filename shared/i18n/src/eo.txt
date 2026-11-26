@@ -1548,3 +1548,5 @@
 1548	Ĉu forigi «{0}» el ĉiuj viaj aparatoj?
 1549	Ĉu forigi «{0}»?
 1550	Se ili ne kongruas, forigu "{0}" el via konto en Viaj aparatoj.
+1551	Ĝi povos uzi vian konton kaj vidi vian bibliotekon. Ni petos Face ID, fingrospuron aŭ la kodon de la aparato.
+1552	Ĝi povos uzi vian konton kaj vidi vian bibliotekon. Ni petos fingrospuron aŭ la kodon de la aparato.

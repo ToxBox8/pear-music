@@ -1548,3 +1548,5 @@
 1548	Vols treure «{0}» de tots els teus dispositius?
 1549	Vols treure «{0}»?
 1550	Si no coincideixen, treu "{0}" del teu compte a Els teus dispositius.
+1551	Podrà fer servir el teu compte i veure la teva biblioteca. Et demanarem Face ID, l'empremta o el codi del dispositiu.
+1552	Podrà fer servir el teu compte i veure la teva biblioteca. Et demanarem l'empremta o el codi del dispositiu.

@@ -153,7 +153,17 @@ enum Demo {
         "v2_14_importar": Scenario(playing: false, showImport: true),
     ]
 
-    static let current: Scenario? = UserDefaults.standard.string(forKey: "screenshotScenario").flatMap { scenarios[$0] }
+    /// Sólo en el simulador (revisión del bloque 2, B2-1): en un iPhone de verdad no hay modo de capturas. Con la app
+    /// firmada para desarrollo (AltStore, iloader), `devicectl` puede lanzarla con argumentos, y la cuenta de mentira de
+    /// los escenarios de la cuenta se salta Face ID (`CuentaPear.presencia`). Las capturas y los CuentaUITests van en
+    /// el simulador (ios.yml), así que no pierden nada.
+    static let current: Scenario? = {
+        #if targetEnvironment(simulator)
+        return UserDefaults.standard.string(forKey: "screenshotScenario").flatMap { scenarios[$0] }
+        #else
+        return nil
+        #endif
+    }()
     static var isActive: Bool { current != nil }
 
     static let songs = [
