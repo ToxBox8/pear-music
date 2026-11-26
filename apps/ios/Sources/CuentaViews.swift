@@ -777,6 +777,9 @@ struct EntrarConClaveView: View {
 private struct CuentaConectada: View {
     @Environment(\.navCuenta) private var nav
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.dynamicTypeSize) private var tamanoLetra
+    /// xxxLarge ≈ la letra al 130 % de Android (revisión del bloque 2): «Comprobar ahora» baja debajo del texto.
+    private var letraGrande: Bool { tamanoLetra >= .xxxLarge }
     @ObservedObject private var cuenta = CuentaPear.shared
     @ObservedObject private var sync = SyncBiblioteca.shared
     @AppStorage("accountName") private var nombreCuenta = ""
@@ -847,27 +850,26 @@ private struct CuentaConectada: View {
                 HStack(spacing: 8) {
                     Image(systemName: e.icono).foregroundStyle(Color(uiColor: .label)).frame(width: 28).accessibilityHidden(true)
                     // El identificador en los textos, no en la fila: en la fila tapaba el de «Comprobar ahora».
-                    // «Comprobar ahora» al lado si el texto cabe entero en una línea; si no (letra grande, idiomas
-                    // largos), debajo: nunca parte «Pendiente de subir» (revisión del bloque 2). Igual que
-                    // `TextOrTrailingBelow` en Android.
+                    // Con letra grande (xxxLarge o más), «Comprobar ahora» va debajo del texto: a su lado partía
+                    // «Pendiente de subir» en trozos (revisión del bloque 2). A tamaño normal, como siempre. Igual
+                    // que `trailingBelowWithLargeText` en Android (letra al 130 % o más).
                     VStack(alignment: .leading, spacing: 2) {
-                        ViewThatFits(in: .horizontal) {
-                            HStack(spacing: 8) {
-                                Text(e.texto).foregroundStyle(Color(uiColor: .label)).fixedSize()
-                                    .accessibilityIdentifier("estadoSync")
-                                Spacer(minLength: 0)
-                                BotonComprobar(comprobando: comprobando) { sync.alEntrar() }
-                            }
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text(e.texto).foregroundStyle(Color(uiColor: .label)).fixedSize(horizontal: false, vertical: true)
-                                    .accessibilityIdentifier("estadoSync")
-                                BotonComprobar(comprobando: comprobando) { sync.alEntrar() }
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(e.texto).foregroundStyle(Color(uiColor: .label)).fixedSize(horizontal: false, vertical: true)
+                            if alDia {
+                                Text(L("Tu música está igual en tus {0} dispositivos", String(n)))
+                                    .font(.footnote).foregroundStyle(Color(uiColor: .secondaryLabel))
                             }
                         }
-                        if alDia {
-                            Text(L("Tu música está igual en tus {0} dispositivos", String(n)))
-                                .font(.footnote).foregroundStyle(Color(uiColor: .secondaryLabel))
+                        .accessibilityElement(children: .combine)
+                        .accessibilityIdentifier("estadoSync")
+                        if letraGrande {
+                            BotonComprobar(comprobando: comprobando) { sync.alEntrar() }.padding(.top, 6)
                         }
+                    }
+                    if !letraGrande {
+                        Spacer(minLength: 0)
+                        BotonComprobar(comprobando: comprobando) { sync.alEntrar() }
                     }
                 }
                 .contentShape(Rectangle())
