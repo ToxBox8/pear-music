@@ -503,9 +503,39 @@ struct CuentaPantalla: View {
             case .terminos: TerminosNuevosView()
             }
         }
+        .claveOculta(pantalla.conClave)
         .enLaCuenta()
     }
 }
+
+extension PantallaCuenta {
+    /// Se ve o se escribe la clave de recuperación (revisión del bloque 2, B2-7). Igual que `PantallaCuenta.conClave`
+    /// en Android.
+    var conClave: Bool { [.clave, .entrar, .comprobar, .borrar].contains(self) }
+}
+
+/// Revisión del bloque 2, B2-7 (lo decidió Toxbox el 26-11): mientras se ve «Tu clave» o se escribe la clave, en cuanto
+/// la app deja de estar activa (selector de apps, centro de control, Face ID) un velo opaco la tapa, así la miniatura
+/// que guarda el sistema no la enseña. iOS no deja bloquear las capturas a una app: en Android, además, `FLAG_SECURE`
+/// las impide (diferencia en docs/ARCHITECTURE.md). Igual que `ClaveFueraDeCapturas` en Android.
+private struct ClaveOculta: ViewModifier {
+    let si: Bool
+    @Environment(\.scenePhase) private var fase
+    func body(content: Content) -> some View {
+        content.overlay {
+            if si && fase != .active {
+                ZStack {
+                    Color(.systemGroupedBackground)
+                    Image(systemName: "lock.fill").font(.largeTitle).foregroundStyle(.secondary)
+                }
+                .ignoresSafeArea()
+                .accessibilityHidden(true)
+                .accessibilityIdentifier("veloClave")
+            }
+        }
+    }
+}
+extension View { fileprivate func claveOculta(_ si: Bool) -> some View { modifier(ClaveOculta(si: si)) } }
 
 /// Una fila de la cuenta: icono, título, la frase de debajo y, a la derecha, el valor, «⋯» (abre un menú) o la flecha
 /// (abre una pantalla). Colores del sistema explícitos: dentro de un botón, `.primary` saldría con el tinte (shu) y la
@@ -845,7 +875,7 @@ private struct CuentaConectada: View {
                 let e = sync.vista.estado()
                 let v = sync.vista
                 let comprobando = v.fase != .quieta
-                let alDia = !comprobando && !v.bloqueado && !v.sinRed && !v.pendiente && v.ultimaOk > 0 && n > 1
+                let alDia = !comprobando && !v.bloqueado && !v.limitado && !v.sinRed && !v.pendiente && v.ultimaOk > 0 && n > 1
                 // Sin envolver en otro Button: en un Form, un botón dentro de otro se lleva el toque de la fila entera.
                 HStack(spacing: 8) {
                     Image(systemName: e.icono).foregroundStyle(Color(uiColor: .label)).frame(width: 28).accessibilityHidden(true)

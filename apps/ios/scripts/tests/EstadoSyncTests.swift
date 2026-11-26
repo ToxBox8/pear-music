@@ -26,5 +26,24 @@ comprobar(String(Int(VistaSync.esperaBloqueado(40, azar: 0.5) / 60_000)), "30")
 comprobar(String(bloq.puedeIntentar(ahora: ahora + 30_000)), "false")
 comprobar(String(bloq.puedeIntentar(ahora: ahora + 60_000)), "true")
 comprobar(String(VistaSync(sinRed: true).puedeIntentar(ahora: ahora)), "true")
+// Revisión del bloque 2, B2-6: el límite de la sync por dispositivo. Pendiente, sin «sin conexión»; el pie dice por qué;
+// no se intenta antes del Retry-After (15 min si no viene; entre 1 min y 1 h).
+var lim = VistaSync(ultimaOk: ahora, pendiente: true); lim.limitado = true; lim.reintentoEn = ahora + 1_200_000
+comprobar(t(lim), "Pendiente de subir")
+comprobar(lim.detalle ?? "", "Has sincronizado muchas veces en poco rato. Lo pendiente se subirá solo dentro de un rato")
+comprobar(String(lim.puedeIntentar(ahora: ahora + 600_000)), "false")
+comprobar(String(lim.puedeIntentar(ahora: ahora + 1_200_000)), "true")
+comprobar(String(Int(VistaSync.esperaLimitado(nil))), "900000")
+comprobar(String(Int(VistaSync.esperaLimitado(3))), "60000")
+comprobar(String(Int(VistaSync.esperaLimitado(99_999))), "3600000")
+// B2-8: «Cerrar sesión» conserva «No sincronizar esto» con su cuenta; quitado desde otro (sin conservar), no; al entrar en
+// la misma cuenta siguen, en otra se olvidan.
+let cerrada = MarcasSoloAqui.alSalir(["playlist:b", "playlist:a"], cuenta: "1X99", conservar: true)
+comprobar(cerrada.map { $0.marcas.joined(separator: ",") + "@" + $0.cuenta } ?? "nada", "playlist:a,playlist:b@1X99")
+comprobar(MarcasSoloAqui.alSalir(["playlist:a"], cuenta: "1X99", conservar: false) == nil ? "nada" : "algo", "nada")
+comprobar(MarcasSoloAqui.alSalir([], cuenta: "1X99", conservar: true) == nil ? "nada" : "algo", "nada")
+comprobar(String(MarcasSoloAqui.siguen(en: "1X99", de: "1X99")), "true")
+comprobar(String(MarcasSoloAqui.siguen(en: "2B88", de: "1X99")), "false")
+comprobar(String(MarcasSoloAqui.siguen(en: "2B88", de: nil)), "true")
 print("Estado de la sincronización: \(total - fallos)/\(total) bien")
 exit(fallos == 0 ? 0 : 1)

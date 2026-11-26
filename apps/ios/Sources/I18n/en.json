@@ -651,6 +651,7 @@
 "Hacía mucho que este dispositivo no se sincronizaba: se ha puesto al día con tu cuenta": "This device hadn't synced for a long time: it's now up to date with your account",
 "Hacía mucho que este móvil no se sincronizaba: se ha puesto al día con tu cuenta": "This phone hadn't synced for a long time: it's now up to date with your account",
 "Has cerrado sesión. Tu biblioteca sigue aquí.": "You've signed out. Your library is still here.",
+"Has sincronizado muchas veces en poco rato. Lo pendiente se subirá solo dentro de un rato": "You have synced many times in a short while. What is pending will upload on its own in a while",
 "Hasta {0}. Se reducen y se les quitan la ubicación y los demás datos de la foto antes de enviarlas.": "Up to {0}. They're resized and stripped of location and other photo data before sending.",
 "Hay términos nuevos que aceptar": "There are new terms to accept",
 "Hay términos nuevos. Para seguir usando la cuenta, léelos y acéptalos.": "There are new terms. To keep using your account, read and accept them.",

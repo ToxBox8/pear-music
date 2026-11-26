@@ -1550,3 +1550,4 @@
 1550	Bat ez badatoz, kendu "{0}" zure kontutik Zure gailuak atalean.
 1551	Zure kontua erabili eta zure liburutegia ikusi ahal izango du. Face ID, hatz-marka edo gailuaren kodea eskatuko dizugu.
 1552	Zure kontua erabili eta zure liburutegia ikusi ahal izango du. Hatz-marka edo gailuaren kodea eskatuko dizugu.
+1553	Denbora gutxian askotan sinkronizatu duzu. Zain dagoena bere kabuz igoko da handik gutxira

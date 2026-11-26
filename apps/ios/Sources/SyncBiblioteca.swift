@@ -44,6 +44,8 @@ final class SyncBiblioteca: ObservableObject {
         var ultimaOk: Double?
         /// «No sincronizar esto» (PULIR #5, sync.md §5.6): las claves «k:id» marcadas en este móvil.
         var soloAqui: [String]?
+        /// La cuenta de esas marcas (B2-8): «Cerrar sesión» las conserva y sólo valen al volver a entrar en ella.
+        var soloAquiCuenta: String?
     }
 
     /// Lo marcado «sólo en este móvil»: ni sube ni lo toca lo que llega; en los demás móviles, como estaba. Igual que
@@ -53,8 +55,16 @@ final class SyncBiblioteca: ObservableObject {
     func soloEnEsteMovil(_ clave: String, _ marcar: Bool) {
         if marcar { soloAqui.insert(clave) } else { soloAqui.remove(clave) }
         estado.soloAqui = soloAqui.sorted()
+        if let id = CuentaPear.shared.cuentaId { estado.soloAquiCuenta = id }
         guardar()
         alCambiar()
+    }
+
+    /// B2-8: las marcas son de la cuenta en la que se pusieron. Antes de usarlas con la cuenta `id`: si eran de otra (se
+    /// cerró sesión y se entró en otra cuenta), se olvidan; si no, se apuntan con ésta. Igual en Android.
+    func cuentaDeSoloAqui(_ id: String) {
+        if !MarcasSoloAqui.siguen(en: id, de: estado.soloAquiCuenta) { soloAqui = []; estado.soloAqui = nil }
+        estado.soloAquiCuenta = id
     }
 
     /// Lo que se ve (PULIR #3 y #4): la cápsula de arriba (`AvisoSync`) y la fila de Ajustes › Cuenta.
@@ -64,22 +74,31 @@ final class SyncBiblioteca: ObservableObject {
     // MARK: Modo fútbol (Pulir 2 #2)
     private let reintento = ReintentoBloqueado()
     private var intentosBloqueado = 0
-    /// Tras un intento fallido con `codigo`: con `bloqueado`, la vista lo explica y se programa el siguiente intento.
-    func alFallar(_ codigo: String?, ahora: Double = Date().timeIntervalSince1970 * 1000) {
-        guard codigo == "bloqueado" else {
+    /// Tras un intento fallido con `codigo`: con `bloqueado` (modo fútbol) o `demasiadas_sincronizaciones` (B2-6), la
+    /// vista lo explica y se programa el siguiente intento; `esperaS` es el `Retry-After` del servidor. Igual en Android.
+    func alFallar(_ codigo: String?, ahora: Double = Date().timeIntervalSince1970 * 1000, esperaS: Int? = nil) {
+        let limitado = codigo == "demasiadas_sincronizaciones"
+        guard codigo == "bloqueado" || limitado else {
             reintento.cancelar(); intentosBloqueado = 0
-            vista.sinRed = codigo == "sin_conexion"; vista.bloqueado = false; vista.reintentoEn = 0
+            vista.sinRed = codigo == "sin_conexion"; vista.bloqueado = false; vista.limitado = false; vista.reintentoEn = 0
             return
         }
-        let espera = VistaSync.esperaBloqueado(intentosBloqueado)
-        intentosBloqueado += 1
-        vista.sinRed = true; vista.bloqueado = true; vista.reintentoEn = ahora + espera
+        let espera: Double
+        if limitado {
+            espera = VistaSync.esperaLimitado(esperaS)
+            vista.sinRed = false; vista.bloqueado = false; vista.limitado = true
+        } else {
+            espera = VistaSync.esperaBloqueado(intentosBloqueado)
+            intentosBloqueado += 1
+            vista.sinRed = true; vista.bloqueado = true; vista.limitado = false
+        }
+        vista.reintentoEn = ahora + espera
         // Sin cancelarse a sí mismo si es el propio reintento el que vuelve a fallar (ReintentoBloqueado).
         reintento.programar(espera: espera) { [weak self] in await self?.sincronizar(); await self?.sincronizarEstadisticas() }
     }
     private func alSalirBien() {
         reintento.cancelar(); intentosBloqueado = 0
-        vista.sinRed = false; vista.bloqueado = false; vista.reintentoEn = 0
+        vista.sinRed = false; vista.bloqueado = false; vista.limitado = false; vista.reintentoEn = 0
     }
 
     /// Sólo capturas (`-screenshotScenario`): un estado fijo, como `vistaDePrueba` en Android.
@@ -134,15 +153,23 @@ final class SyncBiblioteca: ObservableObject {
 
     func conectar(_ library: Library) { self.library = library }
 
-    /// Al salir de la cuenta o quitar este móvil: lo de la sync de esa cuenta se olvida.
-    func olvidar() {
+    /// Al salir de la cuenta o quitar este móvil: lo de la sync de esa cuenta se olvida. Con `conservarSoloAqui`
+    /// («Cerrar sesión»; revisión del bloque 2, B2-8, lo decidió Toxbox el 26-11) se queda «No sincronizar esto», con la
+    /// cuenta de la que era: al volver a entrar en ella no se sube lo que habías dejado sólo aquí; en otra, se olvida
+    /// (`cuentaDeSoloAqui`). Igual en Android.
+    func olvidar(conservarSoloAqui: Bool = false) {
         espera?.cancel()
         esperaEst?.cancel(); esperaEst = nil
         reintento.cancelar(); intentosBloqueado = 0
+        let cuenta = estado.soloAquiCuenta ?? CuentaPear.shared.cuentaId
+        let marcas = soloAqui
         estado = Estado()
         try? FileManager.default.removeItem(at: Self.archivo)
         vista = VistaSync()
-        soloAqui = []
+        if let q = MarcasSoloAqui.alSalir(marcas, cuenta: cuenta, conservar: conservarSoloAqui) {
+            estado.soloAqui = q.marcas; estado.soloAquiCuenta = q.cuenta
+            guardar()
+        } else { soloAqui = [] }
         // El nombre es de esa cuenta (PULIR #6): si se quedara, al entrar en otra se subiría encima del suyo.
         callado { UserDefaults.standard.removeObject(forKey: "accountName") }
     }
@@ -214,6 +241,7 @@ final class SyncBiblioteca: ObservableObject {
         guard !enCurso, let library, library.unreadableCopy == nil, !Demo.isActive, !DemoCatalog.isActive else { return }
         let cuenta = CuentaPear.shared
         guard cuenta.tieneCuenta, let k = cuenta.kMusic, let d = cuenta.dispositivoCorto, let id = cuenta.cuentaId else { return }
+        cuentaDeSoloAqui(id)
         enCurso = true
         defer { enCurso = false; guardar(); alAcabar() }
         do {
@@ -275,7 +303,7 @@ final class SyncBiblioteca: ObservableObject {
         } catch {
             estado.pendiente = true // sin red, 5xx, términos…: se reintenta al volver o al abrir
             let codigo = (error as? CuentaPear.ErrorCuenta)?.codigo
-            alFallar(codigo)
+            alFallar(codigo, esperaS: (error as? CuentaPear.ErrorCuenta)?.esperaS)
             Logs.w("Sync", "biblioteca pendiente: \(codigo ?? "error")") // sin datos
         }
     }
@@ -317,6 +345,8 @@ final class SyncBiblioteca: ObservableObject {
             }
         } catch {
             estado.pendienteEst = true
+            // El límite por dispositivo (B2-6) es el mismo para los dos bloques: tampoco se martillea por aquí.
+            if let e = error as? CuentaPear.ErrorCuenta, e.codigo == "demasiadas_sincronizaciones" { alFallar(e.codigo, esperaS: e.esperaS) }
             Logs.w("Sync", "estadísticas pendientes: \((error as? CuentaPear.ErrorCuenta)?.codigo ?? "error")") // sin datos
         }
     }

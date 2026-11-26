@@ -77,6 +77,8 @@ final class CuentaPear: ObservableObject {
 
     struct ErrorCuenta: Error, Equatable {
         let codigo: String
+        /// El `Retry-After` del servidor (segundos), si lo trae (los 429; B2-6).
+        var esperaS: Int? = nil
         /// Lo que se enseña (`CuentaErrores.mensaje`, sólo Foundation: se prueba en Linux).
         var mensaje: String { CuentaErrores.mensaje(codigo) }
     }
@@ -223,7 +225,7 @@ final class CuentaPear: ObservableObject {
             guard let id = meta.dispositivo else { throw ErrorCuenta(codigo: "sin_cuenta") }
             _ = try await firmada("DELETE", "/v1/id/dispositivos/\(id)", nil, cuentaFirma: true)
         }
-        olvidar()
+        olvidar(conservarSoloAqui: true) // B2-8: «No sincronizar esto» se queda (lo decidió Toxbox)
     }
 
     /// «Quitar todos los demás móviles»: con C y presencia.
@@ -409,9 +411,9 @@ final class CuentaPear: ObservableObject {
     private func guardarMeta() { if let d = try? JSONEncoder().encode(meta) { try? Llavero.guardar("meta", d) } }
 
     /// Este móvil sale de la cuenta (lo han quitado o lo ha quitado él): fuera R, D y la sesión.
-    func olvidar() {
+    func olvidar(conservarSoloAqui: Bool = false) {
         for k in ["R", "D", "meta"] { Llavero.borrar(k) }
-        SyncBiblioteca.shared.olvidar()
+        SyncBiblioteca.shared.olvidar(conservarSoloAqui: conservarSoloAqui)
         let desfase = meta.desfase
         meta = Meta()
         meta.desfase = desfase
@@ -555,7 +557,8 @@ final class CuentaPear: ObservableObject {
             if let codigo { trasError(codigo) }
             // Sin el JSON de error (lo de delante de Cloudflare, un Worker caído): por el código HTTP.
             throw ErrorCuenta(codigo: codigo ?? (http.statusCode == 429 ? "demasiadas_peticiones"
-                                                 : (500...599).contains(http.statusCode) ? "servidor_caido" : "http_\(http.statusCode)"))
+                                                 : (500...599).contains(http.statusCode) ? "servidor_caido" : "http_\(http.statusCode)"),
+                              esperaS: http.value(forHTTPHeaderField: "Retry-After").flatMap { Int($0.trimmingCharacters(in: .whitespaces)) }) // i18n: no
         }
         return (data, http)
     }

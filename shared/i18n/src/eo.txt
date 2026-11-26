@@ -1550,3 +1550,4 @@
 1550	Se ili ne kongruas, forigu "{0}" el via konto en Viaj aparatoj.
 1551	Ĝi povos uzi vian konton kaj vidi vian bibliotekon. Ni petos Face ID, fingrospuron aŭ la kodon de la aparato.
 1552	Ĝi povos uzi vian konton kaj vidi vian bibliotekon. Ni petos fingrospuron aŭ la kodon de la aparato.
+1553	Vi sinkronigis multfoje en mallonga tempo. La atendanta parto alŝutiĝos per si mem post iom da tempo

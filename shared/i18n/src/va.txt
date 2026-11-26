@@ -1550,3 +1550,4 @@
 1550	Si no coincidixen, lleva "{0}" del teu compte en Els teus dispositius.
 1551	Podrà usar el teu compte i vore la teua biblioteca. Et demanarem Face ID, l'empremta o el codi del dispositiu.
 1552	Podrà usar el teu compte i vore la teua biblioteca. Et demanarem l'empremta o el codi del dispositiu.
+1553	Has sincronitzat moltes voltes en poc de temps. El que està pendent es pujarà a soles d'ací a una estona

@@ -1550,3 +1550,4 @@ Tus otros dispositivos siguen en la cuenta y verán que este ya no está.
 Si no coinciden, quita "{0}" de tu cuenta en Tus dispositivos.
 Podrá usar tu cuenta y ver tu biblioteca. Te pediremos Face ID, huella o el código del dispositivo.
 Podrá usar tu cuenta y ver tu biblioteca. Te pediremos la huella o el código del dispositivo.
+Has sincronizado muchas veces en poco rato. Lo pendiente se subirá solo dentro de un rato

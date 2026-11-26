@@ -17,6 +17,7 @@ enum CuentaErrores {
         case "servicio_no_disponible", "incidente": return L("La cuenta no está disponible ahora; puedes seguir escuchando")
         case "limite_diario": return L("La cuenta ha llegado a su límite de hoy. Mañana vuelve a funcionar; la música sigue igual")
         case "demasiadas_peticiones": return L("Demasiados intentos. Prueba dentro de un rato")
+        case "demasiadas_sincronizaciones": return L("Has sincronizado muchas veces en poco rato. Lo pendiente se subirá solo dentro de un rato")
         case "demasiado_pronto": return L("Espera un poco antes de volver a intentarlo")
         case "peticion_invalida": return L("El servidor no ha entendido la petición. Actualiza Jiyu Pulse y prueba otra vez")
         case "demasiado_grande": return L("Es demasiado grande para enviarlo")

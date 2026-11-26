@@ -27,9 +27,18 @@ struct VistaSync: Equatable {
     /// veces, durante los partidos). No es un error: se explica y se vuelve a intentar solo en `reintentoEn` (ms).
     var bloqueado = false
     var reintentoEn: Double = 0
+    /// El servidor ha dicho `demasiadas_sincronizaciones` (revisión del bloque 2, B2-6: 120 escrituras o 600 lecturas por
+    /// hora y dispositivo): lo cambiado sigue pendiente y no se intenta hasta `reintentoEn`, cuando se reintenta sola.
+    var limitado = false
 
     static var textoBloqueado: String { L("No se puede llegar al servidor") }
     static var detalleBloqueado: String { L("En España pasa a veces durante los partidos de fútbol. Se volverá a intentar sola.") }
+    /// El mismo texto que `CuentaErrores.mensaje("demasiadas_sincronizaciones")` (aquí, sin depender de él: Linux).
+    static var detalleLimitado: String { L("Has sincronizado muchas veces en poco rato. Lo pendiente se subirá solo dentro de un rato") }
+
+    /// Cuánto esperar (ms) tras `demasiadas_sincronizaciones` (B2-6): el `Retry-After` (`esperaS`, segundos), entre 1 min
+    /// y 1 h; sin él, 15 min. Igual que `SyncBiblioteca.esperaLimitado` en Android.
+    static func esperaLimitado(_ esperaS: Int?) -> Double { Double(Swift.min(3600, Swift.max(60, esperaS ?? 900))) * 1000 }
 
     /// Cuánto esperar (ms) tras el intento `intento` (0, 1…) que ha dado `bloqueado`: 1, 2, 4, 8, 16 y luego 30 min
     /// como mucho, ±10 % al azar (que no vuelvan todos los móviles a la vez al acabar el partido). Igual en Android.
@@ -39,15 +48,16 @@ struct VistaSync: Equatable {
     }
 
     /// Si se puede intentar ya sin martillear: al abrir o tras un cambio no se intenta antes de `reintentoEn`.
-    func puedeIntentar(ahora: Double = Date().timeIntervalSince1970 * 1000) -> Bool { !bloqueado || ahora >= reintentoEn }
+    func puedeIntentar(ahora: Double = Date().timeIntervalSince1970 * 1000) -> Bool { !(bloqueado || limitado) || ahora >= reintentoEn }
 
-    /// La segunda línea de la fila (sólo en el modo fútbol).
-    var detalle: String? { bloqueado ? VistaSync.detalleBloqueado : nil }
+    /// El pie de la fila (modo fútbol y límite de la sync).
+    var detalle: String? { bloqueado ? VistaSync.detalleBloqueado : limitado ? VistaSync.detalleLimitado : nil }
 
     /// El icono (SF Symbol) y el texto de la fila de Ajustes › Cuenta.
     func estado(ahora: Double = Date().timeIntervalSince1970 * 1000) -> (icono: String, texto: String) {
         if fase != .quieta { return ("arrow.triangle.2.circlepath", fase.texto) }
         if bloqueado { return ("icloud.slash", VistaSync.textoBloqueado) }
+        if limitado { return ("icloud.and.arrow.up", L("Pendiente de subir")) }
         if sinRed { return ("icloud.slash", L("Sin conexión: se subirá luego")) }
         if pendiente { return ("icloud.and.arrow.up", L("Pendiente de subir")) }
         if ultimaOk > 0 { return ("checkmark.icloud", L("Sincronizado {0}", VistaSync.haceCuanto(ultimaOk, ahora))) }
@@ -65,6 +75,20 @@ struct VistaSync: Equatable {
         f.dateStyle = .medium; f.timeStyle = .none
         return L("el {0}", f.string(from: Date(timeIntervalSince1970: ms / 1000)))
     }
+}
+
+/// «No sincronizar esto» y su cuenta (revisión del bloque 2, B2-8; lo decidió Toxbox el 26-11): «Cerrar sesión» conserva
+/// las marcas con la cuenta de la que eran; al volver a entrar en ella siguen, en otra se olvidan. Sólo Foundation: se
+/// prueba en Linux (`EstadoSyncTests`). Igual que `SyncBiblioteca.olvidar` / `cuentaDeSoloAqui` en Android.
+enum MarcasSoloAqui {
+    /// Lo que se queda al salir de la cuenta: con `conservar` (sólo «Cerrar sesión») y algo marcado, las marcas y su
+    /// cuenta; si no, nada.
+    static func alSalir(_ marcas: Set<String>, cuenta: String?, conservar: Bool) -> (marcas: [String], cuenta: String)? {
+        guard conservar, !marcas.isEmpty, let cuenta else { return nil }
+        return (marcas.sorted(), cuenta)
+    }
+    /// Al sincronizar con la cuenta `id`: si las marcas eran de otra cuenta, fuera.
+    static func siguen(en id: String, de: String?) -> Bool { de == nil || de == id }
 }
 
 /// El reintento del modo fútbol (Pulir 2 #2): espera y vuelve a intentar. Al empezar, deja de ser «el que espera»; así,
