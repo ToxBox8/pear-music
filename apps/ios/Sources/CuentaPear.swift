@@ -68,7 +68,8 @@ final class CuentaPear: ObservableObject {
         // SwiftUI construye el destino aunque no sea la ruta del escenario, y la ponía en todos.)
         if let r = Demo.current?.route, [.cuentaComprobar, .cuentaBorrar, .cuentaAnadir, .cuentaAnadirEmojis, .cuentaConectada,
                                           .cuentaSincronizado, .cuentaBloqueado, .cuentaSeguridad, .cuentaCerrarSesion,
-                                          .cuentaCerrarSesionUnico, .cuentaTerminos, .cuentaPulsos, .cuentaPulsosVacio].contains(r) {
+                                          .cuentaCerrarSesionUnico, .cuentaTerminos, .cuentaPulsos, .cuentaPulsosVacio,
+                                          .cuentaCodigo, .cuentaCodigoMal, .cuentaCodigoCanjeado].contains(r) {
             estadoDePrueba(unico: r == .cuentaCerrarSesionUnico)
         }
     }
@@ -494,6 +495,14 @@ final class CuentaPear: ObservableObject {
         guard !deMentira else { throw ErrorCuenta(codigo: "sin_cuenta") }
         guard let cuerpo = PulsosModel.cuerpoGasto(idOperacion, cantidad, concepto) else { throw ErrorCuenta(codigo: "peticion_invalida") }
         return try await json(try await firmada("POST", PulsosModel.rutaGastos, nil, crudo: Data(cuerpo.utf8), tipoCrudo: "application/json"))
+    }
+
+    /// Canjea un código de fundador (puntos.md §6.3) ya en su forma canónica; firmado con D. Da los bytes de la
+    /// respuesta para que `PulsosModel.leerCanje` los compruebe. Repetirlo tras un corte responde lo mismo.
+    func canjearCodigo(_ c20: String) async throws -> Data {
+        guard !deMentira else { throw ErrorCuenta(codigo: "sin_cuenta") }
+        guard let cuerpo = PulsosModel.cuerpoCanje(c20) else { throw ErrorCuenta(codigo: "peticion_invalida") }
+        return try await firmada("POST", PulsosModel.rutaCanjes, nil, crudo: Data(cuerpo.utf8), tipoCrudo: "application/json").0
     }
 
     /// 5 min antes de `exp`, o si no hay: POST /v1/id/sesion, sin enseñar nada (lo decidió Toxbox).

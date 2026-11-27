@@ -242,6 +242,51 @@ final class CuentaUITests: XCTestCase {
         shot("pulsos-historial")
     }
 
+    /// «Tengo un código» (3-B): desde Pulsos (segundo nivel), «Canjear» apagado hasta que el código cuadra (acepta
+    /// minúsculas y espacios); con una errata lo dice sin red; el gesto atrás vuelve a Pulsos. Como NavegacionCuentaTest.
+    func testTengoUnCodigo() {
+        launch("67_cuenta_conectada", ready: "Tus dispositivos") // desde Cuenta: así se va por NavCuenta de verdad
+        let pulsos = id("filaPulsos")
+        bajarHasta(pulsos)
+        pulsos.tap()
+        XCTAssertTrue(titulo("Pulsos").waitForExistence(timeout: 5))
+        let fila = id("filaTengoCodigo")
+        XCTAssertTrue(fila.waitForExistence(timeout: 5), "Pulsos ofrece «Tengo un código»")
+        fila.tap()
+        XCTAssertTrue(titulo("Tengo un código").waitForExistence(timeout: 5), "Abre «Tengo un código» con su título")
+        let boton = id("botonCanjear")
+        XCTAssertTrue(boton.waitForExistence(timeout: 5))
+        XCTAssertFalse(boton.isEnabled, "Sin código, «Canjear» está apagado")
+        let campo = app.textFields["campoCodigo"]
+        campo.tap()
+        campo.typeText("q8e0 pfnc m4ns d974 v4r7") // el de los vectores (puntos.json) con una errata al final
+        XCTAssertTrue(id("errorCodigo").waitForExistence(timeout: 5), "Con una errata, lo dice sin preguntar a nadie")
+        XCTAssertFalse(boton.isEnabled, "y «Canjear» sigue apagado")
+        shot("codigo-mal-escrito")
+        campo.typeText(XCUIKeyboardKey.delete.rawValue + "6")
+        XCTAssertTrue(boton.isEnabled, "Bien escrito (en minúsculas y con espacios), «Canjear» se enciende")
+        XCTAssertFalse(id("errorCodigo").exists, "sin aviso")
+        shot("codigo-bien-escrito")
+        gestoAtras()
+        XCTAssertTrue(titulo("Pulsos").waitForExistence(timeout: 5), "El gesto atrás vuelve a Pulsos")
+    }
+
+    /// Pulsos (3-B): con el marco Fundador lo dice en «Lo que tienes» y ya no ofrece otro código.
+    func testPulsosConMarcoFundador() {
+        launch("72_pulsos", ready: "Movimientos")
+        XCTAssertTrue(any("Marco Fundador").exists, "«Lo que tienes» dice el marco")
+        XCTAssertFalse(id("filaTengoCodigo").exists, "y no ofrece «Tengo un código»")
+        shot("pulsos-marco-fundador")
+    }
+
+    /// «Tengo un código» ya canjeado (3-B): «+500», el saldo nuevo, el marco y «Hecho».
+    func testCodigoCanjeado() {
+        launch("72f_codigo_canjeado", ready: "¡Ya eres fundador!")
+        XCTAssertEqual(id("codigoCanjeado").exists, true)
+        XCTAssertTrue(any("Marco Fundador").exists && id("botonHechoCodigo").exists, "El marco y «Hecho»")
+        shot("codigo-canjeado")
+    }
+
     /// Pulsos (3-A): sin cuenta, explica qué son y «Crear cuenta» la sustituye (atrás vuelve a Cuenta, no a Pulsos).
     func testPulsosSinCuentaOfreceCrearla() {
         launch("56_cuenta_sin_crear", ready: "Tu música en todos tus dispositivos")

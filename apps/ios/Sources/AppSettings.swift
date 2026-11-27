@@ -243,6 +243,9 @@ struct SettingsView: View {
             .demoRoute(.cuentaPulsos) { CuentaPantalla(.pulsos).onAppear { PulsosEstado.shared.vistaDePrueba(PulsosEstado.ejemplo) } }
             .demoRoute(.cuentaPulsosVacio) { CuentaPantalla(.pulsos).onAppear { PulsosEstado.shared.vistaDePrueba(.init(saldo: 0)) } }
             .demoRoute(.cuentaPulsosSinCuenta) { CuentaPantalla(.pulsos) }
+            .demoRoute(.cuentaCodigo) { CuentaPantalla(.codigo).onAppear { PulsosEstado.shared.vistaDePrueba(.init(saldo: 0)) } }
+            .demoRoute(.cuentaCodigoMal) { CodigoView(textoInicial: "q8e0-pfnc-m4ns-d974-v4r7") } // i18n: no
+            .demoRoute(.cuentaCodigoCanjeado) { CodigoView(canjeInicial: PulsosEstado.canjeEjemplo) }
             .demoRoute(.cuentaQr) { QrNuevoView(prueba: .qr) }
             .demoRoute(.cuentaQrEmojis) { QrNuevoView(prueba: .emojis) }
             .demoRoute(.cuentaAnadir) { AnadirMovilView(prueba: .confirmar) }

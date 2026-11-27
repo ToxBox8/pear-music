@@ -385,6 +385,8 @@ private extension String { var nilSiVacio: String? { isEmpty ? nil : self } }
 /// Android.
 enum PantallaCuenta: Hashable {
     case crear, clave, entrar, qrNuevo, anadirMovil, sincronizado, comprobar, cerrarSesion, borrar, terminos, pulsos
+    /// Cuenta › Pulsos › «Tengo un código» (3-B): el segundo nivel. «Hecho» vuelve a Pulsos.
+    case codigo
 }
 
 /// Cómo se va de Cuenta a una de sus pantallas. `ir` la abre encima de Cuenta (la flecha y el gesto atrás vuelven a
@@ -502,6 +504,7 @@ struct CuentaPantalla: View {
             case .borrar: BorrarCuentaView()
             case .terminos: TerminosNuevosView()
             case .pulsos: PulsosView()
+            case .codigo: if CuentaPear.shared.tieneCuenta { CodigoView() } else { PulsosView() }
             }
         }
         .claveOculta(pantalla.conClave)

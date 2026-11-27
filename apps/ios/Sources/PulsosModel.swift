@@ -21,7 +21,12 @@ enum PulsosModel {
         let saldo: Int64
         let movimientos: [Movimiento]
         let siguiente: String?
+        /// Lo que tiene la cuenta (`permisos` de `GET /v1/puntos`, 3-B), sin repetir y en orden.
+        var expansiones: [String] = []
     }
+    static let marcoFundador = "marco-fundador"
+    static let rutaCanjes = "/v1/puntos/canjes"
+    private static let reExpansion = "^[a-z0-9][a-z0-9-]{0,39}$"
 
     /// «1250» → «1.250» (de 3 en 3, siempre). Igual que `Pulsos.agrupar` en Android.
     static func agrupar(_ n: Int64, separador: String) -> String {
@@ -92,7 +97,80 @@ enum PulsosModel {
             movimientos.append(Movimiento(id: id, cantidad: cantidad, motivo: motivos.contains(motivo) ? motivo : "ajuste",
                                           ref: ref, saldoTras: tras, ts: ts))
         }
-        return Pagina(saldo: saldo, movimientos: movimientos, siguiente: siguiente)
+        // permisos (3-B): pueden faltar; si están, cada uno con su `expansion` bien formada (o la respuesta no vale).
+        var expansiones: [String] = []
+        switch o["permisos"] {
+        case nil, is NSNull: break
+        case let lista as [Any]:
+            for x in lista {
+                guard let p = x as? [String: Any], let e = p["expansion"] as? String,
+                      e.range(of: reExpansion, options: .regularExpression) != nil else { return nil }
+                if !expansiones.contains(e) { expansiones.append(e) }
+            }
+        default: return nil
+        }
+        return Pagina(saldo: saldo, movimientos: movimientos, siguiente: siguiente, expansiones: expansiones.sorted())
     }
     static func leer(_ texto: String) -> Pagina? { leer(Data(texto.utf8)) }
+
+    // MARK: Código de fundador (puntos.md §6.2 y §6.3)
+
+    /// Los 2 de control: SHA-256("pear-codigo/v1|" + los 18), ALFABETO[h[0] & 31] y ALFABETO[h[1] & 31].
+    static func controlCodigo(_ c18: String) -> String {
+        let h = Array(CuentaCripto.sha256(Data("pear-codigo/v1|\(c18)".utf8)))
+        return String([CuentaCripto.alfabeto[Int(h[0] & 31)], CuentaCripto.alfabeto[Int(h[1] & 31)]])
+    }
+
+    /// Lo que se escribe → la forma canónica (20, sin guiones), o nil si está mal escrito. Se lee como la clave.
+    static func leerCodigo(_ texto: String) -> String? {
+        let k = CuentaCripto.normalizarGrupo(texto)
+        guard k.count == 20, k.allSatisfy(CuentaCripto.alfabeto.contains) else { return nil }
+        return controlCodigo(String(k.prefix(18))) == String(k.suffix(2)) ? k : nil
+    }
+
+    /// XXXX-XXXX-XXXX-XXXX-XXXX.
+    static func mostrarCodigo(_ c20: String) -> String {
+        stride(from: 0, to: c20.count, by: 4).map { i in
+            let a = c20.index(c20.startIndex, offsetBy: i)
+            return String(c20[a..<c20.index(a, offsetBy: min(4, c20.count - i))])
+        }.joined(separator: "-")
+    }
+
+    /// El cuerpo exacto del canje, o nil si no es una forma canónica.
+    static func cuerpoCanje(_ c20: String) -> String? {
+        guard c20.range(of: "^[0-9A-HJKMNP-TV-Z]{20}$", options: .regularExpression) != nil else { return nil }
+        return "{\"codigo\":\"\(c20)\"}"
+    }
+
+    /// Lo que dice la casilla mientras se escribe: nada, a medias, mal escrito (20 o más que no cuadran) o bien.
+    enum Escrito: Equatable { case vacio, incompleto, malEscrito, bien }
+    static func escrito(_ texto: String) -> Escrito {
+        let k = CuentaCripto.normalizarGrupo(texto)
+        if k.isEmpty { return .vacio }
+        if leerCodigo(texto) != nil { return .bien }
+        if k.count < 20 && k.allSatisfy(CuentaCripto.alfabeto.contains) { return .incompleto }
+        return .malEscrito
+    }
+
+    /// Lo que da un canje bueno (la respuesta de `POST /v1/puntos/canjes`), o nil si no se entiende.
+    struct Canje: Equatable {
+        let pulsos: Int64
+        let expansion: String?
+        let movimiento: Movimiento
+        let saldo: Int64
+    }
+    static func leerCanje(_ datos: Data) -> Canje? {
+        guard let o = (try? JSONSerialization.jsonObject(with: datos)) as? [String: Any],
+              let c = o["canje"] as? [String: Any], let pulsos = entero(c["pulsos"]), pulsos > 0,
+              let saldo = entero(o["saldo"]), saldo >= 0, let m = o["movimiento"] else { return nil }
+        let expansion: String?
+        switch c["expansion"] {
+        case nil, is NSNull: expansion = nil
+        case let e as String where e.range(of: reExpansion, options: .regularExpression) != nil: expansion = e
+        default: return nil
+        }
+        guard let d = try? JSONSerialization.data(withJSONObject: ["saldo": saldo, "movimientos": [m], "siguiente": NSNull()]),
+              let p = leer(d), p.movimientos.count == 1 else { return nil }
+        return Canje(pulsos: pulsos, expansion: expansion, movimiento: p.movimientos[0], saldo: saldo)
+    }
 }

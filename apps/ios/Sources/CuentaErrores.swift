@@ -24,6 +24,12 @@ enum CuentaErrores {
         case "cuota_superada": return L("Tu cuenta ya ocupa el máximo (20 MB)")
         case "version_cambiada": return L("Otro dispositivo ha cambiado lo mismo a la vez. Prueba otra vez")
         case "saldo_insuficiente": return L("No te llegan los pulsos para esto")
+        // Código de fundador (puntos.md §6.3)
+        case "codigo_invalido": return L("Ese código no existe. Revisa que esté bien escrito")
+        case "codigo_caducado": return L("Ese código ya ha caducado")
+        case "codigo_usado": return L("Ese código ya lo ha usado otra cuenta")
+        case "codigo_ya_canjeado": return L("Ya canjeaste un código de fundador en esta cuenta")
+        case "codigo_mal_escrito": return L("Revisa el código: algún carácter no cuadra")
         case "version_bloque": return L("Actualiza la app para ver tu biblioteca")
         case "bloque_roto": return L("Tu biblioteca de la nube no se puede abrir")
         // Sesión y firmas

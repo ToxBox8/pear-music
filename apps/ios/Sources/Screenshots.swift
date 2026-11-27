@@ -11,7 +11,8 @@ enum Demo {
                  cuenta, cuentaCrear, cuentaClave, cuentaEntrar, cuentaComprobar, cuentaBorrar,
                  cuentaSinCrearAbierto, cuentaSeguridad, cuentaCerrarSesion, cuentaCerrarSesionUnico, cuentaTerminos,
                  cuentaQr, cuentaQrEmojis, cuentaAnadir, cuentaAnadirEmojis, cuentaConectada, cuentaSincronizado, cuentaBloqueado,
-                 cuentaPulsos, cuentaPulsosVacio, cuentaPulsosSinCuenta }
+                 cuentaPulsos, cuentaPulsosVacio, cuentaPulsosSinCuenta,
+                 cuentaCodigo, cuentaCodigoMal, cuentaCodigoCanjeado }
 
     struct Scenario {
         var theme: AppTheme = .glass
@@ -138,6 +139,13 @@ enum Demo {
         "72b_pulsos_vacio_oscuro": Scenario(appearance: "dark", tab: .settings, route: .cuentaPulsosVacio),
         "72c_pulsos_sin_cuenta": Scenario(tab: .settings, route: .cuentaPulsosSinCuenta),
         "72c_pulsos_sin_cuenta_oscuro": Scenario(appearance: "dark", tab: .settings, route: .cuentaPulsosSinCuenta),
+        // «Tengo un código» (3-B): vacío, mal escrito y ya canjeado, en claro y en oscuro (como Android).
+        "72d_codigo": Scenario(tab: .settings, route: .cuentaCodigo),
+        "72d_codigo_oscuro": Scenario(appearance: "dark", tab: .settings, route: .cuentaCodigo),
+        "72e_codigo_mal": Scenario(tab: .settings, route: .cuentaCodigoMal),
+        "72e_codigo_mal_oscuro": Scenario(appearance: "dark", tab: .settings, route: .cuentaCodigoMal),
+        "72f_codigo_canjeado": Scenario(tab: .settings, route: .cuentaCodigoCanjeado),
+        "72f_codigo_canjeado_oscuro": Scenario(appearance: "dark", tab: .settings, route: .cuentaCodigoCanjeado),
         // Sólo tests de interfaz (BibliotecaUITests): Playlists con 24 playlists más, para el desplazamiento al borde.
         "ui_muchas_playlists": Scenario(playing: false, tab: .library, route: .playlists, manyPlaylists: true),
         // Sólo tests de interfaz: la Biblioteca con «Reducir movimiento», para ver que en «Ordenar» nada tiembla.
