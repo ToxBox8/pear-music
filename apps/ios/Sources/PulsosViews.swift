@@ -330,6 +330,8 @@ struct CodigoView: View {
                 .textInputAutocapitalization(.characters).autocorrectionDisabled()
                 .accessibilityLabel(L("Tu código de fundador"))
                 .accessibilityIdentifier("campoCodigo")
+                .submitLabel(.go)
+                .onSubmit { if escrito == .bien && !canjeando { canjear() } } // Intro canjea: el teclado tapa el botón
                 .onChange(of: texto) { t in error = nil; if t.count > 40 { texto = String(t.prefix(40)) } }
         } footer: { Text(L("Da igual mayúsculas, espacios o guiones.")) }
         if let aviso = error ?? (escrito == .malEscrito ? CuentaErrores.mensaje("codigo_mal_escrito") : nil) {

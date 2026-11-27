@@ -243,7 +243,7 @@ final class CuentaUITests: XCTestCase {
     }
 
     /// «Tengo un código» (3-B): desde Pulsos (segundo nivel), «Canjear» apagado hasta que el código cuadra (acepta
-    /// minúsculas y espacios); con una errata lo dice sin red; el gesto atrás vuelve a Pulsos. Como NavegacionCuentaTest.
+    /// minúsculas y espacios); con una errata lo dice sin red; atrás vuelve a Pulsos. Como NavegacionCuentaTest.
     func testTengoUnCodigo() {
         launch("67_cuenta_conectada", ready: "Tus dispositivos") // desde Cuenta: así se va por NavCuenta de verdad
         let pulsos = id("filaPulsos")
@@ -267,8 +267,8 @@ final class CuentaUITests: XCTestCase {
         XCTAssertTrue(boton.isEnabled, "Bien escrito (en minúsculas y con espacios), «Canjear» se enciende")
         XCTAssertFalse(id("errorCodigo").exists, "sin aviso")
         shot("codigo-bien-escrito")
-        gestoAtras()
-        XCTAssertTrue(titulo("Pulsos").waitForExistence(timeout: 5), "El gesto atrás vuelve a Pulsos")
+        atras() // con el teclado abierto, el gesto desde el borde no llega a la pila (el de Cuenta ya lo prueban otros tests)
+        XCTAssertTrue(titulo("Pulsos").waitForExistence(timeout: 5), "Atrás vuelve a Pulsos")
     }
 
     /// Pulsos (3-B): con el marco Fundador lo dice en «Lo que tienes» y ya no ofrece otro código.
