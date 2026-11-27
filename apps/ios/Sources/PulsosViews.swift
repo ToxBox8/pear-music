@@ -85,12 +85,12 @@ final class PulsosEstado: ObservableObject {
         }
     }
 
-    /// Un entero en el idioma de la app («1.250», «1,250»…).
+    /// Un entero con los miles agrupados con el separador del idioma de la app («1.250», «1,250»…), también con 4
+    /// cifras: `NumberFormatter` en castellano no agrupa «1250» y Android sí, así que se agrupa a mano en las dos.
     nonisolated static func cifra(_ n: Int64) -> String {
         let f = NumberFormatter()
-        f.numberStyle = .decimal
         f.locale = Locale(identifier: I18n.current == "va" ? "ca" : I18n.current)
-        return f.string(from: NSNumber(value: n)) ?? String(n)
+        return PulsosModel.agrupar(n, separador: f.groupingSeparator ?? ".")
     }
     /// «+500» o «−300» (con el signo menos de verdad, no un guion).
     nonisolated static func cifraConSigno(_ n: Int64) -> String { (n > 0 ? "+" : "\u{2212}") + cifra(abs(n)) }

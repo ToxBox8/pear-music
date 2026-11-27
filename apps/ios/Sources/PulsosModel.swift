@@ -23,6 +23,17 @@ enum PulsosModel {
         let siguiente: String?
     }
 
+    /// «1250» → «1.250» (de 3 en 3, siempre). Igual que `Pulsos.agrupar` en Android.
+    static func agrupar(_ n: Int64, separador: String) -> String {
+        let cifras = Array(String(n.magnitude))
+        var s = ""
+        for (i, c) in cifras.enumerated() {
+            if i > 0 && (cifras.count - i) % 3 == 0 { s += separador }
+            s.append(c)
+        }
+        return (n < 0 ? "-" : "") + s
+    }
+
     // MARK: Formato (puntos.md §3 y §4)
 
     /// id_operacion: 26 caracteres Crockford base32 con los 2 bits de relleno a cero (como los ids de cuenta.md §1).

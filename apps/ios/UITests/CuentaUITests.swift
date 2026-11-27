@@ -150,6 +150,7 @@ final class CuentaUITests: XCTestCase {
         XCTAssertLessThan(id("estadoSync").frame.minY, anadir.frame.minY, "La sync va arriba")
         XCTAssertFalse(id("nombreCuenta").exists, "«Seguridad y cuenta» empieza plegado")
         shot("con-cuenta")
+        bajarHasta(id("seguridadYCuenta")) // con la fila «Pulsos» (3-A) queda bajo el borde y el Form no la crea hasta bajar
         id("seguridadYCuenta").tap()
         bajarHasta(id("borrarCuenta"))
         for fila in ["comprobarMiClave", "nombreCuenta", "quitarLosDemas", "cerrarSesion", "borrarCuenta"] {
@@ -202,6 +203,7 @@ final class CuentaUITests: XCTestCase {
         XCTAssertTrue(titulo("Lo que se sincroniza").waitForExistence(timeout: 5))
         gestoAtras()
         XCTAssertTrue(titulo("Cuenta").waitForExistence(timeout: 5), "El gesto atrás vuelve a Cuenta")
+        bajarHasta(id("seguridadYCuenta")) // con la fila «Pulsos» (3-A) queda bajo el borde y el Form no la crea hasta bajar
         id("seguridadYCuenta").tap()
         bajarHasta(id("cerrarSesion"))
         id("cerrarSesion").tap()
