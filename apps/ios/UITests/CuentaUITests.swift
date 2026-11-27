@@ -329,7 +329,7 @@ final class CuentaUITests: XCTestCase {
         aviso.buttons["Cerrar sesión"].tap()
         XCTAssertTrue(any("Tu música en todos tus dispositivos").waitForExistence(timeout: 10), "Vuelve a Cuenta, ya sin cuenta")
         XCTAssertTrue(titulo("Cuenta").exists)
-        XCTAssertTrue(any("Has cerrado sesión").exists, "Dice que la biblioteca sigue aquí")
+        XCTAssertTrue(any("Has cerrado sesión").waitForExistence(timeout: 3), "Dice que la biblioteca sigue aquí") // el aviso dura 3 s: esperarlo, no mirarlo una vez
         shot("sesion-cerrada")
         app.terminate()
         launch("70b_cuenta_cerrar_sesion_unico", ready: "Cerrar sesión en este dispositivo")

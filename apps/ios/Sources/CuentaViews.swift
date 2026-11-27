@@ -421,7 +421,7 @@ private struct EnLaCuenta: ViewModifier {
             .onDisappear { CuentaEnPantalla.shared.abiertas = Swift.max(0, CuentaEnPantalla.shared.abiertas - 1) }
     }
 }
-extension View { fileprivate func enLaCuenta() -> some View { modifier(EnLaCuenta()) } }
+extension View { func enLaCuenta() -> some View { modifier(EnLaCuenta()) } }
 
 /// Sólo capturas (56b y 67b): «Qué ganas con la cuenta» o «Seguridad y cuenta» ya abiertos y la página bajada hasta lo
 /// último (`id("fin")`), como `seguridadAbiertaCapturas` de Android.

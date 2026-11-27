@@ -128,20 +128,24 @@ final class PulsosEstado: ObservableObject {
 
 struct PulsosView: View {
     @ObservedObject private var cuenta = CuentaPear.shared
+    /// «Tengo un código» (3-B) se abre ENCIMA de Pulsos (Cuenta › Pulsos › Tengo un código, como Android): Cuenta sólo
+    /// tiene un hueco para la pantalla de encima, así que el segundo nivel lo lleva Pulsos.
+    @State private var codigo = false
     var body: some View {
         Form {
-            if cuenta.tieneCuenta { PulsosConCuenta() } else { PulsosSinCuenta() }
+            if cuenta.tieneCuenta { PulsosConCuenta(abrirCodigo: { codigo = true }) } else { PulsosSinCuenta() }
             QueSonLosPulsos()
         }
         .navigationTitle(L("Pulsos"))
         .navigationBarTitleDisplayMode(.inline)
         .themed()
+        .navigationDestination(isPresented: $codigo) { CodigoView().enLaCuenta() }
     }
 }
 
 private struct PulsosConCuenta: View {
     @ObservedObject private var pulsos = PulsosEstado.shared
-    @Environment(\.navCuenta) private var nav
+    let abrirCodigo: () -> Void
     @ScaledMetric(relativeTo: .largeTitle) private var simbolo: CGFloat = 44
 
     private var v: PulsosEstado.Vista { pulsos.vista }
@@ -191,7 +195,7 @@ private struct PulsosConCuenta: View {
             } header: { Text(L("Lo que tienes")) }
         } else if v.saldo != nil {
             Section {
-                Button { nav.ir(.codigo) } label: {
+                Button(action: abrirCodigo) {
                     Fila(titulo: L("Tengo un código"), subtitulo: L("Canjea tu código de fundador"), icono: "gift", flecha: true)
                 }
                 .accessibilityIdentifier("filaTengoCodigo")
