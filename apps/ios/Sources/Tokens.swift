@@ -61,6 +61,7 @@ enum Tokens {
         static let displayLibrary: CGFloat = 40
         static let displayScreen: CGFloat = 30
         static let displaySection: CGFloat = 24
+        static let displayBalance: CGFloat = 56
     }
     static let playlistPalettes: [[Color]] = [
         [Color(hex: 0xFF5C8C), Color(hex: 0xFA994D)],

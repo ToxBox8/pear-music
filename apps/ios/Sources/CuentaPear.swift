@@ -68,7 +68,7 @@ final class CuentaPear: ObservableObject {
         // SwiftUI construye el destino aunque no sea la ruta del escenario, y la ponía en todos.)
         if let r = Demo.current?.route, [.cuentaComprobar, .cuentaBorrar, .cuentaAnadir, .cuentaAnadirEmojis, .cuentaConectada,
                                           .cuentaSincronizado, .cuentaBloqueado, .cuentaSeguridad, .cuentaCerrarSesion,
-                                          .cuentaCerrarSesionUnico, .cuentaTerminos].contains(r) {
+                                          .cuentaCerrarSesionUnico, .cuentaTerminos, .cuentaPulsos, .cuentaPulsosVacio].contains(r) {
             estadoDePrueba(unico: r == .cuentaCerrarSesionUnico)
         }
     }
@@ -414,6 +414,7 @@ final class CuentaPear: ObservableObject {
     func olvidar(conservarSoloAqui: Bool = false) {
         for k in ["R", "D", "meta"] { Llavero.borrar(k) }
         SyncBiblioteca.shared.olvidar(conservarSoloAqui: conservarSoloAqui)
+        PulsosEstado.shared.olvidar()
         let desfase = meta.desfase
         meta = Meta()
         meta.desfase = desfase
@@ -477,6 +478,24 @@ final class CuentaPear: ObservableObject {
         return (try await json(r))["etag"] as? String ?? ""
     }
 
+    // MARK: Pulsos (puntos.md §3 y §4): sólo el transporte; leer y lo que se ve, en PulsosModel y PulsosViews
+
+    /// `GET /v1/puntos` (o `/v1/puntos/antes/{cursor}`) con el token; da los bytes tal cual para que
+    /// `PulsosModel.leer` los compruebe enteros. Un token caducado se renueva y se repite una vez. Igual que Android.
+    func pedirPulsos(_ cursor: String?) async throws -> Data {
+        try abierta()
+        guard !deMentira, meta.cuenta != nil else { throw ErrorCuenta(codigo: "sin_cuenta") }
+        return try await conToken("GET", cursor.map { "/v1/puntos/antes/\($0)" } ?? "/v1/puntos").0 // i18n: no
+    }
+
+    /// Gasta `cantidad` pulsos en `concepto` con un `idOperacion` de `PulsosModel.nuevoIdOperacion` (el mismo si se
+    /// repite tras un corte: no cobra dos veces). Firmado con D. En la 3.0 no lo usa ninguna pantalla (la tienda es la 3.1).
+    func gastarPulsos(_ idOperacion: String, _ cantidad: Int64, _ concepto: String) async throws -> [String: Any] {
+        guard !deMentira else { throw ErrorCuenta(codigo: "sin_cuenta") }
+        guard let cuerpo = PulsosModel.cuerpoGasto(idOperacion, cantidad, concepto) else { throw ErrorCuenta(codigo: "peticion_invalida") }
+        return try await json(try await firmada("POST", PulsosModel.rutaGastos, nil, crudo: Data(cuerpo.utf8), tipoCrudo: "application/json"))
+    }
+
     /// 5 min antes de `exp`, o si no hay: POST /v1/id/sesion, sin enseñar nada (lo decidió Toxbox).
     private func renovarSiHaceFalta() async throws {
         guard tokenExp - 300 <= ahora() else { return }
@@ -505,7 +524,8 @@ final class CuentaPear: ObservableObject {
     /// `crudo`: un cuerpo binario (los bloques de la sync), en vez de `cuerpo` en JSON. `extra`: más cabeceras.
     private func firmada(_ metodo: String, _ ruta: String, _ cuerpo: [String: Any]?, cuenta: String? = nil, disp: ClaveDispositivo? = nil,
                          dispId: String? = nil, cuentaFirma: Bool = false, rec: Data? = nil, conToken: Bool = true,
-                         crudo: Data? = nil, extra: [String: String] = [:], sinCuenta: Bool = false) async throws -> (Data, HTTPURLResponse) {
+                         crudo: Data? = nil, extra: [String: String] = [:], sinCuenta: Bool = false,
+                         tipoCrudo: String = "application/octet-stream") async throws -> (Data, HTTPURLResponse) {
         try abierta()
         if conToken { try await renovarSiHaceFalta() }
         guard let cuentaId = cuenta ?? meta.cuenta, let dispId = dispId ?? meta.dispositivo, let d = disp ?? ClaveDispositivo.guardada() else {
@@ -527,7 +547,7 @@ final class CuentaPear: ObservableObject {
             h.merge(extra) { _, b in b }
             do {
                 return try await pedir(metodo, ruta, cuerpo: cuerpo == nil && crudo == nil ? nil : bytes, token: conToken ? token : nil, cabeceras: h,
-                                       tipo: crudo == nil ? "application/json" : "application/octet-stream")
+                                       tipo: crudo == nil ? "application/json" : tipoCrudo)
             } catch let e as ErrorCuenta where e.codigo == "reloj_desfasado" && !repetida {
                 repetida = true // el desfase ya se ha corregido con la Date de esa respuesta: una vez más
             } catch let e as ErrorCuenta where e.codigo == "terminos_pendientes" {

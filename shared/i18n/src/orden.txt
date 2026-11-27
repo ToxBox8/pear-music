@@ -1551,3 +1551,33 @@ Si no coinciden, quita "{0}" de tu cuenta en Tus dispositivos.
 Podrá usar tu cuenta y ver tu biblioteca. Te pediremos Face ID, huella o el código del dispositivo.
 Podrá usar tu cuenta y ver tu biblioteca. Te pediremos la huella o el código del dispositivo.
 Has sincronizado muchas veces en poco rato. Lo pendiente se subirá solo dentro de un rato
+1 pulso
+Ajuste de Jiyu Pulse
+Aún no tienes pulsos
+Cargando tu saldo
+Cargando…
+Créala gratis, sin contraseña, y empieza a ganarlos.
+Cuando canjees un código o respondas una encuesta, lo verás aquí.
+Código de fundador
+Encuesta respondida
+Gastados en la tienda
+Los pulsos van con tu cuenta
+Marcos, temas y más, en una tienda que llega pronto. Gastarlos es darle de comer a la mascota: le encantan.
+Movimientos
+No se ha podido cargar
+No te llegan los pulsos para esto
+Para personalizar Jiyu Pulse
+Probar otra vez
+Pulsos
+Qué son los pulsos
+Qué son y cómo se ganan
+Respondiendo encuestas, una vez cada una, y con códigos como el de fundador. No se pueden comprar ni cambiar por dinero.
+Se ganan, nunca se compran
+Si no los gastas, no pasa nada: te esperan. La mascota nunca tiene hambre por tu culpa.
+Sin prisa
+Son tuyos
+Van con tu cuenta y no se pueden pasar a otra.
+Ver más
+pulso
+pulsos
+{0} pulsos

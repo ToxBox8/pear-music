@@ -1551,3 +1551,33 @@
 1551	It will be able to use your account and see your library. We'll ask for Face ID, your fingerprint or your device's code.
 1552	It will be able to use your account and see your library. We'll ask for your fingerprint or your device's code.
 1553	You have synced many times in a short while. What is pending will upload on its own in a while
+1554	1 pulse
+1555	Jiyu Pulse adjustment
+1556	You don't have any pulses yet
+1557	Loading your balance
+1558	Loading…
+1559	Create it for free, without a password, and start earning them.
+1560	When you redeem a code or answer a survey, you'll see it here.
+1561	Founder code
+1562	Survey answered
+1563	Spent in the shop
+1564	Pulses come with your account
+1565	Frames, themes and more, in a shop that's coming soon. Spending them feeds the mascot: it loves them.
+1566	Activity
+1567	Couldn't load
+1568	You don't have enough pulses for this
+1569	To personalise Jiyu Pulse
+1570	Try again
+1571	Pulses
+1572	What pulses are
+1573	What they are and how to earn them
+1574	By answering surveys, once each, and with codes like the founder one. They can't be bought or exchanged for money.
+1575	Earned, never bought
+1576	If you don't spend them, nothing happens: they'll wait for you. The mascot is never hungry because of you.
+1577	No rush
+1578	They're yours
+1579	They go with your account and can't be passed to another one.
+1580	See more
+1581	pulse
+1582	pulses
+1583	{0} pulses

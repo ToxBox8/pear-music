@@ -1551,3 +1551,33 @@
 1551	Poderá usar a túa conta e ver a túa biblioteca. Pedirémosche Face ID, a pegada ou o código do dispositivo.
 1552	Poderá usar a túa conta e ver a túa biblioteca. Pedirémosche a pegada ou o código do dispositivo.
 1553	Sincronizaches moitas veces en pouco tempo. O pendente subirase só dentro dun anaco
+1554	1 pulso
+1555	Axuste de Jiyu Pulse
+1556	Aínda non tes pulsos
+1557	Cargando o teu saldo
+1558	Cargando…
+1559	Créaa de balde, sen contrasinal, e comeza a gañalos.
+1560	Cando canxees un código ou respondas unha enquisa, verálo aquí.
+1561	Código de fundador
+1562	Enquisa respondida
+1563	Gastados na tenda
+1564	Os pulsos van coa túa conta
+1565	Marcos, temas e máis, nunha tenda que chega pronto. Gastalos é darlle de comer á mascota: encántanlle.
+1566	Movementos
+1567	Non se puido cargar
+1568	Non che chegan os pulsos para isto
+1569	Para personalizar Jiyu Pulse
+1570	Proba outra vez
+1571	Pulsos
+1572	Que son os pulsos
+1573	Que son e como se gañan
+1574	Respondendo enquisas, unha vez cada unha, e con códigos coma o de fundador. Non se poden mercar nin cambiar por diñeiro.
+1575	Gáñanse, nunca se mercan
+1576	Se non os gastas, non pasa nada: agárdante. A mascota nunca ten fame por culpa túa.
+1577	Sen présa
+1578	Son teus
+1579	Van coa túa conta e non se poden pasar a outra.
+1580	Ver máis
+1581	pulso
+1582	pulsos
+1583	{0} pulsos

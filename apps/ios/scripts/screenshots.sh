@@ -23,6 +23,7 @@ SCENARIOS=(
   68_cuenta_sincronizado 68_cuenta_sincronizado_oscuro 69_cuenta_bloqueado
   70_cuenta_cerrar_sesion 70_cuenta_cerrar_sesion_oscuro 70b_cuenta_cerrar_sesion_unico 70b_cuenta_cerrar_sesion_unico_oscuro
   71_cuenta_terminos_nuevos 71_cuenta_terminos_nuevos_oscuro
+  72_pulsos 72_pulsos_oscuro 72b_pulsos_vacio 72b_pulsos_vacio_oscuro 72c_pulsos_sin_cuenta 72c_pulsos_sin_cuenta_oscuro
 )
 # DEMO=1: las del tráiler v2 con el catálogo del patrocinador (Sources/DemoCatalog.swift; sólo en Debug y Jiyu Dev).
 # En castellano, como ScreenshotTest de Android: la app usa `language` (UserDefaults) o el idioma del sistema, y el

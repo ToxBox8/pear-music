@@ -1551,3 +1551,33 @@
 1551	Ĝi povos uzi vian konton kaj vidi vian bibliotekon. Ni petos Face ID, fingrospuron aŭ la kodon de la aparato.
 1552	Ĝi povos uzi vian konton kaj vidi vian bibliotekon. Ni petos fingrospuron aŭ la kodon de la aparato.
 1553	Vi sinkronigis multfoje en mallonga tempo. La atendanta parto alŝutiĝos per si mem post iom da tempo
+1554	1 pulso
+1555	Alĝustigo de Jiyu Pulse
+1556	Vi ankoraŭ ne havas pulsojn
+1557	Ŝargante vian saldon
+1558	Ŝargante…
+1559	Kreu ĝin senpage, sen pasvorto, kaj ekgajnu ilin.
+1560	Kiam vi elaĉetos kodon aŭ respondos enketon, vi vidos tion ĉi tie.
+1561	Kodo de fondinto
+1562	Enketo respondita
+1563	Elspezitaj en la butiko
+1564	Pulsoj iras kun via konto
+1565	Kadroj, etosoj kaj pli, en butiko kiu baldaŭ venos. Elspezi ilin estas nutri la maskoton: ĝi adoras ilin.
+1566	Movoj
+1567	Ne eblis ŝargi
+1568	Viaj pulsoj ne sufiĉas por tio
+1569	Por personigi Jiyu Pulse
+1570	Provu denove
+1571	Pulsoj
+1572	Kio estas pulsoj
+1573	Kio ili estas kaj kiel gajni ilin
+1574	Respondante enketojn, unufoje ĉiun, kaj per kodoj kiel la fondinta. Oni ne povas aĉeti ilin nek interŝanĝi kontraŭ mono.
+1575	Gajnataj, neniam aĉetataj
+1576	Se vi ne elspezas ilin, nenio okazas: ili atendas vin. La maskoto neniam malsatas pro vi.
+1577	Sen hasto
+1578	Ili estas viaj
+1579	Ili iras kun via konto kaj ne povas pasi al alia.
+1580	Vidi pli
+1581	pulso
+1582	pulsoj
+1583	{0} pulsoj

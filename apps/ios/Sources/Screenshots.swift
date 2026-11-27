@@ -10,7 +10,8 @@ enum Demo {
     enum Route { case favorites, themePicker, artist, downloads, playlists, folder, artists, manage, badges,
                  cuenta, cuentaCrear, cuentaClave, cuentaEntrar, cuentaComprobar, cuentaBorrar,
                  cuentaSinCrearAbierto, cuentaSeguridad, cuentaCerrarSesion, cuentaCerrarSesionUnico, cuentaTerminos,
-                 cuentaQr, cuentaQrEmojis, cuentaAnadir, cuentaAnadirEmojis, cuentaConectada, cuentaSincronizado, cuentaBloqueado }
+                 cuentaQr, cuentaQrEmojis, cuentaAnadir, cuentaAnadirEmojis, cuentaConectada, cuentaSincronizado, cuentaBloqueado,
+                 cuentaPulsos, cuentaPulsosVacio, cuentaPulsosSinCuenta }
 
     struct Scenario {
         var theme: AppTheme = .glass
@@ -130,6 +131,13 @@ enum Demo {
         "70b_cuenta_cerrar_sesion_unico_oscuro": Scenario(appearance: "dark", tab: .settings, route: .cuentaCerrarSesionUnico),
         "71_cuenta_terminos_nuevos": Scenario(tab: .settings, route: .cuentaTerminos),
         "71_cuenta_terminos_nuevos_oscuro": Scenario(appearance: "dark", tab: .settings, route: .cuentaTerminos),
+        // Pulsos (bloque 3, 3-A): con saldo e historial, sin movimientos y sin cuenta, en claro y en oscuro (como Android).
+        "72_pulsos": Scenario(tab: .settings, route: .cuentaPulsos),
+        "72_pulsos_oscuro": Scenario(appearance: "dark", tab: .settings, route: .cuentaPulsos),
+        "72b_pulsos_vacio": Scenario(tab: .settings, route: .cuentaPulsosVacio),
+        "72b_pulsos_vacio_oscuro": Scenario(appearance: "dark", tab: .settings, route: .cuentaPulsosVacio),
+        "72c_pulsos_sin_cuenta": Scenario(tab: .settings, route: .cuentaPulsosSinCuenta),
+        "72c_pulsos_sin_cuenta_oscuro": Scenario(appearance: "dark", tab: .settings, route: .cuentaPulsosSinCuenta),
         // Sólo tests de interfaz (BibliotecaUITests): Playlists con 24 playlists más, para el desplazamiento al borde.
         "ui_muchas_playlists": Scenario(playing: false, tab: .library, route: .playlists, manyPlaylists: true),
         // Sólo tests de interfaz: la Biblioteca con «Reducir movimiento», para ver que en «Ordenar» nada tiembla.

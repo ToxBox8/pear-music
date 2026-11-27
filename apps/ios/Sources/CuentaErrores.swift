@@ -23,6 +23,7 @@ enum CuentaErrores {
         case "demasiado_grande": return L("Es demasiado grande para enviarlo")
         case "cuota_superada": return L("Tu cuenta ya ocupa el máximo (20 MB)")
         case "version_cambiada": return L("Otro dispositivo ha cambiado lo mismo a la vez. Prueba otra vez")
+        case "saldo_insuficiente": return L("No te llegan los pulsos para esto")
         case "version_bloque": return L("Actualiza la app para ver tu biblioteca")
         case "bloque_roto": return L("Tu biblioteca de la nube no se puede abrir")
         // Sesión y firmas

@@ -12,7 +12,7 @@ tabla = tabla.components(separatedBy: "\n## ")[0]
 let re = try NSRegularExpression(pattern: "^\\| `([a-z_]+)` \\|", options: .anchorsMatchLines)
 let codigos = re.matches(in: tabla, range: NSRange(tabla.startIndex..., in: tabla))
     .map { String(tabla[Range($0.range(at: 1), in: tabla)!]) }.filter { $0 != "codigo" }
-comprobar(codigos.count == 24, "la tabla de §7.1 tiene 24 códigos (salen \(codigos.count))")
+comprobar(codigos.count == 25, "la tabla de §7.1 tiene 25 códigos (salen \(codigos.count))")
 let desconocido = CuentaErrores.mensaje("codigo_que_no_existe").components(separatedBy: "(")[0]
 for c in codigos {
     let m = CuentaErrores.mensaje(c)

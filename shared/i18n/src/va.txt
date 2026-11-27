@@ -1551,3 +1551,33 @@
 1551	Podrà usar el teu compte i vore la teua biblioteca. Et demanarem Face ID, l'empremta o el codi del dispositiu.
 1552	Podrà usar el teu compte i vore la teua biblioteca. Et demanarem l'empremta o el codi del dispositiu.
 1553	Has sincronitzat moltes voltes en poc de temps. El que està pendent es pujarà a soles d'ací a una estona
+1554	1 pols
+1555	Ajust de Jiyu Pulse
+1556	Encara no tens polsos
+1557	Carregant el teu saldo
+1558	Carregant…
+1559	Crea'l de franc, sense contrasenya, i comença a guanyar-ne.
+1560	Quan bescanvies un codi o respongues una enquesta, ho voràs ací.
+1561	Codi de fundador
+1562	Enquesta resposta
+1563	Gastats en la botiga
+1564	Els polsos van amb el teu compte
+1565	Marcs, temes i més, en una botiga que arriba prompte. Gastar-los és donar de menjar a la mascota: li encanten.
+1566	Moviments
+1567	No s'ha pogut carregar
+1568	No t'arriben els polsos per a això
+1569	Per a personalitzar Jiyu Pulse
+1570	Torna-ho a provar
+1571	Polsos
+1572	Què són els polsos
+1573	Què són i com es guanyen
+1574	Responent enquestes, una vegada cadascuna, i amb codis com el de fundador. No es poden comprar ni canviar per diners.
+1575	Es guanyen, mai es compren
+1576	Si no els gastes, no passa res: t'esperen. La mascota mai té fam per culpa teua.
+1577	Sense pressa
+1578	Són teus
+1579	Van amb el teu compte i no es poden passar a un altre.
+1580	Mostra'n més
+1581	pols
+1582	polsos
+1583	{0} polsos

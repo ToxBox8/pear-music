@@ -32,7 +32,7 @@ private struct Cabecera: View {
 }
 
 /// Error o éxito: icono en color + texto en `label` (el color nunca es la única pista).
-private struct Estado: View {
+struct Estado: View {
     let ok: Bool, texto: String
     var body: some View {
         Label { Text(texto) } icon: {
@@ -384,7 +384,7 @@ private extension String { var nilSiVacio: String? { isEmpty ? nil : self } }
 /// `version 3/ESTADO.md` y DECISIONS 101. El título de cada una es la fila que la abre. Igual que `PantallaCuenta` en
 /// Android.
 enum PantallaCuenta: Hashable {
-    case crear, clave, entrar, qrNuevo, anadirMovil, sincronizado, comprobar, cerrarSesion, borrar, terminos
+    case crear, clave, entrar, qrNuevo, anadirMovil, sincronizado, comprobar, cerrarSesion, borrar, terminos, pulsos
 }
 
 /// Cómo se va de Cuenta a una de sus pantallas. `ir` la abre encima de Cuenta (la flecha y el gesto atrás vuelven a
@@ -501,6 +501,7 @@ struct CuentaPantalla: View {
             case .cerrarSesion: CerrarSesionView()
             case .borrar: BorrarCuentaView()
             case .terminos: TerminosNuevosView()
+            case .pulsos: PulsosView()
             }
         }
         .claveOculta(pantalla.conClave)
@@ -540,10 +541,12 @@ extension View { fileprivate func claveOculta(_ si: Bool) -> some View { modifie
 /// Una fila de la cuenta: icono, título, la frase de debajo y, a la derecha, el valor, «⋯» (abre un menú) o la flecha
 /// (abre una pantalla). Colores del sistema explícitos: dentro de un botón, `.primary` saldría con el tinte (shu) y la
 /// pantalla tendría varios (COLOR.md). Igual que `FormRow` en Android.
-private struct Fila: View {
+struct Fila: View {
     let titulo: String
     var subtitulo: String? = nil
     var icono: String? = nil
+    /// El símbolo de los pulsos en vez de un SF Symbol (los dos arcos del logo: no hay símbolo del sistema igual).
+    var pulsos = false
     var valor: String? = nil
     var rojo = false
     var flecha = false
@@ -553,6 +556,8 @@ private struct Fila: View {
             if let icono {
                 Image(systemName: icono).font(.body).frame(width: 28)
                     .foregroundStyle(rojo ? Color.red : Color(uiColor: .label)).accessibilityHidden(true)
+            } else if pulsos {
+                SimboloPulsos(lado: 20).foregroundStyle(Color(uiColor: .label)).frame(width: 28).accessibilityHidden(true)
             }
             VStack(alignment: .leading, spacing: 2) {
                 Text(titulo).foregroundStyle(rojo ? Color.red : Color(uiColor: .label))
@@ -622,6 +627,11 @@ private struct CuentaSinCrear: View {
                 }
                 .accessibilityIdentifier("entrarConClave")
             } header: { Text(L("¿Ya tienes cuenta en otro dispositivo?")) }
+            // Pulsos (3-A): qué son, aunque aún no haya cuenta (la pantalla ofrece crearla).
+            Section {
+                Button { nav.ir(.pulsos) } label: { Fila(titulo: L("Pulsos"), subtitulo: L("Qué son y cómo se ganan"), pulsos: true, flecha: true) }
+                    .accessibilityIdentifier("filaPulsos")
+            }
             // Plegado: por qué crearla (los mismos puntos que AccountPitch de la guía inicial). El `DisclosureGroup` dice
             // a VoiceOver si está abierto, como `FoldRow` en Android.
             Section {
@@ -812,6 +822,7 @@ private struct CuentaConectada: View {
     private var letraGrande: Bool { tamanoLetra >= .xxxLarge }
     @ObservedObject private var cuenta = CuentaPear.shared
     @ObservedObject private var sync = SyncBiblioteca.shared
+    @ObservedObject private var pulsos = PulsosEstado.shared
     @AppStorage("accountName") private var nombreCuenta = ""
     @State private var error: String?
     @State private var abierto = CuentaCapturas.seguridad
@@ -929,6 +940,15 @@ private struct CuentaConectada: View {
                 Button { nav.ir(.sincronizado) } label: { Fila(titulo: L("Lo que se sincroniza"), icono: "checklist", flecha: true) }
                     .accessibilityIdentifier("loQueSeSincroniza")
             } footer: { Text(L("Tu biblioteca viaja cifrada: el servidor no puede leerla.")) }
+
+            // 3b. Pulsos (3-A): la fila dice el saldo en cuanto se sabe (se pide al abrir Cuenta; si falla, sin valor).
+            Section {
+                Button { nav.ir(.pulsos) } label: {
+                    Fila(titulo: L("Pulsos"), pulsos: true, valor: pulsos.vista.saldo.map(PulsosEstado.cifra), flecha: true)
+                }
+                .accessibilityIdentifier("filaPulsos")
+            }
+            .task { await pulsos.cargar() }
 
             // 4. Plegado: la clave, el nombre, los términos, quitar los demás, cerrar sesión y borrar. Como «Avanzado».
             Section {

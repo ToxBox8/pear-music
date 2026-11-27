@@ -1551,3 +1551,33 @@
 1551	Vai poder usar a tua conta e ver a tua biblioteca. Vamos pedir o Face ID, a impressão digital ou o código do dispositivo.
 1552	Vai poder usar a tua conta e ver a tua biblioteca. Vamos pedir a impressão digital ou o código do dispositivo.
 1553	Sincronizaste muitas vezes em pouco tempo. O que está pendente vai ser enviado sozinho daqui a pouco
+1554	1 pulso
+1555	Ajuste do Jiyu Pulse
+1556	Ainda não tens pulsos
+1557	A carregar o teu saldo
+1558	A carregar…
+1559	Cria-a grátis, sem palavra-passe, e começa a ganhá-los.
+1560	Quando trocares um código ou responderes a um inquérito, vais vê-lo aqui.
+1561	Código de fundador
+1562	Inquérito respondido
+1563	Gastos na loja
+1564	Os pulsos vão com a tua conta
+1565	Molduras, temas e mais, numa loja que chega em breve. Gastá-los é dar de comer à mascote: adora-os.
+1566	Movimentos
+1567	Não foi possível carregar
+1568	Os teus pulsos não chegam para isto
+1569	Para personalizar o Jiyu Pulse
+1570	Tentar outra vez
+1571	Pulsos
+1572	O que são os pulsos
+1573	O que são e como se ganham
+1574	Respondendo a inquéritos, uma vez cada um, e com códigos como o de fundador. Não se podem comprar nem trocar por dinheiro.
+1575	Ganham-se, nunca se compram
+1576	Se não os gastares, não acontece nada: esperam por ti. A mascote nunca tem fome por tua culpa.
+1577	Sem pressa
+1578	São teus
+1579	Vão com a tua conta e não se podem passar para outra.
+1580	Ver mais
+1581	pulso
+1582	pulsos
+1583	{0} pulsos

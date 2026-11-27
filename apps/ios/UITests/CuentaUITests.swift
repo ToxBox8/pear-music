@@ -210,6 +210,51 @@ final class CuentaUITests: XCTestCase {
         XCTAssertTrue(titulo("Cuenta").waitForExistence(timeout: 5))
     }
 
+    /// Pulsos (3-A): con cuenta, la fila de Cuenta dice el saldo, la pantalla lo enseña (y a VoiceOver) y el gesto
+    /// atrás vuelve a Cuenta. Como `NavegacionCuentaTest` de Android.
+    func testPulsosConCuenta() {
+        launch("67_cuenta_conectada", ready: "Tus dispositivos")
+        let fila = id("filaPulsos")
+        bajarHasta(fila)
+        XCTAssertTrue(fila.waitForExistence(timeout: 5), "Cuenta tiene la fila «Pulsos»")
+        XCTAssertTrue(any("1.250").exists, "La fila dice el saldo")
+        fila.tap()
+        XCTAssertTrue(titulo("Pulsos").waitForExistence(timeout: 5), "Abre «Pulsos» con su título")
+        let saldo = id("saldoPulsos")
+        XCTAssertTrue(saldo.waitForExistence(timeout: 5))
+        XCTAssertEqual(saldo.label, "1.250 pulsos", "El saldo, para VoiceOver")
+        XCTAssertTrue(any("Aún no tienes pulsos").exists, "Sin movimientos, lo dice")
+        shot("pulsos-desde-cuenta")
+        gestoAtras()
+        XCTAssertTrue(titulo("Cuenta").waitForExistence(timeout: 5), "El gesto atrás vuelve a Cuenta")
+    }
+
+    /// Pulsos (3-A): el historial con su texto por motivo, el signo de cada cantidad y «Qué son los pulsos».
+    func testPulsosHistorial() {
+        launch("72_pulsos", ready: "Movimientos")
+        for t in ["Código de fundador", "Encuesta respondida", "Gastados en la tienda", "+500", "\u{2212}300"] {
+            XCTAssertTrue(any(t).exists, "En el historial falta «\(t)»")
+        }
+        bajarHasta(any("Son tuyos"))
+        XCTAssertTrue(any("Se ganan, nunca se compran").exists && any("Son tuyos").exists, "«Qué son los pulsos», entero")
+        shot("pulsos-historial")
+    }
+
+    /// Pulsos (3-A): sin cuenta, explica qué son y «Crear cuenta» la sustituye (atrás vuelve a Cuenta, no a Pulsos).
+    func testPulsosSinCuentaOfreceCrearla() {
+        launch("56_cuenta_sin_crear", ready: "Tu música en todos tus dispositivos")
+        let fila = id("filaPulsos")
+        bajarHasta(fila)
+        fila.tap()
+        XCTAssertTrue(titulo("Pulsos").waitForExistence(timeout: 5), "Abre «Pulsos»")
+        XCTAssertTrue(any("Los pulsos van con tu cuenta").exists, "Explica que van con la cuenta")
+        id("crearCuentaPulsos").tap()
+        XCTAssertTrue(titulo("Crear cuenta").waitForExistence(timeout: 5), "«Crear cuenta» sustituye a Pulsos")
+        atras()
+        XCTAssertTrue(titulo("Cuenta").waitForExistence(timeout: 5), "Atrás vuelve a Cuenta")
+        XCTAssertFalse(titulo("Pulsos").exists)
+    }
+
     /// Notas de la opción A #2: «Tu clave de recuperación» sustituye a «Crear cuenta»: atrás vuelve a Cuenta.
     func testTuClaveSustituyeACrearCuenta() {
         launch("56_cuenta_sin_crear", ready: "Tu música en todos tus dispositivos")

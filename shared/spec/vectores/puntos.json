@@ -1,0 +1,224 @@
+{
+  "aviso": "Bloque 3, 3-A (27-11-2026): docs/spec/puntos.md. Generado por tools/spec/generar-puntos.mjs. Las firmas P-256 cambian en cada ejecución (k aleatorio): sólo se comprueba que verifican.",
+  "descripcion": "Gasto de pulsos (puntos.md §4): cuerpo exacto, id_operacion y la petición firmada con D (cuenta.md §5.2); cómo leen las apps GET /v1/puntos (§3).",
+  "entrada": {
+    "account_id": "1X99P4D412HRCSNX9XJZYP85GR",
+    "device_id": "WR85D13CWP6P3DAEZ6QB9H13HR",
+    "pub_disp_hex": "04bfb8e616f360ff23b9adfc7146da7c46715ef3d87372784b8465e4341479e4d49591084c09b30c7e6bd0e635aa932fc9badb359e4c40673946a9a0a9a29e628c",
+    "ts": 1763400000,
+    "nonce": "H2kvYmAwnx28Qui5Hc_Y2g",
+    "id_operacion": "GF5H5PQYAWF01C0HX748V5JZMM",
+    "cantidad": 300,
+    "concepto": "marco-neon"
+  },
+  "gasto": {
+    "metodo": "POST",
+    "ruta": "/v1/puntos/gastos",
+    "cuerpo": "{\"id_operacion\":\"GF5H5PQYAWF01C0HX748V5JZMM\",\"cantidad\":300,\"concepto\":\"marco-neon\"}",
+    "cuerpo_hex": "7b2269645f6f7065726163696f6e223a22474635483550515941574630314330485837343856354a5a4d4d222c2263616e7469646164223a3330302c22636f6e636570746f223a226d6172636f2d6e656f6e227d",
+    "hash_cuerpo": "nKhnFjEzYyIlFaBv5Ejnkus01G8r_DpBa0fInk47Xo0",
+    "cadena": "pear-req/v1|POST|/v1/puntos/gastos|1X99P4D412HRCSNX9XJZYP85GR|WR85D13CWP6P3DAEZ6QB9H13HR|1763400000|H2kvYmAwnx28Qui5Hc_Y2g|nKhnFjEzYyIlFaBv5Ejnkus01G8r_DpBa0fInk47Xo0",
+    "firma_disp_hex": "3d47a74f53d935362f49e6a30d1f0a65f8b0cca5897ed0c172db7bbabc32302e27e50b25d107fcefed36e4c81783f909e88d7151fd4750d6339d0872524ef02d"
+  },
+  "ids_operacion": {
+    "validos": [
+      "GF5H5PQYAWF01C0HX748V5JZMM",
+      "00000000000000000000000000",
+      "ZZZZZZZZZZZZZZZZZZZZZZZZZW"
+    ],
+    "invalidos": [
+      {
+        "nombre": "minúsculas",
+        "texto": "gf5h5pqyawf01c0hx748v5jzmm"
+      },
+      {
+        "nombre": "25 caracteres",
+        "texto": "GF5H5PQYAWF01C0HX748V5JZM"
+      },
+      {
+        "nombre": "con la letra O",
+        "texto": "OF5H5PQYAWF01C0HX748V5JZMM"
+      },
+      {
+        "nombre": "bits de relleno a 1",
+        "texto": "GF5H5PQYAWF01C0HX748V5JZMZ"
+      },
+      {
+        "nombre": "vacío",
+        "texto": ""
+      }
+    ]
+  },
+  "cuerpos_invalidos": [
+    {
+      "nombre": "cantidad 0",
+      "id_operacion": "GF5H5PQYAWF01C0HX748V5JZMM",
+      "cantidad": 0,
+      "concepto": "marco-neon"
+    },
+    {
+      "nombre": "cantidad negativa",
+      "id_operacion": "GF5H5PQYAWF01C0HX748V5JZMM",
+      "cantidad": -5,
+      "concepto": "marco-neon"
+    },
+    {
+      "nombre": "más de 1.000.000",
+      "id_operacion": "GF5H5PQYAWF01C0HX748V5JZMM",
+      "cantidad": 1000001,
+      "concepto": "marco-neon"
+    },
+    {
+      "nombre": "concepto con mayúsculas",
+      "id_operacion": "GF5H5PQYAWF01C0HX748V5JZMM",
+      "cantidad": 300,
+      "concepto": "Marco"
+    },
+    {
+      "nombre": "concepto con espacio",
+      "id_operacion": "GF5H5PQYAWF01C0HX748V5JZMM",
+      "cantidad": 300,
+      "concepto": "marco neon"
+    },
+    {
+      "nombre": "concepto de 41",
+      "id_operacion": "GF5H5PQYAWF01C0HX748V5JZMM",
+      "cantidad": 300,
+      "concepto": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "nombre": "concepto vacío",
+      "id_operacion": "GF5H5PQYAWF01C0HX748V5JZMM",
+      "cantidad": 300,
+      "concepto": ""
+    },
+    {
+      "nombre": "id_operacion mal",
+      "id_operacion": "hola",
+      "cantidad": 300,
+      "concepto": "marco-neon"
+    }
+  ],
+  "debe_fallar": [
+    {
+      "nombre": "otra cantidad en el cuerpo (la firma era de 300)",
+      "pub_hex": "04bfb8e616f360ff23b9adfc7146da7c46715ef3d87372784b8465e4341479e4d49591084c09b30c7e6bd0e635aa932fc9badb359e4c40673946a9a0a9a29e628c",
+      "cadena": "pear-req/v1|POST|/v1/puntos/gastos|1X99P4D412HRCSNX9XJZYP85GR|WR85D13CWP6P3DAEZ6QB9H13HR|1763400000|H2kvYmAwnx28Qui5Hc_Y2g|fZehKZt2K4EO6h9OfgVGE6ljqEo1il6v4Hf1YNfo2qs",
+      "firma_hex": "3d47a74f53d935362f49e6a30d1f0a65f8b0cca5897ed0c172db7bbabc32302e27e50b25d107fcefed36e4c81783f909e88d7151fd4750d6339d0872524ef02d"
+    },
+    {
+      "nombre": "firma de otro dispositivo",
+      "pub_hex": "04bfb8e616f360ff23b9adfc7146da7c46715ef3d87372784b8465e4341479e4d49591084c09b30c7e6bd0e635aa932fc9badb359e4c40673946a9a0a9a29e628c",
+      "cadena": "pear-req/v1|POST|/v1/puntos/gastos|1X99P4D412HRCSNX9XJZYP85GR|WR85D13CWP6P3DAEZ6QB9H13HR|1763400000|H2kvYmAwnx28Qui5Hc_Y2g|nKhnFjEzYyIlFaBv5Ejnkus01G8r_DpBa0fInk47Xo0",
+      "firma_hex": "b6a4f17cb846299192ead0419cb3ef659cc95dfce6ea4b5ae004d07355ab4fe28c03c189159e2f8b70cfda78137584e5acf1b54a9feb6eef728ea9bc5c9101ff"
+    }
+  ],
+  "respuestas": [
+    {
+      "nombre": "saldo y dos movimientos (gasto y fundador)",
+      "texto": "{\"saldo\":200,\"movimientos\":[{\"id\":\"JA87XXWD13NQJ7QE7HYRDV97QR\",\"cantidad\":-300,\"motivo\":\"gasto\",\"ref\":\"marco-neon\",\"saldo_tras\":200,\"ts\":1763400100},{\"id\":\"90CGJSJSD2CKMNTM4VZD9S56H4\",\"cantidad\":500,\"motivo\":\"fundador\",\"ref\":null,\"saldo_tras\":500,\"ts\":1763300000}],\"siguiente\":null}",
+      "esperado": {
+        "saldo": 200,
+        "movimientos": [
+          {
+            "id": "JA87XXWD13NQJ7QE7HYRDV97QR",
+            "cantidad": -300,
+            "motivo": "gasto",
+            "ref": "marco-neon",
+            "saldo_tras": 200,
+            "ts": 1763400100
+          },
+          {
+            "id": "90CGJSJSD2CKMNTM4VZD9S56H4",
+            "cantidad": 500,
+            "motivo": "fundador",
+            "ref": null,
+            "saldo_tras": 500,
+            "ts": 1763300000
+          }
+        ],
+        "siguiente": null
+      }
+    },
+    {
+      "nombre": "sin movimientos",
+      "texto": "{\"saldo\":0,\"movimientos\":[],\"siguiente\":null}",
+      "esperado": {
+        "saldo": 0,
+        "movimientos": [],
+        "siguiente": null
+      }
+    },
+    {
+      "nombre": "con más páginas",
+      "texto": "{\"saldo\":200,\"movimientos\":[{\"id\":\"JA87XXWD13NQJ7QE7HYRDV97QR\",\"cantidad\":-300,\"motivo\":\"gasto\",\"ref\":\"marco-neon\",\"saldo_tras\":200,\"ts\":1763400100}],\"siguiente\":\"1763400100-JA87XXWD13NQJ7QE7HYRDV97QR\"}",
+      "esperado": {
+        "saldo": 200,
+        "movimientos": [
+          {
+            "id": "JA87XXWD13NQJ7QE7HYRDV97QR",
+            "cantidad": -300,
+            "motivo": "gasto",
+            "ref": "marco-neon",
+            "saldo_tras": 200,
+            "ts": 1763400100
+          }
+        ],
+        "siguiente": "1763400100-JA87XXWD13NQJ7QE7HYRDV97QR"
+      }
+    },
+    {
+      "nombre": "campos que no conoce: se ignoran; motivo que no conoce: «ajuste»",
+      "texto": "{\"saldo\":10,\"nuevo\":1,\"movimientos\":[{\"id\":\"6A3ACQXKAVCEHAJPYA58KXF0RG\",\"cantidad\":10,\"motivo\":\"regalo-futuro\",\"ref\":\"x\",\"saldo_tras\":10,\"ts\":1,\"color\":\"rojo\"}],\"siguiente\":null}",
+      "esperado": {
+        "saldo": 10,
+        "movimientos": [
+          {
+            "id": "6A3ACQXKAVCEHAJPYA58KXF0RG",
+            "cantidad": 10,
+            "motivo": "ajuste",
+            "ref": "x",
+            "saldo_tras": 10,
+            "ts": 1
+          }
+        ],
+        "siguiente": null
+      }
+    },
+    {
+      "nombre": "saldo negativo",
+      "texto": "{\"saldo\":-1,\"movimientos\":[],\"siguiente\":null}",
+      "esperado": null
+    },
+    {
+      "nombre": "saldo con decimales",
+      "texto": "{\"saldo\":1.5,\"movimientos\":[],\"siguiente\":null}",
+      "esperado": null
+    },
+    {
+      "nombre": "saldo como texto",
+      "texto": "{\"saldo\":\"10\",\"movimientos\":[],\"siguiente\":null}",
+      "esperado": null
+    },
+    {
+      "nombre": "movimiento de 0 pulsos",
+      "texto": "{\"saldo\":0,\"movimientos\":[{\"id\":\"6A3ACQXKAVCEHAJPYA58KXF0RG\",\"cantidad\":0,\"motivo\":\"ajuste\",\"ref\":null,\"saldo_tras\":0,\"ts\":1}],\"siguiente\":null}",
+      "esperado": null
+    },
+    {
+      "nombre": "saldo_tras negativo",
+      "texto": "{\"saldo\":0,\"movimientos\":[{\"id\":\"6A3ACQXKAVCEHAJPYA58KXF0RG\",\"cantidad\":-5,\"motivo\":\"gasto\",\"ref\":\"x\",\"saldo_tras\":-5,\"ts\":1}],\"siguiente\":null}",
+      "esperado": null
+    },
+    {
+      "nombre": "siguiente mal formado",
+      "texto": "{\"saldo\":0,\"movimientos\":[],\"siguiente\":\"mañana\"}",
+      "esperado": null
+    },
+    {
+      "nombre": "no es JSON",
+      "texto": "<html>",
+      "esperado": null
+    }
+  ]
+}

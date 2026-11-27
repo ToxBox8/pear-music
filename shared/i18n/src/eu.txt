@@ -1551,3 +1551,33 @@
 1551	Zure kontua erabili eta zure liburutegia ikusi ahal izango du. Face ID, hatz-marka edo gailuaren kodea eskatuko dizugu.
 1552	Zure kontua erabili eta zure liburutegia ikusi ahal izango du. Hatz-marka edo gailuaren kodea eskatuko dizugu.
 1553	Denbora gutxian askotan sinkronizatu duzu. Zain dagoena bere kabuz igoko da handik gutxira
+1554	Pultsu 1
+1555	Jiyu Pulseren doikuntza
+1556	Oraindik ez duzu pultsurik
+1557	Zure saldoa kargatzen
+1558	Kargatzen…
+1559	Sortu doan, pasahitzik gabe, eta hasi irabazten.
+1560	Kode bat trukatzen duzunean edo inkesta bati erantzuten diozunean, hemen ikusiko duzu.
+1561	Sortzaile-kodea
+1562	Inkesta erantzunda
+1563	Dendan gastatuak
+1564	Pultsuak zure kontuarekin doaz
+1565	Markoak, gaiak eta gehiago, laster iritsiko den denda batean. Gastatzea maskotari jaten ematea da: zoratzen da haiekin.
+1566	Mugimenduak
+1567	Ezin izan da kargatu
+1568	Ez zaizkizu pultsuak iristen honetarako
+1569	Jiyu Pulse pertsonalizatzeko
+1570	Saiatu berriro
+1571	Pultsuak
+1572	Zer dira pultsuak
+1573	Zer diren eta nola irabazten diren
+1574	Inkestei erantzunez, bakoitza behin, eta sortzailearena bezalako kodeekin. Ezin dira erosi ezta diruaren truke aldatu ere.
+1575	Irabazi egiten dira, ez dira inoiz erosten
+1576	Gastatzen ez badituzu, ez da ezer gertatzen: zain izango dituzu. Maskotak ez du inoiz gosea zure errua dela eta.
+1577	Presarik gabe
+1578	Zureak dira
+1579	Zure kontuarekin doaz eta ezin zaizkio beste bati pasatu.
+1580	Ikusi gehiago
+1581	pultsu
+1582	pultsu
+1583	{0} pultsu

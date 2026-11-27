@@ -216,7 +216,10 @@ struct SettingsView: View {
             .demoRoute(.cuentaSincronizado) { CuentaPantalla(.sincronizado) }
             .demoRoute(.cuentaConectada) {
                 // La fila de la sincronización siempre igual en la captura 67: «Sincronizado hace 2 min» (como Android).
-                CuentaView().onAppear { SyncBiblioteca.shared.vistaDePrueba(VistaSync(ultimaOk: Date().timeIntervalSince1970 * 1000 - 120_000)) }
+                CuentaView().onAppear {
+                    SyncBiblioteca.shared.vistaDePrueba(VistaSync(ultimaOk: Date().timeIntervalSince1970 * 1000 - 120_000))
+                    PulsosEstado.shared.vistaDePrueba(.init(saldo: 1250)) // la fila «Pulsos» con su saldo, como Android
+                }
             }
             .demoRoute(.cuentaBloqueado) {
                 // Modo fútbol (Pulir 2 #2), como la captura 69 de Android.
@@ -236,6 +239,10 @@ struct SettingsView: View {
             .demoRoute(.cuentaCerrarSesion) { CuentaPantalla(.cerrarSesion) }
             .demoRoute(.cuentaCerrarSesionUnico) { CuentaPantalla(.cerrarSesion) }
             .demoRoute(.cuentaTerminos) { CuentaPantalla(.terminos) }
+            // Pulsos (3-A), como ScreenshotTest.pulsos* de Android: la vista fija antes de abrir (no se pide a la red).
+            .demoRoute(.cuentaPulsos) { CuentaPantalla(.pulsos).onAppear { PulsosEstado.shared.vistaDePrueba(PulsosEstado.ejemplo) } }
+            .demoRoute(.cuentaPulsosVacio) { CuentaPantalla(.pulsos).onAppear { PulsosEstado.shared.vistaDePrueba(.init(saldo: 0)) } }
+            .demoRoute(.cuentaPulsosSinCuenta) { CuentaPantalla(.pulsos) }
             .demoRoute(.cuentaQr) { QrNuevoView(prueba: .qr) }
             .demoRoute(.cuentaQrEmojis) { QrNuevoView(prueba: .emojis) }
             .demoRoute(.cuentaAnadir) { AnadirMovilView(prueba: .confirmar) }
