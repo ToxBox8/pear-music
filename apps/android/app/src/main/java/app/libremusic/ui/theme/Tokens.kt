@@ -64,6 +64,7 @@ object Tokens {
         const val DisplayLibrary = 40f
         const val DisplayScreen = 30f
         const val DisplaySection = 24f
+        const val DisplayBalance = 56f
     }
     object SysLight {
         val Background = Color(0xFFFFFFFF)
